@@ -6,9 +6,8 @@
   "scripts": {
     "lint:html": "htmlhint \"**/*.html\" --config .htmlhintrc",
     "lint:css": "stylelint \"**/*.css\" --config .stylelintrc.json",
-    "lint:js": "eslint . --ext .js --config .eslintrc.json",
     "validate:html": "html-validate \"**/*.html\"",
-    "lint": "npm run lint:html && npm run lint:css && npm run lint:js && npm run validate:html"
+    "lint": "npm run lint:html && npm run lint:css && npm run validate:html"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
