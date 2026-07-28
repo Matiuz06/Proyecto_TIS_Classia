@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cambiar Contraseña</title>
+</head>
+<body style="font-family: sans-serif; background: #f0f0f0; padding: 40px;">
+
+  <!-- TARJETA CENTRADA -->
+  <div style="background: white; padding: 25px; width: 320px; margin: 0 auto; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
+
+    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140">
+    <h3>Cambiar Contraseña</h3>
+
+    <form action="/cambiar_contra" method="POST" style="text-align: left;">
+      
+      <p>
+        <label for="cont1">Contraseña actual:*</label><br>
+        <input type="password" id="cont1" name="contrasena_actual" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <p>
+        <label for="cont2">Nueva contraseña:*</label><br>
+        <input type="password" id="cont2" name="contrasena_nueva" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <p>
+        <label for="cont3">Confirmar nueva contraseña:*</label><br>
+        <input type="password" id="cont3" name="contrasena_confirmar" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <button type="submit" style="width: 100%; padding: 10px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+        Guardar Contraseña
+      </button>
+
+    </form>
+
+    <hr style="margin: 20px 0;">
+
+    <p style="font-size: 14px;">
+      <a href="restablecer_contrasena.html" style="color: #555;">¿Olvidaste tu contraseña?</a>
+    </p>
+    <p style="font-size: 14px; margin: 0;">
+      <a href="usuario.html">← Volver al Perfil</a>
+    </p>
+
+  </div>
+
+</body>
+</html>

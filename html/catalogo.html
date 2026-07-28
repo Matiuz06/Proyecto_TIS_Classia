@@ -12,9 +12,9 @@
     <title>Classia — Catálogo de servicios</title>
   </head>
 
-  <body>
+  <body style="font-family: sans-serif; margin: 0; padding: 20px;">
     <main>
-      <header>
+      <header style="border-bottom: 1px solid #ccc; padding-bottom: 15px; margin-bottom: 20px;">
         <p>Catálogo general</p>
 
         <h1>
@@ -32,14 +32,15 @@
             type="search"
             id="busqueda"
             name="busqueda"
-            placeholder="Servicio, profesional, institución o temática" />
+            placeholder="Servicio, profesional, institución o temática"
+            style="padding: 6px; width: 300px;" />
 
-          <button type="submit">Buscar</button>
+          <button type="submit" style="padding: 6px 12px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">Buscar</button>
         </form>
       </header>
 
-      <div>
-        <aside aria-labelledby="titulo-filtros">
+      <div style="display: flex; gap: 20px;">
+        <aside aria-labelledby="titulo-filtros" style="width: 250px; border-right: 1px solid #ccc; padding-right: 20px; flex-shrink: 0;">
           <h2 id="titulo-filtros">Filtrar servicios</h2>
 
           <form action="catalogo.html" method="get">
@@ -249,13 +250,14 @@
               </label>
             </section>
 
-            <button type="submit">Aplicar filtros</button>
-
-            <button type="reset">Limpiar filtros</button>
+            <div style="margin-top: 15px;">
+              <button type="submit" style="padding: 6px 12px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">Aplicar filtros</button>
+              <button type="reset" style="padding: 6px 12px; background: #888; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;">Limpiar</button>
+            </div>
           </form>
         </aside>
 
-        <section aria-labelledby="titulo-servicios">
+        <section aria-labelledby="titulo-servicios" style="flex: 1;">
           <header>
             <h2 id="titulo-servicios">Servicios disponibles</h2>
 
@@ -264,7 +266,7 @@
             <form action="catalogo.html" method="get">
               <label for="ordenar"> Ordenar por </label>
 
-              <select id="ordenar" name="orden">
+              <select id="ordenar" name="orden" style="padding: 6px;">
                 <option value="recomendados">Recomendados</option>
 
                 <option value="mejor-valorados">Mejor valorados</option>
@@ -278,7 +280,7 @@
                 <option value="mas-recientes">Más recientes</option>
               </select>
 
-              <button type="submit">Ordenar</button>
+              <button type="submit" style="padding: 6px 12px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">Ordenar</button>
             </form>
           </header>
 
@@ -342,7 +344,7 @@
 
                     <a href="detalle-servicio.html"> Ver servicio </a>
 
-                    <button type="button">Agregar al carrito</button>
+                    <button type="button" style="padding: 8px 14px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Agregar al carrito</button>
                   </article>
                 </td>
 
@@ -400,7 +402,7 @@
 
                     <a href="detalle-servicio.html"> Ver servicio </a>
 
-                    <button type="button">Agregar al carrito</button>
+                    <button type="button" style="padding: 8px 14px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Agregar al carrito</button>
                   </article>
                 </td>
 
@@ -457,7 +459,7 @@
 
                     <a href="detalle-servicio.html"> Ver servicio </a>
 
-                    <button type="button">Solicitar contratación</button>
+                    <button type="button" style="padding: 8px 14px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Solicitar contratación</button>
                   </article>
                 </td>
               </tr>
@@ -515,7 +517,7 @@
 
                     <a href="detalle-servicio.html"> Ver servicio </a>
 
-                    <button type="button">Agregar al carrito</button>
+                    <button type="button" style="padding: 8px 14px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Agregar al carrito</button>
                   </article>
                 </td>
 
@@ -572,7 +574,7 @@
 
                     <a href="detalle-servicio.html"> Ver servicio </a>
 
-                    <button type="button">Agregar al carrito</button>
+                    <button type="button" style="padding: 8px 14px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Agregar al carrito</button>
                   </article>
                 </td>
 
@@ -629,7 +631,7 @@
 
                     <a href="detalle-servicio.html"> Ver servicio </a>
 
-                    <button type="button">Agregar al carrito</button>
+                    <button type="button" style="padding: 8px 14px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Agregar al carrito</button>
                   </article>
                 </td>
               </tr>
@@ -659,7 +661,7 @@
       </div>
     </main>
 
-    <footer>
+    <footer style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc; color: #555; font-size: 14px;">
       <p>Classia — Plataforma de comercialización de servicios educativos</p>
 
       <nav aria-label="Navegación secundaria">

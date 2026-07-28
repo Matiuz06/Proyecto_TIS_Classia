@@ -44,5 +44,4 @@ pero se documentan acá como evidencia de que el equipo los tuvo en cuenta
 En **Settings → Branches → Branch protection rules** para `main`:
 - Requerir Pull Request antes de mergear
 - Requerir que pasen los checks de CI (`lint`, `security`, `lighthouse`)
-- Requerir al menos 1 aprobación (CODEOWNERS)
 - No permitir force-push ni borrado de la rama
