@@ -13,7 +13,6 @@ que el equipo aplica manualmente y documenta como evidencia del desarrollo.
 | Análisis estático de JS (OWASP Top 10) | Semgrep (`p/owasp-top-ten`) | `security.yml` |
 | Content-Security-Policy y patrones inseguros en HTML/JS (eval, innerHTML, tabnabbing) | Script propio (`scripts/check-security-headers.sh`) | `security.yml` |
 | Buenas prácticas generales del sitio (HTTPS, accesibilidad) | Lighthouse CI | `lighthouse.yml` |
-| Calidad y consistencia de código | ESLint / stylelint / HTMLHint | `lint.yml` |
 
 ## 2. Controles de gestión (aplicados manualmente)
 
