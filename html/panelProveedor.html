@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="Panel de gestión para proveedores de cursos y servicios en Classia." />
+
+    <title>Panel del proveedor | Classia</title>
+  </head>
+
+  <body>
+    <header>
+      <a href="../index.html" aria-label="Ir al inicio de Classia">
+        <strong>Classia</strong>
+      </a>
+
+      <nav aria-label="Navegación principal">
+        <ul>
+          <li>
+            <a href="../index.html">Inicio</a>
+          </li>
+
+          <li>
+            <a href="catalogo.html">Explorar</a>
+          </li>
+
+          <li>
+            <a href="carrito.html">Carrito</a>
+          </li>
+
+          <li>
+            <a href="pantalla_usuario.html">Mi perfil</a>
+          </li>
+
+          <li>
+            <a href="panel_proveedor.html" aria-current="page">
+              Panel del proveedor
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <header>
+        <p>Espacio de proveedor</p>
+
+        <h1>Panel del proveedor</h1>
+
+        <p>
+          Gestiona tus cursos, servicios, solicitudes, estudiantes y datos
+          profesionales desde un único lugar.
+        </p>
+
+        <p>
+          Sesión iniciada como
+          <strong>Ana Fernández</strong>
+        </p>
+
+        <nav aria-label="Acciones rápidas del proveedor">
+          <ul>
+            <li>
+              <a href="formulario_servicio.html">
+                Publicar un curso o servicio
+              </a>
+            </li>
+
+            <li>
+              <a href="mis_publicaciones.html"> Gestionar publicaciones </a>
+            </li>
+
+            <li>
+              <a href="solicitudes_proveedor.html"> Ver solicitudes </a>
+            </li>
+
+            <li>
+              <a href="editar_perfil.html"> Editar perfil profesional </a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <section aria-labelledby="titulo-resumen">
+        <h2 id="titulo-resumen">Resumen de actividad</h2>
+
+        <article>
+          <h3>Publicaciones activas</h3>
+
+          <p>
+            <strong>5</strong>
+          </p>
+
+          <a href="mis_publicaciones.html"> Ver publicaciones </a>
+        </article>
+
+        <article>
+          <h3>Estudiantes inscriptos</h3>
+
+          <p>
+            <strong>78</strong>
+          </p>
+
+          <a href="#estudiantes"> Ver estudiantes </a>
+        </article>
+
+        <article>
+          <h3>Solicitudes pendientes</h3>
+
+          <p>
+            <strong>4</strong>
+          </p>
+
+          <a href="#solicitudes"> Revisar solicitudes </a>
+        </article>
+
+        <article>
+          <h3>Servicios en proceso</h3>
+
+          <p>
+            <strong>3</strong>
+          </p>
+
+          <a href="#contrataciones"> Ver contrataciones </a>
+        </article>
+
+        <article>
+          <h3>Valoración promedio</h3>
+
+          <p>
+            <strong>4,8 de 5</strong>
+          </p>
+
+          <a href="#valoraciones"> Ver valoraciones </a>
+        </article>
+
+        <article>
+          <h3>Ingresos simulados</h3>
+
+          <p>
+            <strong>$18.750</strong>
+          </p>
+
+          <p>
+            Total correspondiente a contrataciones ficticias realizadas en la
+            plataforma.
+          </p>
+        </article>
+      </section>
+
+      <section aria-labelledby="titulo-notificaciones">
+        <header>
+          <h2 id="titulo-notificaciones">Notificaciones</h2>
+
+          <p>Tienes 5 notificaciones sin revisar.</p>
+
+          <button type="button">Marcar todas como leídas</button>
+        </header>
+
+        <article>
+          <header>
+            <h3>Nueva solicitud de impresión 3D</h3>
+
+            <time datetime="2026-07-27T15:40"> Hoy, 15:40 </time>
+          </header>
+
+          <p>
+            El Centro Educativo del Norte solicita un presupuesto para imprimir
+            veinte piezas destinadas a un proyecto de geometría.
+          </p>
+
+          <a href="detalle_solicitud.html"> Revisar solicitud </a>
+        </article>
+
+        <article>
+          <header>
+            <h3>Nueva inscripción en un curso</h3>
+
+            <time datetime="2026-07-27T13:15"> Hoy, 13:15 </time>
+          </header>
+
+          <p>
+            María González se inscribió en el curso Desarrollo web con HTML, CSS
+            y JavaScript.
+          </p>
+
+          <a href="estudiantes_curso.html"> Ver inscripción </a>
+        </article>
+
+        <article>
+          <header>
+            <h3>Solicitud de mentoría</h3>
+
+            <time datetime="2026-07-26T20:10"> Ayer, 20:10 </time>
+          </header>
+
+          <p>
+            Andrés Pereira solicita una mentoría para revisar la arquitectura de
+            su proyecto de software educativo.
+          </p>
+
+          <a href="detalle_solicitud.html"> Consultar disponibilidad </a>
+        </article>
+
+        <article>
+          <header>
+            <h3>Nueva valoración recibida</h3>
+
+            <time datetime="2026-07-25T18:30"> 25 de julio, 18:30 </time>
+          </header>
+
+          <p>
+            Tu servicio Diseño de recursos didácticos 3D recibió una valoración
+            de 5 estrellas.
+          </p>
+
+          <a href="#valoraciones"> Leer valoración </a>
+        </article>
+
+        <article>
+          <header>
+            <h3>Servicio próximo a vencer</h3>
+
+            <time datetime="2026-07-24T09:00"> 24 de julio, 09:00 </time>
+          </header>
+
+          <p>
+            La publicación Taller de robótica educativa tiene disponibilidad
+            cargada únicamente hasta el próximo mes.
+          </p>
+
+          <a href="formulario_servicio.html"> Actualizar disponibilidad </a>
+        </article>
+
+        <p>
+          <a href="notificaciones.html"> Ver todas las notificaciones </a>
+        </p>
+      </section>
+
+      <section aria-labelledby="titulo-publicaciones">
+        <header>
+          <h2 id="titulo-publicaciones">Mis cursos y servicios</h2>
+
+          <p>Consulta y administra las publicaciones asociadas a tu perfil.</p>
+
+          <a href="formulario_servicio.html"> Crear nueva publicación </a>
+        </header>
+
+        <section aria-labelledby="titulo-cursos">
+          <h3 id="titulo-cursos">Cursos publicados</h3>
+
+          <article>
+            <header>
+              <p>Curso · Programación</p>
+
+              <h4>
+                <a href="detalle-servicio.html">
+                  Desarrollo web con HTML, CSS y JavaScript
+                </a>
+              </h4>
+            </header>
+
+            <dl>
+              <div>
+                <dt>Estado</dt>
+                <dd>Publicado</dd>
+              </div>
+
+              <div>
+                <dt>Modalidad</dt>
+                <dd>Virtual</dd>
+              </div>
+
+              <div>
+                <dt>Precio</dt>
+                <dd>$1.990</dd>
+              </div>
+
+              <div>
+                <dt>Estudiantes</dt>
+                <dd>48</dd>
+              </div>
+
+              <div>
+                <dt>Valoración</dt>
+                <dd>4,9 de 5</dd>
+              </div>
+
+              <div>
+                <dt>Última actualización</dt>
+                <dd>
+                  <time datetime="2026-07-20"> 20 de julio de 2026 </time>
+                </dd>
+              </div>
+            </dl>
+
+            <nav aria-label="Acciones del curso Desarrollo web">
+              <ul>
+                <li>
+                  <a href="detalle-servicio.html"> Ver publicación </a>
+                </li>
+
+                <li>
+                  <a href="formulario_servicio.html"> Editar </a>
+                </li>
+
+                <li>
+                  <a href="estudiantes_curso.html"> Ver estudiantes </a>
+                </li>
+
+                <li>
+                  <button type="button">Pausar</button>
+                </li>
+              </ul>
+            </nav>
+          </article>
+
+          <article>
+            <header>
+              <p>Curso · Educación</p>
+
+              <h4>
+                <a href="detalle-servicio.html">
+                  Inteligencia artificial aplicada a la enseñanza
+                </a>
+              </h4>
+            </header>
+
+            <dl>
+              <div>
+                <dt>Estado</dt>
+                <dd>Publicado</dd>
+              </div>
+
+              <div>
+                <dt>Modalidad</dt>
+                <dd>Híbrida</dd>
+              </div>
+
+              <div>
+                <dt>Precio</dt>
+                <dd>$2.400</dd>
+              </div>
+
+              <div>
+                <dt>Estudiantes</dt>
+                <dd>30</dd>
+              </div>
+
+              <div>
+                <dt>Valoración</dt>
+                <dd>4,7 de 5</dd>
+              </div>
+
+              <div>
+                <dt>Última actualización</dt>
+                <dd>
+                  <time datetime="2026-07-18"> 18 de julio de 2026 </time>
+                </dd>
+              </div>
+            </dl>
+
+            <nav aria-label="Acciones del curso Inteligencia artificial">
+              <ul>
+                <li>
+                  <a href="detalle-servicio.html"> Ver publicación </a>
+                </li>
+
+                <li>
+                  <a href="formulario_servicio.html"> Editar </a>
+                </li>
+
+                <li>
+                  <a href="estudiantes_curso.html"> Ver estudiantes </a>
+                </li>
+
+                <li>
+                  <button type="button">Pausar</button>
+                </li>
+              </ul>
+            </nav>
+          </article>
+        </section>
+
+        <section aria-labelledby="titulo-servicios">
+          <h3 id="titulo-servicios">Servicios publicados</h3>
+
+          <article>
+            <header>
+              <p>Diseño e impresión 3D</p>
+
+              <h4>
+                <a href="detalle-servicio.html">
+                  Diseño e impresión de recursos didácticos 3D
+                </a>
+              </h4>
+            </header>
+
+            <dl>
+              <div>
+                <dt>Estado</dt>
+                <dd>Publicado</dd>
+              </div>
+
+              <div>
+                <dt>Tipo de contratación</dt>
+                <dd>Paquetes y presupuesto</dd>
+              </div>
+
+              <div>
+                <dt>Precio inicial</dt>
+                <dd>$850</dd>
+              </div>
+
+              <div>
+                <dt>Solicitudes pendientes</dt>
+                <dd>2</dd>
+              </div>
+
+              <div>
+                <dt>Servicios completados</dt>
+                <dd>16</dd>
+              </div>
+
+              <div>
+                <dt>Valoración</dt>
+                <dd>4,8 de 5</dd>
+              </div>
+            </dl>
+
+            <nav aria-label="Acciones del servicio de impresión 3D">
+              <ul>
+                <li>
+                  <a href="detalle-servicio.html"> Ver publicación </a>
+                </li>
+
+                <li>
+                  <a href="formulario_servicio.html"> Editar </a>
+                </li>
+
+                <li>
+                  <a href="solicitudes_proveedor.html"> Ver solicitudes </a>
+                </li>
+
+                <li>
+                  <button type="button">Pausar</button>
+                </li>
+              </ul>
+            </nav>
+          </article>
+
+          <article>
+            <header>
+              <p>Mentoría especializada</p>
+
+              <h4>
+                <a href="detalle-servicio.html">
+                  Mentoría para proyectos de software educativos
+                </a>
+              </h4>
+            </header>
+
+            <dl>
+              <div>
+                <dt>Estado</dt>
+                <dd>Publicado</dd>
+              </div>
+
+              <div>
+                <dt>Tipo de contratación</dt>
+                <dd>Reserva</dd>
+              </div>
+
+              <div>
+                <dt>Precio</dt>
+                <dd>$750 por sesión</dd>
+              </div>
+
+              <div>
+                <dt>Reservas pendientes</dt>
+                <dd>1</dd>
+              </div>
+
+              <div>
+                <dt>Sesiones completadas</dt>
+                <dd>23</dd>
+              </div>
+
+              <div>
+                <dt>Valoración</dt>
+                <dd>4,9 de 5</dd>
+              </div>
+            </dl>
+
+            <nav aria-label="Acciones del servicio de mentoría">
+              <ul>
+                <li>
+                  <a href="detalle-servicio.html"> Ver publicación </a>
+                </li>
+
+                <li>
+                  <a href="formulario_servicio.html"> Editar </a>
+                </li>
+
+                <li>
+                  <a href="solicitudes_proveedor.html"> Ver reservas </a>
+                </li>
+
+                <li>
+                  <button type="button">Pausar</button>
+                </li>
+              </ul>
+            </nav>
+          </article>
+
+          <article>
+            <header>
+              <p>Proyecto educativo</p>
+
+              <h4>
+                <a href="detalle-servicio.html">
+                  Diseño de proyectos tecnológicos para instituciones
+                </a>
+              </h4>
+            </header>
+
+            <dl>
+              <div>
+                <dt>Estado</dt>
+                <dd>Borrador</dd>
+              </div>
+
+              <div>
+                <dt>Tipo de contratación</dt>
+                <dd>Propuesta personalizada</dd>
+              </div>
+
+              <div>
+                <dt>Precio</dt>
+                <dd>A consultar</dd>
+              </div>
+
+              <div>
+                <dt>Solicitudes pendientes</dt>
+                <dd>1</dd>
+              </div>
+
+              <div>
+                <dt>Proyectos completados</dt>
+                <dd>4</dd>
+              </div>
+
+              <div>
+                <dt>Valoración</dt>
+                <dd>4,6 de 5</dd>
+              </div>
+            </dl>
+
+            <nav aria-label="Acciones del proyecto educativo">
+              <ul>
+                <li>
+                  <a href="detalle-servicio.html"> Vista previa </a>
+                </li>
+
+                <li>
+                  <a href="formulario_servicio.html"> Continuar editando </a>
+                </li>
+
+                <li>
+                  <button type="button">Publicar</button>
+                </li>
+
+                <li>
+                  <button type="button">Eliminar</button>
+                </li>
+              </ul>
+            </nav>
+          </article>
+        </section>
+
+        <p>
+          <a href="mis_publicaciones.html"> Ver todas las publicaciones </a>
+        </p>
+      </section>
+
+      <section id="solicitudes" aria-labelledby="titulo-solicitudes">
+        <header>
+          <h2 id="titulo-solicitudes">Solicitudes y posibles contrataciones</h2>
+
+          <p>
+            Revisa las personas o instituciones interesadas en tus servicios.
+          </p>
+        </header>
+
+        <article>
+          <header>
+            <h3>Solicitud de impresión de material didáctico</h3>
+
+            <p>
+              Estado:
+              <strong>Pendiente de respuesta</strong>
+            </p>
+          </header>
+
+          <dl>
+            <div>
+              <dt>Cliente</dt>
+              <dd>Centro Educativo del Norte</dd>
+            </div>
+
+            <div>
+              <dt>Servicio</dt>
+              <dd>Diseño e impresión de recursos didácticos 3D</dd>
+            </div>
+
+            <div>
+              <dt>Fecha de solicitud</dt>
+              <dd>
+                <time datetime="2026-07-27"> 27 de julio de 2026 </time>
+              </dd>
+            </div>
+
+            <div>
+              <dt>Cantidad solicitada</dt>
+              <dd>20 piezas</dd>
+            </div>
+
+            <div>
+              <dt>Fecha necesaria</dt>
+              <dd>15 de agosto de 2026</dd>
+            </div>
+          </dl>
+
+          <p>
+            La institución necesita piezas geométricas impresas en varios
+            colores para trabajar en clases de Matemática.
+          </p>
+
+          <nav aria-label="Acciones de la solicitud de impresión">
+            <ul>
+              <li>
+                <a href="detalle_solicitud.html"> Ver solicitud completa </a>
+              </li>
+
+              <li>
+                <a href="crear_presupuesto.html"> Enviar presupuesto </a>
+              </li>
+
+              <li>
+                <a href="contactar_cliente.html"> Contactar </a>
+              </li>
+
+              <li>
+                <button type="button">Rechazar</button>
+              </li>
+            </ul>
+          </nav>
+        </article>
+
+        <article>
+          <header>
+            <h3>Solicitud de mentoría</h3>
+
+            <p>
+              Estado:
+              <strong>Pendiente de confirmación</strong>
+            </p>
+          </header>
+
+          <dl>
+            <div>
+              <dt>Cliente</dt>
+              <dd>Andrés Pereira</dd>
+            </div>
+
+            <div>
+              <dt>Servicio</dt>
+              <dd>Mentoría para proyectos de software educativos</dd>
+            </div>
+
+            <div>
+              <dt>Fecha solicitada</dt>
+              <dd>
+                <time datetime="2026-08-02T18:00">
+                  2 de agosto de 2026, 18:00
+                </time>
+              </dd>
+            </div>
+
+            <div>
+              <dt>Duración</dt>
+              <dd>1 hora</dd>
+            </div>
+
+            <div>
+              <dt>Precio</dt>
+              <dd>$750</dd>
+            </div>
+          </dl>
+
+          <p>
+            El cliente necesita ayuda para revisar el modelo de base de datos de
+            una plataforma educativa.
+          </p>
+
+          <nav aria-label="Acciones de la solicitud de mentoría">
+            <ul>
+              <li>
+                <a href="detalle_solicitud.html"> Ver detalles </a>
+              </li>
+
+              <li>
+                <button type="button">Confirmar reserva</button>
+              </li>
+
+              <li>
+                <a href="contactar_cliente.html"> Proponer otro horario </a>
+              </li>
+
+              <li>
+                <button type="button">Rechazar</button>
+              </li>
+            </ul>
+          </nav>
+        </article>
+
+        <p>
+          <a href="solicitudes_proveedor.html"> Ver todas las solicitudes </a>
+        </p>
+      </section>
+
+      <section id="contrataciones" aria-labelledby="titulo-contrataciones">
+        <header>
+          <h2 id="titulo-contrataciones">Contrataciones en proceso</h2>
+
+          <p>Consulta el estado de los servicios actualmente contratados.</p>
+        </header>
+
+        <article>
+          <h3>Impresión de piezas para proyecto de robótica</h3>
+
+          <dl>
+            <div>
+              <dt>Cliente</dt>
+              <dd>Liceo Tecnológico del Litoral</dd>
+            </div>
+
+            <div>
+              <dt>Estado</dt>
+              <dd>En fabricación</dd>
+            </div>
+
+            <div>
+              <dt>Fecha de entrega</dt>
+              <dd>
+                <time datetime="2026-08-05"> 5 de agosto de 2026 </time>
+              </dd>
+            </div>
+
+            <div>
+              <dt>Importe</dt>
+              <dd>$3.200</dd>
+            </div>
+          </dl>
+
+          <a href="detalle_contratacion.html"> Ver contratación </a>
+
+          <button type="button">Actualizar estado</button>
+        </article>
+
+        <article>
+          <h3>Capacitación en inteligencia artificial para docentes</h3>
+
+          <dl>
+            <div>
+              <dt>Cliente</dt>
+              <dd>Colegio Horizonte</dd>
+            </div>
+
+            <div>
+              <dt>Estado</dt>
+              <dd>Confirmada</dd>
+            </div>
+
+            <div>
+              <dt>Fecha de inicio</dt>
+              <dd>
+                <time datetime="2026-08-12"> 12 de agosto de 2026 </time>
+              </dd>
+            </div>
+
+            <div>
+              <dt>Importe</dt>
+              <dd>$8.500</dd>
+            </div>
+          </dl>
+
+          <a href="detalle_contratacion.html"> Ver contratación </a>
+
+          <button type="button">Contactar cliente</button>
+        </article>
+      </section>
+
+      <section id="estudiantes" aria-labelledby="titulo-estudiantes">
+        <header>
+          <h2 id="titulo-estudiantes">Estudiantes</h2>
+
+          <p>Consulta la cantidad de estudiantes inscriptos en tus cursos.</p>
+        </header>
+
+        <article>
+          <h3>Desarrollo web con HTML, CSS y JavaScript</h3>
+
+          <dl>
+            <div>
+              <dt>Estudiantes inscriptos</dt>
+              <dd>48</dd>
+            </div>
+
+            <div>
+              <dt>Estudiantes activos</dt>
+              <dd>39</dd>
+            </div>
+
+            <div>
+              <dt>Finalizaron el curso</dt>
+              <dd>9</dd>
+            </div>
+          </dl>
+
+          <a href="estudiantes_curso.html"> Ver lista de estudiantes </a>
+        </article>
+
+        <article>
+          <h3>Inteligencia artificial aplicada a la enseñanza</h3>
+
+          <dl>
+            <div>
+              <dt>Estudiantes inscriptos</dt>
+              <dd>30</dd>
+            </div>
+
+            <div>
+              <dt>Estudiantes activos</dt>
+              <dd>26</dd>
+            </div>
+
+            <div>
+              <dt>Finalizaron el curso</dt>
+              <dd>4</dd>
+            </div>
+          </dl>
+
+          <a href="estudiantes_curso.html"> Ver lista de estudiantes </a>
+        </article>
+      </section>
+
+      <section aria-labelledby="titulo-habilidades">
+        <header>
+          <h2 id="titulo-habilidades">Habilidades y especialidades</h2>
+
+          <p>
+            Estas habilidades se muestran en tu perfil público y ayudan a los
+            usuarios a conocer tu experiencia.
+          </p>
+        </header>
+
+        <ul>
+          <li>Desarrollo web</li>
+          <li>HTML5</li>
+          <li>CSS3</li>
+          <li>JavaScript</li>
+          <li>PHP</li>
+          <li>MySQL</li>
+          <li>Diseño e impresión 3D</li>
+          <li>Robótica educativa</li>
+          <li>Micro:bit</li>
+          <li>Diseño de proyectos educativos</li>
+          <li>Formación docente</li>
+          <li>Mentoría tecnológica</li>
+        </ul>
+
+        <a href="editar_perfil.html"> Editar habilidades </a>
+      </section>
+
+      <section aria-labelledby="titulo-perfil-profesional">
+        <header>
+          <h2 id="titulo-perfil-profesional">Perfil profesional</h2>
+
+          <p>Información visible para los posibles clientes y estudiantes.</p>
+        </header>
+
+        <img
+          src="assets/proveedores/ana-fernandez.jpg"
+          alt="Fotografía de perfil de Ana Fernández" />
+
+        <h3>Ana Fernández</h3>
+
+        <p>
+          Docente de Informática y desarrolladora especializada en tecnología
+          educativa, proyectos de software y fabricación digital.
+        </p>
+
+        <dl>
+          <div>
+            <dt>Ubicación</dt>
+            <dd>Salto, Uruguay</dd>
+          </div>
+
+          <div>
+            <dt>Miembro desde</dt>
+            <dd>Marzo de 2026</dd>
+          </div>
+
+          <div>
+            <dt>Tiempo de respuesta</dt>
+            <dd>Menos de 4 horas</dd>
+          </div>
+
+          <div>
+            <dt>Idiomas</dt>
+            <dd>Español e inglés</dd>
+          </div>
+
+          <div>
+            <dt>Valoración promedio</dt>
+            <dd>4,8 de 5</dd>
+          </div>
+
+          <div>
+            <dt>Trabajos completados</dt>
+            <dd>65</dd>
+          </div>
+        </dl>
+
+        <a href="perfil-proveedor.html"> Ver perfil público </a>
+
+        <a href="editar_perfil.html"> Editar información </a>
+      </section>
+
+      <section id="valoraciones" aria-labelledby="titulo-valoraciones">
+        <header>
+          <h2 id="titulo-valoraciones">Valoraciones recientes</h2>
+
+          <p>Opiniones recibidas en cursos y servicios finalizados.</p>
+        </header>
+
+        <article>
+          <header>
+            <h3>Centro Educativo del Norte</h3>
+
+            <p>5 de 5</p>
+
+            <time datetime="2026-07-25"> 25 de julio de 2026 </time>
+          </header>
+
+          <p>
+            El proveedor comprendió nuestras necesidades y entregó materiales de
+            excelente calidad.
+          </p>
+
+          <p>Servicio: Diseño e impresión de recursos didácticos 3D.</p>
+        </article>
+
+        <article>
+          <header>
+            <h3>María González</h3>
+
+            <p>5 de 5</p>
+
+            <time datetime="2026-07-18"> 18 de julio de 2026 </time>
+          </header>
+
+          <p>
+            El curso fue claro, organizado y muy útil para comenzar a
+            desarrollar páginas web.
+          </p>
+
+          <p>Curso: Desarrollo web con HTML, CSS y JavaScript.</p>
+        </article>
+
+        <a href="valoraciones_proveedor.html"> Ver todas las valoraciones </a>
+      </section>
+
+      <section aria-labelledby="titulo-configuracion">
+        <h2 id="titulo-configuracion">
+          Configuración del espacio de proveedor
+        </h2>
+
+        <nav aria-label="Configuración del proveedor">
+          <ul>
+            <li>
+              <a href="editar_perfil.html"> Datos profesionales </a>
+            </li>
+
+            <li>
+              <a href="configurar_disponibilidad.html"> Disponibilidad </a>
+            </li>
+
+            <li>
+              <a href="configurar_notificaciones.html"> Notificaciones </a>
+            </li>
+
+            <li>
+              <a href="datos_facturacion.html">
+                Datos de facturación ficticios
+              </a>
+            </li>
+
+            <li>
+              <a href="seguridad_cuenta.html"> Seguridad de la cuenta </a>
+            </li>
+          </ul>
+        </nav>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Classia — Plataforma de comercialización de cursos y servicios
+        educativos
+      </p>
+
+      <nav aria-label="Navegación secundaria">
+        <ul>
+          <li>
+            <a href="../index.html">Inicio</a>
+          </li>
+
+          <li>
+            <a href="catalogo.html">Catálogo</a>
+          </li>
+
+          <li>
+            <a href="pantalla_usuario.html">Mi perfil</a>
+          </li>
+
+          <li>
+            <a href="sobre-nosotros.html">Acerca de</a>
+          </li>
+
+          <li>
+            <a href="contacto.html">Contacto</a>
+          </li>
+
+          <li>
+            <a href="privacidad.html">Privacidad</a>
+          </li>
+        </ul>
+      </nav>
+
+      <p>
+        <small> &copy; 2026 Classia. Todos los derechos reservados. </small>
+      </p>
+    </footer>
+  </body>
+</html>
