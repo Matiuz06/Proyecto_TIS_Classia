@@ -1,43 +1,134 @@
-:root {
-  --color-bg: #fff;
-  --color-text: #1a1a1a;
-  --color-accent: #2b6cb0;
-}
+/* Estilos generales de organización — Classia */
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  color: var(--color-text);
-  background-color: var(--color-bg);
+  font-family: sans-serif;
   line-height: 1.5;
+  background-color: #f5f5f5;
+  color: #333;
 }
 
+/* Encabezado principal */
 header {
-  padding: 2rem 1.5rem;
-  border-bottom: 1px solid #e2e2e2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
 }
 
-header h1 {
-  margin: 0 0 0.25rem;
-}
-
-main {
-  padding: 2rem 1.5rem;
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-footer {
-  padding: 1.5rem;
+/* Tarjeta centrada (Formularios pequeños, login, contraseñas, checkout) */
+.card-container {
+  background-color: #fff;
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  margin: 40px auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   text-align: center;
-  color: #666;
-  font-size: 0.875rem;
 }
 
+/* Contenedor de página ancha (Perfil, Carrito, Valoración) */
+.page-container {
+  max-width: 800px;
+  margin: 30px auto;
+  background-color: #fff;
+  padding: 25px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Formularios y campos de entrada */
+form p {
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Botones neutros sencillos */
+button,
+.btn {
+  padding: 10px 16px;
+  background-color: #555;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+button:hover,
+.btn:hover {
+  background-color: #333;
+}
+
+/* Enlaces */
 a {
-  color: var(--color-accent);
+  color: #333;
+}
+
+/* Estructura Sidebar / Cuerpo */
+.layout-sidebar {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+aside.sidebar {
+  width: 250px;
+  border-right: 1px solid #ccc;
+  padding: 20px;
+  background-color: #fff;
+  flex-shrink: 0;
+}
+
+main.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #fff;
+}
+
+/* Filas flex para organizar elementos lado a lado */
+.flex-row {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Pie de página */
+footer {
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+  color: #666;
+  font-size: 14px;
+  background-color: #fff;
 }

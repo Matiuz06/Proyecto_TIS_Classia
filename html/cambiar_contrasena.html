@@ -2,43 +2,44 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Cambiar Contraseña</title>
+  <title>Cambiar Contraseña — Classia</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
-<body style="font-family: sans-serif; background: #f0f0f0; padding: 40px;">
+<body>
 
   <!-- TARJETA CENTRADA -->
-  <div style="background: white; padding: 25px; width: 320px; margin: 0 auto; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
+  <div class="card-container">
 
-    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140">
-    <h3>Cambiar Contraseña</h3>
+    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140" style="margin-bottom: 10px;">
+    <h3 style="margin-bottom: 15px;">Cambiar Contraseña</h3>
 
-    <form action="/cambiar_contra" method="POST" style="text-align: left;">
+    <form action="/cambiar_contra" method="POST">
       
       <p>
-        <label for="cont1">Contraseña actual:*</label><br>
-        <input type="password" id="cont1" name="contrasena_actual" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+        <label for="cont1"><strong>Contraseña actual:*</strong></label><br>
+        <input type="password" id="cont1" name="contrasena_actual" required>
       </p>
 
       <p>
-        <label for="cont2">Nueva contraseña:*</label><br>
-        <input type="password" id="cont2" name="contrasena_nueva" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+        <label for="cont2"><strong>Nueva contraseña:*</strong></label><br>
+        <input type="password" id="cont2" name="contrasena_nueva" required>
       </p>
 
       <p>
-        <label for="cont3">Confirmar nueva contraseña:*</label><br>
-        <input type="password" id="cont3" name="contrasena_confirmar" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+        <label for="cont3"><strong>Confirmar nueva contraseña:*</strong></label><br>
+        <input type="password" id="cont3" name="contrasena_confirmar" required>
       </p>
 
-      <button type="submit" style="width: 100%; padding: 10px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+      <button type="submit" style="width: 100%; margin-top: 10px;">
         Guardar Contraseña
       </button>
 
     </form>
 
-    <hr style="margin: 20px 0;">
+    <hr style="margin: 20px 0 15px 0;">
 
-    <p style="font-size: 14px;">
-      <a href="restablecer_contrasena.html" style="color: #555;">¿Olvidaste tu contraseña?</a>
+    <p style="font-size: 14px; margin-bottom: 6px;">
+      <a href="restablecer_contrasena.html">¿Olvidaste tu contraseña?</a>
     </p>
     <p style="font-size: 14px; margin: 0;">
       <a href="usuario.html">← Volver al Perfil</a>

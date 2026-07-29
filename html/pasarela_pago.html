@@ -2,53 +2,49 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Pasarela de Pago</title>
+  <title>Pasarela de Pago — Classia</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
-<body style="font-family: sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;">
+<body>
 
   <!-- TARJETA DE PAGO -->
-  <div style="background-color: white; padding: 30px; width: 320px; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
+  <div class="card-container">
 
     <!-- LOGO -->
-    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140" style="margin-bottom: 10px;">
+    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140" style="margin-bottom: 15px;">
 
     <!-- TÍTULO -->
-    <h3 style="margin: 0 0 20px 0;">Pasarela de Pago</h3>
+    <h3 style="margin-bottom: 20px;">Pasarela de Pago</h3>
 
     <!-- FORMULARIO -->
-    <form action="confirmacion.html" method="GET" style="text-align: left;">
+    <form action="confirmacion.html" method="GET">
 
       <!-- EMAIL -->
-      <p style="margin-bottom: 12px;">
-        <label for="email" style="font-size: 14px; font-weight: bold;">Correo electrónico:*</label><br>
-        <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required
-          style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+      <p>
+        <label for="email"><strong>Correo electrónico:*</strong></label><br>
+        <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
       </p>
 
       <!-- NÚMERO DE TARJETA -->
-      <p style="margin-bottom: 12px;">
-        <label for="numero_tarjeta" style="font-size: 14px; font-weight: bold;">Número de tarjeta:*</label><br>
-        <input type="text" id="numero_tarjeta" name="numero_tarjeta" placeholder="4557 5563 3456 3509" required
-          style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+      <p>
+        <label for="numero_tarjeta"><strong>Número de tarjeta:*</strong></label><br>
+        <input type="text" id="numero_tarjeta" name="numero_tarjeta" placeholder="4557 5563 3456 3509" required>
       </p>
 
       <!-- FECHA Y CVV -->
-      <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <div style="flex: 1;">
-          <label for="fecha_expiracion" style="font-size: 13px; font-weight: bold;">Expiración:*</label><br>
-          <input type="text" id="fecha_expiracion" name="fecha_expiracion" placeholder="MM/AA" required
-            style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+      <div class="flex-row" style="margin-bottom: 20px;">
+        <div style="flex: 1; text-align: left;">
+          <label for="fecha_expiracion" style="font-size: 13px;"><strong>Expiración:*</strong></label><br>
+          <input type="text" id="fecha_expiracion" name="fecha_expiracion" placeholder="MM/AA" required>
         </div>
-        <div style="flex: 1;">
-          <label for="cvv" style="font-size: 13px; font-weight: bold;">CVV:*</label><br>
-          <input type="text" id="cvv" name="cvv" placeholder="123" required
-            style="width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+        <div style="flex: 1; text-align: left;">
+          <label for="cvv" style="font-size: 13px;"><strong>CVV:*</strong></label><br>
+          <input type="text" id="cvv" name="cvv" placeholder="123" required>
         </div>
       </div>
 
       <!-- BOTÓN PAGAR -->
-      <button type="submit"
-        style="width: 100%; padding: 12px; background-color: #555; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer;">
+      <button type="submit" style="width: 100%; padding: 12px; font-size: 16px;">
         Pagar $99.97
       </button>
 
@@ -57,14 +53,14 @@
     <hr style="margin: 20px 0 15px 0;">
 
     <p style="margin: 0; font-size: 14px;">
-      <a href="carrito.html" style="color: #555; text-decoration: none;">← Volver al Carrito</a>
+      <a href="carrito.html" style="text-decoration: none;">← Volver al Carrito</a>
     </p>
 
     <!-- ICONOS DE COMPLIANCE -->
     <div style="text-align: center; margin-top: 15px;">
-      <img src="../assets/PCI-DSS-1.png" alt="PCI-DSS-COMPLIANCE" height="50" style="margin: 0 5px;">
-      <img src="../assets/ISO-8583-300x300.png" alt="ISO-8583-COMPLIANCE" height="50" style="margin: 0 5px;">
-      <img src="../assets/ISO-20022.png" alt="ISO-20022-COMPLIANCE" height="43" style="margin: 0 5px;">
+      <img src="../assets/PCI-DSS-1.png" alt="PCI-DSS-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
+      <img src="../assets/ISO-8583-300x300.png" alt="ISO-8583-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
+      <img src="../assets/ISO-20022.png" alt="ISO-20022-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
     </div>
 
   </div>

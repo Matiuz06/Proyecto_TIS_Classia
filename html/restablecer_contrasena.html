@@ -2,39 +2,40 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Restablecer Contraseña</title>
+  <title>Restablecer Contraseña — Classia</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
-<body style="font-family: sans-serif; background: #f0f0f0; padding: 40px;">
+<body>
 
   <!-- TARJETA CENTRADA -->
-  <div style="background: white; padding: 25px; width: 320px; margin: 0 auto; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
+  <div class="card-container">
 
-    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140">
-    <h3>Restablecer Contraseña</h3>
-    <p style="font-size: 13px; color: #555;">Ingresa tu correo para enviarte las instrucciones de recuperación.</p>
+    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140" style="margin-bottom: 10px;">
+    <h3 style="margin-bottom: 6px;">Restablecer Contraseña</h3>
+    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Ingresa tu correo para enviarte las instrucciones de recuperación.</p>
 
-    <form action="/restablecer_contra" method="POST" style="text-align: left;">
+    <form action="/restablecer_contra" method="POST">
       
       <p>
-        <label for="correo1">Correo registrado:*</label><br>
-        <input type="email" id="correo1" name="correo_recuperacion" placeholder="ejemplo@correo.com" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+        <label for="correo1"><strong>Correo registrado:*</strong></label><br>
+        <input type="email" id="correo1" name="correo_recuperacion" placeholder="ejemplo@correo.com" required>
       </p>
 
       <p>
-        <label for="cont2">Nueva contraseña:*</label><br>
-        <input type="password" id="cont2" name="nueva_contrasena" placeholder="Nueva contraseña" required style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+        <label for="cont2"><strong>Nueva contraseña:*</strong></label><br>
+        <input type="password" id="cont2" name="nueva_contrasena" placeholder="Nueva contraseña" required>
       </p>
 
-      <button type="submit" style="width: 100%; padding: 10px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+      <button type="submit" style="width: 100%; margin-top: 10px;">
         Enviar Restablecimiento
       </button>
 
     </form>
 
-    <hr style="margin: 20px 0;">
+    <hr style="margin: 20px 0 15px 0;">
 
-    <p style="font-size: 14px;">
-      <a href="login.html" style="color: #555;">← Iniciar Sesión</a>
+    <p style="font-size: 14px; margin-bottom: 6px;">
+      <a href="login.html">← Iniciar Sesión</a>
     </p>
     <p style="font-size: 14px; margin: 0;">
       <a href="registro.html">¿No tienes cuenta? Regístrate</a>
