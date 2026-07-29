@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cambiar Contraseña — Classia</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <!-- TARJETA CENTRADA -->
+  <div class="card-container">
+
+    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140" style="margin-bottom: 10px;">
+    <h3 style="margin-bottom: 15px;">Cambiar Contraseña</h3>
+
+    <form action="/cambiar_contra" method="POST">
+      
+      <p>
+        <label for="cont1"><strong>Contraseña actual:*</strong></label><br>
+        <input type="password" id="cont1" name="contrasena_actual" required>
+      </p>
+
+      <p>
+        <label for="cont2"><strong>Nueva contraseña:*</strong></label><br>
+        <input type="password" id="cont2" name="contrasena_nueva" required>
+      </p>
+
+      <p>
+        <label for="cont3"><strong>Confirmar nueva contraseña:*</strong></label><br>
+        <input type="password" id="cont3" name="contrasena_confirmar" required>
+      </p>
+
+      <button type="submit" style="width: 100%; margin-top: 10px;">
+        Guardar Contraseña
+      </button>
+
+    </form>
+
+    <hr style="margin: 20px 0 15px 0;">
+
+    <p style="font-size: 14px; margin-bottom: 6px;">
+      <a href="restablecer_contrasena.html">¿Olvidaste tu contraseña?</a>
+    </p>
+    <p style="font-size: 14px; margin: 0;">
+      <a href="usuario.html">← Volver al Perfil</a>
+    </p>
+
+  </div>
+
+</body>
+</html>
