@@ -13,7 +13,6 @@ que el equipo aplica manualmente y documenta como evidencia del desarrollo.
 | Análisis estático de JS (OWASP Top 10) | Semgrep (`p/owasp-top-ten`) | `security.yml` |
 | Content-Security-Policy y patrones inseguros en HTML/JS (eval, innerHTML, tabnabbing) | Script propio (`scripts/check-security-headers.sh`) | `security.yml` |
 | Buenas prácticas generales del sitio (HTTPS, accesibilidad) | Lighthouse CI | `lighthouse.yml` |
-| Calidad y consistencia de código | ESLint / stylelint / HTMLHint | `lint.yml` |
 
 ## 2. Controles de gestión (aplicados manualmente)
 
@@ -44,5 +43,4 @@ pero se documentan acá como evidencia de que el equipo los tuvo en cuenta
 En **Settings → Branches → Branch protection rules** para `main`:
 - Requerir Pull Request antes de mergear
 - Requerir que pasen los checks de CI (`lint`, `security`, `lighthouse`)
-- Requerir al menos 1 aprobación (CODEOWNERS)
 - No permitir force-push ni borrado de la rama

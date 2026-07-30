@@ -1,5 +1,8 @@
 name: Security Checks
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main, develop]
@@ -9,6 +12,9 @@ on:
     # Corre todos los lunes a las 09:00 UTC, para detectar vulnerabilidades nuevas
     # aunque no haya cambios en el código
     - cron: "0 9 * * 1"
+
+permissions:
+  contents: read
 
 jobs:
   secrets-scan:
@@ -33,7 +39,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "20"
           cache: "npm"

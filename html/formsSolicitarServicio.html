@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="Formulario para solicitar un servicio personalizado en Classia." />
+
+    <title>Solicitar servicio personalizado | Classia</title>
+  </head>
+
+  <body>
+    <header>
+      <a href="../index.html" aria-label="Ir al inicio de Classia">
+        <strong>Classia</strong>
+      </a>
+
+      <nav aria-label="Navegación principal">
+        <ul>
+          <li>
+            <a href="../index.html">Inicio</a>
+          </li>
+
+          <li>
+            <a href="catalogo.html">Catálogo</a>
+          </li>
+
+          <li>
+            <a href="pantalla_usuario.html">Mi cuenta</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <nav aria-label="Ruta de navegación">
+        <ol>
+          <li>
+            <a href="../index.html">Inicio</a>
+          </li>
+
+          <li>
+            <a href="catalogo.html">Servicios</a>
+          </li>
+
+          <li>
+            <a href="detalle-servicio.html">Detalle del servicio</a>
+          </li>
+
+          <li aria-current="page">Solicitar servicio</li>
+        </ol>
+      </nav>
+
+      <header>
+        <p>Solicitud personalizada</p>
+
+        <h1>Cuéntanos qué necesitas</h1>
+
+        <p>
+          Completa la información necesaria para que el proveedor pueda analizar
+          tu solicitud y preparar una propuesta o presupuesto.
+        </p>
+      </header>
+
+      <section aria-labelledby="servicio-seleccionado">
+        <h2 id="servicio-seleccionado">Servicio seleccionado</h2>
+
+        <article>
+          <p>Diseño e impresión 3D</p>
+
+          <h3>Diseño e impresión de recursos didácticos 3D</h3>
+
+          <p>
+            Publicado por
+            <a href="perfil-proveedor.html"> Taller 3D Norte </a>
+          </p>
+
+          <p>Precio orientativo: desde $850</p>
+
+          <a href="detalle-servicio.html"> Volver al detalle </a>
+        </article>
+      </section>
+
+      <form action="confirmacion-solicitud.html" method="post">
+        <fieldset>
+          <legend>Datos de contacto</legend>
+
+          <label for="nombre"> Nombre y apellido </label>
+
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            autocomplete="name"
+            required />
+
+          <label for="correo"> Correo electrónico </label>
+
+          <input
+            type="email"
+            id="correo"
+            name="correo"
+            autocomplete="email"
+            required />
+
+          <label for="telefono"> Teléfono de contacto </label>
+
+          <input type="tel" id="telefono" name="telefono" autocomplete="tel" />
+
+          <label for="medio-contacto"> Medio de contacto preferido </label>
+
+          <select id="medio-contacto" name="medio-contacto" required>
+            <option value="">Selecciona una opción</option>
+            <option value="correo">Correo electrónico</option>
+            <option value="telefono">Teléfono</option>
+            <option value="mensajeria-classia">Mensajería de Classia</option>
+          </select>
+        </fieldset>
+
+        <fieldset>
+          <legend>Tipo de servicio solicitado</legend>
+
+          <label for="tipo-servicio"> Servicio </label>
+
+          <select id="tipo-servicio" name="tipo-servicio" required>
+            <option value="">Selecciona un servicio</option>
+
+            <option value="diseno-3d">Diseño y modelado 3D</option>
+
+            <option value="mentoria">Mentoría especializada</option>
+
+            <option value="proyecto-educativo">Proyecto educativo</option>
+
+            <option value="formacion-institucional">
+              Formación o taller para empresas e instituciones
+            </option>
+
+            <option value="robotica-automatizacion">
+              Robótica y automatización
+            </option>
+          </select>
+
+          <p>
+            En la versión funcional, el formulario mostrará únicamente los
+            campos correspondientes al tipo de servicio seleccionado.
+          </p>
+        </fieldset>
+
+        <section aria-labelledby="solicitud-diseno-3d">
+          <h2 id="solicitud-diseno-3d">Solicitud de diseño o modelado 3D</h2>
+
+          <fieldset>
+            <legend>Información del proyecto 3D</legend>
+
+            <label for="titulo-proyecto-3d">
+              Nombre del proyecto o pieza
+            </label>
+
+            <input
+              type="text"
+              id="titulo-proyecto-3d"
+              name="titulo-proyecto-3d"
+              placeholder="Ejemplo: soporte para micro:bit" />
+
+            <label for="descripcion-3d">
+              ¿Qué necesitas diseñar o imprimir?
+            </label>
+
+            <textarea
+              id="descripcion-3d"
+              name="descripcion-3d"
+              rows="6"
+              placeholder="Describe la pieza, su finalidad y cualquier requisito importante."></textarea>
+
+            <label for="tipo-trabajo-3d"> Tipo de trabajo </label>
+
+            <select id="tipo-trabajo-3d" name="tipo-trabajo-3d">
+              <option value="">Selecciona una opción</option>
+              <option value="solo-diseno">Solo diseño 3D</option>
+              <option value="solo-impresion">Solo impresión 3D</option>
+              <option value="diseno-impresion">Diseño e impresión</option>
+              <option value="modificacion">
+                Modificación de un modelo existente
+              </option>
+            </select>
+
+            <label for="uso-pieza"> Uso previsto </label>
+
+            <input
+              type="text"
+              id="uso-pieza"
+              name="uso-pieza"
+              placeholder="Ejemplo: actividad educativa, prototipo o robótica" />
+
+            <label for="medidas"> Medidas aproximadas </label>
+
+            <input
+              type="text"
+              id="medidas"
+              name="medidas"
+              placeholder="Ejemplo: 12 cm × 8 cm × 4 cm" />
+
+            <label for="cantidad-piezas"> Cantidad de piezas </label>
+
+            <input
+              type="number"
+              id="cantidad-piezas"
+              name="cantidad-piezas"
+              min="1"
+              value="1" />
+
+            <label for="material-preferido"> Material preferido </label>
+
+            <select id="material-preferido" name="material-preferido">
+              <option value="">No tengo preferencia</option>
+              <option value="pla">PLA</option>
+              <option value="petg">PETG</option>
+              <option value="otro">Otro</option>
+            </select>
+
+            <label for="color-preferido"> Color preferido </label>
+
+            <input type="text" id="color-preferido" name="color-preferido" />
+
+            <label for="archivo-3d"> Archivo o referencia </label>
+
+            <input
+              type="file"
+              id="archivo-3d"
+              name="archivo-3d"
+              accept=".stl,.obj,.3mf,.jpg,.jpeg,.png,.pdf" />
+
+            <p>
+              Puedes adjuntar un modelo, dibujo, imagen o documento de
+              referencia.
+            </p>
+
+            <label for="fecha-entrega-3d">
+              Fecha en la que necesitas el trabajo
+            </label>
+
+            <input type="date" id="fecha-entrega-3d" name="fecha-entrega-3d" />
+
+            <label for="presupuesto-3d"> Presupuesto aproximado </label>
+
+            <input
+              type="number"
+              id="presupuesto-3d"
+              name="presupuesto-3d"
+              min="0"
+              step="100"
+              placeholder="Monto estimado" />
+          </fieldset>
+        </section>
+
+        <section aria-labelledby="solicitud-mentoria">
+          <h2 id="solicitud-mentoria">Solicitud de mentoría especializada</h2>
+
+          <fieldset>
+            <legend>Información de la mentoría</legend>
+
+            <label for="tema-mentoria"> Tema principal </label>
+
+            <input
+              type="text"
+              id="tema-mentoria"
+              name="tema-mentoria"
+              placeholder="Ejemplo: diseño de base de datos" />
+
+            <label for="descripcion-mentoria"> ¿En qué necesitas ayuda? </label>
+
+            <textarea
+              id="descripcion-mentoria"
+              name="descripcion-mentoria"
+              rows="6"
+              placeholder="Describe tu situación, dudas, objetivos o proyecto."></textarea>
+
+            <label for="nivel-conocimiento"> Nivel de conocimiento </label>
+
+            <select id="nivel-conocimiento" name="nivel-conocimiento">
+              <option value="">Selecciona una opción</option>
+              <option value="inicial">Inicial</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="avanzado">Avanzado</option>
+            </select>
+
+            <label for="modalidad-mentoria"> Modalidad preferida </label>
+
+            <select id="modalidad-mentoria" name="modalidad-mentoria">
+              <option value="">Selecciona una opción</option>
+              <option value="virtual">Virtual</option>
+              <option value="presencial">Presencial</option>
+              <option value="indiferente">Sin preferencia</option>
+            </select>
+
+            <label for="fecha-mentoria"> Fecha preferida </label>
+
+            <input type="date" id="fecha-mentoria" name="fecha-mentoria" />
+
+            <label for="hora-mentoria"> Horario preferido </label>
+
+            <input type="time" id="hora-mentoria" name="hora-mentoria" />
+
+            <label for="segunda-fecha-mentoria"> Fecha alternativa </label>
+
+            <input
+              type="date"
+              id="segunda-fecha-mentoria"
+              name="segunda-fecha-mentoria" />
+
+            <label for="duracion-mentoria"> Duración estimada </label>
+
+            <select id="duracion-mentoria" name="duracion-mentoria">
+              <option value="">Selecciona una opción</option>
+              <option value="30-minutos">30 minutos</option>
+              <option value="1-hora">1 hora</option>
+              <option value="2-horas">2 horas</option>
+              <option value="varias-sesiones">Varias sesiones</option>
+            </select>
+
+            <label for="archivo-mentoria">
+              Archivo o documento de referencia
+            </label>
+
+            <input
+              type="file"
+              id="archivo-mentoria"
+              name="archivo-mentoria"
+              accept=".pdf,.doc,.docx,.txt,.zip,.jpg,.jpeg,.png" />
+          </fieldset>
+        </section>
+
+        <section aria-labelledby="solicitud-proyecto-educativo">
+          <h2 id="solicitud-proyecto-educativo">
+            Solicitud de proyecto educativo
+          </h2>
+
+          <fieldset>
+            <legend>Información de la institución y el proyecto</legend>
+
+            <label for="nombre-institucion-proyecto">
+              Nombre de la institución
+            </label>
+
+            <input
+              type="text"
+              id="nombre-institucion-proyecto"
+              name="nombre-institucion-proyecto" />
+
+            <label for="tipo-institucion-proyecto"> Tipo de institución </label>
+
+            <select
+              id="tipo-institucion-proyecto"
+              name="tipo-institucion-proyecto">
+              <option value="">Selecciona una opción</option>
+              <option value="escuela">Escuela</option>
+              <option value="liceo">Liceo</option>
+              <option value="utu">UTU</option>
+              <option value="centro-terciario">Centro terciario</option>
+              <option value="universidad">Universidad</option>
+              <option value="academia">Academia</option>
+              <option value="ong">Organización social</option>
+              <option value="otra">Otra</option>
+            </select>
+
+            <label for="nivel-estudiantes"> Nivel de los estudiantes </label>
+
+            <select id="nivel-estudiantes" name="nivel-estudiantes">
+              <option value="">Selecciona una opción</option>
+              <option value="educacion-inicial">Educación inicial</option>
+              <option value="primaria">Educación primaria</option>
+              <option value="media-basica">Educación media básica</option>
+              <option value="media-superior">Educación media superior</option>
+              <option value="terciaria">Educación terciaria</option>
+              <option value="adultos">Educación para personas adultas</option>
+              <option value="varios">Varios niveles</option>
+            </select>
+
+            <label for="edad-estudiantes"> Rango de edad aproximado </label>
+
+            <input
+              type="text"
+              id="edad-estudiantes"
+              name="edad-estudiantes"
+              placeholder="Ejemplo: entre 12 y 14 años" />
+
+            <label for="cantidad-estudiantes"> Cantidad de estudiantes </label>
+
+            <input
+              type="number"
+              id="cantidad-estudiantes"
+              name="cantidad-estudiantes"
+              min="1" />
+
+            <label for="tema-proyecto"> Tema o área del proyecto </label>
+
+            <input
+              type="text"
+              id="tema-proyecto"
+              name="tema-proyecto"
+              placeholder="Ejemplo: robótica, ciudadanía digital o programación" />
+
+            <label for="necesidad-proyecto">
+              ¿Qué necesidad desea atender?
+            </label>
+
+            <textarea
+              id="necesidad-proyecto"
+              name="necesidad-proyecto"
+              rows="6"
+              placeholder="Describe la situación, problema u objetivo educativo."></textarea>
+
+            <label for="resultado-proyecto"> Resultado esperado </label>
+
+            <textarea
+              id="resultado-proyecto"
+              name="resultado-proyecto"
+              rows="4"
+              placeholder="Ejemplo: producto final, taller, secuencia didáctica o feria."></textarea>
+
+            <label for="duracion-proyecto"> Duración estimada </label>
+
+            <select id="duracion-proyecto" name="duracion-proyecto">
+              <option value="">Selecciona una opción</option>
+              <option value="una-jornada">Una jornada</option>
+              <option value="una-semana">Una semana</option>
+              <option value="un-mes">Un mes</option>
+              <option value="un-semestre">Un semestre</option>
+              <option value="personalizada">A definir</option>
+            </select>
+
+            <label for="modalidad-proyecto"> Modalidad </label>
+
+            <select id="modalidad-proyecto" name="modalidad-proyecto">
+              <option value="">Selecciona una opción</option>
+              <option value="presencial">Presencial</option>
+              <option value="virtual">Virtual</option>
+              <option value="hibrida">Híbrida</option>
+            </select>
+
+            <label for="recursos-disponibles"> Recursos disponibles </label>
+
+            <textarea
+              id="recursos-disponibles"
+              name="recursos-disponibles"
+              rows="4"
+              placeholder="Equipos, dispositivos, conectividad, espacios o materiales disponibles."></textarea>
+
+            <label for="archivo-proyecto"> Documento de referencia </label>
+
+            <input
+              type="file"
+              id="archivo-proyecto"
+              name="archivo-proyecto"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+          </fieldset>
+        </section>
+
+        <section aria-labelledby="solicitud-formacion">
+          <h2 id="solicitud-formacion">
+            Solicitud de formación o taller institucional
+          </h2>
+
+          <fieldset>
+            <legend>Información de la empresa o institución</legend>
+
+            <label for="nombre-organizacion">
+              Nombre de la empresa o institución
+            </label>
+
+            <input
+              type="text"
+              id="nombre-organizacion"
+              name="nombre-organizacion" />
+
+            <label for="rubro-organizacion"> Rubro o área de actividad </label>
+
+            <input
+              type="text"
+              id="rubro-organizacion"
+              name="rubro-organizacion"
+              placeholder="Ejemplo: educación, comercio, salud o tecnología" />
+
+            <label for="tipo-organizacion"> Tipo de organización </label>
+
+            <select id="tipo-organizacion" name="tipo-organizacion">
+              <option value="">Selecciona una opción</option>
+              <option value="empresa">Empresa</option>
+              <option value="institucion-educativa">
+                Institución educativa
+              </option>
+              <option value="organismo-publico">Organismo público</option>
+              <option value="ong">Organización social</option>
+              <option value="emprendimiento">Emprendimiento</option>
+              <option value="otra">Otra</option>
+            </select>
+
+            <label for="cantidad-participantes">
+              Cantidad de participantes
+            </label>
+
+            <input
+              type="number"
+              id="cantidad-participantes"
+              name="cantidad-participantes"
+              min="1" />
+
+            <label for="perfil-participantes">
+              Perfil de los participantes
+            </label>
+
+            <textarea
+              id="perfil-participantes"
+              name="perfil-participantes"
+              rows="4"
+              placeholder="Describe cargos, conocimientos previos o características del grupo."></textarea>
+
+            <label for="tema-formacion"> Tema de la formación </label>
+
+            <input
+              type="text"
+              id="tema-formacion"
+              name="tema-formacion"
+              placeholder="Ejemplo: inteligencia artificial, Excel o seguridad digital" />
+
+            <label for="objetivo-formacion"> Objetivo principal </label>
+
+            <textarea
+              id="objetivo-formacion"
+              name="objetivo-formacion"
+              rows="5"
+              placeholder="Explica qué espera lograr la organización con la formación."></textarea>
+
+            <label for="modalidad-formacion"> Modalidad preferida </label>
+
+            <select id="modalidad-formacion" name="modalidad-formacion">
+              <option value="">Selecciona una opción</option>
+              <option value="presencial">Presencial</option>
+              <option value="virtual">Virtual</option>
+              <option value="hibrida">Híbrida</option>
+            </select>
+
+            <label for="cantidad-jornadas">
+              Cantidad estimada de jornadas
+            </label>
+
+            <input
+              type="number"
+              id="cantidad-jornadas"
+              name="cantidad-jornadas"
+              min="1" />
+
+            <label for="duracion-jornada">
+              Duración aproximada por jornada
+            </label>
+
+            <select id="duracion-jornada" name="duracion-jornada">
+              <option value="">Selecciona una opción</option>
+              <option value="1-hora">1 hora</option>
+              <option value="2-horas">2 horas</option>
+              <option value="3-horas">3 horas</option>
+              <option value="media-jornada">Media jornada</option>
+              <option value="jornada-completa">Jornada completa</option>
+            </select>
+
+            <label for="fecha-formacion"> Fecha estimada de inicio </label>
+
+            <input type="date" id="fecha-formacion" name="fecha-formacion" />
+
+            <label for="ubicacion-formacion"> Lugar de realización </label>
+
+            <input
+              type="text"
+              id="ubicacion-formacion"
+              name="ubicacion-formacion" />
+
+            <label for="certificacion">
+              ¿Necesita certificación o constancia?
+            </label>
+
+            <select id="certificacion" name="certificacion">
+              <option value="">Selecciona una opción</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+              <option value="a-definir">A definir</option>
+            </select>
+
+            <label for="presupuesto-formacion"> Presupuesto aproximado </label>
+
+            <input
+              type="number"
+              id="presupuesto-formacion"
+              name="presupuesto-formacion"
+              min="0"
+              step="100" />
+          </fieldset>
+        </section>
+
+        <section aria-labelledby="solicitud-robotica">
+          <h2 id="solicitud-robotica">
+            Solicitud de robótica y automatización
+          </h2>
+
+          <fieldset>
+            <legend>Información técnica del proyecto</legend>
+
+            <label for="nombre-proyecto-robotica"> Nombre del proyecto </label>
+
+            <input
+              type="text"
+              id="nombre-proyecto-robotica"
+              name="nombre-proyecto-robotica" />
+
+            <label for="problema-robotica"> Problema o necesidad </label>
+
+            <textarea
+              id="problema-robotica"
+              name="problema-robotica"
+              rows="6"
+              placeholder="Describe qué necesita automatizar, construir, reparar o programar."></textarea>
+
+            <label for="tipo-servicio-robotica"> Tipo de servicio </label>
+
+            <select id="tipo-servicio-robotica" name="tipo-servicio-robotica">
+              <option value="">Selecciona una opción</option>
+              <option value="asesoramiento">Asesoramiento</option>
+              <option value="programacion">Programación</option>
+              <option value="construccion">Construcción de prototipo</option>
+              <option value="automatizacion">Automatización</option>
+              <option value="reparacion">Revisión o reparación</option>
+              <option value="proyecto-completo">Proyecto completo</option>
+            </select>
+
+            <label for="tecnologia-disponible">
+              Tecnología o hardware disponible
+            </label>
+
+            <textarea
+              id="tecnologia-disponible"
+              name="tecnologia-disponible"
+              rows="4"
+              placeholder="Ejemplo: micro:bit, Arduino, sensores, motores o impresora 3D."></textarea>
+
+            <label for="nivel-avance"> Estado actual del proyecto </label>
+
+            <select id="nivel-avance" name="nivel-avance">
+              <option value="">Selecciona una opción</option>
+              <option value="idea">Solo existe la idea</option>
+              <option value="planificacion">Está planificado</option>
+              <option value="prototipo">Existe un prototipo</option>
+              <option value="funcionando-con-errores">
+                Funciona con errores
+              </option>
+              <option value="finalizado">
+                Está terminado y necesita mejoras
+              </option>
+            </select>
+
+            <label for="resultado-robotica"> Resultado esperado </label>
+
+            <textarea
+              id="resultado-robotica"
+              name="resultado-robotica"
+              rows="4"></textarea>
+
+            <label for="modalidad-robotica"> Modalidad de trabajo </label>
+
+            <select id="modalidad-robotica" name="modalidad-robotica">
+              <option value="">Selecciona una opción</option>
+              <option value="presencial">Presencial</option>
+              <option value="remota">Remota</option>
+              <option value="hibrida">Híbrida</option>
+            </select>
+
+            <label for="fecha-robotica"> Fecha límite </label>
+
+            <input type="date" id="fecha-robotica" name="fecha-robotica" />
+
+            <label for="archivo-robotica">
+              Archivos, fotografías o documentación
+            </label>
+
+            <input
+              type="file"
+              id="archivo-robotica"
+              name="archivo-robotica"
+              accept=".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png,.txt" />
+
+            <label for="presupuesto-robotica"> Presupuesto aproximado </label>
+
+            <input
+              type="number"
+              id="presupuesto-robotica"
+              name="presupuesto-robotica"
+              min="0"
+              step="100" />
+          </fieldset>
+        </section>
+
+        <fieldset>
+          <legend>Información adicional</legend>
+
+          <label for="comentarios-generales">
+            Comentarios u observaciones
+          </label>
+
+          <textarea
+            id="comentarios-generales"
+            name="comentarios-generales"
+            rows="6"
+            placeholder="Agrega cualquier dato que pueda ayudar al proveedor a comprender tu solicitud."></textarea>
+
+          <label for="acepta-contacto">
+            <input
+              type="checkbox"
+              id="acepta-contacto"
+              name="acepta-contacto"
+              required />
+
+            Autorizo al proveedor a contactarme para solicitar información
+            adicional sobre esta propuesta.
+          </label>
+
+          <label for="acepta-terminos">
+            <input
+              type="checkbox"
+              id="acepta-terminos"
+              name="acepta-terminos"
+              required />
+
+            Confirmo que la información proporcionada es correcta y acepto los
+            términos de uso de Classia.
+          </label>
+        </fieldset>
+
+        <section aria-labelledby="resumen-proceso">
+          <h2 id="resumen-proceso">¿Qué ocurrirá después?</h2>
+
+          <ol>
+            <li>El proveedor recibirá y revisará la solicitud.</li>
+
+            <li>Podrá pedir información adicional.</li>
+
+            <li>Preparará una propuesta, presupuesto o fecha disponible.</li>
+
+            <li>Podrás aceptar, rechazar o solicitar modificaciones.</li>
+
+            <li>Si aceptas, se generará una contratación con pago simulado.</li>
+          </ol>
+        </section>
+
+        <button type="submit">Enviar solicitud</button>
+
+        <button type="reset">Limpiar formulario</button>
+
+        <a href="detalle-servicio.html"> Cancelar y volver </a>
+      </form>
+    </main>
+
+    <footer>
+      <p>
+        Classia — Plataforma de comercialización de cursos y servicios
+        educativos
+      </p>
+
+      <nav aria-label="Navegación secundaria">
+        <ul>
+          <li>
+            <a href="../index.html">Inicio</a>
+          </li>
+
+          <li>
+            <a href="catalogo.html">Catálogo</a>
+          </li>
+
+          <li>
+            <a href="sobre-nosotros.html">Acerca de</a>
+          </li>
+
+          <li>
+            <a href="contacto.html">Contacto</a>
+          </li>
+
+          <li>
+            <a href="privacidad.html">Privacidad</a>
+          </li>
+        </ul>
+      </nav>
+
+      <p>
+        <small> &copy; 2026 Classia. Todos los derechos reservados. </small>
+      </p>
+    </footer>
+  </body>
+</html>

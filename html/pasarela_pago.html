@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pasarela de Pago — Classia</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <!-- TARJETA DE PAGO -->
+  <div class="card-container">
+
+    <!-- LOGO -->
+    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140" style="margin-bottom: 15px;">
+
+    <!-- TÍTULO -->
+    <h3 style="margin-bottom: 20px;">Pasarela de Pago</h3>
+
+    <!-- FORMULARIO -->
+    <form action="confirmacion.html" method="GET">
+
+      <!-- EMAIL -->
+      <p>
+        <label for="email"><strong>Correo electrónico:*</strong></label><br>
+        <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
+      </p>
+
+      <!-- NÚMERO DE TARJETA -->
+      <p>
+        <label for="numero_tarjeta"><strong>Número de tarjeta:*</strong></label><br>
+        <input type="text" id="numero_tarjeta" name="numero_tarjeta" placeholder="4557 5563 3456 3509" required>
+      </p>
+
+      <!-- FECHA Y CVV -->
+      <div class="flex-row" style="margin-bottom: 20px;">
+        <div style="flex: 1; text-align: left;">
+          <label for="fecha_expiracion" style="font-size: 13px;"><strong>Expiración:*</strong></label><br>
+          <input type="text" id="fecha_expiracion" name="fecha_expiracion" placeholder="MM/AA" required>
+        </div>
+        <div style="flex: 1; text-align: left;">
+          <label for="cvv" style="font-size: 13px;"><strong>CVV:*</strong></label><br>
+          <input type="text" id="cvv" name="cvv" placeholder="123" required>
+        </div>
+      </div>
+
+      <!-- BOTÓN PAGAR -->
+      <button type="submit" style="width: 100%; padding: 12px; font-size: 16px;">
+        Pagar $99.97
+      </button>
+
+    </form>
+
+    <hr style="margin: 20px 0 15px 0;">
+
+    <p style="margin: 0; font-size: 14px;">
+      <a href="carrito.html" style="text-decoration: none;">← Volver al Carrito</a>
+    </p>
+
+    <!-- ICONOS DE COMPLIANCE -->
+    <div style="text-align: center; margin-top: 15px;">
+      <img src="../assets/PCI-DSS-1.png" alt="PCI-DSS-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
+      <img src="../assets/ISO-8583-300x300.png" alt="ISO-8583-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
+      <img src="../assets/ISO-20022.png" alt="ISO-20022-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
+    </div>
+
+  </div>
+
+</body>
+</html>
