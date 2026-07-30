@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Valoración de Cursos y Servicios — Classia</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="page-container" style="max-width: 650px;">
+
+    <!-- LOGO Y TÍTULO -->
+    <div style="text-align: center; margin-bottom: 20px;">
+      <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140">
+      <h2 style="margin-top: 10px;">Deja tu Valoración y Reseña</h2>
+      <p style="color: #666; font-size: 14px;">Tu opinión ayuda a mejorar nuestros cursos y servicios.</p>
+    </div>
+
+    <hr style="margin: 15px 0;">
+
+    <!-- FORMULARIO DE VALORACIÓN -->
+    <form action="/enviar_reseña" method="POST">
+
+      <!-- ELECCIÓN DE ELEMENTO A VALORAR -->
+      <p>
+        <label for="item_valorar"><strong>Selecciona qué deseas valorar:</strong></label><br>
+        <select name="item_valorar" id="item_valorar">
+          <option>Curso: Robótica para principiantes (Educador: Juan Pérez)</option>
+          <option>Servicio: Impresión 3D y Modelado (Proveedor: AniTech Studio 3D)</option>
+          <option>Curso: Introducción a las funciones (Educador: María López)</option>
+        </select>
+      </p>
+
+      <!-- TARJETA DEL ELEMENTO SELECCIONADO -->
+      <div style="background-color: #fafafa; padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+        <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Imagen del curso o servicio" width="70">
+        <div>
+          <p style="margin: 0 0 4px 0;"><strong>Robótica para principiantes</strong></p>
+          <p style="margin: 0; font-size: 13px; color: #666;">Categoría: Curso de Robótica • Finalizado en Julio 2026</p>
+        </div>
+      </div>
+
+      <!-- CALIFICACIÓN -->
+      <p>
+        <label for="puntuacion"><strong>Calificación general:</strong></label><br>
+        <select name="puntuacion" id="puntuacion">
+          <option value="5">5/5 - Excelente</option>
+          <option value="4">4/5 - Muy bueno</option>
+          <option value="3">3/5 - Bueno</option>
+          <option value="2">2/5 - Regular</option>
+          <option value="1">1/5 - Deficiente</option>
+        </select>
+      </p>
+
+      <!-- COMENTARIO -->
+      <p>
+        <label for="comentario"><strong>Tu reseña u opinión:</strong></label><br>
+        <textarea id="comentario" name="comentario" rows="4" placeholder="Escribe aquí tu experiencia con el curso o servicio..." required style="font-family: sans-serif;"></textarea>
+      </p>
+
+      <!-- RECOMENDACIÓN -->
+      <p>
+        <label><strong>¿Recomendarías este curso/servicio a otros estudiantes o clientes?</strong></label><br>
+        <label style="margin-right: 15px;">
+          <input type="radio" name="recomienda" value="si" checked> Sí
+        </label>
+        <label>
+          <input type="radio" name="recomienda" value="no"> No
+        </label>
+      </p>
+
+      <!-- BOTÓN ENVIAR -->
+      <button type="submit" style="width: 100%; padding: 10px;">
+        Enviar Valoración
+      </button>
+
+    </form>
+
+    <hr style="margin: 20px 0 15px 0;">
+
+    <!-- SECCIÓN DE NAVEGACIÓN -->
+    <p style="text-align: center; margin: 0; font-size: 14px;">
+      <a href="usuario.html">← Volver a mi Perfil</a> | 
+      <a href="catalogo.html">Ir al Catálogo</a>
+    </p>
+
+  </div>
+
+</body>
+</html>

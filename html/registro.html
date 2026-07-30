@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Usuario — Classia</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body style="font-family: sans-serif; background: #f0f0f0; padding: 40px; margin: 0;">
+
+  <div style="background: white; padding: 25px; width: 350px; margin: 0 auto; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
+
+    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140">
+    <h3>Crear Cuenta</h3>
+
+    <form action="/registro" method="POST" style="text-align: left;">
+      <p>
+        <label for="nombre">Nombre:</label><br>
+        <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <p>
+        <label for="apellido">Apellido:</label><br>
+        <input type="text" id="apellido" name="apellido" required placeholder="Ingresa tu apellido" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <p>
+        <label for="usuario">Nombre de usuario:</label><br>
+        <input type="text" id="usuario" name="usuario" required placeholder="Ingresa un usuario" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <p>
+        <label for="correo">Correo electrónico:</label><br>
+        <input type="email" id="correo" name="correo" required placeholder="ejemplo@correo.com" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <p>
+        <label for="contraseña">Contraseña:</label><br>
+        <input type="password" id="contraseña" name="contraseña" required placeholder="Ingresa una contraseña" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <p>
+        <label for="confirmar_contraseña">Confirmar contraseña:</label><br>
+        <input type="password" id="confirmar_contraseña" name="confirmar_contraseña" required placeholder="Confirma tu contraseña" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
+      </p>
+
+      <p>
+        <label><strong>Género:</strong></label><br>
+        <label><input type="radio" name="género" value="Hombre"> Hombre</label><br>
+        <label><input type="radio" name="género" value="Mujer"> Mujer</label><br>
+        <label><input type="radio" name="género" value="Otro"> Prefiero no decirlo</label>
+      </p>
+
+      <button type="submit" style="width: 100%; padding: 10px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+        Registrarse
+      </button>
+    </form>
+
+    <hr style="margin: 20px 0;">
+
+    <p style="font-size: 14px; margin: 0;">
+      ¿Ya tienes una cuenta? <a href="login.html" style="color: #4a3f9f;">Iniciar Sesión</a>
+    </p>
+
+  </div>
+
+</body>
+</html>
