@@ -1,0 +1,70 @@
+name: "🔍 Verificar referencia a requerimientos"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  check-req-reference:
+    name: "Requerimiento referenciado en el PR"
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write  # para dejar comentario si falla
+
+    steps:
+      - name: Verificar que el cuerpo del PR menciona un código de requerimiento
+        id: check
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Patrón: REQ-XXX-NN | RNF-NN | RN-NN
+          # Acepta tanto mayúsculas como minúsculas y guiones
+          PATTERN='(REQ-[A-Z]{2,4}-[0-9]{2}|RNF-[0-9]{2}|RN-[0-9]{2})'
+
+          if echo "$PR_BODY" | grep -qiE "$PATTERN"; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Referencia a requerimiento encontrada."
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "❌ No se encontró ningún código de requerimiento en el cuerpo del PR."
+          fi
+
+      - name: Comentar en el PR si no hay referencia
+        if: steps.check.outputs.found == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `## ⚠️ Falta referencia a requerimiento
+
+            Este PR no menciona ningún código del SRS de Classia en su descripción.
+
+            **Por favor, agregá al menos una referencia** usando la nomenclatura del documento de requerimientos:
+
+            | Tipo | Ejemplos |
+            |---|---|
+            | Funcional | \`REQ-AUT-01\` · \`REQ-CUR-03\` · \`REQ-PAG-02\` |
+            | No funcional | \`RNF-03\` · \`RNF-15\` |
+            | Regla de negocio | \`RN-04\` · \`RN-11\` |
+
+            Podés completar la tabla **"Requerimientos implementados / afectados"** en el cuerpo del PR.
+
+            > Si este PR no implementa ni afecta ningún requerimiento del SRS (p. ej., solo toca CI/CD o documentación interna), escribí \`N/A\` en esa sección para que esta verificación lo ignore.`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+
+      - name: Fallar el check si no hay referencia
+        if: steps.check.outputs.found == 'false'
+        run: |
+          # Permitir N/A explícito para PRs de CI/CD puro
+          if echo "${{ github.event.pull_request.body }}" | grep -qiE 'N/?A|no aplica|no corresponde'; then
+            echo "✅ PR marcado como N/A, se omite la verificación."
+            exit 0
+          fi
+          echo "❌ El PR debe referenciar al menos un código del SRS (REQ-XXX-NN, RNF-NN o RN-NN)."
+          echo "   Si no aplica, escribí 'N/A' en la sección de requerimientos."
+          exit 1
