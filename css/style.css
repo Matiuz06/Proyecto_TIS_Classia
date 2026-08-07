@@ -306,6 +306,7 @@ figure {
   border-radius: var(--radius-sm);
 }
 
+
 .provider-dashboard > section {
   padding-block: var(--space-5);
   border-top: 1px solid var(--color-border);
@@ -793,3 +794,6 @@ th {
     white-space: normal;
   }
 }
+
+
+

@@ -1,181 +1,194 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Perfil de Usuario — Classia</title>
-  <link rel="icon" type="image/png" href="../assets/favicon.png" />
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body style="font-family: sans-serif; margin: 0; padding: 0;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil de Usuario — Classia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <!-- BARRA SUPERIOR -->
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="carrito.html">Carrito</a>
+          <a href="usuario.html" aria-current="page">Mi cuenta</a>
+        </nav>
+      </div>
+    </header>
 
-  <!-- BARRA SUPERIOR -->
-  <header style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding: 10px 20px;">
-    <img src="../assets/logoC.png" alt="Logo Classia" width="160">
-    <input type="search" placeholder="Búsqueda de cursos, servicios y recursos" style="margin-left: 20px; width: 300px; padding: 6px;">
-    <select name="rol_usuario" id="rol_usuario" style="margin-left: 10px; padding: 6px;">
-      <option value="estudiante">Estudiante</option>
-      <option value="educador">Educador</option>
-      <option value="cliente">Cliente</option>
-      <option value="proveedor">Proveedor</option>
-      <option value="admin">Administrador</option>
-    </select>
-    <button type="button" style="margin-left: 10px; padding: 6px 12px;">Notificaciones</button>
-    <a href="#" style="margin-left: 10px; text-decoration: none;">Mi Cuenta</a>
-  </header>
-
-  <!-- 
+    <!--
        REFERENCIA FUTURA: PANEL DE ADMINISTRADOR
        (Cambiar display: none a block cuando sea admin)
    -->
-  <div id="panel-admin" style="display: none; background-color: #ffeb3b; padding: 10px; text-align: center; border-bottom: 1px solid #ccc;">
-    <strong>Modo Administrador Activo:</strong>
-    <a href="#" style="margin: 0 10px;">Gestionar Usuarios</a> |
-    <a href="#" style="margin: 0 10px;">Configuración Global</a> |
-    <a href="#" style="margin: 0 10px;">Reportes del Sistema</a>
-  </div>
-
-  <!-- CUERPO PRINCIPAL -->
-  <main>
-
-    <!-- BANNER DE USUARIO -->
-    <div style="background-color: #0d324d; color: white; padding: 25px 40px;">
-      <p style="margin: 0 0 5px 0;">Bienvenido/a,</p>
-      <h1 style="margin: 0 0 10px 0;">Marco Antonio Solís</h1>
-      <p style="margin: 0 0 5px 0;">Perfil de Usuario (Estudiante, Cliente, Educador y Proveedor)</p>
-      <p style="margin: 0;"><strong>7</strong> Cursos completados | <strong>2</strong> Servicios contratados</p>
+    <div id="panel-admin" hidden>
+      <strong>Modo Administrador Activo:</strong>
+      <a href="usuario.html">Gestionar Usuarios</a> |
+      <a href="usuario.html">Configuración Global</a> |
+      <a href="usuario.html">Reportes del Sistema</a>
     </div>
 
-    <!-- NAVEGACIÓN SECUNDARIA / SECCIONES -->
-    <div style="border-bottom: 1px solid #ccc; padding: 10px 20px; background-color: #f8f8f8;">
-      <button style="padding: 6px 12px; margin-right: 5px;">Perfil</button>
-      <button style="padding: 6px 12px; margin-right: 5px;">Mis Cursos Comprados</button>
-      <button style="padding: 6px 12px; margin-right: 5px;">Mis Servicios Contratados</button>
-      <button style="padding: 6px 12px; margin-right: 5px;">Mis Cursos Publicados</button>
-      <button style="padding: 6px 12px; margin-right: 5px;">Mis Servicios Ofrecidos</button>
-      <button style="padding: 6px 12px; margin-right: 5px;">Certificados</button>
-      <button style="padding: 6px 12px;">Estadísticas</button>
-    </div>
+    <!-- CUERPO PRINCIPAL -->
+    <main>
+      <!-- BANNER DE USUARIO -->
+      <section class="profile-hero" aria-labelledby="perfil-usuario">
+        <p>Bienvenido/a,</p>
+        <h1 id="perfil-usuario">Marco Antonio Solís</h1>
+        <p>Perfil de Usuario (Estudiante, Cliente, Educador y Proveedor)</p>
+        <p>
+          <strong>7</strong> Cursos completados | <strong>2</strong> Servicios
+          contratados
+        </p>
+      </section>
 
-    <!-- CONTENIDO DE SECCIONES -->
+      <!-- NAVEGACIÓN SECUNDARIA / SECCIONES -->
+      <nav class="profile-tabs" aria-label="Secciones de la cuenta">
+        <button type="button">Perfil</button>
+        <button type="button">Mis Cursos Comprados</button>
+        <button type="button">Mis Servicios Contratados</button>
+        <button type="button">Mis Cursos Publicados</button>
+        <button type="button">Mis Servicios Ofrecidos</button>
+        <button type="button">Certificados</button>
+        <button type="button">Estadísticas</button>
+      </nav>
 
-    <!-- SECCIÓN 1: PERFIL -->
-    <div style="padding: 20px;">
-      <h3>Información básica de la cuenta</h3>
-      <p>
-        <label>Nombre:*</label><br>
-        <input type="text" value="Marco Antonio" readonly style="padding: 6px; width: 250px;">
-      </p>
-      <p>
-        <label>Apellido:*</label><br>
-        <input type="text" value="Solís" readonly style="padding: 6px; width: 250px;">
-      </p>
-      <p>
-        <label>Idioma predeterminado:</label><br>
-        <select style="padding: 6px; width: 260px;">
-          <option>Español (Spanish)</option>
-          <option>Inglés (English)</option>
-        </select>
-      </p>
-      <p>
-        <label>País o región:*</label><br>
-        <select style="padding: 6px; width: 260px;">
-          <option>Uruguay</option>
-          <option>Argentina</option>
-        </select>
-      </p>
-    </div>
+      <!-- CONTENIDO DE SECCIONES -->
 
-    <hr style="margin: 0 20px;">
+      <!-- SECCIÓN 1: PERFIL -->
+      <section class="account-section" aria-labelledby="informacion-cuenta">
+        <h2 id="informacion-cuenta">Información básica de la cuenta</h2>
+        <p>
+          <label for="nombre-cuenta">Nombre:*</label><br />
+          <input
+            type="text"
+            id="nombre-cuenta"
+            value="Marco Antonio"
+            readonly />
+        </p>
+        <p>
+          <label for="apellido-cuenta">Apellido:*</label><br />
+          <input type="text" id="apellido-cuenta" value="Solís" readonly />
+        </p>
+        <p>
+          <label for="idioma-cuenta">Idioma predeterminado:</label><br />
+          <select id="idioma-cuenta">
+            <option>Español (Spanish)</option>
+            <option>Inglés (English)</option>
+          </select>
+        </p>
+        <p>
+          <label for="pais-cuenta">País o región:*</label><br />
+          <select id="pais-cuenta">
+            <option>Uruguay</option>
+            <option>Argentina</option>
+          </select>
+        </p>
+      </section>
 
-    <!-- SECCIÓN 2: COMPRADOR - CURSOS -->
-    <div style="padding: 20px;">
-      <h3>Mis Cursos Comprados (Estudiante)</h3>
-      <p>Cursos en los que estás inscripto:</p>
-      
-      <ul>
-        <li style="margin-bottom: 8px;">
-          <strong>Robótica para principiantes</strong> — Progreso: 60%
-          [<a href="curso.html">Continuar curso</a>]
-        </li>
-        <li style="margin-bottom: 8px;">
-          <strong>Introducción a las funciones en programación</strong> — Progreso: 100% (Completado)
-          [<a href="curso.html">Ver contenido</a>]
-        </li>
-      </ul>
-    </div>
+      <hr />
 
-    <hr style="margin: 0 20px;">
+      <!-- SECCIÓN 2: COMPRADOR - CURSOS -->
+      <section class="account-section" aria-labelledby="cursos-inscriptos">
+        <h2 id="cursos-inscriptos">Mis cursos</h2>
+        <p>Cursos en los que estás inscripto:</p>
 
-    <!-- SECCIÓN 3: COMPRADOR - SERVICIOS -->
-    <div style="padding: 20px;">
-      <h3>Mis Servicios Contratados (Cliente)</h3>
-      <p>Servicios solicitados a proveedores:</p>
+        <ul>
+          <li>
+            <strong>Robótica para principiantes</strong> — Progreso: 60% [<a
+              href="curso.html"
+              >Continuar curso</a
+            >]
+          </li>
+        </ul>
+      </section>
 
-      <ul>
-        <li style="margin-bottom: 8px;">
-          <strong>Modelado e Impresión 3D de Chasis de Robot</strong> — Estado: Impresión en proceso (Proveedor: AniTech Studio)
-        </li>
-        <li style="margin-bottom: 8px;">
-          <strong>Asesoría Técnica en Automatización</strong> — Estado: Finalizado (Proveedor: Robótica Uy)
-        </li>
-      </ul>
+      <hr />
 
-      <p><a href="catalogo.html">+ Contratar nuevo servicio</a></p>
-    </div>
+      <!-- SECCIÓN 3: COMPRADOR - SERVICIOS -->
+      <section class="account-section" aria-labelledby="servicios-contratados">
+        <h2 id="servicios-contratados">Mis servicios contratados</h2>
+        <p>Servicios solicitados a proveedores:</p>
 
-    <hr style="margin: 0 20px;">
+        <ul>
+          <li>
+            <strong>Modelado e Impresión 3D de Chasis de Robot</strong> —
+            Estado: Impresión en proceso (Proveedor: Classia Studio)
+          </li>
+          <li>
+            <strong>Asesoría Técnica en Automatización</strong> — Estado:
+            Finalizado (Proveedor: Robótica Uy)
+          </li>
+        </ul>
 
-    <!-- SECCIÓN 4: OFERENTE - EDUCATOR -->
-    <div style="padding: 20px;">
-      <h3>Mis Cursos Publicados (Educador)</h3>
-      <p>Gestión de los cursos que impartes en la plataforma:</p>
+        <p><a class="btn" href="catalogo.html">Contratar nuevo servicio</a></p>
+      </section>
 
-      <ul>
-        <li style="margin-bottom: 8px;"><strong>Curso de Arduino Avanzado</strong> (35 estudiantes inscriptos)</li>
-        <li style="margin-bottom: 8px;"><strong>Taller de Sensores e IoT</strong> (18 estudiantes inscriptos)</li>
-      </ul>
+      <hr />
 
-      <button type="button" style="padding: 6px 12px;">+ Publicar nuevo curso</button>
-      <button type="button" style="padding: 6px 12px; margin-left: 5px;">Actualizar curso existente</button>
-    </div>
+      <!-- SECCIÓN 4: OFERENTE - EDUCATOR -->
+      <section class="account-section" aria-labelledby="cursos-publicados">
+        <h2 id="cursos-publicados">Mis cursos publicados</h2>
+        <p>Gestión de los cursos que impartes en la plataforma:</p>
 
-    <hr style="margin: 0 20px;">
+        <ul>
+          <li>
+            <strong>Curso de Arduino Avanzado</strong> (35 estudiantes
+            inscriptos)
+          </li>
+          <li>
+            <strong>Taller de Sensores e IoT</strong> (18 estudiantes
+            inscriptos)
+          </li>
+        </ul>
 
-    <!-- SECCIÓN 5: OFERENTE - PROVEEDOR -->
-    <div style="padding: 20px;">
-      <h3>Mis Servicios y Diseños Ofrecidos (Proveedor)</h3>
-      <p>Catálogo de servicios 3D e ingeniería que ofreces:</p>
+        <button type="button">+ Publicar nuevo curso</button>
+        <button type="button">Actualizar curso existente</button>
+      </section>
 
-      <ul>
-        <li style="margin-bottom: 8px;"><strong>Diseño e Impresión 3D a Pedido</strong> — Tarifa base: $50</li>
-        <li style="margin-bottom: 8px;"><strong>Corte y Grabado Láser de Piezas</strong> — Tarifa base: $35</li>
-      </ul>
+      <hr />
 
-      <button type="button" style="padding: 6px 12px;">+ Ofrecer nuevo servicio / diseño 3D</button>
-    </div>
+      <!-- SECCIÓN 5: OFERENTE - PROVEEDOR -->
+      <section class="account-section" aria-labelledby="servicios-ofrecidos">
+        <h2 id="servicios-ofrecidos">Mis servicios ofrecidos</h2>
+        <p>Catálogo de servicios 3D e ingeniería que ofreces:</p>
 
-    <hr style="margin: 0 20px;">
+        <ul>
+          <li>
+            <strong>Diseño e Impresión 3D a Pedido</strong> — Tarifa base: $50
+          </li>
+          <li>
+            <strong>Corte y Grabado Láser de Piezas</strong> — Tarifa base: $35
+          </li>
+        </ul>
 
-    <!-- SECCIÓN 6: CERTIFICADOS -->
-    <div style="padding: 20px;">
-      <h3>Mis Certificados</h3>
-      <p>Certificado de Finalización: Introducción a la programación (Julio 2026)</p>
-    </div>
+        <button type="button">+ Ofrecer nuevo servicio / diseño 3D</button>
+      </section>
 
-    <hr style="margin: 0 20px;">
+      <hr />
 
-    <!-- SECCIÓN 7: ESTADÍSTICAS -->
-    <div style="padding: 20px;">
-      <h3>Estadísticas</h3>
-      <p>Resumen de aprendizaje e ingresos por cursos/servicios prestados.</p>
-    </div>
+      <!-- SECCIÓN 6: CERTIFICADOS -->
+      <section class="account-section" aria-labelledby="certificados">
+        <h2 id="certificados">Mis certificados</h2>
+        <p>Certificado de Finalización: Robótica para principiantes (demo)</p>
+      </section>
 
-  </main>
+      <hr />
 
-  <!-- FOOTER -->
-  <footer style="border-top: 1px solid #ccc; padding: 15px; text-align: center; color: #555; font-size: 14px;">
-    <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
-  </footer>
+      <!-- SECCIÓN 7: ESTADÍSTICAS -->
+      <section class="account-section" aria-labelledby="estadisticas">
+        <h2 id="estadisticas">Estadísticas</h2>
+        <p>Resumen de aprendizaje e ingresos por cursos/servicios prestados.</p>
+      </section>
+    </main>
 
-</body>
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
+    </footer>
+  </body>
 </html>
