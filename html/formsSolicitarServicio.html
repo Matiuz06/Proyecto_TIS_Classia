@@ -15,26 +15,18 @@
   </head>
 
   <body>
-    <header>
-      <a href="../index.html" aria-label="Ir al inicio de Classia">
-        <img id="logoC" src="../assets/logoC.png" alt="Logo Classia">
-      </a>
-
-      <nav aria-label="Navegación principal">
-        <ul>
-          <li>
-            <a href="../index.html">Inicio</a>
-          </li>
-
-          <li>
-            <a href="catalogo.html">Catálogo</a>
-          </li>
-
-          <li>
-            <a href="pantalla_usuario.html">Mi cuenta</a>
-          </li>
-        </ul>
-      </nav>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html" aria-current="page">Catálogo</a>
+          <a href="carrito.html">Carrito</a>
+          <a href="usuario.html">Mi cuenta</a>
+        </nav>
+      </div>
     </header>
 
     <main>
@@ -49,7 +41,7 @@
           </li>
 
           <li>
-            <a href="detalle-servicio.html">Detalle del servicio</a>
+            <a href="servicioDetalle.html">Detalle del servicio</a>
           </li>
 
           <li aria-current="page">Solicitar servicio</li>
@@ -77,16 +69,16 @@
 
           <p>
             Publicado por
-            <a href="perfil-proveedor.html"> Taller 3D Norte </a>
+            <a href="usuario.html"> Taller 3D Norte </a>
           </p>
 
           <p>Precio orientativo: desde $850</p>
 
-          <a href="detalle-servicio.html"> Volver al detalle </a>
+          <a href="servicioDetalle.html"> Volver al detalle </a>
         </article>
       </section>
 
-      <form action="confirmacion-solicitud.html" method="post">
+      <form action="confirmacion.html" method="post">
         <fieldset>
           <legend>Datos de contacto</legend>
 
@@ -758,11 +750,11 @@
 
         <button type="reset">Limpiar formulario</button>
 
-        <a href="detalle-servicio.html"> Cancelar y volver </a>
+        <a href="servicioDetalle.html"> Cancelar y volver </a>
       </form>
     </main>
 
-    <footer>
+    <footer class="site-footer">
       <p>
         Classia — Plataforma de comercialización de cursos y servicios
         educativos
@@ -779,15 +771,15 @@
           </li>
 
           <li>
-            <a href="sobre-nosotros.html">Acerca de</a>
+            <a href="../index.html">Acerca de</a>
           </li>
 
           <li>
-            <a href="contacto.html">Contacto</a>
+            <a href="../index.html">Contacto</a>
           </li>
 
           <li>
-            <a href="privacidad.html">Privacidad</a>
+            <a href="../index.html">Privacidad</a>
           </li>
         </ul>
       </nav>
