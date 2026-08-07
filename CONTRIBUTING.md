@@ -16,7 +16,7 @@ Este documento detalla la gestión operativa, flujo de trabajo en GitHub, vincul
 
 ```
 main (protegida)
- └── Dev-<NombreDesarrollador> (ej: Dev-Rafael, Dev-Thiago)
+ └── Dev-<NombreDesarrollador> (ej: Dev-Ezequel, Dev-Mateus)
        └── Testing (integración previa para lógica JS o BD — cuando aplica)
              └── main
 ```
