@@ -14,39 +14,21 @@
   </head>
 
   <body>
-    <header>
-      <a href="../index.html" aria-label="Ir al inicio de Classia">
-        <image id="logoC" src="../assets/logoC.png"></image>
-      </a>
-
-      <nav aria-label="Navegación principal">
-        <ul>
-          <li>
-            <a href="../index.html">Inicio</a>
-          </li>
-
-          <li>
-            <a href="catalogo.html">Explorar</a>
-          </li>
-
-          <li>
-            <a href="carrito.html">Carrito</a>
-          </li>
-
-          <li>
-            <a href="pantalla_usuario.html">Mi perfil</a>
-          </li>
-
-          <li>
-            <a href="panel_proveedor.html" aria-current="page">
-              Panel del proveedor
-            </a>
-          </li>
-        </ul>
-      </nav>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="carrito.html">Carrito</a>
+          <a href="usuario.html" aria-current="page">Mi cuenta</a>
+        </nav>
+      </div>
     </header>
 
-    <main>
+    <main class="provider-dashboard">
       <header>
         <p>Espacio de proveedor</p>
 
@@ -65,21 +47,21 @@
         <nav aria-label="Acciones rápidas del proveedor">
           <ul>
             <li>
-              <a href="formulario_servicio.html">
+              <a href="formsSolicitarServicio.html">
                 Publicar un curso o servicio
               </a>
             </li>
 
             <li>
-              <a href="mis_publicaciones.html"> Gestionar publicaciones </a>
+              <a href="#publicaciones"> Gestionar publicaciones </a>
             </li>
 
             <li>
-              <a href="solicitudes_proveedor.html"> Ver solicitudes </a>
+              <a href="#solicitudes"> Ver solicitudes </a>
             </li>
 
             <li>
-              <a href="editar_perfil.html"> Editar perfil profesional </a>
+              <a href="#perfil"> Editar perfil profesional </a>
             </li>
           </ul>
         </nav>
@@ -95,7 +77,7 @@
             <strong>5</strong>
           </p>
 
-          <a href="mis_publicaciones.html"> Ver publicaciones </a>
+          <a href="#publicaciones"> Ver publicaciones </a>
         </article>
 
         <article>
@@ -173,7 +155,7 @@
             veinte piezas destinadas a un proyecto de geometría.
           </p>
 
-          <a href="detalle_solicitud.html"> Revisar solicitud </a>
+          <a href="#solicitudes"> Revisar solicitud </a>
         </article>
 
         <article>
@@ -188,7 +170,7 @@
             y JavaScript.
           </p>
 
-          <a href="estudiantes_curso.html"> Ver inscripción </a>
+          <a href="#estudiantes"> Ver inscripción </a>
         </article>
 
         <article>
@@ -203,7 +185,7 @@
             su proyecto de software educativo.
           </p>
 
-          <a href="detalle_solicitud.html"> Consultar disponibilidad </a>
+          <a href="#solicitudes"> Consultar disponibilidad </a>
         </article>
 
         <article>
@@ -233,11 +215,11 @@
             cargada únicamente hasta el próximo mes.
           </p>
 
-          <a href="formulario_servicio.html"> Actualizar disponibilidad </a>
+          <a href="formsSolicitarServicio.html"> Actualizar disponibilidad </a>
         </article>
 
         <p>
-          <a href="notificaciones.html"> Ver todas las notificaciones </a>
+          <a href="#titulo-notificaciones"> Ver todas las notificaciones </a>
         </p>
       </section>
 
@@ -247,7 +229,7 @@
 
           <p>Consulta y administra las publicaciones asociadas a tu perfil.</p>
 
-          <a href="formulario_servicio.html"> Crear nueva publicación </a>
+          <a href="formsSolicitarServicio.html"> Crear nueva publicación </a>
         </header>
 
         <section aria-labelledby="titulo-cursos">
@@ -258,7 +240,7 @@
               <p>Curso · Programación</p>
 
               <h4>
-                <a href="detalle-servicio.html">
+                <a href="servicioDetalle.html">
                   Desarrollo web con HTML, CSS y JavaScript
                 </a>
               </h4>
@@ -301,15 +283,15 @@
             <nav aria-label="Acciones del curso Desarrollo web">
               <ul>
                 <li>
-                  <a href="detalle-servicio.html"> Ver publicación </a>
+                  <a href="servicioDetalle.html"> Ver publicación </a>
                 </li>
 
                 <li>
-                  <a href="formulario_servicio.html"> Editar </a>
+                  <a href="formsSolicitarServicio.html"> Editar </a>
                 </li>
 
                 <li>
-                  <a href="estudiantes_curso.html"> Ver estudiantes </a>
+                  <a href="#estudiantes"> Ver estudiantes </a>
                 </li>
 
                 <li>
@@ -324,7 +306,7 @@
               <p>Curso · Educación</p>
 
               <h4>
-                <a href="detalle-servicio.html">
+                <a href="servicioDetalle.html">
                   Inteligencia artificial aplicada a la enseñanza
                 </a>
               </h4>
@@ -367,15 +349,15 @@
             <nav aria-label="Acciones del curso Inteligencia artificial">
               <ul>
                 <li>
-                  <a href="detalle-servicio.html"> Ver publicación </a>
+                  <a href="servicioDetalle.html"> Ver publicación </a>
                 </li>
 
                 <li>
-                  <a href="formulario_servicio.html"> Editar </a>
+                  <a href="formsSolicitarServicio.html"> Editar </a>
                 </li>
 
                 <li>
-                  <a href="estudiantes_curso.html"> Ver estudiantes </a>
+                  <a href="#estudiantes"> Ver estudiantes </a>
                 </li>
 
                 <li>
@@ -394,7 +376,7 @@
               <p>Diseño e impresión 3D</p>
 
               <h4>
-                <a href="detalle-servicio.html">
+                <a href="servicioDetalle.html">
                   Diseño e impresión de recursos didácticos 3D
                 </a>
               </h4>
@@ -435,15 +417,15 @@
             <nav aria-label="Acciones del servicio de impresión 3D">
               <ul>
                 <li>
-                  <a href="detalle-servicio.html"> Ver publicación </a>
+                  <a href="servicioDetalle.html"> Ver publicación </a>
                 </li>
 
                 <li>
-                  <a href="formulario_servicio.html"> Editar </a>
+                  <a href="formsSolicitarServicio.html"> Editar </a>
                 </li>
 
                 <li>
-                  <a href="solicitudes_proveedor.html"> Ver solicitudes </a>
+                  <a href="#solicitudes"> Ver solicitudes </a>
                 </li>
 
                 <li>
@@ -458,7 +440,7 @@
               <p>Mentoría especializada</p>
 
               <h4>
-                <a href="detalle-servicio.html">
+                <a href="servicioDetalle.html">
                   Mentoría para proyectos de software educativos
                 </a>
               </h4>
@@ -499,15 +481,15 @@
             <nav aria-label="Acciones del servicio de mentoría">
               <ul>
                 <li>
-                  <a href="detalle-servicio.html"> Ver publicación </a>
+                  <a href="servicioDetalle.html"> Ver publicación </a>
                 </li>
 
                 <li>
-                  <a href="formulario_servicio.html"> Editar </a>
+                  <a href="formsSolicitarServicio.html"> Editar </a>
                 </li>
 
                 <li>
-                  <a href="solicitudes_proveedor.html"> Ver reservas </a>
+                  <a href="#solicitudes"> Ver reservas </a>
                 </li>
 
                 <li>
@@ -522,7 +504,7 @@
               <p>Proyecto educativo</p>
 
               <h4>
-                <a href="detalle-servicio.html">
+                <a href="servicioDetalle.html">
                   Diseño de proyectos tecnológicos para instituciones
                 </a>
               </h4>
@@ -563,11 +545,11 @@
             <nav aria-label="Acciones del proyecto educativo">
               <ul>
                 <li>
-                  <a href="detalle-servicio.html"> Vista previa </a>
+                  <a href="servicioDetalle.html"> Vista previa </a>
                 </li>
 
                 <li>
-                  <a href="formulario_servicio.html"> Continuar editando </a>
+                  <a href="formsSolicitarServicio.html"> Continuar editando </a>
                 </li>
 
                 <li>
@@ -583,7 +565,7 @@
         </section>
 
         <p>
-          <a href="mis_publicaciones.html"> Ver todas las publicaciones </a>
+          <a href="#publicaciones"> Ver todas las publicaciones </a>
         </p>
       </section>
 
@@ -643,15 +625,15 @@
           <nav aria-label="Acciones de la solicitud de impresión">
             <ul>
               <li>
-                <a href="detalle_solicitud.html"> Ver solicitud completa </a>
+                <a href="#solicitudes"> Ver solicitud completa </a>
               </li>
 
               <li>
-                <a href="crear_presupuesto.html"> Enviar presupuesto </a>
+                <a href="#solicitudes"> Enviar presupuesto </a>
               </li>
 
               <li>
-                <a href="contactar_cliente.html"> Contactar </a>
+                <a href="#solicitudes"> Contactar </a>
               </li>
 
               <li>
@@ -710,7 +692,7 @@
           <nav aria-label="Acciones de la solicitud de mentoría">
             <ul>
               <li>
-                <a href="detalle_solicitud.html"> Ver detalles </a>
+                <a href="#solicitudes"> Ver detalles </a>
               </li>
 
               <li>
@@ -718,7 +700,7 @@
               </li>
 
               <li>
-                <a href="contactar_cliente.html"> Proponer otro horario </a>
+                <a href="#solicitudes"> Proponer otro horario </a>
               </li>
 
               <li>
@@ -729,7 +711,7 @@
         </article>
 
         <p>
-          <a href="solicitudes_proveedor.html"> Ver todas las solicitudes </a>
+          <a href="#solicitudes"> Ver todas las solicitudes </a>
         </p>
       </section>
 
@@ -767,7 +749,7 @@
             </div>
           </dl>
 
-          <a href="detalle_contratacion.html"> Ver contratación </a>
+          <a href="#contrataciones"> Ver contratación </a>
 
           <button type="button">Actualizar estado</button>
         </article>
@@ -799,7 +781,7 @@
             </div>
           </dl>
 
-          <a href="detalle_contratacion.html"> Ver contratación </a>
+          <a href="#contrataciones"> Ver contratación </a>
 
           <button type="button">Contactar cliente</button>
         </article>
@@ -832,7 +814,7 @@
             </div>
           </dl>
 
-          <a href="estudiantes_curso.html"> Ver lista de estudiantes </a>
+          <a href="#estudiantes"> Ver lista de estudiantes </a>
         </article>
 
         <article>
@@ -855,7 +837,7 @@
             </div>
           </dl>
 
-          <a href="estudiantes_curso.html"> Ver lista de estudiantes </a>
+          <a href="#estudiantes"> Ver lista de estudiantes </a>
         </article>
       </section>
 
@@ -884,7 +866,7 @@
           <li>Mentoría tecnológica</li>
         </ul>
 
-        <a href="editar_perfil.html"> Editar habilidades </a>
+        <a href="#perfil"> Editar habilidades </a>
       </section>
 
       <section aria-labelledby="titulo-perfil-profesional">
@@ -894,9 +876,7 @@
           <p>Información visible para los posibles clientes y estudiantes.</p>
         </header>
 
-        <img
-          src="assets/proveedores/ana-fernandez.jpg"
-          alt="Fotografía de perfil de Ana Fernández" />
+        <span class="brand-mark">Classia</span>
 
         <h3>Ana Fernández</h3>
 
@@ -937,9 +917,9 @@
           </div>
         </dl>
 
-        <a href="perfil-proveedor.html"> Ver perfil público </a>
+        <a href="usuario.html"> Ver perfil público </a>
 
-        <a href="editar_perfil.html"> Editar información </a>
+        <a href="#perfil"> Editar información </a>
       </section>
 
       <section id="valoraciones" aria-labelledby="titulo-valoraciones">
@@ -980,10 +960,10 @@
             desarrollar páginas web.
           </p>
 
-          <p>Curso: Desarrollo web con HTML, CSS y JavaScript.</p>
+          <p>Curso demo: Robótica para principiantes.</p>
         </article>
 
-        <a href="valoraciones_proveedor.html"> Ver todas las valoraciones </a>
+        <a href="#valoraciones"> Ver todas las valoraciones </a>
       </section>
 
       <section aria-labelledby="titulo-configuracion">
@@ -994,32 +974,32 @@
         <nav aria-label="Configuración del proveedor">
           <ul>
             <li>
-              <a href="editar_perfil.html"> Datos profesionales </a>
+              <a href="#perfil"> Datos profesionales </a>
             </li>
 
             <li>
-              <a href="configurar_disponibilidad.html"> Disponibilidad </a>
+              <a href="#titulo-configuracion"> Disponibilidad </a>
             </li>
 
             <li>
-              <a href="configurar_notificaciones.html"> Notificaciones </a>
+              <a href="#titulo-configuracion"> Notificaciones </a>
             </li>
 
             <li>
-              <a href="datos_facturacion.html">
+              <a href="#titulo-configuracion">
                 Datos de facturación ficticios
               </a>
             </li>
 
             <li>
-              <a href="seguridad_cuenta.html"> Seguridad de la cuenta </a>
+              <a href="#titulo-configuracion"> Seguridad de la cuenta </a>
             </li>
           </ul>
         </nav>
       </section>
     </main>
 
-    <footer>
+    <footer class="site-footer">
       <p>
         Classia — Plataforma de comercialización de cursos y servicios
         educativos
@@ -1036,19 +1016,19 @@
           </li>
 
           <li>
-            <a href="pantalla_usuario.html">Mi perfil</a>
+            <a href="usuario.html">Mi perfil</a>
           </li>
 
           <li>
-            <a href="sobre-nosotros.html">Acerca de</a>
+            <a href="../index.html">Acerca de</a>
           </li>
 
           <li>
-            <a href="contacto.html">Contacto</a>
+            <a href="../index.html">Contacto</a>
           </li>
 
           <li>
-            <a href="privacidad.html">Privacidad</a>
+            <a href="../index.html">Privacidad</a>
           </li>
         </ul>
       </nav>

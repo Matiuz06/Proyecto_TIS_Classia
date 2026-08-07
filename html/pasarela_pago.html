@@ -1,69 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Pasarela de Pago — Classia</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-
-  <!-- TARJETA DE PAGO -->
-  <div class="card-container">
-
-    <!-- LOGO -->
-    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140" style="margin-bottom: 15px;">
-
-    <!-- TÍTULO -->
-    <h3 style="margin-bottom: 20px;">Pasarela de Pago</h3>
-
-    <!-- FORMULARIO -->
-    <form action="confirmacion.html" method="GET">
-
-      <!-- EMAIL -->
-      <p>
-        <label for="email"><strong>Correo electrónico:*</strong></label><br>
-        <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
-      </p>
-
-      <!-- NÚMERO DE TARJETA -->
-      <p>
-        <label for="numero_tarjeta"><strong>Número de tarjeta:*</strong></label><br>
-        <input type="text" id="numero_tarjeta" name="numero_tarjeta" placeholder="4557 5563 3456 3509" required>
-      </p>
-
-      <!-- FECHA Y CVV -->
-      <div class="flex-row" style="margin-bottom: 20px;">
-        <div style="flex: 1; text-align: left;">
-          <label for="fecha_expiracion" style="font-size: 13px;"><strong>Expiración:*</strong></label><br>
-          <input type="text" id="fecha_expiracion" name="fecha_expiracion" placeholder="MM/AA" required>
-        </div>
-        <div style="flex: 1; text-align: left;">
-          <label for="cvv" style="font-size: 13px;"><strong>CVV:*</strong></label><br>
-          <input type="text" id="cvv" name="cvv" placeholder="123" required>
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pasarela de Pago — Classia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="carrito.html" aria-current="page">Carrito</a>
+          <a href="usuario.html">Mi cuenta</a>
+        </nav>
       </div>
+    </header>
+    <!-- TARJETA DE PAGO -->
+    <div class="card-container">
+      <!-- LOGO -->
+      <span class="brand-mark">Classia</span>
 
-      <!-- BOTÓN PAGAR -->
-      <button type="submit" style="width: 100%; padding: 12px; font-size: 16px;">
-        Pagar $99.97
-      </button>
+      <!-- TÍTULO -->
+      <h1>Pasarela de Pago</h1>
 
-    </form>
+      <!-- FORMULARIO -->
+      <form action="confirmacion.html" method="GET">
+        <!-- EMAIL -->
+        <p>
+          <label for="email"><strong>Correo electrónico:*</strong></label
+          ><br />
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="correo@ejemplo.com"
+            required />
+        </p>
 
-    <hr style="margin: 20px 0 15px 0;">
+        <!-- NÚMERO DE TARJETA -->
+        <p>
+          <label for="numero_tarjeta"
+            ><strong>Número de tarjeta:*</strong></label
+          ><br />
+          <input
+            type="text"
+            id="numero_tarjeta"
+            name="numero_tarjeta"
+            placeholder="4557 5563 3456 3509"
+            required />
+        </p>
 
-    <p style="margin: 0; font-size: 14px;">
-      <a href="carrito.html" style="text-decoration: none;">← Volver al Carrito</a>
-    </p>
+        <!-- FECHA Y CVV -->
+        <div class="flex-row">
+          <div>
+            <label for="fecha_expiracion"><strong>Expiración:*</strong></label
+            ><br />
+            <input
+              type="text"
+              id="fecha_expiracion"
+              name="fecha_expiracion"
+              placeholder="MM/AA"
+              required />
+          </div>
+          <div>
+            <label for="cvv"><strong>CVV:*</strong></label
+            ><br />
+            <input type="text" id="cvv" name="cvv" placeholder="123" required />
+          </div>
+        </div>
 
-    <!-- ICONOS DE COMPLIANCE -->
-    <div style="text-align: center; margin-top: 15px;">
-      <img src="../assets/PCI-DSS-1.png" alt="PCI-DSS-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
-      <img src="../assets/ISO-8583-300x300.png" alt="ISO-8583-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
-      <img src="../assets/ISO-20022.png" alt="ISO-20022-COMPLIANCE" height="40" style="margin: 0 5px; vertical-align: middle;">
+        <!-- BOTÓN PAGAR -->
+        <button type="submit">Pagar $99.97</button>
+      </form>
+
+      <hr />
+
+      <p>
+        <a href="carrito.html">← Volver al Carrito</a>
+      </p>
+
+      <!-- ICONOS DE COMPLIANCE -->
+      <div>
+        <span class="badge">Cumplimiento de seguridad</span>
+        <span class="badge">Cumplimiento de seguridad</span>
+        <span class="badge">Cumplimiento de seguridad</span>
+      </div>
     </div>
-
-  </div>
-
-</body>
+  </body>
 </html>
