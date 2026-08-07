@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions: {}
+
 jobs:
   branch-naming:
     name: "Verificar nombre de rama"
