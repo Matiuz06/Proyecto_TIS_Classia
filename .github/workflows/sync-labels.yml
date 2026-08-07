@@ -1,0 +1,36 @@
+name: "🏷️ Sincronizar labels"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/labels.yml"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Simular sin aplicar cambios (dry run)"
+        required: false
+        default: "false"
+        type: boolean
+
+jobs:
+  sync-labels:
+    name: "Sincronizar labels con labels.yml"
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write      # crear / editar labels
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sincronizar labels con el repositorio
+        uses: EndBug/label-sync@v2
+        with:
+          config-file: .github/labels.yml
+          # delete-other-labels elimina labels que NO estén en labels.yml.
+          # Cambiá a 'true' si querés un control estricto (elimina los defaults de GitHub).
+          delete-other-labels: false
+          dry-run: ${{ inputs.dry_run || false }}
+          token: ${{ secrets.GITHUB_TOKEN }}
