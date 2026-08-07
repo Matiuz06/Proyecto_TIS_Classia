@@ -1,47 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Restablecer Contraseña — Classia</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restablecer Contraseña — Classia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="carrito.html">Carrito</a>
+          <a href="usuario.html" aria-current="page">Mi cuenta</a>
+        </nav>
+      </div>
+    </header>
+    <!-- TARJETA CENTRADA -->
+    <div class="card-container">
+      <span class="brand-mark">Classia</span>
+      <h1>Restablecer Contraseña</h1>
+      <p>Ingresa tu correo para enviarte las instrucciones de recuperación.</p>
 
-  <!-- TARJETA CENTRADA -->
-  <div class="card-container">
+      <form action="/restablecer_contra" method="POST">
+        <p>
+          <label for="correo1"><strong>Correo registrado:*</strong></label
+          ><br />
+          <input
+            type="email"
+            id="correo1"
+            name="correo_recuperacion"
+            placeholder="ejemplo@correo.com"
+            required />
+        </p>
 
-    <img src="../assets/Isotipo +Logo AniTech Letras.png" alt="Logo AniTech" width="140" style="margin-bottom: 10px;">
-    <h3 style="margin-bottom: 6px;">Restablecer Contraseña</h3>
-    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Ingresa tu correo para enviarte las instrucciones de recuperación.</p>
+        <p>
+          <label for="cont2"><strong>Nueva contraseña:*</strong></label
+          ><br />
+          <input
+            type="password"
+            id="cont2"
+            name="nueva_contrasena"
+            placeholder="Nueva contraseña"
+            required />
+        </p>
 
-    <form action="/restablecer_contra" method="POST">
-      
+        <button type="submit">Enviar Restablecimiento</button>
+      </form>
+
+      <hr />
+
       <p>
-        <label for="correo1"><strong>Correo registrado:*</strong></label><br>
-        <input type="email" id="correo1" name="correo_recuperacion" placeholder="ejemplo@correo.com" required>
+        <a href="login.html">← Iniciar Sesión</a>
       </p>
-
       <p>
-        <label for="cont2"><strong>Nueva contraseña:*</strong></label><br>
-        <input type="password" id="cont2" name="nueva_contrasena" placeholder="Nueva contraseña" required>
+        <a href="registro.html">¿No tienes cuenta? Regístrate</a>
       </p>
-
-      <button type="submit" style="width: 100%; margin-top: 10px;">
-        Enviar Restablecimiento
-      </button>
-
-    </form>
-
-    <hr style="margin: 20px 0 15px 0;">
-
-    <p style="font-size: 14px; margin-bottom: 6px;">
-      <a href="login.html">← Iniciar Sesión</a>
-    </p>
-    <p style="font-size: 14px; margin: 0;">
-      <a href="registro.html">¿No tienes cuenta? Regístrate</a>
-    </p>
-
-  </div>
-
-</body>
+    </div>
+  </body>
 </html>
