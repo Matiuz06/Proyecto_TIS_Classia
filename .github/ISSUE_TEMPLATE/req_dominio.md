@@ -2,7 +2,7 @@
 name: "📐 Regla de negocio / Dominio"
 about: Documentar o implementar una regla de negocio del SRS de Classia
 title: "[RN-NN] "
-labels: "RN: dominio"
+labels: "RN: dominio, estado: backlog"
 assignees: ""
 ---
 
@@ -15,6 +15,19 @@ assignees: ""
 
 **`RN-NN`**
 > Copiá aquí el texto exacto del SRS.
+
+## Rol responsable
+
+- [ ] Product Owner
+- [ ] Desarrollador/a
+- [ ] Tester
+- [ ] Scrum Master
+
+## Estimación
+
+- [ ] ½ día
+- [ ] 1 día
+- [ ] 2 días
 
 ## Descripción técnica
 
@@ -36,6 +49,12 @@ assignees: ""
 
 - [ ] 
 - [ ] 
+
+## Vinculación
+
+- **Trello:** <!-- URL de la tarjeta en https://trello.com/b/GxSUgvHG/proyecto-taller-anitech -->
+- **Sprint (Milestone):** <!-- ej: Sprint 1 -->
+- **PR relacionado:** <!-- se completa al abrir el PR -->
 
 ## Requerimientos funcionales relacionados
 

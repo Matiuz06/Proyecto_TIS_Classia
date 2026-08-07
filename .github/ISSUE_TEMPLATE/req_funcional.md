@@ -2,7 +2,7 @@
 name: "📋 Requerimiento funcional"
 about: Implementar un requerimiento funcional del SRS de Classia
 title: "[REQ-XXX-NN] "
-labels: ""
+labels: "estado: backlog"
 assignees: ""
 ---
 
@@ -43,6 +43,23 @@ assignees: ""
 - [ ] Media
 - [ ] Baja
 
+## Rol responsable
+
+<!-- Asigná el label de rol correspondiente en el panel lateral -->
+
+- [ ] Product Owner
+- [ ] Desarrollador/a
+- [ ] Tester
+- [ ] Scrum Master
+
+## Estimación
+
+<!-- Máximo 2 días por tarea. Si supera eso, dividí en sub-issues. -->
+
+- [ ] ½ día
+- [ ] 1 día
+- [ ] 2 días
+
 ## Descripción técnica
 
 <!-- ¿Qué hay que construir o modificar para cumplir este requerimiento? -->
@@ -58,6 +75,12 @@ assignees: ""
 ## Archivos / módulos afectados
 
 <!-- ¿En qué archivos HTML, CSS o JS se va a trabajar? -->
+
+## Vinculación
+
+- **Trello:** <!-- URL de la tarjeta en https://trello.com/b/GxSUgvHG/proyecto-taller-anitech -->
+- **Sprint (Milestone):** <!-- ej: Sprint 1 -->
+- **PR relacionado:** <!-- se completa al abrir el PR -->
 
 ## Requerimientos relacionados
 

@@ -27,19 +27,33 @@
 - [ ] Documentación
 - [ ] CI/CD
 
+## Cómo probar
+
+<!--
+  Pasos detallados para que el revisor o tester pueda verificar estos cambios localmente:
+  1. Abrir index.html o ir a '...'
+  2. Ejecutar '...'
+  3. Verificar que ...
+-->
+
+1. 
+2. 
+
 ## Checklist
 
 - [ ] El código pasa el lint (HTMLHint / stylelint / ESLint)
 - [ ] Probé los cambios localmente en el navegador
 - [ ] No introduje secretos ni credenciales en el código
 - [ ] Actualicé la documentación si corresponde
-- [ ] Asocié este PR a un Issue (si aplica)
+- [ ] Asocié este PR a una Issue en GitHub (Closes #...)
+- [ ] La tarjeta correspondiente en Trello fue movida a "En Review"
 - [ ] La tabla de requerimientos está completa (al menos una fila)
 
-## Issue relacionado
+## Vinculaciones
 
-Closes #
+- **Closes Issue:** Closes #
+- **Tarjeta Trello:** https://trello.com/b/GxSUgvHG/proyecto-taller-anitech
 
-## Capturas (si aplica)
+## Capturas / Evidencia (si aplica)
 
-<!-- Arrastrar imágenes acá -->
+<!-- Arrastrar imágenes o GIFs del comportamiento acá -->

@@ -4,7 +4,67 @@
 # Nomenclatura basada en el SRS v1.0 (31/10/2025)
 # ─────────────────────────────────────────────────────────────
 
+# ── Roles Scrum ───────────────────────────────────────────────
+- name: "rol: Product Owner"
+  color: "0EA5E9"
+  description: "Tarea liderada o definida por el Product Owner"
+
+- name: "rol: Desarrollador"
+  color: "22C55E"
+  description: "Tarea de implementación a cargo del desarrollador"
+
+- name: "rol: Tester"
+  color: "F59E0B"
+  description: "Tarea de verificación y pruebas"
+
+- name: "rol: Scrum Master"
+  color: "8B5CF6"
+  description: "Tarea de gestión de proceso o ceremonia Scrum"
+
+- name: "rol: Stakeholder"
+  color: "64748B"
+  description: "Issue originado o validado por el cliente / stakeholder"
+
+# ── Estado Kanban (espejo del tablero Trello) ─────────────────
+- name: "estado: backlog"
+  color: "CBD5E1"
+  description: "Tarea identificada, pendiente de planificación"
+
+- name: "estado: to-do"
+  color: "93C5FD"
+  description: "Comprometida para el sprint actual, sin empezar"
+
+- name: "estado: en desarrollo"
+  color: "FCD34D"
+  description: "En desarrollo activo (WIP)"
+
+- name: "estado: en review"
+  color: "FB923C"
+  description: "PR abierto, esperando revisión de par"
+
+- name: "estado: en testing"
+  color: "A78BFA"
+  description: "Integrado en Testing, bajo verificación"
+
+- name: "estado: finalizado"
+  color: "4ADE80"
+  description: "Mergeado a main y verificado"
+
+# ── Estimación ────────────────────────────────────────────────
+- name: "estimación: ½ día"
+  color: "E0F2FE"
+  description: "Tarea estimada en medio día de trabajo"
+
+- name: "estimación: 1 día"
+  color: "BAE6FD"
+  description: "Tarea estimada en un día de trabajo"
+
+- name: "estimación: 2 días"
+  color: "7DD3FC"
+  description: "Tarea estimada en dos días de trabajo (máximo)"
+
 # ── Requerimientos Funcionales (RF) ──────────────────────────
+
 - name: "RF: autenticación"
   color: "7C3AED"
   description: "REQ-AUT: Autenticación y acceso (RF 7.1)"

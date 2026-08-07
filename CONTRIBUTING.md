@@ -1,180 +1,117 @@
-# Guía de contribución — Classia
+# Guía de contribución y gestión de proyecto — Classia (AniTech)
 
-Bienvenido al repositorio de **Classia**, el EVA desarrollado por **AniTech**.
-Este documento describe cómo trabajar en el proyecto de forma ordenada y trazable respecto a los requerimientos del SRS.
+Bienvenido al repositorio de **Classia**, el Entorno Virtual de Aprendizaje (EVA) desarrollado por **AniTech**.
+Este documento detalla la gestión operativa, flujo de trabajo en GitHub, vinculación con Trello y convención de sprints/requerimientos.
+
+---
+
+## 🔗 Enlaces operativos principales
+
+- 📋 **Tablero Kanban (Trello):** [https://trello.com/b/GxSUgvHG/proyecto-taller-anitech](https://trello.com/b/GxSUgvHG/proyecto-taller-anitech)
+- 🐙 **Repositorio GitHub:** [https://github.com/Matiuz06/Proyecto_TIS_Classia](https://github.com/Matiuz06/Proyecto_TIS_Classia)
 
 ---
 
 ## 1. Flujo de ramas
 
 ```
-main
- └── dev/<nombre-desarrollador>
-       └── (testing — solo si la funcionalidad involucra JS o base de datos)
+main (protegida)
+ └── Dev-<NombreDesarrollador> (ej: Dev-Rafael, Dev-Thiago)
+       └── Testing (integración previa para lógica JS o BD — cuando aplica)
              └── main
 ```
 
-### Reglas
+### Reglas de ramas
 
-| Rama | Propósito |
+| Rama | Descripción |
 |---|---|
-| `main` | Código en producción. Solo se integra via PR aprobado. |
-| `dev/<nombre>` | Rama de trabajo del desarrollador. Se abre desde `main`. |
-| `testing` | Rama de integración para validar cambios que involucren lógica JS o BD antes de ir a `main`. Solo se usa cuando aplica. |
+| `main` | Código estable y entregable. Rama protegida; solo acepta cambios mediante Pull Request revisado y aprobado. |
+| `Testing` | Rama de integración para validar funcionalidades complejas (especialmente cambios de JavaScript, base de datos o lógica cliente/servidor) antes de mergear a `main`. |
+| `Dev-<Nombre>` / `feature/*` / `hotfix/*` | Ramas de desarrollo individual por desarrollador o funcionalidad. |
 
-> **No hacer push directo a `main`.** Todo cambio entra mediante Pull Request con al menos una revisión de código aprobada.
+> ⚠️ **Sin commits directos a `main`:** Todos los cambios deben ingresar por Pull Request con al menos 1 revisión aprobada de un compañero de equipo.
 
 ---
 
-## 2. Nomenclatura de ramas
+## 2. Definición de roles Scrum
+
+Cada tarea e Issue debe asociarse al rol correspondiente utilizando los labels de GitHub:
+
+- 👤 **Product Owner (`rol: Product Owner`):** Definición de requerimientos, criterios de aceptación y priorización del backlog.
+- 💻 **Desarrollador/a (`rol: Desarrollador`):** Implementación técnica, maquetación HTML/CSS, lógica JS y solución de bugs.
+- 🧪 **Tester (`rol: Tester`):** Verificación de criterios de aceptación, pruebas de usabilidad y control de calidad.
+- ⚡ **Scrum Master (`rol: Scrum Master`):** Gestión de proceso, remoción de bloqueos y facilitación de ceremonias.
+- 👔 **Stakeholder (`rol: Stakeholder`):** Feedback del cliente y validación funcional.
+
+---
+
+## 3. Tablero Kanban (Trello) y estimación
+
+El flujo de trabajo visual se administra en el tablero Trello con las siguientes columnas obligatorias:
+
+$$\text{Backlog} \longrightarrow \text{Listo / To Do} \longrightarrow \text{En Desarrollo} \longrightarrow \text{En Review} \longrightarrow \text{En Testing} \longrightarrow \text{Finalizado}$$
+
+### Reglas del tablero
+
+1. **Tamaño máximo de tarea:** Cada issue/tarjeta debe representar máximo **1 a 2 días de trabajo** (`estimación: ½ día`, `estimación: 1 día`, `estimación: 2 días`).
+2. **Vinculación bidireccional:**
+   - La tarjeta de Trello debe contener el enlace al Issue o PR de GitHub.
+   - El Issue de GitHub debe incluir la URL de la tarjeta de Trello en la sección **Vinculación**.
+3. **Cierre automático:** Al abrir un PR, incluir `Closes #<número-issue>` para que el issue de GitHub se cierre automáticamente al hacer merge a `main`.
+
+---
+
+## 4. Sprints y Milestones (GitHub)
+
+Los sprints tienen una duración de **2 semanas** y se gestionan mediante **Milestones** en GitHub:
+
+- **Ejemplos:** `Sprint 1`, `Sprint 2`, `Sprint 3`…
+- Cada Milestone se configura con su **fecha de inicio** y **fecha de fin**.
+- Al iniciar un Sprint:
+  1. Se asignan los Issues comprometidos al Milestone actual.
+  2. Las tarjetas en Trello se mueven a **Listo / To Do**.
+- Al finalizar el Sprint:
+  1. Se realiza la integración de los PRs revisados a `main`.
+  2. Se realiza la Review y Retrospectiva de Sprint.
+
+---
+
+## 5. Convención de Commits y PRs
+
+### Mensajes de commit (Conventional Commits)
 
 ```
-dev/<nombre-desarrollador>/<tipo>/<descripcion-corta>
+<tipo>(<código-requerimiento>): <descripción corta>
 ```
 
 **Ejemplos:**
+- `feat(REQ-AUT-01): agregar formulario de login con correo y contraseña`
+- `fix(REQ-CAL-05): corregir cálculo de entregas fuera de plazo`
+- `style(RNF-18): ajustar contraste en botones principales según WCAG`
+- `docs: actualizar guía de contribución con flujo de Trello y Sprints`
 
-```
-dev/ana/feat/req-aut-01-login
-dev/bruno/fix/rnf-15-tiempo-respuesta
-dev/ana/refactor/modulo-cursos
-```
+### Plantilla de Pull Request
 
-**Tipos válidos:**
-
-| Tipo | Cuándo usarlo |
-|---|---|
-| `feat` | Nueva funcionalidad (implementa un REQ del SRS) |
-| `fix` | Corrección de bug |
-| `refactor` | Cambio sin impacto funcional |
-| `docs` | Solo documentación |
-| `ci` | Cambios en workflows o scripts de CI/CD |
+Todo PR debe completar la plantilla predefinida en `.github/pull_request_template.md`:
+- **Descripción:** Qué cambia y por qué.
+- **Requerimientos:** Código del SRS (`REQ-XXX-NN`, `RNF-NN` o `RN-NN`).
+- **Cómo probar:** Pasos detallados para verificación manual.
+- **Vinculaciones:** `Closes #ID` y URL de Trello.
+- **Capturas / Evidencia:** Imágenes o GIFs demostrativos.
 
 ---
 
-## 3. Convención de commits
+## 6. Nomenclatura del SRS de Classia
 
-Seguimos **Conventional Commits** con referencia al código del SRS:
+### Funcionales (`REQ-XXX-NN`)
+`REQ-AUT` (Autenticación) · `REQ-USR` (Usuarios) · `REQ-CUR` (Cursos) · `REQ-CON` (Contenidos) · `REQ-BUS` (Búsqueda) · `REQ-INS` (Inscripción) · `REQ-ACT` (Actividades) · `REQ-EVA` (Evaluaciones) · `REQ-CAL` (Calificaciones) · `REQ-COM` (Comunicación) · `REQ-PAN` (Panel/Calendario) · `REQ-SER` (Servicios) · `REQ-PAG` (Pagos) · `REQ-VAL` (Valoraciones) · `REQ-ADM` (Administración).
 
-```
-<tipo>(<código-requerimiento>): <descripción corta en imperativo>
-```
+### No funcionales (`RNF-NN`)
+`RNF-01` a `RNF-09` (Seguridad) · `RNF-10` a `RNF-14` (Privacidad/Ley 18.331) · `RNF-15` a `RNF-16` (Rendimiento) · `RNF-17` a `RNF-18` (Usabilidad/WCAG) · `RNF-19` a `RNF-20` (Compatibilidad) · `RNF-21` a `RNF-24` (Mantenibilidad).
 
-**Ejemplos:**
-
-```
-feat(REQ-AUT-01): implementar formulario de inicio de sesión
-fix(REQ-CAL-05): distinguir correctamente actividades vencidas
-style(RNF-18): mejorar contraste de botones según WCAG AA
-refactor(REQ-CUR-03): extraer lógica de edición de cursos a módulo separado
-docs: actualizar CONTRIBUTING con flujo de ramas
-ci: agregar workflow de sincronización de labels
-```
-
-### Tipos de commit válidos
-
-| Tipo | Cuándo usarlo |
-|---|---|
-| `feat` | Nueva funcionalidad |
-| `fix` | Corrección de bug |
-| `refactor` | Cambio interno sin impacto funcional |
-| `style` | Cambios de estilo/formato sin lógica |
-| `docs` | Solo documentación |
-| `test` | Añadir o modificar pruebas |
-| `ci` | Pipelines y automatización |
-| `chore` | Tareas de mantenimiento menores |
-
-> Si el commit no corresponde a ningún requerimiento del SRS (p. ej., es un cambio de CI puro), omitir el paréntesis: `ci: agregar workflow sync-labels`.
+### Dominio / Reglas de negocio (`RN-NN`)
+`RN-01` a `RN-14`.
 
 ---
 
-## 4. Nomenclatura de requerimientos (SRS)
-
-Classia tiene tres tipos de códigos según el *Documento de Requerimientos de Software*:
-
-### Requerimientos Funcionales — `REQ-XXX-NN`
-
-| Prefijo | Módulo |
-|---|---|
-| `REQ-AUT` | Autenticación y acceso |
-| `REQ-USR` | Gestión de usuarios y roles |
-| `REQ-CUR` | Gestión de cursos |
-| `REQ-CON` | Organización de contenidos |
-| `REQ-BUS` | Búsqueda y navegación |
-| `REQ-INS` | Inscripción y matriculación |
-| `REQ-ACT` | Actividades y entregas |
-| `REQ-EVA` | Evaluaciones |
-| `REQ-CAL` | Calificaciones y progreso |
-| `REQ-COM` | Comunicación y notificaciones |
-| `REQ-PAN` | Calendario y panel principal |
-| `REQ-SER` | Catálogo de servicios institucionales |
-| `REQ-PAG` | Contratación de servicios y pagos |
-| `REQ-VAL` | Valoraciones y comentarios |
-| `REQ-ADM` | Panel administrativo y analíticas |
-
-### Requerimientos No Funcionales — `RNF-NN`
-
-| Código | Categoría |
-|---|---|
-| `RNF-01` a `RNF-09` | Seguridad |
-| `RNF-10` a `RNF-14` | Privacidad y cumplimiento normativo |
-| `RNF-15` a `RNF-16` | Rendimiento y disponibilidad |
-| `RNF-17` a `RNF-18` | Usabilidad y accesibilidad |
-| `RNF-19` a `RNF-20` | Compatibilidad y escalabilidad |
-| `RNF-21` a `RNF-24` | Mantenibilidad e integridad |
-
-### Reglas de Negocio / Dominio — `RN-NN`
-
-`RN-01` a `RN-14` — Reglas que definen el comportamiento del dominio educativo.
-
----
-
-## 5. Issues
-
-Usá siempre un **template de issue** al abrir uno nuevo. Los templates disponibles son:
-
-| Template | Cuándo usarlo |
-|---|---|
-| 📋 Requerimiento funcional | Implementar un `REQ-XXX-NN` |
-| ⚙️ Requerimiento no funcional | Implementar o verificar un `RNF-NN` |
-| 📐 Regla de negocio / Dominio | Implementar una `RN-NN` |
-| 🐛 Reporte de bug | Reportar un comportamiento incorrecto |
-| ✨ Solicitud de funcionalidad | Proponer una mejora no contemplada en el SRS |
-
----
-
-## 6. Pull Requests
-
-Antes de abrir un PR:
-
-1. ✅ Tu rama está actualizada respecto a `main` (o `testing` si aplica).
-2. ✅ El código pasa el lint: `npm run lint` (HTMLHint + stylelint + ESLint).
-3. ✅ Probaste los cambios en el navegador.
-4. ✅ No hay secretos ni credenciales en el código.
-5. ✅ Completaste la tabla **"Requerimientos implementados / afectados"** en el PR. _(El workflow `check-req-reference` verifica esto automáticamente.)_
-
-### Labels de PR
-
-Asigná manualmente los labels que correspondan al tipo de cambio y al módulo del SRS.
-El `labeler.yml` asigna automáticamente los labels de tipo de archivo (`frontend: html`, `frontend: js`, etc.) y el módulo RF cuando el nombre del archivo coincide con la convención.
-
----
-
-## 7. Revisión de código
-
-Toda revisión debe incluir:
-
-- ✅ Correctitud funcional respecto al requerimiento del SRS
-- ✅ Aspectos de seguridad (ver `RNF-08`)
-- ✅ Calidad y legibilidad del código
-- ✅ Documentación actualizada si aplica
-
----
-
-## 8. Política de seguridad
-
-Ver [`SECURITY.md`](./SECURITY.md) para el proceso de reporte de vulnerabilidades.
-
----
-
-*Documento generado en base al SRS v1.0 de Classia — AniTech.*
+*Documento configurado para la Etapa 2 del Proyecto Taller — AniTech / Classia.*

@@ -2,7 +2,7 @@
 name: "⚙️ Requerimiento no funcional"
 about: Implementar o verificar un requerimiento no funcional del SRS de Classia
 title: "[RNF-NN] "
-labels: ""
+labels: "estado: backlog"
 assignees: ""
 ---
 
@@ -27,6 +27,19 @@ assignees: ""
 - [ ] **Compatibilidad y escalabilidad** — RNF-19 a RNF-20
 - [ ] **Mantenibilidad e integridad** — RNF-21 a RNF-24
 
+## Rol responsable
+
+- [ ] Product Owner
+- [ ] Desarrollador/a
+- [ ] Tester
+- [ ] Scrum Master
+
+## Estimación
+
+- [ ] ½ día
+- [ ] 1 día
+- [ ] 2 días
+
 ## Descripción técnica
 
 <!-- ¿Qué control, verificación o cambio arquitectural se requiere? -->
@@ -38,6 +51,12 @@ assignees: ""
 - [ ] 
 - [ ] 
 - [ ] 
+
+## Vinculación
+
+- **Trello:** <!-- URL de la tarjeta en https://trello.com/b/GxSUgvHG/proyecto-taller-anitech -->
+- **Sprint (Milestone):** <!-- ej: Sprint 1 -->
+- **PR relacionado:** <!-- se completa al abrir el PR -->
 
 ## Requerimientos funcionales relacionados
 

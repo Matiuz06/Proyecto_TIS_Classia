@@ -1,0 +1,35 @@
+name: "🌿 Verificar convención de nombres de rama"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  branch-naming:
+    name: "Verificar nombre de rama"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validar nombre de la rama origen
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          echo "Evaluando nombre de rama: $HEAD_REF"
+          
+          # Patrones permitidos:
+          # - Dev-<Nombre> (convención actual del equipo, ej: Dev-Rafael, Dev-Thiago)
+          # - feature/<slug> o feature/<id>-<slug>
+          # - fix/<slug> o hotfix/<slug>
+          # - refactor/<slug>, docs/<slug>, chore/<slug>
+          # - dependabot/*
+          PATTERN="^(Dev-[A-Za-z0-9_.-]+|feature\/[A-Za-z0-9_.-]+|fix\/[A-Za-z0-9_.-]+|hotfix\/[A-Za-z0-9_.-]+|refactor\/[A-Za-z0-9_.-]+|docs\/[A-Za-z0-9_.-]+|dependabot\/.*)$"
+          
+          if [[ "$HEAD_REF" =~ $PATTERN ]]; then
+            echo "✅ El nombre de rama '$HEAD_REF' cumple con las convenciones del proyecto."
+          else
+            echo "⚠️ ADVERTENCIA: La rama '$HEAD_REF' no sigue las convenciones recomendadas."
+            echo "Formatos sugeridos:"
+            echo "  - Dev-<Nombre> (ej: Dev-Rafael)"
+            echo "  - feature/<id-issue>-<descripcion> (ej: feature/42-login-form)"
+            echo "  - hotfix/<descripcion>"
+          fi

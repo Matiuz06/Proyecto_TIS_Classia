@@ -2,7 +2,7 @@
 name: "🐛 Reporte de bug"
 about: Reportar un problema o comportamiento inesperado
 title: "[BUG] "
-labels: bug
+labels: "bug, estado: backlog"
 assignees: ""
 ---
 
@@ -19,6 +19,19 @@ Una descripción clara y concisa del problema.
 -->
 
 - `REQ-XXX-NN` / `RNF-NN` / `RN-NN` — descripción breve del requerimiento
+
+## Rol responsable
+
+- [ ] Product Owner
+- [ ] Desarrollador/a
+- [ ] Tester
+- [ ] Scrum Master
+
+## Estimación
+
+- [ ] ½ día
+- [ ] 1 día
+- [ ] 2 días
 
 ## Pasos para reproducir
 
@@ -37,6 +50,11 @@ Qué está pasando en realidad.
 ## Capturas
 
 Si aplica, agregar capturas de pantalla o grabación.
+
+## Vinculación
+
+- **Trello:** <!-- URL de la tarjeta en https://trello.com/b/GxSUgvHG/proyecto-taller-anitech -->
+- **Sprint (Milestone):** <!-- ej: Sprint 1 -->
 
 ## Entorno
 

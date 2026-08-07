@@ -1,0 +1,27 @@
+name: "🧹 Gestión de Issues y PRs inactivos"
+
+on:
+  schedule:
+    - cron: "0 0 * * 1" # Ejecutar todos los lunes a las 00:00 UTC
+  workflow_dispatch:
+
+jobs:
+  stale:
+    name: "Marcar inactivos"
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 14
+          days-before-close: 7
+          stale-issue-message: "Este issue no ha tenido actividad por 14 días. Se marcará como inactivo (stale) y se cerrará en 7 días si no se registra nueva actividad."
+          stale-pr-message: "Este PR no ha tenido actividad por 14 días. Se marcará como inactivo (stale) y se cerrará en 7 días si no se actualiza."
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+          exempt-issue-labels: "prioridad: alta"
+          exempt-pr-labels: "prioridad: alta"
