@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -14,9 +14,21 @@
     <link rel="stylesheet" href="../css/style.css" />
   </head>
 
-  <body style="font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 20px;">
-    <main style="background: white; max-width: 750px; margin: 0 auto; padding: 30px; border-radius: 8px; border: 1px solid #ccc;">
-      <header style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;">
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html"></a>
+        <img src="../assets/logoC.png" />
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="carrito.html">Carrito</a>
+          <a href="usuario.html" aria-current="page">Mi cuenta</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <header>
         <p>Configuración inicial</p>
 
         <h1>Contanos qué buscás en Classia</h1>
@@ -32,7 +44,7 @@
         </p>
       </header>
 
-      <form action="dashboard_Usuarios.html" method="get">
+      <form action="usuario.html" method="get">
         <fieldset>
           <legend>1. Datos personales y profesionales</legend>
 
@@ -733,21 +745,21 @@
                 required />
 
               Confirmo que leí y acepto la
-              <a href="politica-privacidad.html"> política de privacidad </a>
+              <a href="../index.html"> política de privacidad </a>
               y el tratamiento de mis datos personales.
             </label>
           </p>
         </fieldset>
 
-        <div style="margin-top: 25px;">
-          <button type="submit" style="padding: 10px 20px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Guardar y continuar</button>
+        <div>
+          <button type="submit">Guardar y continuar</button>
 
-          <a href="dashboard_Usuarios.html" style="margin-left: 15px; color: #555;"> Omitir por ahora </a>
+          <a href="usuario.html"> Omitir por ahora </a>
         </div>
       </form>
     </main>
 
-    <footer style="text-align: center; margin-top: 30px; color: #555; font-size: 14px;">
+    <footer class="site-footer">
       <p>Classia — Plataforma de comercialización de servicios educativos</p>
 
       <nav aria-label="Navegación secundaria">
@@ -761,11 +773,11 @@
           </li>
 
           <li>
-            <a href="politica-privacidad.html"> Privacidad </a>
+            <a href="../index.html"> Privacidad </a>
           </li>
 
           <li>
-            <a href="contacto.html">Contacto</a>
+            <a href="../index.html">Contacto</a>
           </li>
         </ul>
       </nav>

@@ -1,50 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="../assets/favicon.png">
-  <title>Iniciar Sesión — Classia</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body style="font-family: sans-serif; background: #f0f0f0; padding: 40px; margin: 0;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Inicio de sesión en Classia." />
+    <title>Iniciar sesión | Classia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body class="auth-page">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="carrito.html">Carrito</a>
+          <a href="usuario.html" aria-current="page">Mi cuenta</a>
+        </nav>
+      </div>
+    </header>
+    <main class="auth-shell">
+      <section class="auth-intro" aria-labelledby="intro-login">
+        <span class="brand-mark">Classia</span>
+        <h1 id="intro-login">Entrá a tu espacio educativo</h1>
+        <p>
+          Accedé a tus cursos, solicitudes, publicaciones y herramientas de
+          gestión desde una cuenta Classia.
+        </p>
+      </section>
 
-  <div style="background: white; padding: 25px; width: 320px; margin: 0 auto; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
-    
-    <img src="../assets/logoC.png" alt="Logo Classia" width="140" style="margin: 0 auto 15px auto;">
-    <h3>Iniciar Sesión</h3>
-
-    <form action="/login" method="POST" style="text-align: left;">
-      <p>
-        <label for="correo">Correo electrónico:</label><br>
-        <input type="email" id="correo" name="correo" required placeholder="ejemplo@correo.com" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
-      </p>
-
-      <p>
-        <label for="contraseña">Contraseña:</label><br>
-        <input type="password" id="contraseña" name="contraseña" required placeholder="Ingresa tu contraseña" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
-      </p>
-
-      <p style="font-size: 13px;">
-        <label>
-          <input type="checkbox" name="terminos" required> Acepto los términos y condiciones
-        </label>
-      </p>
-
-      <button type="submit" style="width: 100%; padding: 10px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
-        Iniciar Sesión
-      </button>
-    </form>
-
-    <hr style="margin: 20px 0;">
-
-    <p style="font-size: 14px;">
-      <a href="restablecer_contrasena.html" style="color: #4a3f9f;">¿Olvidaste tu contraseña?</a>
-    </p>
-    <p style="font-size: 14px; margin: 0;">
-      <a href="registro.html">¿No tienes cuenta? Regístrate</a>
-    </p>
-
-  </div>
-
-</body>
+      <section class="auth-card" aria-labelledby="titulo-login">
+        <h2 id="titulo-login">Iniciar sesión</h2>
+        <p class="muted">Usá tu correo y contraseña para continuar.</p>
+        <form action="/login" method="POST">
+          <p>
+            <label for="correo">Correo electrónico</label>
+            <input
+              type="email"
+              id="correo"
+              name="correo"
+              autocomplete="email"
+              required
+              placeholder="ejemplo@correo.com" />
+          </p>
+          <p>
+            <label for="contrasena">Contraseña</label>
+            <input
+              type="password"
+              id="contrasena"
+              name="contraseña"
+              autocomplete="current-password"
+              required
+              placeholder="Ingresa tu contraseña" />
+          </p>
+          <label>
+            <input type="checkbox" name="terminos" required /> Acepto los
+            términos y condiciones
+          </label>
+          <button type="submit">Iniciar sesión</button>
+        </form>
+        <p class="auth-links">
+          <a href="restablecer_contrasena.html">¿Olvidaste tu contraseña?</a>
+        </p>
+        <p class="auth-links">
+          ¿No tenés cuenta? <a href="registro.html">Registrate</a>
+        </p>
+      </section>
+    </main>
+  </body>
 </html>
