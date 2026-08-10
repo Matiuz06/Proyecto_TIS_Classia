@@ -171,10 +171,9 @@ hr {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--color-header-bg);
+  background: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(14px);
 }
 
 .site-header__inner {
@@ -208,7 +207,7 @@ hr {
 #logoC {
   display: block;
   width: auto;
-  height: 2.5rem;
+  height: 4.0rem;
   max-width: 100%;
   object-fit: contain;
 }
@@ -579,7 +578,7 @@ dd {
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  min-height: 1.75rem;
+  min-height: 3.0rem;
   padding: 0.25rem 0.55rem;
   color: var(--color-info);
   background: var(--color-info-bg);
@@ -587,6 +586,17 @@ dd {
   border-radius: var(--radius-sm);
   font-size: var(--text-xs);
   font-weight: 800;
+}
+
+.badge img {
+  display: block;
+  max-width: 3.4rem;
+  max-height: 3.4rem;
+  object-fit: contain;
+}
+
+.badge {
+  justify-content: center;
 }
 
 .empty-state {
@@ -610,7 +620,7 @@ dd {
   gap: var(--space-6);
   width: min(920px, 100%);
   margin-inline: auto;
-  align-items: center;
+  align-items: start;
 }
 
 .auth-intro {
