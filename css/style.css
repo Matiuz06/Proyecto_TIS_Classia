@@ -171,9 +171,10 @@ hr {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--color-bg);
+  background: var(--color-header-bg);
   border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(14px);
 }
 
 .site-header__inner {
@@ -194,8 +195,6 @@ hr {
   min-height: 2.5rem;
   padding: var(--space-2) var(--space-3);
   color: var(--color-brand-primary-hover);
-  background: var(--color-surface-elevated);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: var(--text-lg);
   font-weight: 900;
@@ -207,7 +206,7 @@ hr {
 #logoC {
   display: block;
   width: auto;
-  height: 4.0rem;
+  height: 2.5rem;
   max-width: 100%;
   object-fit: contain;
 }
@@ -304,7 +303,6 @@ figure {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
 }
-
 
 .provider-dashboard > section {
   padding-block: var(--space-5);
@@ -578,7 +576,7 @@ dd {
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  min-height: 3.0rem;
+  min-height: 1.75rem;
   padding: 0.25rem 0.55rem;
   color: var(--color-info);
   background: var(--color-info-bg);
@@ -586,17 +584,6 @@ dd {
   border-radius: var(--radius-sm);
   font-size: var(--text-xs);
   font-weight: 800;
-}
-
-.badge img {
-  display: block;
-  max-width: 3.4rem;
-  max-height: 3.4rem;
-  object-fit: contain;
-}
-
-.badge {
-  justify-content: center;
 }
 
 .empty-state {
@@ -620,7 +607,7 @@ dd {
   gap: var(--space-6);
   width: min(920px, 100%);
   margin-inline: auto;
-  align-items: start;
+  align-items: center;
 }
 
 .auth-intro {
@@ -804,6 +791,3 @@ th {
     white-space: normal;
   }
 }
-
-
-
