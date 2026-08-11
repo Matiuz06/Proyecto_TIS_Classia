@@ -1,103 +1,96 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="../assets/favicon.png">
-  <title>Pantalla Curso — Classia</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-
-  <!-- BARRA SUPERIOR -->
-  <header>
-    <div class="flex-row">
-      <img src="../assets/logoC.png" alt="Logo AniTech" width="140">
-      <input type="search" placeholder="Buscar en el curso..." style="width: 260px; margin-left: 15px;">
-    </div>
-    <div class="flex-row">
-      <select name="rol_usuario" id="rol_usuario" style="width: 150px;">
-        <option value="estudiante">Estudiante</option>
-        <option value="educador">Educador</option>
-        <option value="cliente">Cliente</option>
-        <option value="proveedor">Proveedor</option>
-        <option value="admin">Administrador</option>
-      </select>
-      <button type="button">Notificaciones</button>
-      <a href="usuario.html" style="text-decoration: none;">Mi Cuenta</a>
-    </div>
-  </header>
-
-  <!-- CUERPO PRINCIPAL CON SIDEBAR -->
-  <div class="layout-sidebar">
-
-    <!-- SIDEBAR IZQUIERDO: lista de módulos -->
-    <aside class="sidebar">
-      <h3 style="margin-bottom: 12px;">Contenido del curso</h3>
-
-      <h4 style="margin: 10px 0 5px 0;">Módulo 1 — Introducción</h4>
-      <ul style="padding-left: 20px; font-size: 14px; margin-bottom: 15px;">
-        <li>Bienvenida al módulo (Video · 2 min)</li>
-        <li>Introducción teórica (PDF)</li>
-        <li>Actividad práctica 1</li>
-      </ul>
-
-      <h4 style="margin: 10px 0 5px 0;">Módulo 2 — Desarrollo</h4>
-      <ul style="padding-left: 20px; font-size: 14px; margin-bottom: 15px;">
-        <li>Bienvenida al Módulo 2 (Video · 1 min)</li>
-        <li><strong>Introducción a las funciones (Video · 3 min)</strong></li>
-        <li>Crear una función básica (Video · 2 min)</li>
-        <li>Lectura complementaria (PDF)</li>
-        <li>Cuestionario del módulo (Actividad)</li>
-      </ul>
-
-      <h4 style="margin: 10px 0 5px 0;">Módulo 3 — Cierre</h4>
-      <ul style="padding-left: 20px; font-size: 14px;">
-        <li>Proyecto final (Actividad)</li>
-        <li>Video de cierre (Video · 4 min)</li>
-      </ul>
-    </aside>
-
-    <!-- ÁREA PRINCIPAL: video + descripción + siguiente -->
-    <main class="main-content">
-      <h2 style="margin-bottom: 15px;">Introducción a las funciones</h2>
-
-      <!-- VIDEO -->
-      <video controls style="width: 100%; max-height: 400px; background: #000; border-radius: 4px;">
-        <source src="#" type="video/mp4">
-        Tu navegador no soporta video.
-      </video>
-
-      <hr style="margin: 20px 0;">
-
-      <!-- DESCRIPCIÓN DEL MATERIAL -->
-      <h3 style="margin-bottom: 8px;">Descripción del material</h3>
-      <p style="margin-bottom: 20px;">
-        En este video vamos a explorar el concepto de funciones dentro de
-        la programación. Una función es un bloque de código reutilizable
-        que realiza una tarea específica.
-      </p>
-
-      <!-- CHAT DE CONSULTAS -->
-      <h3 style="margin-bottom: 8px;">Chat de Consultas</h3>
-      <p style="margin-bottom: 8px; color: #555;">Asistente virtual: ¿Tienes alguna duda sobre este módulo?</p>
-      <div class="flex-row">
-        <input type="text" placeholder="Escribe tu pregunta..." style="max-width: 320px;">
-        <button type="button">Enviar</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pantalla Curso — Classia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <!-- BARRA SUPERIOR -->
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html" aria-current="page">Catálogo</a>
+          <a href="carrito.html">Carrito</a>
+          <a href="usuario.html">Mi cuenta</a>
+        </nav>
       </div>
+    </header>
 
-      <!-- BOTÓN SIGUIENTE -->
-      <p style="text-align: right; margin-top: 30px;">
-        <a href="#" class="btn">Siguiente tema →</a>
-      </p>
+    <!-- CUERPO PRINCIPAL CON SIDEBAR -->
+    <div class="layout-sidebar">
+      <!-- SIDEBAR IZQUIERDO: lista de módulos -->
+      <aside class="sidebar">
+        <h2 style="color: white;">Contenido del curso</h2>
 
-    </main>
+        <h4>Módulo 1 — Introducción</h4>
+        <ul>
+          <li>Bienvenida al módulo (Video · 2 min)</li>
+          <li>Introducción teórica (PDF)</li>
+          <li>Actividad práctica 1</li>
+        </ul>
 
-  </div>
+        <h4>Módulo 2 — Desarrollo</h4>
+        <ul>
+          <li>Bienvenida al Módulo 2 (Video · 1 min)</li>
+          <li><strong>Introducción a las funciones (Video · 3 min)</strong></li>
+          <li>Crear una función básica (Video · 2 min)</li>
+          <li>Lectura complementaria (PDF)</li>
+          <li>Cuestionario del módulo (Actividad)</li>
+        </ul>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>&copy; 2026 AniTech. Todos los derechos reservados.</p>
-  </footer>
+        <h4>Módulo 3 — Cierre</h4>
+        <ul>
+          <li>Proyecto final (Actividad)</li>
+          <li>Video de cierre (Video · 4 min)</li>
+        </ul>
+      </aside>
 
-</body>
+      <!-- ÁREA PRINCIPAL: video + descripción + siguiente -->
+      <main class="main-content">
+        <h1>Introducción a las funciones</h1>
+
+        <!-- VIDEO -->
+        <video controls aria-label="Video de demostración del curso">
+          Tu navegador no soporta video.
+        </video>
+
+        <hr />
+
+        <!-- DESCRIPCIÓN DEL MATERIAL -->
+        <h3>Descripción del material</h3>
+        <p>
+          En este video vamos a explorar el concepto de funciones dentro de la
+          programación. Una función es un bloque de código reutilizable que
+          realiza una tarea específica.
+        </p>
+
+        <!-- CHAT DE CONSULTAS -->
+        <h3>Chat de Consultas</h3>
+        <p>Asistente virtual: ¿Tienes alguna duda sobre este módulo?</p>
+        <div class="flex-row">
+          <input
+            type="text"
+            aria-label="Pregunta para el chat de consultas"
+            placeholder="Escribe tu pregunta..." />
+          <button type="button">Enviar</button>
+        </div>
+
+        <!-- BOTÓN SIGUIENTE -->
+        <p>
+          <a href="usuario.html" class="btn">Continuar aprendizaje</a>
+        </p>
+      </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
+    </footer>
+  </body>
 </html>

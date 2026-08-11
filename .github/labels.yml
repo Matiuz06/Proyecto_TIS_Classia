@@ -1,0 +1,207 @@
+# ─────────────────────────────────────────────────────────────
+# labels.yml — Classia / AniTech
+# Sincronizar con: .github/workflows/sync-labels.yml
+# Nomenclatura basada en el SRS v1.0 (31/10/2025)
+# ─────────────────────────────────────────────────────────────
+
+# ── Roles Scrum ───────────────────────────────────────────────
+- name: "rol: Product Owner"
+  color: "0EA5E9"
+  description: "Tarea liderada o definida por el Product Owner"
+
+- name: "rol: Desarrollador"
+  color: "22C55E"
+  description: "Tarea de implementación a cargo del desarrollador"
+
+- name: "rol: Tester"
+  color: "F59E0B"
+  description: "Tarea de verificación y pruebas"
+
+- name: "rol: Scrum Master"
+  color: "8B5CF6"
+  description: "Tarea de gestión de proceso o ceremonia Scrum"
+
+- name: "rol: Stakeholder"
+  color: "64748B"
+  description: "Issue originado o validado por el cliente / stakeholder"
+
+# ── Estado Kanban (espejo del tablero Trello) ─────────────────
+- name: "estado: backlog"
+  color: "CBD5E1"
+  description: "Tarea identificada, pendiente de planificación"
+
+- name: "estado: to-do"
+  color: "93C5FD"
+  description: "Comprometida para el sprint actual, sin empezar"
+
+- name: "estado: en desarrollo"
+  color: "FCD34D"
+  description: "En desarrollo activo (WIP)"
+
+- name: "estado: en review"
+  color: "FB923C"
+  description: "PR abierto, esperando revisión de par"
+
+- name: "estado: en testing"
+  color: "A78BFA"
+  description: "Integrado en Testing, bajo verificación"
+
+- name: "estado: finalizado"
+  color: "4ADE80"
+  description: "Mergeado a main y verificado"
+
+# ── Estimación ────────────────────────────────────────────────
+- name: "estimación: ½ día"
+  color: "E0F2FE"
+  description: "Tarea estimada en medio día de trabajo"
+
+- name: "estimación: 1 día"
+  color: "BAE6FD"
+  description: "Tarea estimada en un día de trabajo"
+
+- name: "estimación: 2 días"
+  color: "7DD3FC"
+  description: "Tarea estimada en dos días de trabajo (máximo)"
+
+# ── Requerimientos Funcionales (RF) ──────────────────────────
+
+- name: "RF: autenticación"
+  color: "7C3AED"
+  description: "REQ-AUT: Autenticación y acceso (RF 7.1)"
+
+- name: "RF: usuarios"
+  color: "7C3AED"
+  description: "REQ-USR: Gestión de usuarios y roles (RF 7.2)"
+
+- name: "RF: cursos"
+  color: "7C3AED"
+  description: "REQ-CUR: Gestión de cursos (RF 7.3)"
+
+- name: "RF: contenidos"
+  color: "7C3AED"
+  description: "REQ-CON: Organización de contenidos (RF 7.4)"
+
+- name: "RF: búsqueda"
+  color: "7C3AED"
+  description: "REQ-BUS: Búsqueda y navegación (RF 7.5)"
+
+- name: "RF: inscripción"
+  color: "7C3AED"
+  description: "REQ-INS: Inscripción y matriculación (RF 7.6)"
+
+- name: "RF: actividades"
+  color: "7C3AED"
+  description: "REQ-ACT: Actividades y entregas (RF 7.7)"
+
+- name: "RF: evaluaciones"
+  color: "7C3AED"
+  description: "REQ-EVA: Evaluaciones (RF 7.8)"
+
+- name: "RF: calificaciones"
+  color: "7C3AED"
+  description: "REQ-CAL: Calificaciones y progreso (RF 7.9)"
+
+- name: "RF: comunicación"
+  color: "7C3AED"
+  description: "REQ-COM: Comunicación y notificaciones (RF 7.10)"
+
+- name: "RF: panel"
+  color: "7C3AED"
+  description: "REQ-PAN: Calendario y panel principal (RF 7.11)"
+
+- name: "RF: servicios"
+  color: "7C3AED"
+  description: "REQ-SER: Catálogo de servicios institucionales (RF 7.12)"
+
+- name: "RF: pagos"
+  color: "7C3AED"
+  description: "REQ-PAG: Contratación de servicios y pagos (RF 7.13)"
+
+- name: "RF: valoraciones"
+  color: "7C3AED"
+  description: "REQ-VAL: Valoraciones y comentarios (RF 7.14)"
+
+- name: "RF: admin"
+  color: "7C3AED"
+  description: "REQ-ADM: Panel administrativo y analíticas (RF 7.15)"
+
+# ── Requerimientos No Funcionales (RNF) ──────────────────────
+- name: "RNF: seguridad"
+  color: "DC2626"
+  description: "RNF-01 a RNF-09: Seguridad (OWASP, CIS, ISO 27001, NIST)"
+
+- name: "RNF: privacidad"
+  color: "EA580C"
+  description: "RNF-10 a RNF-14: Privacidad y cumplimiento normativo (Ley 18.331)"
+
+- name: "RNF: rendimiento"
+  color: "CA8A04"
+  description: "RNF-15 a RNF-16: Rendimiento y disponibilidad"
+
+- name: "RNF: usabilidad"
+  color: "16A34A"
+  description: "RNF-17 a RNF-18: Usabilidad y accesibilidad (WCAG)"
+
+- name: "RNF: compatibilidad"
+  color: "0891B2"
+  description: "RNF-19 a RNF-20: Compatibilidad y escalabilidad"
+
+- name: "RNF: mantenibilidad"
+  color: "9333EA"
+  description: "RNF-21 a RNF-24: Mantenibilidad e integridad"
+
+# ── Reglas de Negocio / Dominio (RN) ─────────────────────────
+- name: "RN: dominio"
+  color: "475569"
+  description: "RN-01 a RN-14: Reglas de negocio y dominio"
+
+# ── Prioridad ─────────────────────────────────────────────────
+- name: "prioridad: alta"
+  color: "DC2626"
+  description: "Prioridad alta según SRS"
+
+- name: "prioridad: media"
+  color: "F59E0B"
+  description: "Prioridad media según SRS"
+
+- name: "prioridad: baja"
+  color: "6B7280"
+  description: "Prioridad baja según SRS"
+
+# ── Tipo de cambio ────────────────────────────────────────────
+- name: "bug"
+  color: "EF4444"
+  description: "Comportamiento incorrecto o inesperado"
+
+- name: "enhancement"
+  color: "3B82F6"
+  description: "Nueva funcionalidad o mejora"
+
+- name: "refactor"
+  color: "8B5CF6"
+  description: "Cambio interno sin impacto en comportamiento"
+
+- name: "docs"
+  color: "94A3B8"
+  description: "Documentación únicamente"
+
+- name: "ci/cd"
+  color: "F97316"
+  description: "Pipelines, workflows y automatización"
+
+# ── Frontend ──────────────────────────────────────────────────
+- name: "frontend: html"
+  color: "E34F26"
+  description: "Cambios en archivos HTML"
+
+- name: "frontend: css"
+  color: "1572B6"
+  description: "Cambios en archivos CSS"
+
+- name: "frontend: js"
+  color: "F7DF1E"
+  description: "Cambios en archivos JavaScript"
+
+- name: "assets"
+  color: "A855F7"
+  description: "Imágenes, íconos y recursos estáticos"

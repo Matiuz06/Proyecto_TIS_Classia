@@ -1,68 +1,119 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="../assets/favicon.png">
-  <title>Registro de Usuario — Classia</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body style="font-family: sans-serif; background: #f0f0f0; padding: 40px; margin: 0;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Registro de usuario en Classia." />
+    <title>Crear cuenta | Classia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body class="auth-page">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="carrito.html">Carrito</a>
+          <a href="usuario.html" aria-current="page">Mi cuenta</a>
+        </nav>
+      </div>
+    </header>
+    <main class="auth-shell">
+      <section class="auth-intro" aria-labelledby="intro-registro">
+        <span class="brand-mark">Classia</span>
+        <h1 id="intro-registro">Creá tu cuenta en Classia</h1>
+        <p>
+          Unificá aprendizaje, servicios educativos y gestión académica en una
+          plataforma clara.
+        </p>
+      </section>
 
-  <div style="background: white; padding: 25px; width: 350px; margin: 0 auto; border-radius: 8px; border: 1px solid #ccc; text-align: center;">
-
-    <img src="../assets/logoC.png" alt="Logo Classia" width="140" style="margin: 0 auto 15px auto;">
-    <h3>Crear Cuenta</h3>
-
-    <form action="/registro" method="POST" style="text-align: left;">
-      <p>
-        <label for="nombre">Nombre:</label><br>
-        <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
-      </p>
-
-      <p>
-        <label for="apellido">Apellido:</label><br>
-        <input type="text" id="apellido" name="apellido" required placeholder="Ingresa tu apellido" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
-      </p>
-
-      <p>
-        <label for="usuario">Nombre de usuario:</label><br>
-        <input type="text" id="usuario" name="usuario" required placeholder="Ingresa un usuario" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
-      </p>
-
-      <p>
-        <label for="correo">Correo electrónico:</label><br>
-        <input type="email" id="correo" name="correo" required placeholder="ejemplo@correo.com" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
-      </p>
-
-      <p>
-        <label for="contraseña">Contraseña:</label><br>
-        <input type="password" id="contraseña" name="contraseña" required placeholder="Ingresa una contraseña" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
-      </p>
-
-      <p>
-        <label for="confirmar_contraseña">Confirmar contraseña:</label><br>
-        <input type="password" id="confirmar_contraseña" name="confirmar_contraseña" required placeholder="Confirma tu contraseña" style="width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;">
-      </p>
-
-      <p>
-        <label><strong>Género:</strong></label><br>
-        <label><input type="radio" name="género" value="Hombre"> Hombre</label><br>
-        <label><input type="radio" name="género" value="Mujer"> Mujer</label><br>
-        <label><input type="radio" name="género" value="Otro"> Prefiero no decirlo</label>
-      </p>
-
-      <button type="submit" style="width: 100%; padding: 10px; background: #555; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">
-        Registrarse
-      </button>
-    </form>
-
-    <hr style="margin: 20px 0;">
-
-    <p style="font-size: 14px; margin: 0;">
-      ¿Ya tienes una cuenta? <a href="login.html" style="color: #4a3f9f;">Iniciar Sesión</a>
-    </p>
-
-  </div>
-
-</body>
+      <section class="auth-card" aria-labelledby="titulo-registro">
+        <h2 id="titulo-registro">Registro</h2>
+        <p class="muted">Completá tus datos básicos para empezar.</p>
+        <form action="/registro" method="POST">
+          <p>
+            <label for="nombre">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              autocomplete="given-name"
+              required
+              placeholder="Ingresa tu nombre" />
+          </p>
+          <p>
+            <label for="apellido">Apellido</label>
+            <input
+              type="text"
+              id="apellido"
+              name="apellido"
+              autocomplete="family-name"
+              required
+              placeholder="Ingresa tu apellido" />
+          </p>
+          <p>
+            <label for="usuario">Nombre de usuario</label>
+            <input
+              type="text"
+              id="usuario"
+              name="usuario"
+              autocomplete="username"
+              required
+              placeholder="Ingresa un usuario" />
+          </p>
+          <p>
+            <label for="correo">Correo electrónico</label>
+            <input
+              type="email"
+              id="correo"
+              name="correo"
+              autocomplete="email"
+              required
+              placeholder="ejemplo@correo.com" />
+          </p>
+          <p>
+            <label for="contrasena">Contraseña</label>
+            <input
+              type="password"
+              id="contrasena"
+              name="contraseña"
+              autocomplete="new-password"
+              required
+              placeholder="Ingresa una contraseña" />
+          </p>
+          <p>
+            <label for="confirmar-contrasena">Confirmar contraseña</label>
+            <input
+              type="password"
+              id="confirmar-contrasena"
+              name="confirmar_contraseña"
+              autocomplete="new-password"
+              required
+              placeholder="Confirma tu contraseña" />
+          </p>
+          <fieldset>
+            <legend>Género</legend>
+            <label
+              ><input type="radio" name="genero" value="hombre" /> Hombre</label
+            >
+            <label
+              ><input type="radio" name="genero" value="mujer" /> Mujer</label
+            >
+            <label
+              ><input type="radio" name="genero" value="sin-especificar" />
+              Prefiero no decirlo</label
+            >
+          </fieldset>
+          <button type="submit">Registrarse</button>
+        </form>
+        <p class="auth-links">
+          ¿Ya tenés cuenta? <a href="login.html">Iniciar sesión</a>
+        </p>
+      </section>
+    </main>
+  </body>
 </html>

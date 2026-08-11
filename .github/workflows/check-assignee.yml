@@ -1,0 +1,32 @@
+name: "👤 Verificar asignación en Issues"
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  check-assignee:
+    name: "Verificar Assignee en Issue"
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Validar asignado en Issue recién abierto
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            if (!issue.assignees || issue.assignees.length === 0) {
+              const body = `👋 ¡Gracias por abrir este issue!
+              
+              > ⚠️ **Recordatorio:** Este issue no tiene ningún responsable asignado todavía.
+              > Por favor asigná a la persona responsable (o a vos mismo) y establecé el label de **rol** corresponiente (\`rol: Dev\`, \`rol: PO\`, \`rol: Tester\`...).`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body
+              });
+            }
