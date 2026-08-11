@@ -1,84 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="../assets/favicon.png">
-  <title>Carrito de Compras — Classia</title>
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-
-  <div class="page-container">
-
-    <h2>Tu Carrito (Cursos y Servicios)</h2>
-    <hr style="margin: 15px 0;">
-
-    <!-- ITEM 1: CURSO -->
-    <div style="background-color: #fff; padding: 15px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 5px; display: flex; align-items: center; gap: 15px;">
-      <img src="../assets/logoC.png" alt="Curso" width="70">
-      <div style="flex: 1;">
-        <p style="margin: 0 0 4px 0;"><strong>Curso: Robótica para principiantes</strong></p>
-        <p style="margin: 0; color: #666; font-size: 14px;">Educador: Juan Pérez</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carrito de compras | Classia</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="../index.html">
+          <img src="../assets/logoC.png" />
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="../index.html">Inicio</a>
+          <a href="catalogo.html">Catálogo</a>
+          <a href="carrito.html" aria-current="page">Carrito</a>
+          <a href="usuario.html">Mi cuenta</a>
+        </nav>
       </div>
-      <div style="text-align: right;">
-        <p style="margin: 0 0 4px 0;"><strong>$29.99</strong></p>
-        <a href="#" style="color: #c00; font-size: 13px;">Eliminar</a>
-      </div>
-    </div>
+    </header>
+    <main class="page-container">
+      <header class="page-header">
+        <p>Compra simulada</p>
+        <h1>Carrito</h1>
+        <p>
+          Este carrito muestra un único curso de demostración hasta que existan
+          publicaciones reales.
+        </p>
+      </header>
 
-    <!-- ITEM 2: SERVICIO -->
-    <div style="background-color: #fff; padding: 15px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 5px; display: flex; align-items: center; gap: 15px;">
-      <img src="../assets/logoC.png" alt="Servicio" width="70">
-      <div style="flex: 1;">
-        <p style="margin: 0 0 4px 0;"><strong>Servicio: Impresión 3D y Modelado Personalizado</strong></p>
-        <p style="margin: 0; color: #666; font-size: 14px;">Proveedor: AniTech Studio 3D</p>
-      </div>
-      <div style="text-align: right;">
-        <p style="margin: 0 0 4px 0;"><strong>$49.99</strong></p>
-        <a href="#" style="color: #c00; font-size: 13px;">Eliminar</a>
-      </div>
-    </div>
+      <article class="catalog-card" aria-labelledby="item-curso-demo">
+        <div class="placeholder-visual" aria-hidden="true">Curso demo</div>
+        <div>
+          <span class="badge">Ejemplo</span>
+          <h2 id="item-curso-demo">Robótica para principiantes</h2>
+          <p>Educador: Juan Pérez</p>
+          <p><strong>$29.99</strong></p>
+          <p><a href="catalogo.html">Eliminar</a></p>
+        </div>
+      </article>
 
-    <!-- ITEM 3: CURSO -->
-    <div style="background-color: #fff; padding: 15px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 5px; display: flex; align-items: center; gap: 15px;">
-      <img src="../assets/logoC.png" alt="Curso" width="70">
-      <div style="flex: 1;">
-        <p style="margin: 0 0 4px 0;"><strong>Curso: Introducción a la programación</strong></p>
-        <p style="margin: 0; color: #666; font-size: 14px;">Educador: María López</p>
-      </div>
-      <div style="text-align: right;">
-        <p style="margin: 0 0 4px 0;"><strong>$19.99</strong></p>
-        <a href="#" style="color: #c00; font-size: 13px;">Eliminar</a>
-      </div>
-    </div>
-
-    <hr style="margin: 20px 0;">
-
-    <!-- RESUMEN DEL PEDIDO -->
-    <div style="background-color: #fafafa; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
-      <h3 style="margin-bottom: 12px;">Resumen del pedido</h3>
-      <p style="margin-bottom: 6px;">Subtotal (2 cursos, 1 servicio): <strong>$99.97</strong></p>
-      <p style="margin-bottom: 6px;">Descuento: <strong>- $0.00</strong></p>
-      <p style="margin-bottom: 15px; font-size: 18px;">Total: <strong>$99.97</strong></p>
-
-      <!-- CUPÓN -->
-      <div style="margin-bottom: 20px;">
-        <label for="cupon" style="font-size: 14px;">¿Tienes un cupón de descuento?</label><br>
-        <input type="text" id="cupon" placeholder="Código de descuento" style="padding: 8px; width: 200px; display: inline-block; margin-right: 5px;">
-        <button type="button">Aplicar</button>
-      </div>
-
-      <!-- BOTÓN IR A PAGAR -->
-      <a href="pasarela_pago.html" class="btn" style="display: block; width: 100%; padding: 12px; font-size: 16px;">
-        Ir a pagar →
-      </a>
-
-      <p style="text-align: center; margin-top: 15px; margin-bottom: 0;">
-        <a href="catalogo.html">← Seguir explorando catálogo</a>
-      </p>
-    </div>
-
-  </div>
-
-</body>
+      <section class="panel" aria-labelledby="resumen-pedido">
+        <h2 id="resumen-pedido">Resumen del pedido</h2>
+        <p>Subtotal: <strong>$29.99</strong></p>
+        <p>Descuento: <strong>$0.00</strong></p>
+        <p>Total: <strong>$29.99</strong></p>
+        <form action="pasarela_pago.html" method="get">
+          <p>
+            <label for="cupon">¿Tenés un cupón de descuento?</label>
+            <input
+              type="text"
+              id="cupon"
+              name="cupon"
+              placeholder="Código de descuento" />
+          </p>
+          <button type="submit">Ir a pagar</button>
+        </form>
+        <p><a href="catalogo.html">← Seguir explorando catálogo</a></p>
+      </section>
+    </main>
+  </body>
 </html>

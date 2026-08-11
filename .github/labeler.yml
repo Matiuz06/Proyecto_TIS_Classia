@@ -1,3 +1,4 @@
+# ── Tipo de archivo ───────────────────────────────────────────
 "frontend: html":
   - changed-files:
       - any-glob-to-any-file: "**/*.html"
@@ -21,3 +22,66 @@
 "docs":
   - changed-files:
       - any-glob-to-any-file: ["**/*.md", "docs/**"]
+
+# ── Módulos de requerimientos funcionales (RF) ────────────────
+# Se infieren por convención de nombres de carpeta/archivo.
+# Completar según la estructura real del proyecto.
+"RF: autenticación":
+  - changed-files:
+      - any-glob-to-any-file: ["**/auth*", "**/login*", "**/sesion*", "**/session*", "**/password*"]
+
+"RF: usuarios":
+  - changed-files:
+      - any-glob-to-any-file: ["**/user*", "**/usuario*", "**/perfil*", "**/profile*", "**/rol*", "**/role*"]
+
+"RF: cursos":
+  - changed-files:
+      - any-glob-to-any-file: ["**/curso*", "**/course*"]
+
+"RF: contenidos":
+  - changed-files:
+      - any-glob-to-any-file: ["**/contenido*", "**/content*", "**/modulo*", "**/module*", "**/recurso*", "**/resource*"]
+
+"RF: búsqueda":
+  - changed-files:
+      - any-glob-to-any-file: ["**/busqueda*", "**/search*", "**/filtro*", "**/filter*"]
+
+"RF: inscripción":
+  - changed-files:
+      - any-glob-to-any-file: ["**/inscripcion*", "**/matricula*", "**/enroll*"]
+
+"RF: actividades":
+  - changed-files:
+      - any-glob-to-any-file: ["**/actividad*", "**/activity*", "**/entrega*", "**/submission*", "**/tarea*"]
+
+"RF: evaluaciones":
+  - changed-files:
+      - any-glob-to-any-file: ["**/evaluacion*", "**/quiz*", "**/examen*", "**/cuestionario*"]
+
+"RF: calificaciones":
+  - changed-files:
+      - any-glob-to-any-file: ["**/calificacion*", "**/grade*", "**/nota*", "**/progreso*", "**/progress*"]
+
+"RF: comunicación":
+  - changed-files:
+      - any-glob-to-any-file: ["**/comunicacion*", "**/notificacion*", "**/notification*", "**/aviso*", "**/foro*", "**/forum*"]
+
+"RF: panel":
+  - changed-files:
+      - any-glob-to-any-file: ["**/panel*", "**/dashboard*", "**/calendario*", "**/calendar*"]
+
+"RF: servicios":
+  - changed-files:
+      - any-glob-to-any-file: ["**/servicio*", "**/service*", "**/catalogo*", "**/catalog*"]
+
+"RF: pagos":
+  - changed-files:
+      - any-glob-to-any-file: ["**/pago*", "**/payment*", "**/carrito*", "**/cart*", "**/compra*"]
+
+"RF: valoraciones":
+  - changed-files:
+      - any-glob-to-any-file: ["**/valoracion*", "**/rating*", "**/resena*", "**/review*", "**/estrella*"]
+
+"RF: admin":
+  - changed-files:
+      - any-glob-to-any-file: ["**/admin*", "**/analitica*", "**/analytics*", "**/reporte*", "**/report*"]

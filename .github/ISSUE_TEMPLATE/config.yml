@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: "📋 Tablero Trello del equipo"
+    url: https://trello.com/b/GxSUgvHG/proyecto-taller-anitech
+    about: "Vinculá el issue a su tarjeta en el tablero Kanban del proyecto."
+  - name: "📖 Documento de Requerimientos (SRS)"
+    url: https://github.com/Matiuz06/Proyecto_TIS_Classia/blob/main/CONTRIBUTING.md
+    about: "Consultá la nomenclatura REQ-XXX-NN, RNF-NN y RN-NN antes de abrir un issue."
