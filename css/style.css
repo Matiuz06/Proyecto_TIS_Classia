@@ -610,7 +610,7 @@ dd {
   gap: var(--space-6);
   width: min(920px, 100%);
   margin-inline: auto;
-  align-items: center;
+  align-items: start;
 }
 
 .auth-intro {
