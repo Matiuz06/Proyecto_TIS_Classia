@@ -21,7 +21,7 @@ La plataforma busca facilitar procesos como:
 - Gestión de solicitudes.
 - Valoraciones.
 - Procesos de compra y pago.
-- Interacción entre distintos perfiles dentro de la plataforma.
+- Interacción entre estudiantes, docentes/proveedores y administradores.
 
 La finalidad es construir una solución que permita integrar estas funcionalidades dentro de una interfaz coherente, clara y fácil de utilizar.
 
@@ -35,13 +35,18 @@ Classia contempla diferentes perfiles de usuario, cada uno con funcionalidades e
 
 Los estudiantes pueden explorar contenidos educativos, acceder a cursos, consultar actividades y gestionar recursos relacionados con su aprendizaje.
 
-### Docentes
+### Docentes / Proveedores
 
-Los docentes pueden participar en la publicación y gestión de contenidos educativos, así como interactuar con los estudiantes.
+Este perfil puede crear, publicar y gestionar tanto **cursos** como **servicios educativos** dentro de la plataforma.
 
-### Proveedores
+Entre sus posibilidades se encuentran:
 
-Los proveedores disponen de herramientas para ofrecer cursos o servicios, gestionar publicaciones, recibir solicitudes y administrar su actividad dentro de la plataforma.
+- Crear y administrar cursos.
+- Publicar y gestionar servicios.
+- Recibir solicitudes o contrataciones.
+- Gestionar el contenido asociado a sus publicaciones.
+- Interactuar con los usuarios que acceden a sus cursos o servicios.
+- Consultar y administrar su actividad dentro de la plataforma.
 
 ### Administradores
 
@@ -67,7 +72,7 @@ El proyecto incluye interfaces y flujos relacionados con:
 - Pasarela de pago.
 - Confirmación de compra.
 - Sistema de valoraciones.
-- Panel de proveedor.
+- Panel de docente/proveedor.
 
 Estas funcionalidades forman parte de una implementación progresiva del sistema.
 
@@ -77,7 +82,7 @@ Estas funcionalidades forman parte de una implementación progresiva del sistema
 
 Classia no está pensada únicamente como una plataforma de cursos.
 
-También contempla la posibilidad de ofrecer y contratar diferentes **servicios vinculados al ámbito educativo**, permitiendo la interacción entre usuarios y proveedores.
+También contempla la posibilidad de ofrecer y contratar diferentes **servicios vinculados al ámbito educativo**, permitiendo la interacción entre usuarios y docentes/proveedores.
 
 Algunos ejemplos de servicios que puede soportar la plataforma son:
 
@@ -243,7 +248,7 @@ Entre las futuras incorporaciones se contempla:
 - Sistema de notificaciones.
 - Mejoras de accesibilidad.
 - Mejoras de experiencia de usuario.
-- Integración completa entre clientes y proveedores.
+- Integración completa entre usuarios y docentes/proveedores.
 
 ---
 
@@ -272,7 +277,7 @@ El proyecto permite trabajar de manera progresiva conceptos relacionados con:
 
 La visión de Classia es evolucionar hacia un **ecosistema digital educativo** en el que aprendizaje, enseñanza y prestación de servicios puedan gestionarse desde una misma plataforma.
 
-Más que funcionar únicamente como un catálogo de cursos, Classia busca explorar un modelo donde distintos actores del ámbito educativo puedan conectarse, compartir recursos, ofrecer servicios y gestionar sus actividades desde un entorno común.
+Más que funcionar únicamente como un catálogo de cursos, Classia busca explorar un modelo donde distintos actores del ámbito educativo puedan conectarse, compartir recursos, crear cursos, ofrecer servicios y gestionar sus actividades desde un entorno común.
 
 ---
 
