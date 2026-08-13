@@ -84,6 +84,29 @@ video {
   border-radius: var(--radius-sm);
 }
 
+.compliance-icons,
+.compliance-icons img {
+  max-width: 100%;
+}
+
+.compliance-icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-block: 0.25rem 0.5rem;
+}
+
+.compliance-icons img {
+  width: auto;
+  max-width: 3.0rem;
+  height: 3.0rem;
+  object-fit: contain;
+  opacity: 0.96;
+  flex-shrink: 0;
+}
+
 video {
   background: var(--color-heading);
 }
@@ -95,7 +118,16 @@ a {
   text-underline-offset: 0.18em;
 }
 
-a:hover {
+.link {
+  transition: transform 250ms ease, color 250ms ease;
+}
+
+.link:hover {
+  color: var(--color-brand-primary-hover);
+  transform: translateY(2px);
+}
+
+a:not(.link):hover {
   color: var(--color-brand-primary-hover);
 }
 
@@ -210,7 +242,14 @@ hr {
   height: 4.0rem;
   max-width: 100%;
   object-fit: contain;
+  transition: all 200ms ease;
 }
+
+.site-brand:hover img,
+#logoC:hover {
+  transform: scale(1.05);
+}
+
 
 .site-nav,
 nav ul,
@@ -226,6 +265,7 @@ nav ol {
 
 .site-nav {
   justify-content: flex-end;
+
 }
 
 .site-nav a {
@@ -238,6 +278,11 @@ nav ol {
   text-decoration: none;
   white-space: nowrap;
   border-radius: var(--radius-sm);
+  transition: all 250ms ease;
+}
+
+.site-nav a:focus-visible {
+  outline: 3px solid rgb(21, 113, 86);
 }
 
 .site-nav a:hover,
@@ -245,6 +290,19 @@ nav ol {
   color: var(--color-brand-primary-hover);
   background: var(--color-brand-accent-soft);
   text-decoration: none;
+  transform: translateY(2px);
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--color-brand-primary-hover);
+  background: var(--color-brand-accent-soft);
+  text-decoration: none;
+  transition:all 250ms ease;
+}
+
+.site-nav a[aria-current="page"]:hover {
+  transform: translateY(2px);
+  transform: scale(1.04);
 }
 main,
 .page-container,
@@ -253,6 +311,7 @@ main,
   margin-inline: auto;
   padding-block: var(--space-8);
 }
+
 
 main > header,
 .page-header {
@@ -387,20 +446,29 @@ button {
     background-color var(--dur-short) var(--ease-out),
     border-color var(--dur-short) var(--ease-out),
     color var(--dur-short) var(--ease-out);
+    transition: all 300ms ease-in-out;
 }
 
 .btn:hover,
-button:hover {
+.btn:focus-visible,
+button:hover,
+button:focus-visible {
   color: var(--color-text-inverse);
   background: var(--color-brand-primary-hover);
   border-color: var(--color-brand-primary-hover);
   text-decoration: none;
-  transform: translateY(-1px);
+  transform: scale(1.02);
+}
+
+a.btn:hover,
+a.btn:focus-visible {
+  color: var(--color-text-inverse);
 }
 
 .btn:active,
 button:active {
   transform: translateY(0);
+  transition: all 150ms ease-in-out;
 }
 
 button[type="reset"],
@@ -512,6 +580,13 @@ dd {
   background: var(--color-brand-primary-soft);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  overflow: clip;
+}
+
+.catalog-filters form {
+  display: grid;
+  gap: var(--space-3);
+  overflow: clip;
 }
 
 .sidebar {
@@ -536,11 +611,25 @@ dd {
 }
 
 .catalog-tools {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
   align-items: end;
+  gap: var(--space-3);
   margin-block: var(--space-5);
+}
+
+.catalog-tools p {
+  flex: 1 1 18rem;
+  margin: 0;
+}
+
+.catalog-tools label {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.catalog-tools button {
+  align-self: end;
 }
 
 .catalog-grid {
