@@ -544,6 +544,23 @@ dd {
   margin-block: var(--space-5);
 }
 
+#Barrabusqueda:hover {
+  background-color: oklch(94% 0.025 238deg);
+}
+
+.solicitarPropuesta:hover {
+  color: oklch(52.705% 0.07875 250.7);
+;
+}
+
+.solicitarServicio:hover {
+  color: oklch(52.705% 0.07875 250.7);
+}
+
+.botonLimpiar:hover {
+  background-color: oklch(82.892% 0.04363 236.438);
+}
+
 .catalog-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
