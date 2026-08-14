@@ -966,3 +966,33 @@ th {
     white-space: normal;
   }
 }
+
+.auth-intro {
+  animation: entrar-texto 1.6s ease-in-out 1 both;
+}
+.auth-card {
+  animation: entrar-formulario 1.6s ease-in-out 1 both;
+}
+
+@keyframes entrar-texto {
+  from {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes entrar-formulario {
+  from {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
