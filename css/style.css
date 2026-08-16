@@ -996,3 +996,759 @@ th {
     transform: translateX(0);
   }
 }
+/* =========================================================
+    ANIMACIÓN DE ENTRADA - PÁGINA PRINCIPAL
+    ========================================================= */
+
+/* Bloque principal de presentación */
+body > main > header {
+  animation: entrada-principal 1s ease-out 1 both;
+}
+
+/* Sección de roles */
+body > main > section {
+  animation: entrada-seccion 1s ease-out 0.35s 1 both;
+}
+
+/* Tarjetas */
+.role-grid .content-card:nth-child(1) {
+  animation: entrada-tarjeta 0.7s ease-out 0.65s 1 both;
+}
+
+.role-grid .content-card:nth-child(2) {
+  animation: entrada-tarjeta 0.7s ease-out 0.85s 1 both;
+}
+
+.role-grid .content-card:nth-child(3) {
+  animation: entrada-tarjeta 0.7s ease-out 1.05s 1 both;
+}
+
+/* =========================================================
+    KEYFRAMES
+    ========================================================= */
+
+/* Hero:
+    aparece desde abajo con una pequeña escala */
+@keyframes entrada-principal {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.97);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Título de la sección:
+    aparece ligeramente desde la izquierda */
+@keyframes entrada-seccion {
+  0% {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Tarjetas:
+    aparecen desde abajo una por una */
+@keyframes entrada-tarjeta {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* =========================================================
+    ANIMACIONES - CATÁLOGO
+    ========================================================= */
+
+/* Encabezado principal del catálogo */
+body > main > header {
+  animation: catalogo-header 0.9s ease-out 1 both;
+}
+
+/* Panel de filtros */
+.catalog-filters {
+  animation: catalogo-filtros 1.1s ease-out 0.25s 1 both;
+}
+
+/* Sección donde aparece el curso */
+#cursos {
+  animation: catalogo-contenido 1.1s ease-out 0.25s 1 both;
+}
+
+/* Tarjeta del curso */
+.catalog-card {
+  animation: catalogo-tarjeta 0.8s ease-out 0.75s 1 both;
+}
+
+/* Mensaje de "Aún no hay más cursos" */
+.empty-state {
+  animation: catalogo-vacio 0.8s ease-out 1s 1 both;
+}
+
+/* =========================================================
+    KEYFRAMES
+    ========================================================= */
+
+/* Encabezado:
+    aparece desde arriba */
+@keyframes catalogo-header {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Filtros:
+    entran desde fuera de la pantalla izquierda */
+@keyframes catalogo-filtros {
+  0% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateX(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Contenido:
+    entra desde fuera de la pantalla derecha */
+@keyframes catalogo-contenido {
+  0% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateX(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Tarjeta:
+    aparece desde adentro con una pequeña escala */
+@keyframes catalogo-tarjeta {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Estado vacío:
+    aparece al final desde abajo */
+@keyframes catalogo-vacio {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* =========================================================
+    ANIMACIONES - CARRITO
+    ========================================================= */
+
+/* Encabezado */
+.page-container > .page-header {
+  animation: carrito-header 0.8s ease-out 1 both;
+}
+
+/* Curso agregado */
+.page-container > .catalog-card {
+  animation: carrito-producto 1s ease-out 0.2s 1 both;
+}
+
+/* Resumen del pedido */
+.page-container > .order-summary {
+  animation: carrito-resumen 1s ease-out 0.35s 1 both;
+}
+
+/* =========================================================
+    KEYFRAMES
+    ========================================================= */
+
+/* Encabezado desde arriba */
+@keyframes carrito-header {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Curso desde la izquierda */
+@keyframes carrito-producto {
+  0% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+
+  75% {
+    opacity: 1;
+    transform: translateX(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Resumen desde la derecha */
+@keyframes carrito-resumen {
+  0% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+
+  75% {
+    opacity: 1;
+    transform: translateX(-12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+/* =========================================================
+    SOLICITUD DE IMPRESIÓN 3D
+    ========================================================= */
+
+.solicitud-3d {
+  width: min(1180px, calc(100% - 2rem));
+}
+
+/* BREADCRUMB */
+
+.breadcrumb {
+  margin-bottom: var(--space-5);
+}
+
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.breadcrumb li:not(:last-child)::after {
+  content: "›";
+  margin-left: 0.5rem;
+  color: var(--color-text-muted);
+}
+
+.breadcrumb li[aria-current="page"] {
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+    HERO
+    ========================================================= */
+
+.solicitud-3d__hero {
+  max-width: 850px;
+  margin-bottom: var(--space-8);
+}
+
+.solicitud-3d__hero > p:not(.eyebrow) {
+  max-width: 65ch;
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+}
+
+.eyebrow {
+  margin-bottom: var(--space-2);
+  color: var(--color-brand-accent-hover);
+  font-size: var(--text-sm);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* PASOS SUPERIORES */
+
+.servicio-3d-pasos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.servicio-3d-pasos div {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--color-brand-primary-soft);
+  border-radius: var(--radius-sm);
+}
+
+.servicio-3d-pasos strong {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  place-items: center;
+  color: var(--color-text-inverse);
+  background: var(--color-brand-primary);
+  border-radius: 50%;
+}
+
+.servicio-3d-pasos span {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* =========================================================
+    LAYOUT
+    ========================================================= */
+
+.solicitud-3d__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 19rem;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+/* =========================================================
+    FORMULARIO
+    ========================================================= */
+
+.form-impresion-3d {
+  gap: var(--space-5);
+}
+
+.form-impresion-3d fieldset {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-impresion-3d legend {
+  padding-inline: var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-md);
+  font-weight: 900;
+}
+
+/* DOS COLUMNAS */
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+/* =========================================================
+    TIPO DE TRABAJO
+    ========================================================= */
+
+.tipo-trabajo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.tipo-trabajo-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out);
+}
+
+.tipo-trabajo-card:hover {
+  border-color: var(--color-brand-accent);
+  background: var(--color-brand-accent-soft);
+  transform: translateY(-2px);
+}
+
+.tipo-trabajo-card input {
+  grid-row: 1 / 3;
+  align-self: start;
+}
+
+.tipo-trabajo-card strong {
+  color: var(--color-heading);
+}
+
+.tipo-trabajo-card span {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+/* =========================================================
+    ARCHIVOS
+    ========================================================= */
+
+.archivo-3d-box {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  text-align: center;
+  background: var(--color-brand-primary-soft);
+  border: 2px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.archivo-3d-box:hover {
+  border-color: var(--color-brand-accent);
+}
+
+.archivo-3d-box span {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.archivo-3d-box input {
+  margin-top: var(--space-3);
+}
+
+/* =========================================================
+    RESUMEN LATERAL
+    ========================================================= */
+
+.resumen-servicio-3d {
+  position: sticky;
+  top: 6rem;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.resumen-servicio-3d .content-card {
+  margin: 0;
+}
+
+.resumen-servicio-3d dl {
+  grid-template-columns: 1fr;
+}
+
+.proceso-3d {
+  display: grid;
+  gap: var(--space-3);
+  padding-left: 1.3rem;
+}
+
+.proceso-3d li {
+  padding-left: 0.25rem;
+}
+
+/* =========================================================
+    AVISO
+    ========================================================= */
+
+.aviso-presupuesto {
+  padding: var(--space-4);
+  background: var(--color-info-bg);
+  border-left: 0.3rem solid var(--color-info);
+  border-radius: var(--radius-sm);
+}
+
+.aviso-presupuesto h2 {
+  font-size: var(--text-md);
+}
+
+.aviso-presupuesto p {
+  margin: 0;
+}
+
+/* CHECKBOX */
+
+.check-line {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+/* =========================================================
+    RESPONSIVE
+    ========================================================= */
+
+@media (width <= 900px) {
+  .solicitud-3d__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .resumen-servicio-3d {
+    position: static;
+  }
+}
+
+@media (width <= 650px) {
+  .servicio-3d-pasos,
+  .tipo-trabajo-grid,
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+/* =========================================================
+    ANIMACIONES - PÁGINA DEL CURSO
+    ========================================================= */
+
+/* Sidebar */
+.layout-sidebar > .sidebar {
+  animation: curso-sidebar 1s ease-out 1 both;
+}
+
+/* Área principal */
+.layout-sidebar > .main-content {
+  animation: curso-contenido 1s ease-out 0.15s 1 both;
+}
+
+/* Video */
+.main-content video {
+  animation: curso-video 0.8s ease-out 0.5s 1 both;
+}
+
+/* Descripción */
+.main-content h3:nth-of-type(1),
+.main-content h3:nth-of-type(1) + p {
+  animation: curso-aparecer 0.7s ease-out 0.8s 1 both;
+}
+
+/* Chat */
+.main-content h3:nth-of-type(2),
+.main-content h3:nth-of-type(2) + p,
+.main-content .flex-row {
+  animation: curso-aparecer 0.7s ease-out 1s 1 both;
+}
+
+/* Botón final */
+.main-content > p:last-child {
+  animation: curso-boton 0.7s ease-out 1.2s 1 both;
+}
+
+/* =========================================================
+    KEYFRAMES
+    ========================================================= */
+
+/* Sidebar: izquierda → posición final */
+@keyframes curso-sidebar {
+  from {
+    opacity: 0;
+    transform: translateX(-120px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Contenido: derecha → posición final */
+@keyframes curso-contenido {
+  from {
+    opacity: 0;
+    transform: translateX(120px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Video: zoom suave */
+@keyframes curso-video {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.015);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Secciones internas */
+@keyframes curso-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Botón */
+@keyframes curso-boton {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* =========================================================
+   BUSCADOR DEL CATÁLOGO
+   ========================================================= */
+
+.catalog-tools {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.catalog-tools p {
+  flex: 1;
+  margin: 0;
+}
+
+.catalog-tools label {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.catalog-tools input {
+  margin-top: 0;
+}
+
+.catalog-tools button {
+  align-self: flex-end;
+  margin: 0;
+}
+/* =====================================================
+   ANIMACIÓN DE ENTRADA - REGISTRO
+   ===================================================== */
+
+/*
+  INTRO:
+  empieza fuera de la pantalla por la DERECHA
+  y termina en su posición de la IZQUIERDA.
+*/
+.auth-page .auth-intro {
+  position: relative;
+  z-index: 1;
+
+  animation-name: entrar-desde-derecha;
+  animation-duration: 1.8s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0s;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+/*
+  FORMULARIO:
+  empieza fuera de la pantalla por la IZQUIERDA
+  y termina en su posición de la DERECHA.
+*/
+.auth-page .auth-card--registro {
+  position: relative;
+  z-index: 2;
+
+  animation-name: entrar-desde-izquierda;
+  animation-duration: 1.8s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0s;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+/* TEXTO: derecha → izquierda */
+@keyframes entrar-desde-derecha {
+  0% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* FORMULARIO: izquierda → derecha */
+@keyframes entrar-desde-izquierda {
+  0% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
