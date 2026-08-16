@@ -1,0 +1,528 @@
+.link {
+  transition:
+    transform 250ms ease,
+    color 250ms ease;
+}
+
+.link:hover {
+  transform: translateY(2px);
+}
+
+.site-brand img,
+#logoC {
+  transition: all 200ms ease;
+}
+
+.site-brand:hover img,
+#logoC:hover {
+  transform: scale(1.05);
+}
+
+.site-nav a {
+  transition: all 250ms ease;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  transform: translateY(2px);
+}
+
+.site-nav a[aria-current="page"] {
+  transition: all 250ms ease;
+}
+
+.site-nav a[aria-current="page"]:hover {
+  transform: translateY(2px);
+  transform: scale(1.04);
+}
+
+.btn,
+button {
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    color var(--dur-short) var(--ease-out);
+  transition: all 300ms ease-in-out;
+}
+
+.btn:hover,
+.btn:focus-visible,
+button:hover,
+button:focus-visible {
+  transform: scale(1.02);
+}
+
+.btn:active,
+button:active {
+  transform: translateY(0);
+  transition: all 150ms ease-in-out;
+}
+
+.placeholder-visual {
+  transition: transform var(--dur-short) var(--ease-out);
+}
+
+.motion-card {
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out);
+}
+
+.motion-entry {
+  animation: fade-slide-up var(--dur-medium) var(--ease-out) both;
+}
+
+.confirmation-card {
+  animation: confirmation-pop 360ms var(--ease-out) both;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .motion-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .motion-card:hover .placeholder-visual {
+    transform: scale(1.01);
+  }
+}
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confirmation-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms;
+    animation-duration: 1ms;
+  }
+
+  .motion-entry,
+  .confirmation-card {
+    animation: none;
+  }
+}
+
+.auth-intro {
+  animation: entrar-texto 1.6s ease-in-out 1 both;
+}
+
+.auth-card {
+  animation: entrar-formulario 1.6s ease-in-out 1 both;
+}
+
+@keyframes entrar-texto {
+  from {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes entrar-formulario {
+  from {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+body > main > header {
+  animation: entrada-principal 1s ease-out 1 both;
+}
+
+body > main > section {
+  animation: entrada-seccion 1s ease-out 0.35s 1 both;
+}
+
+.role-grid .content-card:nth-child(1) {
+  animation: entrada-tarjeta 0.7s ease-out 0.65s 1 both;
+}
+
+.role-grid .content-card:nth-child(2) {
+  animation: entrada-tarjeta 0.7s ease-out 0.85s 1 both;
+}
+
+.role-grid .content-card:nth-child(3) {
+  animation: entrada-tarjeta 0.7s ease-out 1.05s 1 both;
+}
+
+@keyframes entrada-principal {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.97);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes entrada-seccion {
+  0% {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes entrada-tarjeta {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body > main > header {
+  animation: catalogo-header 0.9s ease-out 1 both;
+}
+
+.catalog-filters {
+  animation: catalogo-filtros 1.1s ease-out 0.25s 1 both;
+}
+
+#cursos {
+  animation: catalogo-contenido 1.1s ease-out 0.25s 1 both;
+}
+
+.catalog-card {
+  animation: catalogo-tarjeta 0.8s ease-out 0.75s 1 both;
+}
+
+.empty-state {
+  animation: catalogo-vacio 0.8s ease-out 1s 1 both;
+}
+
+@keyframes catalogo-header {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes catalogo-filtros {
+  0% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateX(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes catalogo-contenido {
+  0% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateX(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes catalogo-tarjeta {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes catalogo-vacio {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-container > .page-header {
+  animation: carrito-header 0.8s ease-out 1 both;
+}
+
+.page-container > .catalog-card {
+  animation: carrito-producto 1s ease-out 0.2s 1 both;
+}
+
+.page-container > .order-summary {
+  animation: carrito-resumen 1s ease-out 0.35s 1 both;
+}
+
+@keyframes carrito-header {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes carrito-producto {
+  0% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+
+  75% {
+    opacity: 1;
+    transform: translateX(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes carrito-resumen {
+  0% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+
+  75% {
+    opacity: 1;
+    transform: translateX(-12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.tipo-trabajo-card {
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out);
+}
+
+.tipo-trabajo-card:hover {
+  transform: translateY(-2px);
+}
+
+.layout-sidebar > .sidebar {
+  animation: curso-sidebar 1s ease-out 1 both;
+}
+
+.layout-sidebar > .main-content {
+  animation: curso-contenido 1s ease-out 0.15s 1 both;
+}
+
+.main-content video {
+  animation: curso-video 0.8s ease-out 0.5s 1 both;
+}
+
+.main-content h3:nth-of-type(1),
+.main-content h3:nth-of-type(1) + p {
+  animation: curso-aparecer 0.7s ease-out 0.8s 1 both;
+}
+
+.main-content h3:nth-of-type(2),
+.main-content h3:nth-of-type(2) + p,
+.main-content .flex-row {
+  animation: curso-aparecer 0.7s ease-out 1s 1 both;
+}
+
+.main-content > p:last-child {
+  animation: curso-boton 0.7s ease-out 1.2s 1 both;
+}
+
+@keyframes curso-sidebar {
+  from {
+    opacity: 0;
+    transform: translateX(-120px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes curso-contenido {
+  from {
+    opacity: 0;
+    transform: translateX(120px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes curso-video {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.015);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes curso-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes curso-boton {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.auth-page .auth-intro {
+  animation-name: entrar-desde-derecha;
+  animation-duration: 1.8s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0s;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+.auth-page .auth-card--registro {
+  animation-name: entrar-desde-izquierda;
+  animation-duration: 1.8s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0s;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+@keyframes entrar-desde-derecha {
+  0% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes entrar-desde-izquierda {
+  0% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
