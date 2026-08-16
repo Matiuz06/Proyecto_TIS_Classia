@@ -414,6 +414,13 @@ figure {
   width: min(100% - 2rem, 440px);
   margin: var(--space-8) auto;
   text-align: center;
+
+}
+.payment-card.motion-entry {
+
+  animation:entradaPago ;
+  animation-duration: 1s;
+  animation-iteration-count: ease-in-out;
 }
 
 .page-container {
@@ -632,6 +639,10 @@ dd {
     flex: 1 1 18rem;
     margin: 0;
   }
+}
+
+input:hover {
+  background-color: oklch(94% 0.025 238deg);
 }
 
 .catalog-tools label {
@@ -964,5 +975,17 @@ th {
   .auth-card form button {
     width: 100%;
     white-space: normal;
+  }
+}
+
+@keyframes entradaPago {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
