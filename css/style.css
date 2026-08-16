@@ -119,15 +119,8 @@ a {
   text-underline-offset: 0.18em;
 }
 
-.link {
-  transition:
-    transform 250ms ease,
-    color 250ms ease;
-}
-
 .link:hover {
   color: var(--color-brand-primary-hover);
-  transform: translateY(2px);
 }
 
 a:not(.link):hover {
@@ -242,12 +235,6 @@ hr {
   height: 2.5rem;
   max-width: 100%;
   object-fit: contain;
-  transition: all 200ms ease;
-}
-
-.site-brand:hover img,
-#logoC:hover {
-  transform: scale(1.05);
 }
 
 .site-nav,
@@ -276,7 +263,6 @@ nav ol {
   text-decoration: none;
   white-space: nowrap;
   border-radius: var(--radius-sm);
-  transition: all 250ms ease;
 }
 
 .site-nav a:focus-visible {
@@ -288,19 +274,12 @@ nav ol {
   color: var(--color-brand-primary-hover);
   background: var(--color-brand-accent-soft);
   text-decoration: none;
-  transform: translateY(2px);
 }
 
 .site-nav a[aria-current="page"] {
   color: var(--color-brand-primary-hover);
   background: var(--color-brand-accent-soft);
   text-decoration: none;
-  transition: all 250ms ease;
-}
-
-.site-nav a[aria-current="page"]:hover {
-  transform: translateY(2px);
-  transform: scale(1.04);
 }
 main,
 .page-container,
@@ -444,12 +423,6 @@ button {
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
-  transition:
-    transform var(--dur-short) var(--ease-out),
-    background-color var(--dur-short) var(--ease-out),
-    border-color var(--dur-short) var(--ease-out),
-    color var(--dur-short) var(--ease-out);
-  transition: all 300ms ease-in-out;
 }
 
 .btn:hover,
@@ -460,18 +433,11 @@ button:focus-visible {
   background: var(--color-brand-primary-hover);
   border-color: var(--color-brand-primary-hover);
   text-decoration: none;
-  transform: scale(1.02);
 }
 
 a.btn:hover,
 a.btn:focus-visible {
   color: var(--color-text-inverse);
-}
-
-.btn:active,
-button:active {
-  transform: translateY(0);
-  transition: all 150ms ease-in-out;
 }
 
 button[type="reset"],
@@ -682,22 +648,6 @@ input:hover {
   );
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  transition: transform var(--dur-short) var(--ease-out);
-}
-
-.motion-card {
-  transition:
-    transform var(--dur-short) var(--ease-out),
-    box-shadow var(--dur-short) var(--ease-out),
-    border-color var(--dur-short) var(--ease-out);
-}
-
-.motion-entry {
-  animation: fade-slide-up var(--dur-medium) var(--ease-out) both;
-}
-
-.confirmation-card {
-  animation: confirmation-pop 360ms var(--ease-out) both;
 }
 
 .payment-card button,
@@ -709,40 +659,6 @@ input:hover {
   .motion-card:hover {
     border-color: var(--color-border-strong);
     box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
-  }
-
-  .motion-card:hover .placeholder-visual {
-    transform: scale(1.01);
-  }
-}
-
-@keyframes fade-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(0.5rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes confirmation-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-
-  70% {
-    opacity: 1;
-    transform: scale(1.01);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 
@@ -900,13 +816,6 @@ th {
   *::before,
   *::after {
     scroll-behavior: auto;
-    transition-duration: 1ms;
-    animation-duration: 1ms;
-  }
-
-  .motion-entry,
-  .confirmation-card {
-    animation: none;
   }
 }
 
@@ -976,6 +885,270 @@ th {
     width: 100%;
     white-space: normal;
   }
+}
+.solicitud-3d {
+  width: min(1180px, calc(100% - 2rem));
+}
+
+.breadcrumb {
+  margin-bottom: var(--space-5);
+}
+
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.breadcrumb li:not(:last-child)::after {
+  content: "›";
+  margin-left: 0.5rem;
+  color: var(--color-text-muted);
+}
+
+.breadcrumb li[aria-current="page"] {
+  color: var(--color-text-muted);
+}
+
+.solicitud-3d__hero {
+  max-width: 850px;
+  margin-bottom: var(--space-8);
+}
+
+.solicitud-3d__hero > p:not(.eyebrow) {
+  max-width: 65ch;
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+}
+
+.eyebrow {
+  margin-bottom: var(--space-2);
+  color: var(--color-brand-accent-hover);
+  font-size: var(--text-sm);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.servicio-3d-pasos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.servicio-3d-pasos div {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--color-brand-primary-soft);
+  border-radius: var(--radius-sm);
+}
+
+.servicio-3d-pasos strong {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  place-items: center;
+  color: var(--color-text-inverse);
+  background: var(--color-brand-primary);
+  border-radius: 50%;
+}
+
+.servicio-3d-pasos span {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.solicitud-3d__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 19rem;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.form-impresion-3d {
+  gap: var(--space-5);
+}
+
+.form-impresion-3d fieldset {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-impresion-3d legend {
+  padding-inline: var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-md);
+  font-weight: 900;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.tipo-trabajo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.tipo-trabajo-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.tipo-trabajo-card:hover {
+  border-color: var(--color-brand-accent);
+  background: var(--color-brand-accent-soft);
+}
+
+.tipo-trabajo-card input {
+  grid-row: 1 / 3;
+  align-self: start;
+}
+
+.tipo-trabajo-card strong {
+  color: var(--color-heading);
+}
+
+.tipo-trabajo-card span {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.archivo-3d-box {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  text-align: center;
+  background: var(--color-brand-primary-soft);
+  border: 2px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.archivo-3d-box:hover {
+  border-color: var(--color-brand-accent);
+}
+
+.archivo-3d-box span {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.archivo-3d-box input {
+  margin-top: var(--space-3);
+}
+
+.resumen-servicio-3d {
+  position: sticky;
+  top: 6rem;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.resumen-servicio-3d .content-card {
+  margin: 0;
+}
+
+.resumen-servicio-3d dl {
+  grid-template-columns: 1fr;
+}
+
+.proceso-3d {
+  display: grid;
+  gap: var(--space-3);
+  padding-left: 1.3rem;
+}
+
+.proceso-3d li {
+  padding-left: 0.25rem;
+}
+
+.aviso-presupuesto {
+  padding: var(--space-4);
+  background: var(--color-info-bg);
+  border-left: 0.3rem solid var(--color-info);
+  border-radius: var(--radius-sm);
+}
+
+.aviso-presupuesto h2 {
+  font-size: var(--text-md);
+}
+
+.aviso-presupuesto p {
+  margin: 0;
+}
+
+.check-line {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+@media (width <= 900px) {
+  .solicitud-3d__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .resumen-servicio-3d {
+    position: static;
+  }
+}
+
+@media (width <= 650px) {
+  .servicio-3d-pasos,
+  .tipo-trabajo-grid,
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+.catalog-tools {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.catalog-tools p {
+  flex: 1;
+  margin: 0;
+}
+
+.catalog-tools label {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.catalog-tools input {
+  margin-top: 0;
+}
+
+.catalog-tools button {
+  align-self: flex-end;
+  margin: 0;
+}
+.auth-page .auth-intro {
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes entradaPago {
