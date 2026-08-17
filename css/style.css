@@ -113,7 +113,7 @@ video {
 }
 
 a {
-  color: var(--color-brand-primary);
+  color: oklch(38.191% 0.0814 253.833);
   font-weight: 700;
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.18em;
