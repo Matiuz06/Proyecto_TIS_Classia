@@ -1,196 +1,133 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perfil de usuario</title>
-    <link rel="stylesheet" href="../css/animation.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
-  </head>
-  <body>
-    <!-- BARRA SUPERIOR -->
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="../index.html">
-          <img src="../assets/logoC.png" />
-        </a>
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.html">Inicio</a>
-          <a href="catalogo.html">Catálogo</a>
-          <a href="carrito.html">Carrito</a>
-          <a href="login.html" aria-current="page">Mi cuenta</a>
-        </nav>
-      </div>
-    </header>
 
-    <!--
-       REFERENCIA FUTURA: PANEL DE ADMINISTRADOR
-       (Cambiar display: none a block cuando sea admin)
-   -->
-    <div id="panel-admin" hidden>
-      <strong>Modo Administrador Activo:</strong>
-      <a href="usuario.html">Gestionar Usuarios</a> |
-      <a href="usuario.html">Configuración Global</a> |
-      <a href="usuario.html">Reportes del Sistema</a>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil de usuario</title>
+  <link rel="stylesheet" href="../css/animation.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+</head>
 
-    <!-- CUERPO PRINCIPAL -->
-    <main>
-      <!-- BANNER DE USUARIO -->
-      <section class="profile-hero" aria-labelledby="perfil-usuario">
-        <p>Bienvenido/a,</p>
-        <h1 id="perfil-usuario">Marco Antonio Solís</h1>
-        <p>Perfil de Usuario (Estudiante, Cliente, Educador y Proveedor)</p>
-        <p>
-          <strong>7</strong> Cursos completados | <strong>2</strong> Servicios
-          contratados
-        </p>
-      </section>
-
-      <!-- NAVEGACIÓN SECUNDARIA / SECCIONES -->
-      <nav class="profile-tabs" aria-label="Secciones de la cuenta">
-        <button type="button">Perfil</button>
-        <button type="button">Mis Cursos Comprados</button>
-        <button type="button">Mis Servicios Contratados</button>
-        <button type="button">Mis Cursos Publicados</button>
-        <button type="button">Mis Servicios Ofrecidos</button>
-        <button type="button">Certificados</button>
-        <button type="button">Estadísticas</button>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="site-brand" href="../index.html">
+        <img src="../assets/logoC.png" />
+      </a>
+      <nav class="site-nav" aria-label="Navegación principal">
+        <a href="../index.html">Inicio</a>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="carrito.html">Carrito</a>
+        <a href="login.html" aria-current="page">Mi cuenta</a>
       </nav>
+    </div>
+  </header>
 
-      <!-- CONTENIDO DE SECCIONES -->
 
-      <!-- SECCIÓN 1: PERFIL -->
-      <section class="account-section" aria-labelledby="informacion-cuenta">
-        <h2 id="informacion-cuenta">Información básica de la cuenta</h2>
-        <p>
-          <label for="nombre-cuenta">Nombre:*</label><br />
-          <input
-            type="text"
-            id="nombre-cuenta"
-            value="Marco Antonio"
-            readonly />
-        </p>
-        <p>
-          <label for="apellido-cuenta">Apellido:*</label><br />
-          <input type="text" id="apellido-cuenta" value="Solís" readonly />
-        </p>
-        <p>
-          <label for="idioma-cuenta">Idioma predeterminado:</label><br />
-          <select id="idioma-cuenta">
-            <option>Español (Spanish)</option>
-            <option>Inglés (English)</option>
-          </select>
-        </p>
-        <p>
-          <label for="pais-cuenta">País o región:*</label><br />
-          <select id="pais-cuenta">
-            <option>Uruguay</option>
-            <option>Argentina</option>
-          </select>
-        </p>
-      </section>
+  <div id="panel-admin" hidden>
+    <strong>Modo Administrador Activo:</strong>
+    <a href="usuario.html">Gestionar Usuarios</a> |
+    <a href="usuario.html">Configuración Global</a> |
+    <a href="usuario.html">Reportes del Sistema</a>
+  </div>
 
-      <hr />
+  <main class="motion-entry">
+    <section class="profile-hero" aria-labelledby="perfil-usuario">
+      <p>Bienvenido/a,</p>
+      <h1 id="perfil-usuario">Carlos "Chacho" Ramos</h1>
+      <p>Perfil de Usuario (Estudiante, Cliente)</p>
+      <p>
+        <strong>7</strong> Cursos completados | <strong>2</strong> Servicios
+        contratados
+      </p>
+    </section>
 
-      <!-- SECCIÓN 2: COMPRADOR - CURSOS -->
-      <section class="account-section" aria-labelledby="cursos-inscriptos">
-        <h2 id="cursos-inscriptos">Mis cursos</h2>
-        <p>Cursos en los que estás inscripto:</p>
+    <nav class="profile-tabs" aria-label="Secciones de la cuenta">
+      <button type="button">Perfil</button>
+      <button type="button">Mis Cursos Comprados</button>
+      <button type="button">Mis Servicios Contratados</button>
+      <button type="button">Certificados</button>
+      <button type="button">Estadísticas</button>
+    </nav>
 
-        <ul>
-          <li>
-            <strong>Robótica para principiantes</strong> — Progreso: 60% [<a
-              href="curso.html"
-              >Continuar curso</a
-            >]
-          </li>
-        </ul>
-      </section>
 
-      <hr />
+    <section class="account-section" aria-labelledby="informacion-cuenta">
+      <h2 id="informacion-cuenta">Información básica de la cuenta</h2>
+      <p>
+        <label for="nombre-cuenta">Nombre:*</label><br />
+        <input type="text" id="nombre-cuenta" value="Carlos Alberto" readonly />
+      </p>
+      <p>
+        <label for="apellido-cuenta">Apellido:*</label><br />
+        <input type="text" id="apellido-cuenta" value="Ramos Cruz" readonly />
+      </p>
+      <p>
+        <label for="idioma-cuenta">Idioma predeterminado:</label><br />
+        <select id="idioma-cuenta">
+          <option>Español (Spanish)</option>
+          <option>Inglés (English)</option>
+        </select>
+      </p>
+      <p>
+        <label for="pais-cuenta">País o región:*</label><br />
+        <select id="pais-cuenta">
+          <option>Uruguay</option>
+          <option>Argentina</option>
+        </select>
+      </p>
+    </section>
 
-      <!-- SECCIÓN 3: COMPRADOR - SERVICIOS -->
-      <section class="account-section" aria-labelledby="servicios-contratados">
-        <h2 id="servicios-contratados">Mis servicios contratados</h2>
-        <p>Servicios solicitados a proveedores:</p>
+    <hr />
 
-        <ul>
-          <li>
-            <strong>Modelado e Impresión 3D de Chasis de Robot</strong> —
-            Estado: Impresión en proceso (Proveedor: Classia Studio)
-          </li>
-          <li>
-            <strong>Asesoría Técnica en Automatización</strong> — Estado:
-            Finalizado (Proveedor: Robótica Uy)
-          </li>
-        </ul>
+    <section class="account-section" aria-labelledby="cursos-inscriptos">
+      <h2 id="cursos-inscriptos">Mis cursos</h2>
+      <p>Cursos en los que estás inscripto:</p>
 
-        <p><a class="btn" href="catalogo.html">Contratar nuevo servicio</a></p>
-      </section>
+      <ul>
+        <li>
+          <strong>Robótica para principiantes</strong> — Progreso: 60% [<a href="curso.html">Continuar curso</a>]
+        </li>
+      </ul>
+    </section>
 
-      <hr />
+    <hr />
 
-      <!-- SECCIÓN 4: OFERENTE - EDUCATOR -->
-      <section class="account-section" aria-labelledby="cursos-publicados">
-        <h2 id="cursos-publicados">Mis cursos publicados</h2>
-        <p>Gestión de los cursos que impartes en la plataforma:</p>
+    <section class="account-section" aria-labelledby="servicios-contratados">
+      <h2 id="servicios-contratados">Mis servicios contratados</h2>
+      <p>Servicios solicitados a proveedores:</p>
 
-        <ul>
-          <li>
-            <strong>Curso de Arduino Avanzado</strong> (35 estudiantes
-            inscriptos)
-          </li>
-          <li>
-            <strong>Taller de Sensores e IoT</strong> (18 estudiantes
-            inscriptos)
-          </li>
-        </ul>
+      <ul>
+        <li>
+          <strong>Modelado e Impresión 3D de Chasis de Robot</strong> —
+          Estado: Impresión en proceso (Proveedor: Classia Studio)
+        </li>
+        <li>
+          <strong>Asesoría Técnica en Automatización</strong> — Estado:
+          Finalizado (Proveedor: Robótica Uy)
+        </li>
+      </ul>
 
-        <button type="button">+ Publicar nuevo curso</button>
-        <button type="button">Actualizar curso existente</button>
-      </section>
+      <p><a class="btn" href="catalogo.html">Contratar nuevo servicio</a></p>
+    </section>
 
-      <hr />
+    <section class="account-section" aria-labelledby="certificados">
+      <h2 id="certificados">Mis certificados</h2>
+      <p>Certificado de Finalización: Robótica para principiantes (demo)</p>
+    </section>
 
-      <!-- SECCIÓN 5: OFERENTE - PROVEEDOR -->
-      <section class="account-section" aria-labelledby="servicios-ofrecidos">
-        <h2 id="servicios-ofrecidos">Mis servicios ofrecidos</h2>
-        <p>Catálogo de servicios 3D e ingeniería que ofreces:</p>
+    <hr />
 
-        <ul>
-          <li>
-            <strong>Diseño e Impresión 3D a Pedido</strong> — Tarifa base: $50
-          </li>
-          <li>
-            <strong>Corte y Grabado Láser de Piezas</strong> — Tarifa base: $35
-          </li>
-        </ul>
+    <section class="account-section" aria-labelledby="estadisticas">
+      <h2 id="estadisticas">Estadísticas</h2>
+      <p>Resumen de aprendizaje e ingresos por cursos/servicios prestados.</p>
+    </section>
+  </main>
 
-        <button type="button">+ Ofrecer nuevo servicio / diseño 3D</button>
-      </section>
+  <footer class="site-footer">
+    <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
+  </footer>
+</body>
 
-      <hr />
-
-      <!-- SECCIÓN 6: CERTIFICADOS -->
-      <section class="account-section" aria-labelledby="certificados">
-        <h2 id="certificados">Mis certificados</h2>
-        <p>Certificado de Finalización: Robótica para principiantes (demo)</p>
-      </section>
-
-      <hr />
-
-      <!-- SECCIÓN 7: ESTADÍSTICAS -->
-      <section class="account-section" aria-labelledby="estadisticas">
-        <h2 id="estadisticas">Estadísticas</h2>
-        <p>Resumen de aprendizaje e ingresos por cursos/servicios prestados.</p>
-      </section>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
-      <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
-    </footer>
-  </body>
 </html>
