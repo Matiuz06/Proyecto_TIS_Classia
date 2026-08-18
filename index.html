@@ -9,7 +9,7 @@
     <title>Classia</title>
     <meta
       name="description"
-      content="Classia conecta estudiantes, docentes y administradores en una plataforma educativa clara y organizada." />
+      content="Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada." />
     <link rel="stylesheet" href="css/animation.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
@@ -18,7 +18,7 @@
     <header class="site-header">
       <div class="site-header__inner">
         <a class="site-brand" href="index.html">
-          <img src="assets/logoC.png" />
+          <img src="assets/logoC.png" alt="Classia" />
         </a>
         <nav class="site-nav" aria-label="Navegación principal">
           <a href="index.html" aria-current="page">Inicio</a>
@@ -32,10 +32,10 @@
     <main>
       <header>
         <p>Plataforma educativa</p>
-        <h1>Classia organiza el aprendizaje</h1>
+        <h1>Classia conecta aprendizaje y servicios</h1>
         <p>
-          Un espacio para explorar cursos, contratar servicios académicos y
-          coordinar el trabajo entre estudiantes, docentes y administradores.
+          Un espacio para explorar cursos, contratar servicios educativos,
+          publicar propuestas y administrar la actividad de la plataforma.
         </p>
         <p class="action-row">
           <a class="btn" href="html/catalogo.html">Explorar catálogo</a>
@@ -49,27 +49,41 @@
           <h2 id="roles-classia">Una misma plataforma para cada rol</h2>
         </header>
         <div class="role-grid">
-          <article class="content-card">
-            <h3>Estudiantes</h3>
-            <p>
-              Encuentran cursos, siguen su avance y acceden a materiales desde
-              un entorno ordenado.
+          <a
+            class="content-card role-card-link motion-card"
+            href="html/usuario.html">
+            <span class="badge role-card-meta">Estudiante</span>
+            <h3>Cliente</h3>
+            <p class="role-card-text">
+              Explora cursos y servicios, consulta publicaciones, contrata
+              propuestas educativas y gestiona su actividad.
             </p>
-          </article>
-          <article class="content-card">
-            <h3>Docentes</h3>
-            <p>
-              Publican propuestas, gestionan estudiantes y mantienen visible la
-              actividad académica.
+            <span class="role-card-action">Acceder</span>
+          </a>
+
+          <a
+            class="content-card role-card-link motion-card"
+            href="html/panelProveedor.html">
+            <span class="badge role-card-meta">Publicador</span>
+            <h3>Docente / Proveedor</h3>
+            <p class="role-card-text">
+              Publica cursos, ofrece servicios, administra publicaciones y
+              gestiona solicitudes desde su panel.
             </p>
-          </article>
-          <article class="content-card">
-            <h3>Administradores</h3>
-            <p>
-              Supervisan servicios, usuarios y procesos con una jerarquía visual
-              preparada para paneles.
+            <span class="role-card-action">Acceder</span>
+          </a>
+
+          <a
+            class="content-card role-card-link motion-card"
+            href="html/panelAdministrador.html">
+            <span class="badge role-card-meta">Supervisión</span>
+            <h3>Administrador</h3>
+            <p class="role-card-text">
+              Gestiona usuarios, revisa cursos, habilita o rechaza publicaciones
+              y supervisa la plataforma.
             </p>
-          </article>
+            <span class="role-card-action">Acceder</span>
+          </a>
         </div>
       </section>
     </main>
