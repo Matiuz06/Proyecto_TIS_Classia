@@ -7,6 +7,7 @@
       name="description"
       content="Catálogo de cursos y servicios educativos disponibles en Classia." />
     <title>Catálogo de cursos y servicios</title>
+    <link rel="stylesheet" href="../css/animation.css" />
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
   </head>
@@ -20,7 +21,7 @@
           <a href="../index.html">Inicio</a>
           <a href="catalogo.html" aria-current="page">Catálogo</a>
           <a href="carrito.html">Carrito</a>
-          <a href="usuario.html">Mi cuenta</a>
+          <a href="login.html">Mi cuenta</a>
         </nav>
       </div>
     </header>
@@ -111,25 +112,18 @@
         <section id="cursos" aria-labelledby="titulo-cursos">
           <header>
             <p>Contenido disponible</p>
-            <h2 id="titulo-cursos">Curso de demostración</h2>
-            <p>
-              Este curso es un ejemplo visual para mostrar cómo se presentarán
-              las propuestas reales dentro de Classia.
-            </p>
+            <h2 id="titulo-cursos">Cursos</h2>
+            <p>Cursos diversos para una aprendizaje profundo.</p>
           </header>
 
           <div class="catalog-grid">
             <article class="catalog-card" aria-labelledby="curso-demo">
-              <div class="placeholder-visual" aria-hidden="true">
-                Curso demo
-              </div>
+              <div class="placeholder-visual" aria-hidden="true">Curso img</div>
               <div>
-                <span class="badge">Ejemplo</span>
                 <h3 id="curso-demo">Robótica para principiantes</h3>
                 <p>
                   Introducción a conceptos básicos de robótica educativa,
-                  sensores y pensamiento computacional para estudiantes que dan
-                  sus primeros pasos.
+                  sensores y pensamiento computacional.
                 </p>
                 <dl>
                   <div>
@@ -147,11 +141,49 @@
                 </dl>
                 <p class="catalog-actions">
                   <a class="btn" href="curso.html">Ver curso</a>
-                  <a
-                    class="solicitarPropuesta"
-                    href="formsSolicitarServicio.html"
-                    >Solicitar propuesta</a
-                  >
+                </p>
+              </div>
+            </article>
+            <h2 id="titulo-servicios">Servicios</h2>
+            <p>Distintos servicios según tu necesidad.</p>
+
+            <article
+              class="catalog-card"
+              aria-labelledby="servicio-impresion-3d">
+              <div class="placeholder-visual" aria-hidden="true">
+                Servicio img
+              </div>
+
+              <div>
+                <h3 id="servicio-impresion-3d">Diseño e impresión 3D</h3>
+
+                <p>
+                  Diseñamos y materializamos tus ideas mediante modelado e
+                  impresión 3D, adaptándonos a las características y necesidades
+                  de cada proyecto.
+                </p>
+
+                <dl>
+                  <div>
+                    <dt>Modalidad</dt>
+                    <dd>Virtual / Presencial</dd>
+                  </div>
+
+                  <div>
+                    <dt>Tipo</dt>
+                    <dd>Servicio personalizado</dd>
+                  </div>
+
+                  <div>
+                    <dt>Entrega</dt>
+                    <dd>A coordinar</dd>
+                  </div>
+                </dl>
+
+                <p class="catalog-actions">
+                  <a class="btn" href="solicitudImpresion3d.html">
+                    Solicitar servicio
+                  </a>
                 </p>
               </div>
             </article>
@@ -159,14 +191,8 @@
             <section class="empty-state" aria-labelledby="sin-mas-cursos">
               <h3 id="sin-mas-cursos">Aún no hay más cursos publicados</h3>
               <p>
-                Cuando docentes y administradores carguen nuevas propuestas,
-                aparecerán en este catálogo. Por ahora mantenemos un solo curso
-                de demostración para evitar contenido ficticio repetido.
-              </p>
-              <p>
-                <a class="solicitarServicio" href="formsSolicitarServicio.html"
-                  >Solicitar asesoramiento educativo</a
-                >
+                Cuando se carguen nuevas propuestas, aparecerán en este
+                catálogo.
               </p>
             </section>
           </div>
