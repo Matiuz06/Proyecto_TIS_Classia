@@ -286,3 +286,15 @@ Más que funcionar únicamente como un catálogo de cursos, Classia busca explor
 Este proyecto se encuentra en desarrollo académico.
 
 Determinadas funcionalidades, usuarios, cursos, servicios, valoraciones, precios y operaciones presentes en la plataforma pueden utilizar información ficticia o simulada exclusivamente con fines de desarrollo, prueba y demostración.
+
+---
+
+## Estructura PHP
+
+La estructura inicial del backend PHP queda separada del frontend actual:
+
+- `config/`: configuracion global del backend, incluida la futura conexion a la base de datos.
+- `includes/`: codigo PHP reutilizable.
+- `php/`: logica PHP organizada por modulo.
+- `sql/`: esquema, scripts y recursos relacionados con la base de datos.
+- `docs/`: documentacion tecnica interna.
