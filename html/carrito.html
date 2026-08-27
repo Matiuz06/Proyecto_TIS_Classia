@@ -3,8 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Carrito de compras | Classia</title>
+    <title>Carrito de compras</title>
+    <link rel="stylesheet" href="../css/animation.css" />
     <link rel="stylesheet" href="../css/style.css" />
+    <link rel="icon" type="image/png" href="../assets/favicon.png" />
   </head>
   <body>
     <header class="site-header">
@@ -16,7 +18,7 @@
           <a href="../index.html">Inicio</a>
           <a href="catalogo.html">Catálogo</a>
           <a href="carrito.html" aria-current="page">Carrito</a>
-          <a href="usuario.html">Mi cuenta</a>
+          <a href="login.html">Mi cuenta</a>
         </nav>
       </div>
     </header>
@@ -30,7 +32,9 @@
         </p>
       </header>
 
-      <article class="catalog-card" aria-labelledby="item-curso-demo">
+      <article
+        class="catalog-card motion-card"
+        aria-labelledby="item-curso-demo">
         <div class="placeholder-visual" aria-hidden="true">Curso demo</div>
         <div>
           <span class="badge">Ejemplo</span>
@@ -41,7 +45,9 @@
         </div>
       </article>
 
-      <section class="panel" aria-labelledby="resumen-pedido">
+      <section
+        class="panel order-summary motion-entry"
+        aria-labelledby="resumen-pedido">
         <h2 id="resumen-pedido">Resumen del pedido</h2>
         <p>Subtotal: <strong>$29.99</strong></p>
         <p>Descuento: <strong>$0.00</strong></p>
