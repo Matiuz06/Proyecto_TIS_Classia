@@ -17,19 +17,19 @@
       <div class="site-header__inner">
         <a
           class="site-brand"
-          href="../index.html"
+          href="../index.php"
           aria-label="Classia - Inicio">
           <img src="../assets/logoC.png" alt="Classia" />
         </a>
 
         <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.html"> Inicio </a>
+          <a href="../index.php"> Inicio </a>
 
-          <a href="catalogo.html" aria-current="page"> Catálogo </a>
+          <a href="catalogo.php" aria-current="page"> Catálogo </a>
 
-          <a href="carrito.html"> Carrito </a>
+          <a href="carrito.php"> Carrito </a>
 
-          <a href="login.html"> Mi cuenta </a>
+          <a href="login.php"> Mi cuenta </a>
         </nav>
       </div>
     </header>
@@ -38,11 +38,11 @@
       <nav class="breadcrumb" aria-label="Ruta de navegación">
         <ol>
           <li>
-            <a href="../index.html">Inicio</a>
+            <a href="../index.php">Inicio</a>
           </li>
 
           <li>
-            <a href="catalogo.html">Servicios</a>
+            <a href="catalogo.php">Servicios</a>
           </li>
 
           <li aria-current="page">Diseño e impresión 3D</li>
@@ -81,7 +81,7 @@
       <div class="solicitud-3d__layout">
         <form
           class="form-impresion-3d"
-          action="confirmacion.html"
+          action="confirmacion.php"
           method="post"
           enctype="multipart/form-data">
           <fieldset>
@@ -374,7 +374,7 @@
           <div class="action-row">
             <button type="submit">Solicitar presupuesto</button>
 
-            <a class="btn btn-secondary" href="catalogo.html">
+            <a class="btn btn-secondary" href="catalogo.php">
               Volver al catálogo
             </a>
           </div>

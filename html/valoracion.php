@@ -1,27 +1,10 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Valoración</title>
-    <link rel="stylesheet" href="../css/animation.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="../index.html">
-          <img src="../assets/logoC.png" />
-        </a>
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.html">Inicio</a>
-          <a href="catalogo.html">Catálogo</a>
-          <a href="carrito.html">Carrito</a>
-          <a href="login.html" aria-current="page">Mi cuenta</a>
-        </nav>
-      </div>
-    </header>
+<?php
+$title     = 'Valoración';
+$cssPrefix = '..';
+$activePage = 'cuenta';
+include '../includes/header.php';
+?>
+
     <main class="page-container">
       <header class="page-header">
         <span class="brand-mark">Classia</span>
@@ -76,9 +59,9 @@
         <button type="submit">Enviar valoración</button>
       </form>
       <p>
-        <a href="usuario.html">← Volver a mi perfil</a> |
-        <a href="catalogo.html">Ir al catálogo</a>
+        <a href="usuario.php">← Volver a mi perfil</a> |
+        <a href="catalogo.php">Ir al catálogo</a>
       </p>
     </main>
-  </body>
-</html>
+
+<?php include '../includes/footer.php'; ?>

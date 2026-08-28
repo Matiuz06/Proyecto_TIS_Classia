@@ -15,14 +15,14 @@
 <body>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="site-brand" href="../index.html">
+      <a class="site-brand" href="../index.php">
         <img src="../assets/logoC.png" alt="Classia" />
       </a>
       <nav class="site-nav" aria-label="Navegación principal">
-        <a href="../index.html">Inicio</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="carrito.html">Carrito</a>
-        <a href="login.html">Mi cuenta</a>
+        <a href="../index.php">Inicio</a>
+        <a href="catalogo.php">Catálogo</a>
+        <a href="carrito.php">Carrito</a>
+        <a href="login.php">Mi cuenta</a>
       </nav>
     </div>
   </header>
@@ -578,7 +578,7 @@
         <a class="btn" href="mailto:privacidad@classia.uy" id="btn-contacto-privacidad">
           Contactar al equipo de privacidad
         </a>
-        <a href="registro.html">Crear cuenta</a>
+        <a href="registro.php">Crear cuenta</a>
       </p>
     </div>
 
@@ -590,15 +590,15 @@
     <nav aria-label="Navegación secundaria">
       <ul>
         <li>
-          <a href="../index.html">Inicio</a>
+          <a href="../index.php">Inicio</a>
         </li>
 
         <li>
-          <a href="catalogo.html">Servicios</a>
+          <a href="catalogo.php">Servicios</a>
         </li>
 
         <li>
-          <a href="politica_privacidad.html" aria-current="page">Privacidad</a>
+          <a href="politica_privacidad.php" aria-current="page">Privacidad</a>
         </li>
 
         <li>

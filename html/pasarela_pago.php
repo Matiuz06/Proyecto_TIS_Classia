@@ -1,27 +1,10 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pasarela de pago</title>
-    <link rel="stylesheet" href="../css/animation.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="../index.html">
-          <img src="../assets/logoC.png" />
-        </a>
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.html">Inicio</a>
-          <a href="catalogo.html">Catálogo</a>
-          <a href="carrito.html" aria-current="page">Carrito</a>
-          <a href="login.html">Mi cuenta</a>
-        </nav>
-      </div>
-    </header>
+<?php
+$title     = 'Pasarela de pago';
+$cssPrefix = '..';
+$activePage = 'carrito';
+include '../includes/header.php';
+?>
+
     <!-- TARJETA DE PAGO -->
     <div class="card-container payment-card motion-entry">
       <!-- LOGO -->
@@ -31,7 +14,7 @@
       <h1>Pasarela de Pago</h1>
 
       <!-- FORMULARIO -->
-      <form action="confirmacion.html" method="GET">
+      <form action="confirmacion.php" method="GET">
         <!-- EMAIL -->
         <p>
           <label for="email"><strong>Correo electrónico:*</strong></label
@@ -82,7 +65,7 @@
       <hr />
 
       <p>
-        <a href="carrito.html">← Volver al Carrito</a>
+        <a href="carrito.php">← Volver al Carrito</a>
       </p>
 
       <!-- ICONOS DE COMPLIANCE -->
@@ -96,5 +79,5 @@
           alt="ISO 20022" />
       </div>
     </div>
-  </body>
-</html>
+
+<?php include '../includes/footer.php'; ?>

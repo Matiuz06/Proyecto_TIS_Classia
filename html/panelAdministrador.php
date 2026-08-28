@@ -17,14 +17,14 @@
   <body>
     <header class="site-header">
       <div class="site-header__inner">
-        <a class="site-brand" href="index.html">
+        <a class="site-brand" href="index.php">
           <img src="assets/logoC.png" alt="Classia" />
         </a>
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="index.html" aria-current="page">Inicio</a>
-          <a href="html/catalogo.html">Catálogo</a>
-          <a href="html/carrito.html">Carrito</a>
-          <a href="html/login.html">Mi cuenta</a>
+        <nav class="site-nav" aria-label="Navegaci&oacute;n principal">
+          <a href="index.php" aria-current="page">Inicio</a>
+          <a href="catalogo.php">Cat&aacute;logo</a>
+          <a href="carrito.php">Carrito</a>
+          <a href="login.php">Mi cuenta</a>
         </nav>
       </div>
     </header>
@@ -38,20 +38,20 @@
           publicar propuestas y administrar la actividad de la plataforma.
         </p>
         <p class="action-row">
-          <a class="btn" href="html/catalogo.html">Explorar catálogo</a>
-          <a href="html/registro.html">Crear cuenta</a>
+          <a class="btn" href="catalogo.php">Explorar cat&aacute;logo</a>
+          <a href="registro.php">Crear cuenta</a>
         </p>
       </header>
 
       <section aria-labelledby="roles-classia">
         <header>
-          <p>Gestión clara</p>
+          <p>Gesti&oacute;n clara</p>
           <h2 id="roles-classia">Una misma plataforma para cada rol</h2>
         </header>
         <div class="role-grid">
           <a
             class="content-card role-card-link motion-card"
-            href="html/usuario.html">
+            href="catalogo.php">
             <span class="badge role-card-meta">Estudiante</span>
             <h3>Cliente</h3>
             <p class="role-card-text">
@@ -63,7 +63,7 @@
 
           <a
             class="content-card role-card-link motion-card"
-            href="html/panelProveedor.html">
+            href="panelProveedor.php">
             <span class="badge role-card-meta">Publicador</span>
             <h3>Docente / Proveedor</h3>
             <p class="role-card-text">
@@ -75,8 +75,8 @@
 
           <a
             class="content-card role-card-link motion-card"
-            href="html/panelAdministrador.html">
-            <span class="badge role-card-meta">Supervisión</span>
+            href="panelAdministrador.php">
+            <span class="badge role-card-meta">Supervisi&oacute;n</span>
             <h3>Administrador</h3>
             <p class="role-card-text">
               Gestiona usuarios, revisa cursos, habilita o rechaza publicaciones

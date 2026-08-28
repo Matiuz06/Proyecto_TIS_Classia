@@ -14,14 +14,14 @@
   <body>
     <header class="site-header">
       <div class="site-header__inner">
-        <a class="site-brand" href="../index.html">
+        <a class="site-brand" href="../index.php">
           <img src="../assets/logoC.png" />
         </a>
         <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.html">Inicio</a>
-          <a href="catalogo.html" aria-current="page">Catálogo</a>
-          <a href="carrito.html">Carrito</a>
-          <a href="login.html">Mi cuenta</a>
+          <a href="../index.php">Inicio</a>
+          <a href="catalogo.php" aria-current="page">Catálogo</a>
+          <a href="carrito.php">Carrito</a>
+          <a href="login.php">Mi cuenta</a>
         </nav>
       </div>
     </header>
@@ -30,15 +30,15 @@
       <nav aria-label="Ruta de navegación">
         <ol>
           <li>
-            <a href="../index.html">Inicio</a>
+            <a href="../index.php">Inicio</a>
           </li>
 
           <li>
-            <a href="catalogo.html">Servicios</a>
+            <a href="catalogo.php">Servicios</a>
           </li>
 
           <li>
-            <a href="servicioDetalle.html">Detalle del servicio</a>
+            <a href="servicioDetalle.php">Detalle del servicio</a>
           </li>
 
           <li aria-current="page">Solicitar servicio</li>
@@ -66,16 +66,16 @@
 
           <p>
             Publicado por
-            <a href="usuario.html"> Taller 3D Norte </a>
+            <a href="usuario.php"> Taller 3D Norte </a>
           </p>
 
           <p>Precio orientativo: desde $850</p>
 
-          <a href="servicioDetalle.html"> Volver al detalle </a>
+          <a href="servicioDetalle.php"> Volver al detalle </a>
         </article>
       </section>
 
-      <form action="confirmacion.html" method="post">
+      <form action="confirmacion.php" method="post">
         <fieldset>
           <legend>Datos de contacto</legend>
 
@@ -747,7 +747,7 @@
 
         <button type="reset">Limpiar formulario</button>
 
-        <a href="servicioDetalle.html"> Cancelar y volver </a>
+        <a href="servicioDetalle.php"> Cancelar y volver </a>
       </form>
     </main>
 
@@ -760,23 +760,23 @@
       <nav aria-label="Navegación secundaria">
         <ul>
           <li>
-            <a href="../index.html">Inicio</a>
+            <a href="../index.php">Inicio</a>
           </li>
 
           <li>
-            <a href="catalogo.html">Catálogo</a>
+            <a href="catalogo.php">Catálogo</a>
           </li>
 
           <li>
-            <a href="../index.html">Acerca de</a>
+            <a href="../index.php">Acerca de</a>
           </li>
 
           <li>
-            <a href="../index.html">Contacto</a>
+            <a href="../index.php">Contacto</a>
           </li>
 
           <li>
-            <a href="../index.html">Privacidad</a>
+            <a href="../index.php">Privacidad</a>
           </li>
         </ul>
       </nav>
