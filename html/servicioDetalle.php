@@ -15,14 +15,14 @@
   <body>
     <header class="site-header">
       <div class="site-header__inner">
-        <a class="site-brand" href="../index.html">
+        <a class="site-brand" href="../index.php">
           <img src="../assets/logoC.png" />
         </a>
         <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.html">Inicio</a>
-          <a href="catalogo.html" aria-current="page">Catálogo</a>
-          <a href="carrito.html">Carrito</a>
-          <a href="login.html">Mi cuenta</a>
+          <a href="../index.php">Inicio</a>
+          <a href="catalogo.php" aria-current="page">Catálogo</a>
+          <a href="carrito.php">Carrito</a>
+          <a href="login.php">Mi cuenta</a>
         </nav>
       </div>
     </header>
@@ -31,15 +31,15 @@
       <nav aria-label="Ruta de navegación">
         <ol>
           <li>
-            <a href="../index.html">Inicio</a>
+            <a href="../index.php">Inicio</a>
           </li>
 
           <li>
-            <a href="catalogo.html">Servicios</a>
+            <a href="catalogo.php">Servicios</a>
           </li>
 
           <li>
-            <a href="catalogo.html?tipo=servicio&categoria=diseno-impresion-3d">
+            <a href="catalogo.php?tipo=servicio&categoria=diseno-impresion-3d">
               Diseño e impresión 3D
             </a>
           </li>
@@ -63,7 +63,7 @@
 
           <p>
             Publicado por
-            <a href="usuario.html">
+            <a href="usuario.php">
               <strong>Taller 3D Norte</strong>
             </a>
           </p>
@@ -133,7 +133,7 @@
           <aside aria-labelledby="titulo-contratacion">
             <h2 id="titulo-contratacion">Contratar este servicio</h2>
 
-            <form action="pasarela_pago.html" method="get">
+            <form action="pasarela_pago.php" method="get">
               <fieldset>
                 <legend>Selecciona un paquete</legend>
 
@@ -257,13 +257,13 @@
 
             <p>El pago será simulado y no se procesará dinero real.</p>
 
-            <a href="formsSolicitarServicio.html">
+            <a href="formsSolicitarServicio.php">
               Solicitar presupuesto personalizado
             </a>
 
             <button type="button">Guardar servicio</button>
 
-            <a href="formsSolicitarServicio.html"> Contactar al proveedor </a>
+            <a href="formsSolicitarServicio.php"> Contactar al proveedor </a>
           </aside>
         </div>
 
@@ -386,7 +386,7 @@
           <span class="brand-mark">Classia</span>
 
           <h3>
-            <a href="usuario.html"> Taller 3D Norte </a>
+            <a href="usuario.php"> Taller 3D Norte </a>
           </h3>
 
           <p>
@@ -416,7 +416,7 @@
             </div>
           </dl>
 
-          <a href="usuario.html"> Ver perfil completo </a>
+          <a href="usuario.php"> Ver perfil completo </a>
         </section>
 
         <section aria-labelledby="preguntas">
@@ -502,7 +502,7 @@
 
           <article>
             <h3>
-              <a href="servicioDetalle.html">
+              <a href="servicioDetalle.php">
                 Diseño de piezas para proyectos de robótica
               </a>
             </h3>
@@ -512,7 +512,7 @@
 
           <article>
             <h3>
-              <a href="servicioDetalle.html">
+              <a href="servicioDetalle.php">
                 Modelado 3D para maquetas educativas
               </a>
             </h3>
@@ -522,7 +522,7 @@
 
           <article>
             <h3>
-              <a href="servicioDetalle.html">
+              <a href="servicioDetalle.php">
                 Asesoramiento para proyectos maker
               </a>
             </h3>
@@ -542,23 +542,23 @@
       <nav aria-label="Navegación secundaria">
         <ul>
           <li>
-            <a href="../index.html">Inicio</a>
+            <a href="../index.php">Inicio</a>
           </li>
 
           <li>
-            <a href="catalogo.html">Catálogo</a>
+            <a href="catalogo.php">Catálogo</a>
           </li>
 
           <li>
-            <a href="../index.html">Acerca de</a>
+            <a href="../index.php">Acerca de</a>
           </li>
 
           <li>
-            <a href="../index.html">Contacto</a>
+            <a href="../index.php">Contacto</a>
           </li>
 
           <li>
-            <a href="../index.html">Privacidad</a>
+            <a href="../index.php">Privacidad</a>
           </li>
         </ul>
       </nav>

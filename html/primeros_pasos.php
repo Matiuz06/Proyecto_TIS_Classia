@@ -14,14 +14,14 @@
 <body>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="site-brand" href="../index.html">
+      <a class="site-brand" href="../index.php">
         <img src="../assets/logoC.png" alt="Logo Classia" />
       </a>
       <nav class="site-nav" aria-label="Navegación principal">
-        <a href="../index.html">Inicio</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="carrito.html">Carrito</a>
-        <a href="login.html" aria-current="page">Mi cuenta</a>
+        <a href="../index.php">Inicio</a>
+        <a href="catalogo.php">Catálogo</a>
+        <a href="carrito.php">Carrito</a>
+        <a href="login.php" aria-current="page">Mi cuenta</a>
       </nav>
     </div>
   </header>
@@ -37,7 +37,7 @@
       </p>
     </header>
 
-    <form action="usuario.html" method="get">
+    <form action="usuario.php" method="get">
 
       <fieldset class="onboarding-step">
         <legend class="onboarding-legend">
@@ -424,7 +424,7 @@
           <label class="option-card" for="acepta-privacidad">
             <input type="checkbox" id="acepta-privacidad" name="acepta_privacidad" value="si" required />
             <span class="option-text">
-              Confirmo que leí y acepto la <a href="politica_privacidad.html"
+              Confirmo que leí y acepto la <a href="politica_privacidad.php"
                 style="color: var(--color-brand-primary); font-weight: 600;">política de privacidad</a> y el tratamiento
               de mis datos personales.
             </span>
@@ -433,7 +433,7 @@
       </fieldset>
 
       <div class="onboarding-actions">
-        <a href="usuario.html" class="btn btn-secondary">Omitir por ahora</a>
+        <a href="usuario.php" class="btn btn-secondary">Omitir por ahora</a>
         <button type="submit" class="btn btn-primary">Guardar y continuar</button>
       </div>
     </form>
@@ -443,10 +443,10 @@
     <p>Classia — Plataforma de comercialización de servicios educativos</p>
     <nav aria-label="Navegación secundaria">
       <ul>
-        <li><a href="../index.html">Inicio</a></li>
-        <li><a href="catalogo.html">Servicios</a></li>
-        <li><a href="politica_privacidad.html">Privacidad</a></li>
-        <li><a href="../index.html">Contacto</a></li>
+        <li><a href="../index.php">Inicio</a></li>
+        <li><a href="catalogo.php">Servicios</a></li>
+        <li><a href="politica_privacidad.php">Privacidad</a></li>
+        <li><a href="../index.php">Contacto</a></li>
       </ul>
     </nav>
     <p>© 2026 Classia. Todos los derechos reservados.</p>

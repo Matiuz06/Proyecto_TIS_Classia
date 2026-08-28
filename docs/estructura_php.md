@@ -5,7 +5,7 @@ Este documento define la estructura inicial del backend PHP para Classia.
 ## Carpetas
 
 - `config/`: configuracion global del backend.
-- `config/database.php`: futura conexion PDO a la base de datos. Se implementara en PHP-02.
+- `config/database.php`: conexion PDO centralizada a la base de datos.
 - `includes/`: codigo PHP reutilizable, como validaciones, helpers o componentes comunes.
 - `php/auth/`: futura logica de login, registro y logout.
 - `php/usuarios/`: futura logica relacionada con usuarios.
@@ -31,7 +31,17 @@ Los archivos reutilizables deben ir en `includes/`.
 
 ## Base de datos
 
-La conexion a la base de datos estara en `config/database.php`.
+La conexion PDO a la base de datos esta en `config/database.php` y deja disponible la variable `$pdo` para los archivos que la incluyan.
+
+Valores locales predeterminados:
+
+- `DB_HOST`: `localhost`
+- `DB_PORT`: `3306`
+- `DB_NAME`: `classia_db`
+- `DB_USER`: `root`
+- `DB_PASSWORD`: vacia
+
+Estos valores pueden reemplazarse con variables de entorno del mismo nombre. El archivo `.env.example` muestra los nombres esperados, pero el proyecto no carga archivos `.env` automaticamente ni requiere paquetes externos.
 
 Los scripts SQL deben guardarse en `sql/`. El archivo `sql/schema.sql` sera incorporado desde la rama que contiene el modelo de base de datos.
 
