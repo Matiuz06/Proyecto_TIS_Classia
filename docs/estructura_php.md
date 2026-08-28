@@ -61,6 +61,41 @@ require_once __DIR__ . "/../../config/database.php";
 $stmt = $pdo->prepare("SELECT 1");
 ```
 
+## Sesiones PHP
+
+La logica inicial de sesiones esta en `php/auth/session.php`.
+
+Funciones disponibles:
+
+- `iniciar_sesion()`: inicia la sesion solo si no existe una sesion activa.
+- `establecer_usuario_sesion($id_usuario, $nombre, $email, $id_rol)`: regenera el ID de sesion y guarda los datos minimos del usuario autenticado.
+- `esta_autenticado()`: devuelve `true` cuando existe `$_SESSION["usuario"]` con los datos minimos requeridos.
+- `usuario_actual()`: devuelve el arreglo del usuario autenticado o `null`.
+- `requerir_autenticacion($login_url)`: redirige a la URL de login indicada cuando no hay usuario autenticado.
+- `cerrar_sesion()`: vacia `$_SESSION`, elimina la cookie de sesion cuando corresponde y destruye la sesion.
+
+Estructura guardada en sesion:
+
+```php
+$_SESSION["usuario"] = [
+    "id_usuario" => 1,
+    "nombre" => "Usuario de prueba",
+    "email" => "prueba@classia.local",
+    "id_rol" => 1,
+];
+```
+
+No se deben guardar `password`, `password_hash`, datos de PDO ni datos sensibles innecesarios.
+
+Prueba manual de persistencia con XAMPP:
+
+1. Abrir `scripts/session/iniciar_prueba.php` desde el navegador.
+2. Abrir `scripts/session/verificar_prueba.php` y comprobar que el usuario ficticio persiste.
+3. Abrir `scripts/session/cerrar_prueba.php`.
+4. Volver a `scripts/session/verificar_prueba.php` y comprobar que ya no hay usuario autenticado.
+
+Estos scripts son solo para desarrollo y no consultan la base de datos.
+
 ## Convenciones
 
 - Archivos PHP: `snake_case`.
