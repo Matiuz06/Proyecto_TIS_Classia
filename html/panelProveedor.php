@@ -18,14 +18,14 @@
   <body>
     <header class="site-header">
       <div class="site-header__inner">
-        <a class="site-brand" href="../index.html">
+        <a class="site-brand" href="../index.php">
           <img src="../assets/logoC.png" />
         </a>
         <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.html">Inicio</a>
-          <a href="catalogo.html">Catálogo</a>
-          <a href="carrito.html">Carrito</a>
-          <a href="login.html" aria-current="page">Mi cuenta</a>
+          <a href="../index.php">Inicio</a>
+          <a href="catalogo.php">Catálogo</a>
+          <a href="carrito.php">Carrito</a>
+          <a href="login.php" aria-current="page">Mi cuenta</a>
         </nav>
       </div>
     </header>
@@ -48,7 +48,7 @@
         <nav aria-label="Acciones rápidas del proveedor">
           <ul>
             <li>
-              <a href="formsSolicitarServicio.html">
+              <a href="formsSolicitarServicio.php">
                 Publicar un curso o servicio
               </a>
             </li>
@@ -216,7 +216,7 @@
             cargada únicamente hasta el próximo mes.
           </p>
 
-          <a href="formsSolicitarServicio.html"> Actualizar disponibilidad </a>
+          <a href="formsSolicitarServicio.php"> Actualizar disponibilidad </a>
         </article>
 
         <p>
@@ -230,7 +230,7 @@
 
           <p>Consulta y administra las publicaciones asociadas a tu perfil.</p>
 
-          <a href="formsSolicitarServicio.html"> Crear nueva publicación </a>
+          <a href="formsSolicitarServicio.php"> Crear nueva publicación </a>
         </header>
 
         <br>
@@ -242,7 +242,7 @@
             <header>
 
               <h4>
-                <a href="servicioDetalle.html">
+                <a href="servicioDetalle.php">
                   Desarrollo web con HTML, CSS y JavaScript
                 </a>
               </h4>
@@ -285,11 +285,11 @@
             <nav aria-label="Acciones del curso Desarrollo web">
               <ul>
                 <li>
-                  <a href="servicioDetalle.html"> Ver publicación </a>
+                  <a href="servicioDetalle.php"> Ver publicación </a>
                 </li>
 
                 <li>
-                  <a href="formsSolicitarServicio.html"> Editar </a>
+                  <a href="formsSolicitarServicio.php"> Editar </a>
                 </li>
 
                 <li>
@@ -306,7 +306,7 @@
           <article>
             <header>
               <h4>
-                <a href="servicioDetalle.html">
+                <a href="servicioDetalle.php">
                   Inteligencia artificial aplicada a la enseñanza
                 </a>
               </h4>
@@ -349,11 +349,11 @@
             <nav aria-label="Acciones del curso Inteligencia artificial">
               <ul>
                 <li>
-                  <a href="servicioDetalle.html"> Ver publicación </a>
+                  <a href="servicioDetalle.php"> Ver publicación </a>
                 </li>
 
                 <li>
-                  <a href="formsSolicitarServicio.html"> Editar </a>
+                  <a href="formsSolicitarServicio.php"> Editar </a>
                 </li>
 
                 <li>
@@ -375,7 +375,7 @@
             <header>
 
               <h4>
-                <a href="servicioDetalle.html">
+                <a href="servicioDetalle.php">
                   Diseño e impresión de recursos didácticos 3D
                 </a>
               </h4>
@@ -416,11 +416,11 @@
             <nav aria-label="Acciones del servicio de impresión 3D">
               <ul>
                 <li>
-                  <a href="servicioDetalle.html"> Ver publicación </a>
+                  <a href="servicioDetalle.php"> Ver publicación </a>
                 </li>
 
                 <li>
-                  <a href="formsSolicitarServicio.html"> Editar </a>
+                  <a href="formsSolicitarServicio.php"> Editar </a>
                 </li>
 
                 <li>
@@ -438,7 +438,7 @@
             <header>
 
               <h4>
-                <a href="servicioDetalle.html">
+                <a href="servicioDetalle.php">
                   Mentoría para proyectos de software educativos
                 </a>
               </h4>
@@ -479,11 +479,11 @@
             <nav aria-label="Acciones del servicio de mentoría">
               <ul>
                 <li>
-                  <a href="servicioDetalle.html"> Ver publicación </a>
+                  <a href="servicioDetalle.php"> Ver publicación </a>
                 </li>
 
                 <li>
-                  <a href="formsSolicitarServicio.html"> Editar </a>
+                  <a href="formsSolicitarServicio.php"> Editar </a>
                 </li>
 
                 <li>
@@ -501,7 +501,7 @@
             <header>
 
               <h4>
-                <a href="servicioDetalle.html">
+                <a href="servicioDetalle.php">
                   Diseño de proyectos tecnológicos para instituciones
                 </a>
               </h4>
@@ -542,11 +542,11 @@
             <nav aria-label="Acciones del proyecto educativo">
               <ul>
                 <li>
-                  <a href="servicioDetalle.html"> Vista previa </a>
+                  <a href="servicioDetalle.php"> Vista previa </a>
                 </li>
 
                 <li>
-                  <a href="formsSolicitarServicio.html"> Continuar editando </a>
+                  <a href="formsSolicitarServicio.php"> Continuar editando </a>
                 </li>
 
                 <li>
@@ -759,7 +759,7 @@
           </div>
         </dl>
 
-        <a href="usuario.html"> Ver perfil público </a>
+        <a href="usuario.php"> Ver perfil público </a>
 
         <a href="#perfil"> Editar información </a>
       </section>
@@ -850,27 +850,27 @@
       <nav aria-label="Navegación secundaria">
         <ul>
           <li>
-            <a href="../index.html">Inicio</a>
+            <a href="../index.php">Inicio</a>
           </li>
 
           <li>
-            <a href="catalogo.html">Catálogo</a>
+            <a href="catalogo.php">Catálogo</a>
           </li>
 
           <li>
-            <a href="usuario.html">Mi perfil</a>
+            <a href="usuario.php">Mi perfil</a>
           </li>
 
           <li>
-            <a href="../index.html">Acerca de</a>
+            <a href="../index.php">Acerca de</a>
           </li>
 
           <li>
-            <a href="../index.html">Contacto</a>
+            <a href="../index.php">Contacto</a>
           </li>
 
           <li>
-            <a href="../index.html">Privacidad</a>
+            <a href="../index.php">Privacidad</a>
           </li>
         </ul>
       </nav>

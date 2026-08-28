@@ -1,30 +1,12 @@
-<!doctype html>
-<html lang="es">
+<?php
+$title      = 'Iniciar sesión';
+$description = 'Inicio de sesión en Classia.';
+$cssPrefix  = '..';
+$bodyClass  = 'auth-page';
+$activePage = 'cuenta';
+include '../includes/header.php';
+?>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Inicio de sesión en Classia." />
-  <title>Iniciar sesión</title>
-  <link rel="stylesheet" href="../css/animation.css" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="icon" type="image/png" href="../assets/favicon.png" />
-</head>
-
-<body class="auth-page">
-  <header class="site-header">
-    <div class="site-header__inner">
-      <a class="site-brand" href="../index.html">
-        <img src="../assets/logoC.png" />
-      </a>
-      <nav class="site-nav" aria-label="Navegación principal">
-        <a href="../index.html">Inicio</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="carrito.html">Carrito</a>
-        <a href="login.html" aria-current="page">Mi cuenta</a>
-      </nav>
-    </div>
-  </header>
   <main class="auth-shell">
     <section class="auth-intro" aria-labelledby="intro-login">
       <h1 id="intro-login">Entrá a tu espacio educativo</h1>
@@ -55,19 +37,17 @@
         <button type="submit">Iniciar sesión</button>
       </form>
       <p class="auth-links">
-        <a href="restablecer_contrasena.html">¿Olvidaste tu contraseña?</a>
+        <a href="restablecer_contrasena.php">¿Olvidaste tu contraseña?</a>
       </p>
       <p class="auth-links">
-        ¿No tenés cuenta? <a href="registro.html">Registrate</a>
+        ¿No tenés cuenta? <a href="registro.php">Registrate</a>
       </p>
 
       <div class="auth-divider" aria-hidden="true">
         <span>o continuá con</span>
       </div>
 
-      <!-- SVG inline: se usa para mostrar el ícono oficial de Google sin
-             depender de una imagen externa ni de una librería de íconos.
-             Los 4 path representan los 4 colores característicos del logo. -->
+    
       <a href="#" class="btn-google" id="btn-google-login" aria-label="Iniciar sesión con Google">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"
           focusable="false">
@@ -84,6 +64,5 @@
       </a>
     </section>
   </main>
-</body>
 
-</html>
+<?php include '../includes/footer.php'; ?>
