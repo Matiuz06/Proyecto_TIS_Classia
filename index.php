@@ -1,33 +1,11 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self';" />
-    <title>Classia</title>
-    <meta
-      name="description"
-      content="Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada." />
-    <link rel="stylesheet" href="css/animation.css" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" type="image/png" href="assets/favicon.png" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="index.html">
-          <img src="assets/logoC.png" alt="Classia" />
-        </a>
-        <nav class="site-nav" aria-label="Navegaci&oacute;n principal">
-          <a href="index.html" aria-current="page">Inicio</a>
-          <a href="html/catalogo.html">Cat&aacute;logo</a>
-          <a href="html/carrito.html">Carrito</a>
-          <a href="html/login.html">Mi cuenta</a>
-        </nav>
-      </div>
-    </header>
+<?php
+$title      = 'Classia';
+$description = 'Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada.';
+$cssPrefix  = '.';
+$jsPrefix   = '.';
+$activePage = 'inicio';
+include 'includes/header.php';
+?>
 
     <main>
       <header>
@@ -38,20 +16,20 @@
           publicar propuestas y administrar la actividad de la plataforma.
         </p>
         <p class="action-row">
-          <a class="btn" href="html/catalogo.html">Explorar cat&aacute;logo</a>
-          <a href="html/registro.html">Crear cuenta</a>
+          <a class="btn" href="html/catalogo.php">Explorar catálogo</a>
+          <a href="html/registro.php">Crear cuenta</a>
         </p>
       </header>
 
       <section aria-labelledby="roles-classia">
         <header>
-          <p>Gesti&oacute;n clara</p>
+          <p>Gestión clara</p>
           <h2 id="roles-classia">Una misma plataforma para cada rol</h2>
         </header>
         <div class="role-grid">
           <a
             class="content-card role-card-link motion-card"
-            href="html/catalogo.html">
+            href="html/usuario.php">
             <span class="badge role-card-meta">Estudiante</span>
             <h3>Cliente</h3>
             <p class="role-card-text">
@@ -63,7 +41,7 @@
 
           <a
             class="content-card role-card-link motion-card"
-            href="html/panelProveedor.html">
+            href="html/panelProveedor.php">
             <span class="badge role-card-meta">Publicador</span>
             <h3>Docente / Proveedor</h3>
             <p class="role-card-text">
@@ -75,8 +53,8 @@
 
           <a
             class="content-card role-card-link motion-card"
-            href="html/panelAdministrador.html">
-            <span class="badge role-card-meta">Supervisi&oacute;n</span>
+            href="html/panelAdministrador.php">
+            <span class="badge role-card-meta">Supervisión</span>
             <h3>Administrador</h3>
             <p class="role-card-text">
               Gestiona usuarios, revisa cursos, habilita o rechaza publicaciones
@@ -88,10 +66,6 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
-    </footer>
-
-    <script src="js/script.js"></script>
-  </body>
-</html>
+<?php
+include 'includes/footer.php';
+?>

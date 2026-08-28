@@ -1,36 +1,15 @@
-<!doctype html>
-<html lang="es">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Perfil de usuario</title>
-  <link rel="stylesheet" href="../css/animation.css" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="icon" type="image/png" href="../assets/favicon.png" />
-</head>
-
-<body>
-  <header class="site-header">
-    <div class="site-header__inner">
-      <a class="site-brand" href="../index.html">
-        <img src="../assets/logoC.png" />
-      </a>
-      <nav class="site-nav" aria-label="Navegación principal">
-        <a href="../index.html">Inicio</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="carrito.html">Carrito</a>
-        <a href="login.html" aria-current="page">Mi cuenta</a>
-      </nav>
-    </div>
-  </header>
-
+<?php
+$title     = 'Perfil de usuario';
+$cssPrefix = '..';
+$activePage = 'cuenta';
+include '../includes/header.php';
+?>
 
   <div id="panel-admin" hidden>
     <strong>Modo Administrador Activo:</strong>
-    <a href="usuario.html">Gestionar Usuarios</a> |
-    <a href="usuario.html">Configuración Global</a> |
-    <a href="usuario.html">Reportes del Sistema</a>
+    <a href="usuario.php">Gestionar Usuarios</a> |
+    <a href="usuario.php">Configuración Global</a> |
+    <a href="usuario.php">Reportes del Sistema</a>
   </div>
 
   <main class="motion-entry">
@@ -87,7 +66,7 @@
 
       <ul>
         <li>
-          <strong>Robótica para principiantes</strong> — Progreso: 60% [<a href="curso.html">Continuar curso</a>]
+          <strong>Robótica para principiantes</strong> — Progreso: 60% [<a href="curso.php">Continuar curso</a>]
         </li>
       </ul>
     </section>
@@ -109,7 +88,7 @@
         </li>
       </ul>
 
-      <p><a class="btn" href="catalogo.html">Contratar nuevo servicio</a></p>
+      <p><a class="btn" href="catalogo.php">Contratar nuevo servicio</a></p>
     </section>
 
     <section class="account-section" aria-labelledby="certificados">
@@ -129,5 +108,4 @@
     <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
   </footer>
 </body>
-
 </html>
