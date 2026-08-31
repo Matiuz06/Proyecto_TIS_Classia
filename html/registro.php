@@ -23,8 +23,8 @@ include '../includes/header.php';
       <p class="muted">Completá tus datos básicos para empezar.</p>
 
       <?php if (!empty($errores)): ?>
-        <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
-          <ul style="margin: 0; padding-left: 20px;">
+        <div class="alert alert-danger">
+          <ul>
             <?php foreach ($errores as $error): ?>
               <li><?php echo htmlspecialchars($error); ?></li>
             <?php endforeach; ?>

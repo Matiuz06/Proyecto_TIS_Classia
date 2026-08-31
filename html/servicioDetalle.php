@@ -133,7 +133,7 @@
           <aside aria-labelledby="titulo-contratacion">
             <h2 id="titulo-contratacion">Contratar este servicio</h2>
 
-            <form action="pasarela_pago.php" method="get">
+            <form action="pasarelaPago.php" method="get">
               <fieldset>
                 <legend>Selecciona un paquete</legend>
 

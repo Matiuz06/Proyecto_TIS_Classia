@@ -1,3 +1,4 @@
+<?php require_once '../php/publicaciones/obtenerPublicaciones.php'; ?>
 <!doctype html>
 <html lang="es">
   <head>
@@ -31,6 +32,16 @@
     </header>
 
     <main class="provider-dashboard">
+      <?php if (isset($_GET['mensaje'])): ?>
+        <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 12px 16px; margin: 15px 0; border-radius: 6px; font-weight: bold;">
+          <?php 
+            if ($_GET['mensaje'] === 'creada') echo "Publicación creada exitosamente.";
+            elseif ($_GET['mensaje'] === 'actualizada') echo "Publicación actualizada correctamente.";
+            elseif ($_GET['mensaje'] === 'estado_actualizado') echo "El estado de la publicación se actualizó correctamente.";
+          ?>
+        </div>
+      <?php endif; ?>
+
       <header>
 
         <h1>Panel del proveedor</h1>
@@ -48,7 +59,7 @@
         <nav aria-label="Acciones rápidas del proveedor">
           <ul>
             <li>
-              <a href="formsSolicitarServicio.php">
+              <a href="crearPublicacion.php">
                 Publicar un curso o servicio
               </a>
             </li>
@@ -224,338 +235,107 @@
         </p>
       </section>
 
-      <section aria-labelledby="titulo-publicaciones">
+      <section id="publicaciones" aria-labelledby="titulo-publicaciones">
         <header>
           <h2 id="titulo-publicaciones">Mis cursos y servicios</h2>
 
-          <p>Consulta y administra las publicaciones asociadas a tu perfil.</p>
+          <p>Consulta y administra las publicaciones asociadas a tu perfil (Alta, Consulta, Edición y Baja lógica).</p>
 
-          <a href="formsSolicitarServicio.php"> Crear nueva publicación </a>
+          <a href="crearPublicacion.php" class="btn btn-primary-action">
+            + Crear nueva publicación
+          </a>
         </header>
 
         <br>
 
-        <section aria-labelledby="titulo-cursos">
-          <h3 id="titulo-cursos">Cursos publicados</h3>
+        <?php if (empty($publicaciones_proveedor)): ?>
+          <p>No tenés publicaciones registradas aún. <a href="crearPublicacion.php">Creá tu primera publicación</a>.</p>
+        <?php else: ?>
+          <div class="publicaciones-lista">
+            <?php foreach ($publicaciones_proveedor as $pub): ?>
+              <article class="pub-card">
+                <header>
+                  <h4>
+                    <a href="servicioDetalle.php?id=<?php echo $pub['id_publicacion']; ?>">
+                      <?php echo htmlspecialchars($pub['titulo']); ?>
+                    </a>
+                  </h4>
+                  <span class="pub-badge">
+                    <?php echo htmlspecialchars($pub['tipo']); ?> — <?php echo htmlspecialchars($pub['nombre_categoria']); ?>
+                  </span>
+                </header>
 
-          <article>
-            <header>
+                <p class="pub-desc">
+                  <?php echo htmlspecialchars($pub['descripcion']); ?>
+                </p>
 
-              <h4>
-                <a href="servicioDetalle.php">
-                  Desarrollo web con HTML, CSS y JavaScript
-                </a>
-              </h4>
-            </header>
+                <dl class="pub-details">
+                  <div>
+                    <dt><strong>Estado:</strong></dt>
+                    <dd>
+                      <?php 
+                        $statusClass = ($pub['estado'] === 'Activo') ? 'status-activo' : (($pub['estado'] === 'Pausado') ? 'status-pausado' : 'status-inactivo');
+                      ?>
+                      <span class="<?php echo $statusClass; ?>">
+                        <?php echo htmlspecialchars($pub['estado']); ?>
+                      </span>
+                    </dd>
+                  </div>
 
-            <dl>
-              <div>
-                <dt>Estado</dt>
-                <dd>Publicado</dd>
-              </div>
+                  <div>
+                    <dt><strong>Precio:</strong></dt>
+                    <dd>$<?php echo number_format($pub['precio'], 2); ?></dd>
+                  </div>
 
-              <div>
-                <dt>Modalidad</dt>
-                <dd>Virtual</dd>
-              </div>
+                  <div>
+                    <dt><strong>Fecha de creación:</strong></dt>
+                    <dd><?php echo date('d/m/Y', strtotime($pub['fecha_creacion'])); ?></dd>
+                  </div>
+                </dl>
 
-              <div>
-                <dt>Precio</dt>
-                <dd>$1.990</dd>
-              </div>
+                <nav aria-label="Acciones de la publicación <?php echo htmlspecialchars($pub['titulo']); ?>">
+                  <ul class="pub-actions">
+                    <li>
+                      <a href="editarPublicacion.php?id=<?php echo $pub['id_publicacion']; ?>" class="pub-actions-link">
+                        Editar
+                      </a>
+                    </li>
 
-              <div>
-                <dt>Estudiantes</dt>
-                <dd>48</dd>
-              </div>
+                    <li>
+                      <form action="editarPublicacion.php" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                        <input type="hidden" name="id_publicacion" value="<?php echo (int)$pub['id_publicacion']; ?>">
+                        
+                        <?php if ($pub['estado'] === 'Activo'): ?>
+                          <button type="submit" name="cambiar_estado" value="Pausado" class="btn-status btn-status-pause">
+                            Pausar
+                          </button>
+                        <?php else: ?>
+                          <button type="submit" name="cambiar_estado" value="Activo" class="btn-status btn-status-activate">
+                            Activar
+                          </button>
+                        <?php endif; ?>
+                      </form>
+                    </li>
 
-              <div>
-                <dt>Valoración</dt>
-                <dd>4,9 de 5</dd>
-              </div>
-
-              <div>
-                <dt>Última actualización</dt>
-                <dd>
-                  <time datetime="2026-07-20"> 20 de julio de 2026 </time>
-                </dd>
-              </div>
-            </dl>
-
-            <nav aria-label="Acciones del curso Desarrollo web">
-              <ul>
-                <li>
-                  <a href="servicioDetalle.php"> Ver publicación </a>
-                </li>
-
-                <li>
-                  <a href="formsSolicitarServicio.php"> Editar </a>
-                </li>
-
-                <li>
-                  <a href="#estudiantes"> Ver estudiantes </a>
-                </li>
-
-                <li>
-                  <button type="button">Pausar</button>
-                </li>
-              </ul>
-            </nav>
-          </article>
-
-          <article>
-            <header>
-              <h4>
-                <a href="servicioDetalle.php">
-                  Inteligencia artificial aplicada a la enseñanza
-                </a>
-              </h4>
-            </header>
-
-            <dl>
-              <div>
-                <dt>Estado</dt>
-                <dd>Publicado</dd>
-              </div>
-
-              <div>
-                <dt>Modalidad</dt>
-                <dd>Híbrida</dd>
-              </div>
-
-              <div>
-                <dt>Precio</dt>
-                <dd>$2.400</dd>
-              </div>
-
-              <div>
-                <dt>Estudiantes</dt>
-                <dd>30</dd>
-              </div>
-
-              <div>
-                <dt>Valoración</dt>
-                <dd>4,7 de 5</dd>
-              </div>
-
-              <div>
-                <dt>Última actualización</dt>
-                <dd>
-                  <time datetime="2026-07-18"> 18 de julio de 2026 </time>
-                </dd>
-              </div>
-            </dl>
-
-            <nav aria-label="Acciones del curso Inteligencia artificial">
-              <ul>
-                <li>
-                  <a href="servicioDetalle.php"> Ver publicación </a>
-                </li>
-
-                <li>
-                  <a href="formsSolicitarServicio.php"> Editar </a>
-                </li>
-
-                <li>
-                  <a href="#estudiantes"> Ver estudiantes </a>
-                </li>
-
-                <li>
-                  <button type="button">Pausar</button>
-                </li>
-              </ul>
-            </nav>
-          </article>
-        </section>
-
-        <section aria-labelledby="titulo-servicios">
-          <h3 id="titulo-servicios">Servicios publicados</h3>
-
-          <article>
-            <header>
-
-              <h4>
-                <a href="servicioDetalle.php">
-                  Diseño e impresión de recursos didácticos 3D
-                </a>
-              </h4>
-            </header>
-
-            <dl>
-              <div>
-                <dt>Estado</dt>
-                <dd>Publicado</dd>
-              </div>
-
-              <div>
-                <dt>Tipo de contratación</dt>
-                <dd>Paquetes y presupuesto</dd>
-              </div>
-
-              <div>
-                <dt>Precio inicial</dt>
-                <dd>$850</dd>
-              </div>
-
-              <div>
-                <dt>Solicitudes pendientes</dt>
-                <dd>2</dd>
-              </div>
-
-              <div>
-                <dt>Servicios completados</dt>
-                <dd>16</dd>
-              </div>
-
-              <div>
-                <dt>Valoración</dt>
-                <dd>4,8 de 5</dd>
-              </div>
-            </dl>
-
-            <nav aria-label="Acciones del servicio de impresión 3D">
-              <ul>
-                <li>
-                  <a href="servicioDetalle.php"> Ver publicación </a>
-                </li>
-
-                <li>
-                  <a href="formsSolicitarServicio.php"> Editar </a>
-                </li>
-
-                <li>
-                  <a href="#solicitudes"> Ver solicitudes </a>
-                </li>
-
-                <li>
-                  <button type="button">Pausar</button>
-                </li>
-              </ul>
-            </nav>
-          </article>
-
-          <article>
-            <header>
-
-              <h4>
-                <a href="servicioDetalle.php">
-                  Mentoría para proyectos de software educativos
-                </a>
-              </h4>
-            </header>
-
-            <dl>
-              <div>
-                <dt>Estado</dt>
-                <dd>Publicado</dd>
-              </div>
-
-              <div>
-                <dt>Tipo de contratación</dt>
-                <dd>Reserva</dd>
-              </div>
-
-              <div>
-                <dt>Precio</dt>
-                <dd>$750 por sesión</dd>
-              </div>
-
-              <div>
-                <dt>Reservas pendientes</dt>
-                <dd>1</dd>
-              </div>
-
-              <div>
-                <dt>Sesiones completadas</dt>
-                <dd>23</dd>
-              </div>
-
-              <div>
-                <dt>Valoración</dt>
-                <dd>4,9 de 5</dd>
-              </div>
-            </dl>
-
-            <nav aria-label="Acciones del servicio de mentoría">
-              <ul>
-                <li>
-                  <a href="servicioDetalle.php"> Ver publicación </a>
-                </li>
-
-                <li>
-                  <a href="formsSolicitarServicio.php"> Editar </a>
-                </li>
-
-                <li>
-                  <a href="#solicitudes"> Ver reservas </a>
-                </li>
-
-                <li>
-                  <button type="button">Pausar</button>
-                </li>
-              </ul>
-            </nav>
-          </article>
-
-          <article>
-            <header>
-
-              <h4>
-                <a href="servicioDetalle.php">
-                  Diseño de proyectos tecnológicos para instituciones
-                </a>
-              </h4>
-            </header>
-
-            <dl>
-              <div>
-                <dt>Estado</dt>
-                <dd>Borrador</dd>
-              </div>
-
-              <div>
-                <dt>Tipo de contratación</dt>
-                <dd>Propuesta personalizada</dd>
-              </div>
-
-              <div>
-                <dt>Precio</dt>
-                <dd>A consultar</dd>
-              </div>
-
-              <div>
-                <dt>Solicitudes pendientes</dt>
-                <dd>1</dd>
-              </div>
-
-              <div>
-                <dt>Proyectos completados</dt>
-                <dd>4</dd>
-              </div>
-
-              <div>
-                <dt>Valoración</dt>
-                <dd>4,6 de 5</dd>
-              </div>
-            </dl>
-
-            <nav aria-label="Acciones del proyecto educativo">
-              <ul>
-                <li>
-                  <a href="servicioDetalle.php"> Vista previa </a>
-                </li>
-
-                <li>
-                  <a href="formsSolicitarServicio.php"> Continuar editando </a>
-                </li>
-
-                <li>
-                  <button type="button">Publicar</button>
-                </li>
-
-                <li>
-                  <button type="button">Eliminar</button>
-                </li>
+                    <?php if ($pub['estado'] !== 'Inactivo'): ?>
+                      <li>
+                        <form action="editarPublicacion.php" method="POST">
+                          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                          <input type="hidden" name="id_publicacion" value="<?php echo (int)$pub['id_publicacion']; ?>">
+                          <button type="submit" name="cambiar_estado" value="Inactivo" onclick="return confirm('¿Confirmás que querés dar de baja esta publicación?');" class="btn-status btn-status-delete">
+                            Dar de baja (Inactivar)
+                          </button>
+                        </form>
+                      </li>
+                    <?php endif; ?>
+                  </ul>
+                </nav>
+              </article>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </section>
 
 
         <article>
