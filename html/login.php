@@ -19,6 +19,12 @@ include '../includes/header.php';
     <section class="auth-card" aria-labelledby="titulo-login">
       <h2 id="titulo-login">Iniciar sesión</h2>
       <p class="muted">Usá tu correo y contraseña para continuar.</p>
+      
+      <?php if (isset($_GET['registro']) && $_GET['registro'] === 'exitoso'): ?>
+        <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+          Registro completado con éxito. Ahora podés iniciar sesión.
+        </div>
+      <?php endif; ?>
       <form action="/login" method="POST">
         <p>
           <label for="correo">Correo electrónico</label>
