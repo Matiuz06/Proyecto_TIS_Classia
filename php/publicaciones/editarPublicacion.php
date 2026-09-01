@@ -1,9 +1,4 @@
 <?php
-/**
- * Lógica funcional para modificar publicaciones y cambiar su estado (REQ-SER-NN / CU-09).
- * Incluye validación estricta de propiedad (evita que un proveedor modifique publicaciones ajenas).
- * Soporta baja lógica mediante cambio de estado ('Activo', 'Inactivo', 'Pausado').
- */
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -21,7 +16,6 @@ $id_usuario_autenticado = $_SESSION['id_usuario'] ?? 2;
 
 $id_publicacion = (int)($_GET['id'] ?? $_POST['id_publicacion'] ?? 0);
 
-// Control de seguridad: Verificar que la publicación pertenezca al proveedor autenticado
 if ($id_publicacion > 0) {
     $stmt_check = $pdo->prepare("SELECT * FROM publicaciones WHERE id_publicacion = :id_pub AND id_usuario = :id_user");
     $stmt_check->execute([
@@ -37,7 +31,6 @@ if ($id_publicacion > 0) {
     $errores[] = "Publicación no especificada.";
 }
 
-// Procesar actualización (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
     $token_recibido = $_POST['csrf_token'] ?? '';
 
@@ -45,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
         $errores[] = "La sesión del formulario expiró. Por favor, recargá la página e intentá nuevamente.";
     }
 
-    // Acción rápida de cambio de estado (Baja lógica / Pausa / Activación)
     if (isset($_POST['cambiar_estado'])) {
         $nuevo_estado = $_POST['cambiar_estado'];
         if (in_array($nuevo_estado, ['Activo', 'Inactivo', 'Pausado'], true)) {
@@ -66,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
             $errores[] = "El estado seleccionado no es válido.";
         }
     } else {
-        // Edición completa de datos
         $titulo = trim($_POST['titulo'] ?? '');
         $descripcion = trim($_POST['descripcion'] ?? '');
         $precio = trim($_POST['precio'] ?? '');
