@@ -1,4 +1,4 @@
-name: "📝 Validar formato del título del PR"
+name: "Validar formato del titulo del PR"
 
 on:
   pull_request:
@@ -10,11 +10,11 @@ permissions:
 
 jobs:
   conventional-commits:
-    name: "Validar Conventional Commits en Título de PR"
+    name: "Validar Conventional Commits en Titulo de PR"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Validar título del PR
+      - name: Validar titulo del PR
         uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

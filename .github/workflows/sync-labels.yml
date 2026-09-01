@@ -1,4 +1,4 @@
-name: "🏷️ Sincronizar labels"
+name: "Sincronizar labels"
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       dry_run:
         description: "Simular sin aplicar cambios (dry run)"
         required: false
-        default: "false"
+        default: false
         type: boolean
 
 jobs:
@@ -19,11 +19,13 @@ jobs:
     name: "Sincronizar labels con labels.yml"
     runs-on: ubuntu-latest
     permissions:
-      issues: write      # crear / editar labels
+      contents: read     # necesario para actions/checkout
+      issues: write       # crear / editar labels
+      pull-requests: write
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Sincronizar labels con el repositorio
         uses: EndBug/label-sync@v2
