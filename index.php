@@ -16,8 +16,8 @@ include 'includes/header.php';
           publicar propuestas y administrar la actividad de la plataforma.
         </p>
         <p class="action-row">
-          <a class="btn" href="html/catalogo.php">Explorar catálogo</a>
-          <a href="html/registro.php">Crear cuenta</a>
+          <a class="btn" href="views/catalogo.php">Explorar catálogo</a>
+          <a href="views/registro.php">Crear cuenta</a>
         </p>
       </header>
 
@@ -29,7 +29,7 @@ include 'includes/header.php';
         <div class="role-grid">
           <a
             class="content-card role-card-link motion-card"
-            href="html/usuario.php">
+            href="views/usuario.php">
             <span class="badge role-card-meta">Estudiante</span>
             <h3>Cliente</h3>
             <p class="role-card-text">
@@ -41,7 +41,7 @@ include 'includes/header.php';
 
           <a
             class="content-card role-card-link motion-card"
-            href="html/panelProveedor.php">
+            href="views/panel-proveedor.php">
             <span class="badge role-card-meta">Publicador</span>
             <h3>Docente / Proveedor</h3>
             <p class="role-card-text">
@@ -53,7 +53,7 @@ include 'includes/header.php';
 
           <a
             class="content-card role-card-link motion-card"
-            href="html/panelAdministrador.php">
+            href="views/panel-administrador.php">
             <span class="badge role-card-meta">Supervisión</span>
             <h3>Administrador</h3>
             <p class="role-card-text">

@@ -73,7 +73,7 @@ Para cumplir con **`RNF-08`**, el repositorio aplica políticas estrictas en Git
 
 1. **Ramas protegidas:** `main` y `Testing`.
 2. **Pull Requests obligatorios:** Ningún desarrollador puede realizar push directo a `main` o `Testing`.
-3. **Revisiones requeridas:** Todo PR debe ser revisado y aprobado por al menos 1 integrante asignado en el archivo [`.github/CODEOWNERS`](file:///.github/CODEOWNERS).
+3. **Revisiones requeridas:** Todo PR debe ser revisado y aprobado por al menos 1 integrante asignado.
 4. **Passing Status Checks:** Los PRs solo pueden mergearse si todos los workflows de CI/CD (`lint`, `security`, `check-req-reference`) finalizan exitosamente.
 
 ---
@@ -94,4 +94,4 @@ Si descubrís alguna vulnerabilidad de seguridad en Classia, te pedimos que la r
 
 ---
 
-*Última actualización: Agosto 2026 — AniTech DevSecOps Team.*
+*Última actualización: Septiembre 2026 — AniTech DevSecOps Team.*

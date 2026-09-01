@@ -1,4 +1,6 @@
 <?php
+require_once '../php/usuarios/registro.php';
+
 $title      = 'Crear cuenta';
 $description = 'Registro de usuario en Classia.';
 $cssPrefix  = '..';
@@ -19,7 +21,19 @@ include '../includes/header.php';
     <section class="auth-card" aria-labelledby="titulo-registro">
       <h2 id="titulo-registro">Registro</h2>
       <p class="muted">Completá tus datos básicos para empezar.</p>
-      <form action="/registro" method="POST">
+
+      <?php if (!empty($errores)): ?>
+        <div class="alert alert-danger">
+          <ul>
+            <?php foreach ($errores as $error): ?>
+              <li><?php echo htmlspecialchars($error); ?></li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+      <?php endif; ?>
+
+      <form action="registro.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
         <p>
           <label for="nombre">Nombre</label>
           <input
@@ -28,6 +42,7 @@ include '../includes/header.php';
             name="nombre"
             autocomplete="given-name"
             required
+            value="<?php echo htmlspecialchars($nombre ?? ''); ?>"
             placeholder="Ingresa tu nombre" />
         </p>
         <p>
@@ -38,6 +53,7 @@ include '../includes/header.php';
             name="apellido"
             autocomplete="family-name"
             required
+            value="<?php echo htmlspecialchars($apellido ?? ''); ?>"
             placeholder="Ingresa tu apellido" />
         </p>
         <p>
@@ -48,6 +64,7 @@ include '../includes/header.php';
             name="usuario"
             autocomplete="username"
             required
+            value="<?php echo htmlspecialchars($_POST['usuario'] ?? ''); ?>"
             placeholder="Ingresa un usuario" />
         </p>
         <p>
@@ -58,6 +75,7 @@ include '../includes/header.php';
             name="correo"
             autocomplete="email"
             required
+            value="<?php echo htmlspecialchars($correo ?? ''); ?>"
             placeholder="ejemplo@correo.com" />
         </p>
         <p>
@@ -65,7 +83,7 @@ include '../includes/header.php';
           <input
             type="password"
             id="contrasena"
-            name="contraseña"
+            name="contrasenia"
             autocomplete="new-password"
             required
             placeholder="Ingresa una contraseña" />
@@ -75,7 +93,7 @@ include '../includes/header.php';
           <input
             type="password"
             id="confirmar-contrasena"
-            name="confirmar_contraseña"
+            name="confirmar_contrasenia"
             autocomplete="new-password"
             required
             placeholder="Confirma tu contraseña" />
@@ -83,13 +101,13 @@ include '../includes/header.php';
         <fieldset>
           <legend>Género</legend>
           <label
-            ><input type="radio" name="genero" value="hombre" /> Hombre</label
+            ><input type="radio" name="genero" value="hombre" <?php echo (isset($_POST['genero']) && $_POST['genero'] === 'hombre') ? 'checked' : ''; ?> /> Hombre</label
           >
           <label
-            ><input type="radio" name="genero" value="mujer" /> Mujer</label
+            ><input type="radio" name="genero" value="mujer" <?php echo (isset($_POST['genero']) && $_POST['genero'] === 'mujer') ? 'checked' : ''; ?> /> Mujer</label
           >
           <label
-            ><input type="radio" name="genero" value="sin-especificar" />
+            ><input type="radio" name="genero" value="sin-especificar" <?php echo (!isset($_POST['genero']) || $_POST['genero'] === 'sin-especificar') ? 'checked' : ''; ?> />
             Prefiero no decirlo</label
           >
         </fieldset>

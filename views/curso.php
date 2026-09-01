@@ -5,9 +5,7 @@ $activePage = 'catalogo';
 include '../includes/header.php';
 ?>
 
-    <!-- CUERPO PRINCIPAL CON SIDEBAR -->
     <div class="layout-sidebar">
-      <!-- SIDEBAR IZQUIERDO: lista de módulos -->
       <aside class="sidebar">
         <h2 style="color: white">Contenido del curso</h2>
 
@@ -34,18 +32,15 @@ include '../includes/header.php';
         </ul>
       </aside>
 
-      <!-- ÁREA PRINCIPAL: video + descripción + siguiente -->
       <main class="main-content">
         <h1>Introducción a las funciones</h1>
 
-        <!-- VIDEO -->
         <video controls aria-label="Video de demostración del curso">
           Tu navegador no soporta video.
         </video>
 
         <hr />
 
-        <!-- DESCRIPCIÓN DEL MATERIAL -->
         <h3>Descripción del material</h3>
         <p>
           En este video vamos a explorar el concepto de funciones dentro de la
@@ -53,7 +48,6 @@ include '../includes/header.php';
           realiza una tarea específica.
         </p>
 
-        <!-- CHAT DE CONSULTAS -->
         <h3>Chat de Consultas</h3>
         <p>Asistente virtual: ¿Tienes alguna duda sobre este módulo?</p>
         <div class="flex-row">
@@ -64,14 +58,12 @@ include '../includes/header.php';
           <button type="button">Enviar</button>
         </div>
 
-        <!-- BOTÓN SIGUIENTE -->
         <p>
           <a href="usuario.php" class="btn">Continuar aprendizaje</a>
         </p>
       </main>
     </div>
 
-    <!-- FOOTER -->
     <footer class="site-footer">
       <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
     </footer>
