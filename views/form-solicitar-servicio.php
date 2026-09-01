@@ -38,7 +38,7 @@
           </li>
 
           <li>
-            <a href="servicioDetalle.php">Detalle del servicio</a>
+            <a href="servicio-detalle.php">Detalle del servicio</a>
           </li>
 
           <li aria-current="page">Solicitar servicio</li>
@@ -71,7 +71,7 @@
 
           <p>Precio orientativo: desde $850</p>
 
-          <a href="servicioDetalle.php"> Volver al detalle </a>
+          <a href="servicio-detalle.php"> Volver al detalle </a>
         </article>
       </section>
 
@@ -747,7 +747,7 @@
 
         <button type="reset">Limpiar formulario</button>
 
-        <a href="servicioDetalle.php"> Cancelar y volver </a>
+        <a href="servicio-detalle.php"> Cancelar y volver </a>
       </form>
     </main>
 

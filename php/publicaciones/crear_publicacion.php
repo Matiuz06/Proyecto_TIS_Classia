@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'id_categoria' => $id_categoria
             ]);
 
-            header("Location: panelProveedor.php?mensaje=creada");
+            header("Location: panel-proveedor.php?mensaje=creada");
             exit;
         } catch (PDOException $e) {
             error_log("Error SQL al crear publicación: " . $e->getMessage());

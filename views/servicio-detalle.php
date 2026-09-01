@@ -9,14 +9,14 @@
     <title>Diseño e impresión de recursos didácticos 3D</title>
     <link rel="stylesheet" href="../css/animation.css" />
     <link rel="stylesheet" href="../css/style.css" />
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
   </head>
 
   <body>
     <header class="site-header">
       <div class="site-header__inner">
         <a class="site-brand" href="../index.php">
-          <img src="../assets/logoC.png" />
+          <img src="../assets/images/logo-classia.png" alt="Classia" />
         </a>
         <nav class="site-nav" aria-label="Navegación principal">
           <a href="../index.php">Inicio</a>
@@ -133,7 +133,7 @@
           <aside aria-labelledby="titulo-contratacion">
             <h2 id="titulo-contratacion">Contratar este servicio</h2>
 
-            <form action="pasarelaPago.php" method="get">
+            <form action="pasarela-pago.php" method="get">
               <fieldset>
                 <legend>Selecciona un paquete</legend>
 
@@ -257,13 +257,13 @@
 
             <p>El pago será simulado y no se procesará dinero real.</p>
 
-            <a href="formsSolicitarServicio.php">
+            <a href="form-solicitar-servicio.php">
               Solicitar presupuesto personalizado
             </a>
 
             <button type="button">Guardar servicio</button>
 
-            <a href="formsSolicitarServicio.php"> Contactar al proveedor </a>
+            <a href="form-solicitar-servicio.php"> Contactar al proveedor </a>
           </aside>
         </div>
 
@@ -502,7 +502,7 @@
 
           <article>
             <h3>
-              <a href="servicioDetalle.php">
+              <a href="servicio-detalle.php">
                 Diseño de piezas para proyectos de robótica
               </a>
             </h3>
@@ -512,7 +512,7 @@
 
           <article>
             <h3>
-              <a href="servicioDetalle.php">
+              <a href="servicio-detalle.php">
                 Modelado 3D para maquetas educativas
               </a>
             </h3>
@@ -522,7 +522,7 @@
 
           <article>
             <h3>
-              <a href="servicioDetalle.php">
+              <a href="servicio-detalle.php">
                 Asesoramiento para proyectos maker
               </a>
             </h3>

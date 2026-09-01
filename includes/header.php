@@ -6,9 +6,9 @@ $cssPrefix   = $cssPrefix   ?? '..';
 $activePage  = $activePage  ?? '';
 
 $indexHref    = ($cssPrefix === '.') ? 'index.php'           : '../index.php';
-$catalogoHref = ($cssPrefix === '.') ? 'html/catalogo.php'   : 'catalogo.php';
-$carritoHref  = ($cssPrefix === '.') ? 'html/carrito.php'    : 'carrito.php';
-$loginHref    = ($cssPrefix === '.') ? 'html/login.php'      : 'login.php';
+$catalogoHref = ($cssPrefix === '.') ? 'views/catalogo.php'  : 'catalogo.php';
+$carritoHref  = ($cssPrefix === '.') ? 'views/carrito.php'   : 'carrito.php';
+$loginHref    = ($cssPrefix === '.') ? 'views/login.php'     : 'login.php';
 ?>
 <!doctype html>
 <html lang="es">
@@ -19,13 +19,13 @@ $loginHref    = ($cssPrefix === '.') ? 'html/login.php'      : 'login.php';
   <title><?= htmlspecialchars($title) ?></title>
   <link rel="stylesheet" href="<?= $cssPrefix ?>/css/animation.css" />
   <link rel="stylesheet" href="<?= $cssPrefix ?>/css/style.css" />
-  <link rel="icon" type="image/png" href="<?= $cssPrefix ?>/assets/favicon.png" />
+  <link rel="icon" type="image/png" href="<?= $cssPrefix ?>/assets/images/favicon.png" />
 </head>
 <body<?= ($bodyClass ?? '') ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?>>
   <header class="site-header">
     <div class="site-header__inner">
       <a class="site-brand" href="<?= $indexHref ?>">
-        <img src="<?= $cssPrefix ?>/assets/logoC.png" alt="Classia" />
+        <img src="<?= $cssPrefix ?>/assets/images/logo-classia.png" alt="Classia" />
       </a>
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="<?= $indexHref ?>"<?= $activePage === 'inicio'   ? ' aria-current="page"' : '' ?>>Inicio</a>

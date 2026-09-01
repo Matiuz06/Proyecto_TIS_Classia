@@ -4,23 +4,23 @@ Este documento define la arquitectura y organización técnica del backend PHP p
 
 ---
 
-## 📁 Estructura de carpetas y módulos
+## Estructura de carpetas y módulos
 
 - `config/`: Configuración global del backend.
   - `config/database.php`: Conexión centralizada PDO a MariaDB/MySQL con manejo de variables de entorno y sentencias preparadas.
 - `includes/`: Código PHP reutilizable y componentes compartidos de presentación.
   - `includes/header.php`: Barra de navegación modular con control de estado de sesión.
   - `includes/footer.php`: Pie de página institucional modular.
-- `html/`: Vistas y páginas de la aplicación implementadas en PHP (`login.php`, `registro.php`, `panelProveedor.php`, `panelAdministrador.php`, `crearPublicacion.php`, `editarPublicacion.php`, etc.).
+- `views/`: Vistas y páginas de la aplicación implementadas en PHP (`login.php`, `registro.php`, `panel-proveedor.php`, `panel-administrador.php`, `crear-publicacion.php`, `editar-publicacion.php`, etc.).
 - `php/auth/`: Lógica de autenticación, control de acceso y sesiones.
   - `session.php`: Helper de funciones de sesión (`iniciar_sesion`, `requerir_autenticacion`, `establecer_usuario_sesion`, etc.).
   - `logout.php`: Procesamiento de cierre de sesión y destrucción de cookies.
 - `php/usuarios/`: Lógica de usuarios.
   - `registro.php`: Procesamiento de registro de nuevos usuarios con validación de datos, verificación de unicidad de email y hash seguro (`password_hash`).
 - `php/publicaciones/`: Lógica y controladores del ciclo de vida de cursos y servicios.
-  - `crearPublicacion.php`: Alta de nuevas publicaciones vinculadas al usuario autenticado.
-  - `editarPublicacion.php`: Edición de publicaciones existentes y alternancia de estados (`publicado`, `borrador`, `pausado`).
-  - `obtenerPublicaciones.php`: Funciones helper (`obtenerPublicacionesPorUsuario`) para alimentar vistas dinámicas.
+  - `crear_publicacion.php`: Alta de nuevas publicaciones vinculadas al usuario autenticado.
+  - `editar_publicacion.php`: Edición de publicaciones existentes y alternancia de estados (`publicado`, `borrador`, `pausado`).
+  - `obtener_publicaciones.php`: Funciones helper (`obtenerPublicacionesPorUsuario`) para alimentar vistas dinámicas.
 - `php/solicitudes/`: Futura lógica relacionada con solicitudes de servicios personalizados.
 - `php/contrataciones/`: Futura lógica de carrito y contrataciones.
 - `php/pagos/`: Futura simulación y registro de pagos.
@@ -30,33 +30,24 @@ Este documento define la arquitectura y organización técnica del backend PHP p
 
 ---
 
-## 📄 Vistas y páginas PHP
+## Vistas y páginas PHP
 
 La plataforma completó la migración a PHP:
 - El punto de entrada es `index.php` en la raíz.
-- Las vistas residen en `html/*.php` y hacen uso de `require_once` para incorporar `includes/header.php` y `includes/footer.php`.
-- Los formularios envían peticiones POST hacia los controladores en `php/` o procesan de forma segura las operaciones.
+- Las vistas residen en `views/*.php` y hacen uso de `require_once` para incorporar `includes/header.php` y `includes/footer.php`.
+- Los formularios envían peticiones POST hacia las vistas o controladores en `php/` procesando de forma segura las operaciones.
 
----
-
-## 🗄️ Base de datos y persistencia
+## Base de datos y persistencia
 
 La conexión PDO a la base de datos se centraliza en `config/database.php` y expone la variable `$pdo` para los scripts que la requieran.
 
-### Parámetros locales predeterminados:
-- **`DB_HOST`**: `localhost`
-- **`DB_PORT`**: `3306`
-- **`DB_NAME`**: `classia_db`
-- **`DB_USER`**: `root`
-- **`DB_PASSWORD`**: vacía
-
-Estos valores pueden sobreescribirse mediante variables de entorno del sistema o del servidor web. El archivo `.env.example` detalla las variables reconocidas.
+La configuración de conexión se gestiona mediante variables de entorno en un archivo `.env` local (tomando como referencia `.env.example`).
 
 El esquema DDL relacional está disponible en `sql/schema.sql` e implementa integridad referencial completa (Foreign Keys, restricciones UNIQUE y tablas en 3FN).
 
 ---
 
-## 🔁 Reutilización y rutas relativas con `__DIR__`
+## Reutilización y rutas relativas con `__DIR__`
 
 Para incluir configuración, helpers o componentes reutilizables se deben utilizar rutas absolutas basadas en `__DIR__`:
 
@@ -67,7 +58,7 @@ require_once __DIR__ . "/../auth/session.php";
 
 ---
 
-## 🛡️ Manejo de sesiones y autenticación
+## Manejo de sesiones y autenticación
 
 El control de sesiones se gestiona en `php/auth/session.php`.
 
@@ -93,7 +84,7 @@ $_SESSION["usuario"] = [
 
 ---
 
-## 🏷️ Convenciones de nomenclatura y desarrollo
+## Convenciones de nomenclatura y desarrollo
 
 - **Archivos PHP:** `camelCase` o `snake_case` según el contexto del módulo (`crearPublicacion.php`, `session.php`).
 - **Tablas:** Plural y `snake_case` (`usuarios`, `roles`, `publicaciones`, `solicitudes`, `contrataciones`, `detalles_contratacion`, `pagos`, `valoraciones`).

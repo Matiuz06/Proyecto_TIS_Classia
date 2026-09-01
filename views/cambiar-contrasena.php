@@ -31,7 +31,7 @@ include '../includes/header.php';
     <hr />
 
     <p>
-      <a href="restablecerContrasena.php" class="link">¿Olvidaste tu contraseña?</a>
+      <a href="restablecer-contrasena.php" class="link">¿Olvidaste tu contraseña?</a>
     </p>
     <p>
       <a href="usuario.php" class="link">← Volver al Perfil</a>

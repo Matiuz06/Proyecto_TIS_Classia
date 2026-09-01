@@ -10,18 +10,18 @@
     <meta
       name="description"
       content="Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada." />
-    <link rel="stylesheet" href="css/animation.css" />
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="stylesheet" href="../css/animation.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
   </head>
   <body>
     <header class="site-header">
       <div class="site-header__inner">
-        <a class="site-brand" href="index.php">
-          <img src="assets/logoC.png" alt="Classia" />
+        <a class="site-brand" href="../index.php">
+          <img src="../assets/images/logo-classia.png" alt="Classia" />
         </a>
         <nav class="site-nav" aria-label="Navegaci&oacute;n principal">
-          <a href="index.php" aria-current="page">Inicio</a>
+          <a href="../index.php" aria-current="page">Inicio</a>
           <a href="catalogo.php">Cat&aacute;logo</a>
           <a href="carrito.php">Carrito</a>
           <a href="login.php">Mi cuenta</a>
@@ -51,7 +51,7 @@
         <div class="role-grid">
           <a
             class="content-card role-card-link motion-card"
-            href="catalogo.php">
+            href="usuario.php">
             <span class="badge role-card-meta">Estudiante</span>
             <h3>Cliente</h3>
             <p class="role-card-text">
@@ -63,7 +63,7 @@
 
           <a
             class="content-card role-card-link motion-card"
-            href="panelProveedor.php">
+            href="panel-proveedor.php">
             <span class="badge role-card-meta">Publicador</span>
             <h3>Docente / Proveedor</h3>
             <p class="role-card-text">
@@ -75,7 +75,7 @@
 
           <a
             class="content-card role-card-link motion-card"
-            href="panelAdministrador.php">
+            href="panel-administrador.php">
             <span class="badge role-card-meta">Supervisi&oacute;n</span>
             <h3>Administrador</h3>
             <p class="role-card-text">

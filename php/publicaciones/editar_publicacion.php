@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
                     'id_pub' => $id_publicacion,
                     'id_user' => $id_usuario_autenticado
                 ]);
-                header("Location: panelProveedor.php?mensaje=estado_actualizado");
+                header("Location: panel-proveedor.php?mensaje=estado_actualizado");
                 exit;
             } catch (PDOException $e) {
                 error_log("Error al cambiar estado de publicación: " . $e->getMessage());
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
                     'id_user' => $id_usuario_autenticado
                 ]);
 
-                header("Location: panelProveedor.php?mensaje=actualizada");
+                header("Location: panel-proveedor.php?mensaje=actualizada");
                 exit;
             } catch (PDOException $e) {
                 error_log("Error SQL al actualizar publicación: " . $e->getMessage());

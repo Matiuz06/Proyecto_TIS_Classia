@@ -1,6 +1,6 @@
 <?php
-require_once '../php/publicaciones/editarPublicacion.php';
-require_once '../php/publicaciones/obtenerPublicaciones.php';
+require_once '../php/publicaciones/editar_publicacion.php';
+require_once '../php/publicaciones/obtener_publicaciones.php';
 
 $title       = 'Editar publicación';
 $description = 'Modificación de cursos o servicios en Classia.';
@@ -33,7 +33,7 @@ include '../includes/header.php';
       <?php endif; ?>
 
       <?php if ($publicacion): ?>
-        <form action="editarPublicacion.php?id=<?php echo (int)$publicacion['id_publicacion']; ?>" method="POST">
+        <form action="editar-publicacion.php?id=<?php echo (int)$publicacion['id_publicacion']; ?>" method="POST">
           <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
           <input type="hidden" name="id_publicacion" value="<?php echo (int)$publicacion['id_publicacion']; ?>">
 
@@ -105,7 +105,7 @@ include '../includes/header.php';
       <?php endif; ?>
 
       <p class="auth-links">
-        <a href="panelProveedor.php">Volver al panel del proveedor</a>
+        <a href="panel-proveedor.php">Volver al panel del proveedor</a>
       </p>
     </section>
   </main>

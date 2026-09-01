@@ -4,7 +4,7 @@ Módulo de gestión y procesamiento de usuarios para la plataforma Classia.
 
 ---
 
-## 👤 PHP-10: Registro de usuarios (`registro.php`)
+## PHP-10: Registro de usuarios (`registro.php`)
 
 El script `php/usuarios/registro.php` implementa el procesamiento seguro del formulario de registro de nuevos usuarios (`html/registro.php`).
 

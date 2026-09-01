@@ -4,7 +4,7 @@ Directorio de componentes PHP reutilizables y plantillas compartidas para la pla
 
 ---
 
-## 🧩 Componentes disponibles:
+## Componentes disponibles:
 
 ### 1. `header.php`
 Encabezado global HTML5 con metadatos dinámicos y barra de navegación institucional.

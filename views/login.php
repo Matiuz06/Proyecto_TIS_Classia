@@ -43,7 +43,7 @@ include '../includes/header.php';
         <button type="submit">Iniciar sesión</button>
       </form>
       <p class="auth-links">
-        <a href="restablecerContrasena.php">¿Olvidaste tu contraseña?</a>
+        <a href="restablecer-contrasena.php">¿Olvidaste tu contraseña?</a>
       </p>
       <p class="auth-links">
         ¿No tenés cuenta? <a href="registro.php">Registrate</a>

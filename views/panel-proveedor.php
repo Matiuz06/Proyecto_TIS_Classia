@@ -1,4 +1,4 @@
-<?php require_once '../php/publicaciones/obtenerPublicaciones.php'; ?>
+<?php require_once '../php/publicaciones/obtener_publicaciones.php'; ?>
 <!doctype html>
 <html lang="es">
   <head>
@@ -59,7 +59,7 @@
         <nav aria-label="Acciones rápidas del proveedor">
           <ul>
             <li>
-              <a href="crearPublicacion.php">
+              <a href="crear-publicacion.php">
                 Publicar un curso o servicio
               </a>
             </li>
@@ -227,7 +227,7 @@
             cargada únicamente hasta el próximo mes.
           </p>
 
-          <a href="formsSolicitarServicio.php"> Actualizar disponibilidad </a>
+          <a href="form-solicitar-servicio.php"> Actualizar disponibilidad </a>
         </article>
 
         <p>
@@ -241,7 +241,7 @@
 
           <p>Consulta y administra las publicaciones asociadas a tu perfil (Alta, Consulta, Edición y Baja lógica).</p>
 
-          <a href="crearPublicacion.php" class="btn btn-primary-action">
+          <a href="crear-publicacion.php" class="btn btn-primary-action">
             + Crear nueva publicación
           </a>
         </header>
@@ -249,14 +249,14 @@
         <br>
 
         <?php if (empty($publicaciones_proveedor)): ?>
-          <p>No tenés publicaciones registradas aún. <a href="crearPublicacion.php">Creá tu primera publicación</a>.</p>
+          <p>No tenés publicaciones registradas aún. <a href="crear-publicacion.php">Creá tu primera publicación</a>.</p>
         <?php else: ?>
           <div class="publicaciones-lista">
             <?php foreach ($publicaciones_proveedor as $pub): ?>
               <article class="pub-card">
                 <header>
                   <h4>
-                    <a href="servicioDetalle.php?id=<?php echo $pub['id_publicacion']; ?>">
+                    <a href="servicio-detalle.php?id=<?php echo $pub['id_publicacion']; ?>">
                       <?php echo htmlspecialchars($pub['titulo']); ?>
                     </a>
                   </h4>
@@ -296,13 +296,13 @@
                 <nav aria-label="Acciones de la publicación <?php echo htmlspecialchars($pub['titulo']); ?>">
                   <ul class="pub-actions">
                     <li>
-                      <a href="editarPublicacion.php?id=<?php echo $pub['id_publicacion']; ?>" class="pub-actions-link">
+                      <a href="editar-publicacion.php?id=<?php echo $pub['id_publicacion']; ?>" class="pub-actions-link">
                         Editar
                       </a>
                     </li>
 
                     <li>
-                      <form action="editarPublicacion.php" method="POST">
+                      <form action="editar-publicacion.php" method="POST">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                         <input type="hidden" name="id_publicacion" value="<?php echo (int)$pub['id_publicacion']; ?>">
                         
@@ -320,7 +320,7 @@
 
                     <?php if ($pub['estado'] !== 'Inactivo'): ?>
                       <li>
-                        <form action="editarPublicacion.php" method="POST">
+                        <form action="editar-publicacion.php" method="POST">
                           <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                           <input type="hidden" name="id_publicacion" value="<?php echo (int)$pub['id_publicacion']; ?>">
                           <button type="submit" name="cambiar_estado" value="Inactivo" onclick="return confirm('¿Confirmás que querés dar de baja esta publicación?');" class="btn-status btn-status-delete">

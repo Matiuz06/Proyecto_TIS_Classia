@@ -6,7 +6,7 @@ La propuesta centraliza en un único entorno digital a diferentes actores, recur
 
 ---
 
-## 🎯 Objetivo del proyecto
+## Objetivo del proyecto
 
 El objetivo principal de Classia es construir un Entorno Virtual de Aprendizaje (EVA) y catálogo de servicios educativos capaz de gestionar de forma integral el ciclo formativo y comercial:
 
@@ -22,11 +22,11 @@ El objetivo principal de Classia es construir un Entorno Virtual de Aprendizaje 
 
 ---
 
-## 👥 Roles de la plataforma
+## Roles de la plataforma
 
 Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 
-### 🎓 Estudiantes / Clientes (Rol 3)
+### Estudiantes / Clientes (Rol 3)
 - Explorar el catálogo de cursos y servicios con filtros avanzados.
 - Consultar detalles de publicaciones, programas formativos y paquetes.
 - Solicitar servicios personalizados (e.g. impresión 3D, tutorías, robótica).
@@ -34,7 +34,7 @@ Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 - Visualizar sus cursos inscritos, historial de contrataciones y certificados en su perfil.
 - Emitir valoraciones y comentarios sobre cursos y servicios completados.
 
-### 👨‍🏫 Docentes / Proveedores (Rol 2)
+### Docentes / Proveedores (Rol 2)
 - Acceder a su **Panel de Proveedor** con estadísticas y métricas de actividad.
 - Crear nuevas publicaciones especificando título, descripción, precio, categoría y modalidad (curso o servicio).
 - Editar publicaciones existentes y gestionar su estado (`publicado`, `borrador`, `pausado`, `archivado`).
@@ -42,7 +42,7 @@ Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 - Recibir y gestionar solicitudes de servicios personalizadas.
 - Administrar el contenido de sus cursos y calificaciones.
 
-### 🛡️ Administradores (Rol 1)
+### Administradores (Rol 1)
 - Acceso al **Panel de Administrador** para la supervisión global de la plataforma.
 - Gestión y moderación de usuarios, roles y permisos.
 - Moderación de publicaciones, cursos y servicios ofertados.
@@ -50,7 +50,7 @@ Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 
 ---
 
-## 🖥️ Estructura del proyecto
+## Estructura del proyecto
 
 El proyecto cuenta con una arquitectura modular en **PHP**, separando la capa de presentación, la lógica de negocio, la configuración y el acceso a datos:
 
@@ -62,27 +62,27 @@ Proyecto_TIS_Classia/
 ├── includes/
 │   ├── header.php                 # Encabezado modular con navegación y estado de sesión
 │   └── footer.php                 # Pie de página institucional modular
-├── html/                          # Vistas y páginas de la aplicación (.php)
+├── views/                         # Vistas y páginas de la aplicación (.php)
 │   ├── login.php                  # Inicio de sesión con feedback y redirecciones
 │   ├── registro.php               # Formulario de registro con validaciones
-│   ├── panelProveedor.php         # Panel del proveedor con listado dinámico de publicaciones
-│   ├── panelAdministrador.php     # Panel de gestión y métricas administrativas
-│   ├── crearPublicacion.php       # Interfaz de creación de cursos y servicios
-│   ├── editarPublicacion.php      # Interfaz de edición y gestión de estado
+│   ├── panel-proveedor.php        # Panel del proveedor con listado dinámico de publicaciones
+│   ├── panel-administrador.php    # Panel de gestión y métricas administrativas
+│   ├── crear-publicacion.php      # Interfaz de creación de cursos y servicios
+│   ├── editar-publicacion.php     # Interfaz de edición y gestión de estado
 │   ├── catalogo.php               # Catálogo interactivo de cursos y servicios
 │   ├── curso.php                  # Vista detallada de contenido de un curso
-│   ├── servicioDetalle.php        # Vista de detalle y paquetes de servicios
-│   ├── formsSolicitarServicio.php # Formulario de solicitud personalizada
-│   ├── solicitudImpresion3d.php   # Formulario especializado de impresión 3D
+│   ├── servicio-detalle.php       # Vista de detalle y paquetes de servicios
+│   ├── form-solicitar-servicio.php# Formulario de solicitud personalizada
+│   ├── solicitud-impresion-3d.php # Formulario especializado de impresión 3D
 │   ├── carrito.php                # Carrito de compras
-│   ├── pasarelaPago.php           # Simulación de pasarela de pago segura
+│   ├── pasarela-pago.php          # Simulación de pasarela de pago segura
 │   ├── confirmacion.php           # Confirmación de contratación
 │   ├── usuario.php                # Perfil del usuario estudiante
 │   ├── valoracion.php             # Formulario de emisión de reseñas
-│   ├── cambiarContrasena.php      # Cambio de credenciales de usuario
-│   ├── restablecerContrasena.php  # Recuperación de contraseña
-│   ├── primerosPasos.php          # Guía de onboarding para nuevos usuarios
-│   └── politicaPrivacidad.php     # Política de privacidad (Ley 18.331 / URCDP)
+│   ├── cambiar-contrasena.php     # Cambio de credenciales de usuario
+│   ├── restablecer-contrasena.php # Recuperación de contraseña
+│   ├── primeros-pasos.php         # Guía de onboarding para nuevos usuarios
+│   └── politica-privacidad.php    # Política de privacidad (Ley 18.331 / URCDP)
 ├── php/                           # Lógica de backend organizada por módulo
 │   ├── auth/
 │   │   ├── session.php            # Helper de sesiones seguras y control de acceso
@@ -90,9 +90,9 @@ Proyecto_TIS_Classia/
 │   ├── usuarios/
 │   │   └── registro.php           # Procesamiento de registro, validaciones y hash seguro
 │   ├── publicaciones/
-│   │   ├── crearPublicacion.php   # Procesamiento de alta de cursos y servicios (PDO)
-│   │   ├── editarPublicacion.php  # Procesamiento de edición y actualización de estado
-│   │   └── obtenerPublicaciones.php # Helpers para consulta de publicaciones por usuario
+│   │   ├── crear_publicacion.php  # Procesamiento de alta de cursos y servicios (PDO)
+│   │   ├── editar_publicacion.php # Procesamiento de edición y actualización de estado
+│   │   └── obtener_publicaciones.php # Helpers para consulta de publicaciones por usuario
 │   ├── contrataciones/            # Lógica en desarrollo de contrataciones
 │   ├── pagos/                     # Lógica en desarrollo de pagos
 │   ├── solicitudes/               # Lógica en desarrollo de solicitudes
@@ -101,6 +101,7 @@ Proyecto_TIS_Classia/
 │   └── schema.sql                 # Esquema relacional DDL (MariaDB / MySQL)
 ├── docs/                          # Documentación técnica, modelos y diagramas UML
 │   ├── estructura_php.md          # Guía de arquitectura backend y sesiones
+│   ├── estilo_y_nomenclatura.md   # Convenciones oficiales de nombrado y estructura
 │   ├── mer_classia.md             # Modelo Entidad-Relación formal
 │   ├── modelo_relacional_classia.md # Modelo relacional normalizado
 │   ├── diagrama_de_clases_classia.md # Diagrama de clases de dominio UML
@@ -112,6 +113,7 @@ Proyecto_TIS_Classia/
 ├── js/
 │   └── script.js                  # Interacciones dinámicas en el cliente
 ├── assets/                        # Recursos multimedia, imágenes e íconos
+│   └── images/                    # Imágenes de marca, logotipos e íconos normalizados
 ├── scripts/                       # Scripts auxiliares y validaciones de seguridad
 ├── .github/                       # CI/CD Workflows, templates de PR/Issue y linters
 ├── .env.example                   # Ejemplo de variables de entorno de base de datos
@@ -120,7 +122,7 @@ Proyecto_TIS_Classia/
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## Tecnologías utilizadas
 
 ### Backend y Base de Datos
 - **PHP 8.x**: Lenguaje de servidor para controladores, helpers de sesión y endpoints modulares.
@@ -139,7 +141,7 @@ Proyecto_TIS_Classia/
 
 ---
 
-## 🚀 Instalación y ejecución local
+## Instalación y ejecución local
 
 ### 1. Requisitos previos
 - **PHP 8.0 o superior** con extensión `pdo_mysql` habilitada.
@@ -168,7 +170,7 @@ Ubicar el proyecto dentro de la carpeta `htdocs` (o `www`) y acceder a través d
 
 ---
 
-## ✅ Calidad y validación del código
+## Calidad y validación del código
 
 Para ejecutar las herramientas de análisis estático:
 
