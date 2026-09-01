@@ -1,4 +1,4 @@
-name: "🌿 Verificar convención de nombres de rama"
+name: "Verificar convencion de nombres de rama"
 
 on:
   pull_request:
@@ -19,7 +19,7 @@ jobs:
           echo "Evaluando nombre de rama: $HEAD_REF"
           
           # Patrones permitidos:
-          # - Dev-<Nombre> (convención actual del equipo, ej: Dev-Rafael, Dev-Thiago)
+          # - Dev-<Nombre> (convencion actual del equipo, ej: Dev-Rafael, Dev-Thiago)
           # - feature/<slug> o feature/<id>-<slug>
           # - fix/<slug> o hotfix/<slug>
           # - refactor/<slug>, docs/<slug>, chore/<slug>
@@ -27,9 +27,9 @@ jobs:
           PATTERN="^(Dev-[A-Za-z0-9_.-]+|feature\/[A-Za-z0-9_.-]+|fix\/[A-Za-z0-9_.-]+|hotfix\/[A-Za-z0-9_.-]+|refactor\/[A-Za-z0-9_.-]+|docs\/[A-Za-z0-9_.-]+|dependabot\/.*)$"
           
           if [[ "$HEAD_REF" =~ $PATTERN ]]; then
-            echo "✅ El nombre de rama '$HEAD_REF' cumple con las convenciones del proyecto."
+            echo "El nombre de rama '$HEAD_REF' cumple con las convenciones del proyecto."
           else
-            echo "⚠️ ADVERTENCIA: La rama '$HEAD_REF' no sigue las convenciones recomendadas."
+            echo "ADVERTENCIA: La rama '$HEAD_REF' no sigue las convenciones recomendadas."
             echo "Formatos sugeridos:"
             echo "  - Dev-<Nombre> (ej: Dev-Rafael)"
             echo "  - feature/<id-issue>-<descripcion> (ej: feature/42-login-form)"
