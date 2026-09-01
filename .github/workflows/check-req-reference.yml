@@ -1,4 +1,4 @@
-name: "🔍 Verificar referencia a requerimientos"
+name: "Verificar referencia a requerimientos"
 
 on:
   pull_request:
@@ -12,33 +12,33 @@ jobs:
       pull-requests: write  # para dejar comentario si falla
 
     steps:
-      - name: Verificar que el cuerpo del PR menciona un código de requerimiento
+      - name: Verificar que el cuerpo del PR menciona un codigo de requerimiento
         id: check
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Patrón: REQ-XXX-NN | RNF-NN | RN-NN
-          # Acepta tanto mayúsculas como minúsculas y guiones
+          # Patron: REQ-XXX-NN | RNF-NN | RN-NN
+          # Acepta tanto mayusculas como minusculas y guiones
           PATTERN='(REQ-[A-Z]{2,4}-[0-9]{2}|RNF-[0-9]{2}|RN-[0-9]{2})'
 
           if echo "$PR_BODY" | grep -qiE "$PATTERN"; then
             echo "found=true" >> "$GITHUB_OUTPUT"
-            echo "✅ Referencia a requerimiento encontrada."
+            echo "Referencia a requerimiento encontrada."
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "❌ No se encontró ningún código de requerimiento en el cuerpo del PR."
+            echo "No se encontro ningun codigo de requerimiento en el cuerpo del PR."
           fi
 
       - name: Comentar en el PR si no hay referencia
         if: steps.check.outputs.found == 'false'
-        uses: actions/github-script@v9
+        uses: actions/github-script@v7
         with:
           script: |
-            const body = `## ⚠️ Falta referencia a requerimiento
+            const body = `## Falta referencia a requerimiento
 
-            Este PR no menciona ningún código del SRS de Classia en su descripción.
+            Este PR no menciona ningun codigo del SRS de Classia en su descripcion.
 
-            **Por favor, agregá al menos una referencia** usando la nomenclatura del documento de requerimientos:
+            **Por favor, agrega al menos una referencia** usando la nomenclatura del documento de requerimientos:
 
             | Tipo | Ejemplos |
             |---|---|
@@ -46,9 +46,9 @@ jobs:
             | No funcional | \`RNF-03\` · \`RNF-15\` |
             | Regla de negocio | \`RN-04\` · \`RN-11\` |
 
-            Podés completar la tabla **"Requerimientos implementados / afectados"** en el cuerpo del PR.
+            Podes completar la tabla **"Requerimientos implementados / afectados"** en el cuerpo del PR.
 
-            > Si este PR no implementa ni afecta ningún requerimiento del SRS (p. ej., solo toca CI/CD o documentación interna), escribí \`N/A\` en esa sección para que esta verificación lo ignore.`;
+            > Si este PR no implementa ni afecta ningun requerimiento del SRS (p. ej., solo toca CI/CD o documentacion interna), escribi \`N/A\` en esa seccion para que esta verificacion lo ignore.`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
@@ -60,11 +60,11 @@ jobs:
       - name: Fallar el check si no hay referencia
         if: steps.check.outputs.found == 'false'
         run: |
-          # Permitir N/A explícito para PRs de CI/CD puro
+          # Permitir N/A explicito para PRs de CI/CD puro
           if echo "${{ github.event.pull_request.body }}" | grep -qiE 'N/?A|no aplica|no corresponde'; then
-            echo "✅ PR marcado como N/A, se omite la verificación."
+            echo "PR marcado como N/A, se omite la verificacion."
             exit 0
           fi
-          echo "❌ El PR debe referenciar al menos un código del SRS (REQ-XXX-NN, RNF-NN o RN-NN)."
-          echo "   Si no aplica, escribí 'N/A' en la sección de requerimientos."
+          echo "El PR debe referenciar al menos un codigo del SRS (REQ-XXX-NN, RNF-NN o RN-NN)."
+          echo "Si no aplica, escribi 'N/A' en la seccion de requerimientos."
           exit 1

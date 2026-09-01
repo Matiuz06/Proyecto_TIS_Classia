@@ -2,23 +2,23 @@ name: Lint (HTML / CSS / JS)
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, testing]
   pull_request:
-    branches: [main, develop]
+    branches: [main, testing]
 
 permissions:
   contents: read
 
 jobs:
   lint:
-    name: Lint código
+    name: Lint codigo
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"

@@ -204,4 +204,17 @@
 
 - name: "assets"
   color: "A855F7"
-  description: "Imágenes, íconos y recursos estáticos"
+  description: "Imagenes, iconos y recursos estaticos"
+
+# ── CI/CD Sincronizacion de Ramas ────────────────────────────
+- name: "sync: dev->testing"
+  color: "0075CA"
+  description: "PR automatico de rama dev a testing"
+
+- name: "sync: testing->dev"
+  color: "E4E669"
+  description: "PR de sincronizacion de testing a rama dev"
+
+- name: "sync: main->testing"
+  color: "D93F0B"
+  description: "PR de sincronizacion de main a testing"

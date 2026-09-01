@@ -5,16 +5,13 @@ permissions:
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, testing]
   pull_request:
-    branches: [main, develop]
+    branches: [main, testing]
   schedule:
     # Corre todos los lunes a las 09:00 UTC, para detectar vulnerabilidades nuevas
     # aunque no haya cambios en el código
     - cron: "0 9 * * 1"
-
-permissions:
-  contents: read
 
 jobs:
   secrets-scan:
@@ -22,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -32,14 +29,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   dependency-audit:
-    name: Auditoría de dependencias (npm audit)
+    name: Auditoria de dependencias (npm audit)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
@@ -55,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Semgrep
         uses: semgrep/semgrep-action@v1
@@ -68,13 +65,13 @@ jobs:
           SEMGREP_SEND_METRICS: "off"
 
   security-headers:
-    name: Verificación de cabeceras de seguridad recomendadas (OWASP)
+    name: Verificacion de cabeceras de seguridad recomendadas (OWASP)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
-      - name: Chequear meta CSP y buenas prácticas en HTML
+      - name: Chequear meta CSP y buenas practicas en HTML
         run: |
           chmod +x ./scripts/check-security-headers.sh
           ./scripts/check-security-headers.sh

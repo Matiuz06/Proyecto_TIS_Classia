@@ -1,0 +1,325 @@
+name: "Sincronización de ramas"
+
+# ─────────────────────────────────────────────────────────────
+# Disparadores:
+#   1. push a main   → sincroniza main → testing automáticamente
+#   2. push a testing → crea PRs de sync hacia todas las Dev-*
+#   3. workflow_dispatch → permite ejecutarlo manualmente
+# ─────────────────────────────────────────────────────────────
+on:
+  push:
+    branches:
+      - main
+      - testing
+  workflow_dispatch:
+    inputs:
+      direction:
+        description: "Dirección de sincronización"
+        required: true
+        default: "testing-to-devs"
+        type: choice
+        options:
+          - main-to-testing
+          - testing-to-devs
+          - both
+
+# ─────────────────────────────────────────────────────────────
+# NOTA SOBRE EL TOKEN:
+#   El GITHUB_TOKEN puede crear PRs, pero los PRs creados por él
+#   NO disparan otros workflows automáticamente (limitación de GitHub).
+#   Si necesitás que los PRs de sync disparen checks, usá un PAT:
+#     Settings → Secrets → New secret → Nombre: GH_PAT
+#     Scope mínimo: repo (Full control of private repositories)
+#   Luego reemplazá secrets.GITHUB_TOKEN por secrets.GH_PAT en todo el archivo.
+# ─────────────────────────────────────────────────────────────
+permissions:
+  contents: write
+  pull-requests: write
+
+# ─────────────────────────────────────────────────────────────
+# JOB 1: Sincronizar main → testing
+# Se ejecuta cuando: push a main, o dispatch con "main-to-testing"/"both"
+# ─────────────────────────────────────────────────────────────
+jobs:
+  sync-main-to-testing:
+    name: "Sincronizar main → testing"
+    runs-on: ubuntu-latest
+    if: |
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.direction == 'main-to-testing' || inputs.direction == 'both'))
+
+    steps:
+      - name: "Checkout completo"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Configurar identidad de Git"
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: "Fetch de todas las ramas"
+        run: git fetch --all
+
+      - name: "Verificar conflictos main → testing"
+        id: main-conflict
+        run: |
+          git checkout -b temp-main-sync origin/testing
+          if git merge --no-commit --no-ff origin/main 2>&1; then
+            echo "conflict=false" >> "$GITHUB_OUTPUT"
+            echo "Merge limpio: main puede aplicarse sobre testing."
+          else
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+            echo "Hay conflictos entre main y testing."
+          fi
+          git merge --abort 2>/dev/null || true
+          git checkout -
+
+      - name: "Aplicar merge main → testing (sin conflictos)"
+        if: steps.main-conflict.outputs.conflict == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git checkout testing
+          git merge --no-ff origin/main -m "chore(sync): merge main → testing [auto-sync]"
+          git push origin testing
+          echo "testing actualizado con los cambios de main."
+
+      - name: "Crear PR de sync main → testing (con conflictos)"
+        if: steps.main-conflict.outputs.conflict == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          EXISTING=$(gh pr list \
+            --base testing --head main \
+            --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING" ]; then
+            echo "Ya existe PR #$EXISTING de main → testing. No se duplica."
+          else
+            cat > /tmp/pr_main_testing.md << PREOF
+          ## Descripción
+
+          Sincronización automática de \`main\` hacia \`testing\`.
+          El workflow detectó **conflictos** y no pudo realizar el merge directo.
+          Se requiere resolución manual antes de continuar.
+
+          > **Un administrador o dev senior debe revisar y resolver los conflictos en este PR antes de mergearlo.**
+
+          ## Requerimientos implementados / afectados
+
+          | Código | Descripción |
+          |---|---|
+          | N/A | Sincronización de ramas (CI/CD) |
+
+          ## Tipo de cambio
+
+          - [ ] Fix (corrección de un bug)
+          - [ ] Feature (nueva funcionalidad — implementa requerimiento del SRS)
+          - [ ] Refactor (sin cambio de comportamiento)
+          - [ ] Documentación
+          - [x] CI/CD
+
+          ## Cómo probar
+
+          1. Revisar los archivos en conflicto listados en el diff.
+          2. Resolver los conflictos manualmente.
+          3. Verificar que \`testing\` funciona correctamente tras el merge.
+
+          ## Checklist
+
+          - [ ] El código pasa el lint (HTMLHint / stylelint / ESLint)
+          - [ ] Probé los cambios localmente en el navegador
+          - [ ] No introduje secretos ni credenciales en el código
+          - [ ] Actualicé la documentación si corresponde
+          - [ ] Asocié este PR a una Issue en GitHub (Closes #...)
+          - [ ] La tarjeta correspondiente en Trello fue movida a "En Review"
+          - [ ] La tabla de requerimientos está completa (al menos una fila)
+
+          ## Vinculaciones
+
+          - **Closes Issue:** Closes #
+          - **Tarjeta Trello:** https://trello.com/b/GxSUgvHG/proyecto-taller-anitech
+          - **Workflow run:** $RUN_URL
+
+          ## Capturas / Evidencia (si aplica)
+
+          <!-- Arrastrar imágenes o GIFs del comportamiento acá -->
+          PREOF
+
+            gh pr create \
+              --base "testing" \
+              --head "main" \
+              --title "[Sync] main → testing" \
+              --body-file /tmp/pr_main_testing.md \
+              --label "sync: main->testing"
+            echo "PR de sync creado para resolución manual."
+          fi
+
+  # ─────────────────────────────────────────────────────────────
+  # JOB 2: Crear PRs de testing → cada rama Dev-*
+  # Se ejecuta cuando: push a testing, o dispatch con "testing-to-devs"/"both"
+  # ─────────────────────────────────────────────────────────────
+  sync-testing-to-devs:
+    name: "Crear PRs testing → Dev-*"
+    runs-on: ubuntu-latest
+    if: |
+      github.ref == 'refs/heads/testing' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.direction == 'testing-to-devs' || inputs.direction == 'both'))
+
+    steps:
+      - name: "Checkout completo"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Configurar identidad de Git"
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: "Fetch de todas las ramas"
+        run: git fetch --all
+
+      - name: "Obtener lista de ramas Dev-* activas"
+        id: get-dev-branches
+        run: |
+          DEV_BRANCHES=$(git branch -r \
+            | grep 'origin/Dev-' \
+            | sed 's|origin/||' \
+            | tr -d ' ' \
+            | tr '\n' ' ')
+          echo "branches=$DEV_BRANCHES" >> "$GITHUB_OUTPUT"
+          echo "Ramas Dev encontradas: $DEV_BRANCHES"
+
+      - name: "Crear PRs de sync para cada rama Dev-*"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEV_BRANCHES: ${{ steps.get-dev-branches.outputs.branches }}
+        run: |
+          if [ -z "$DEV_BRANCHES" ]; then
+            echo "No se encontraron ramas Dev-* activas. Nada que sincronizar."
+            exit 0
+          fi
+
+          for BRANCH in $DEV_BRANCHES; do
+            echo ""
+            echo "──────────────────────────────────────"
+            echo "Procesando: testing → $BRANCH"
+
+            DEV_NAME="${BRANCH#Dev-}"
+
+            # Verificar si testing tiene algo nuevo respecto a la rama Dev-*
+            AHEAD=$(git rev-list "origin/$BRANCH..origin/testing" --count 2>/dev/null || echo "0")
+
+            if [ "$AHEAD" -eq 0 ]; then
+              echo "$BRANCH ya está al día con testing. Saltando."
+              continue
+            fi
+
+            echo "testing está $AHEAD commit(s) adelante de $BRANCH."
+
+            # Verificar conflictos
+            git checkout -b "temp-sync-$BRANCH" "origin/$BRANCH" 2>/dev/null || \
+              git checkout "temp-sync-$BRANCH"
+
+            CONFLICT="false"
+            if ! git merge --no-commit --no-ff origin/testing 2>&1; then
+              CONFLICT="true"
+            fi
+            git merge --abort 2>/dev/null || true
+            git checkout -
+            git branch -D "temp-sync-$BRANCH" 2>/dev/null || true
+
+            CONFLICT_BADGE="Sin conflictos detectados"
+            if [ "$CONFLICT" = "true" ]; then
+              CONFLICT_BADGE="Se detectaron posibles conflictos — revisar antes de mergear"
+            fi
+
+            # Verificar si ya existe PR abierto
+            EXISTING=$(gh pr list \
+              --base "$BRANCH" \
+              --head "testing" \
+              --state open \
+              --json number \
+              --jq '.[0].number' 2>/dev/null || echo "")
+
+            if [ -n "$EXISTING" ]; then
+              echo "Ya existe PR #$EXISTING de testing → $BRANCH. No se duplica."
+              continue
+            fi
+
+            cat > /tmp/pr_sync_dev.md << PREOF
+          ## Descripción
+
+          Hola **$DEV_NAME** 
+
+          La rama \`testing\` se actualizó y tiene **$AHEAD commit(s)** nuevos respecto a tu rama \`$BRANCH\`.
+          Se recomienda integrar estos cambios para mantenerte sincronizado y evitar conflictos futuros.
+
+          > $CONFLICT_BADGE
+
+          ## Requerimientos implementados / afectados
+
+          | Código | Descripción |
+          |---|---|
+          | N/A | Sincronización de rama dev con testing (CI/CD) |
+
+          ## Tipo de cambio
+
+          - [ ] Fix (corrección de un bug)
+          - [ ] Feature (nueva funcionalidad — implementa requerimiento del SRS)
+          - [ ] Refactor (sin cambio de comportamiento)
+          - [ ] Documentación
+          - [x] CI/CD
+
+          ## Cómo probar
+
+          1. Aceptar este PR o hacer merge manualmente:
+          \`\`\`bash
+          git fetch origin
+          git checkout $BRANCH
+          git merge origin/testing
+          # Si hay conflictos, resolverlos y luego:
+          git add .
+          git commit -m 'chore(sync): merge testing into $BRANCH'
+          git push origin $BRANCH
+          \`\`\`
+          2. Verificar que tu rama sigue funcionando correctamente tras el merge.
+
+          ## Checklist
+
+          - [ ] El código pasa el lint (HTMLHint / stylelint / ESLint)
+          - [ ] Probé los cambios localmente en el navegador
+          - [ ] No introduje secretos ni credenciales en el código
+          - [ ] Actualicé la documentación si corresponde
+          - [ ] Asocié este PR a una Issue en GitHub (Closes #...)
+          - [ ] La tarjeta correspondiente en Trello fue movida a "En Review"
+          - [ ] La tabla de requerimientos está completa (al menos una fila)
+
+          ## Vinculaciones
+
+          - **Closes Issue:** Closes #
+          - **Tarjeta Trello:** https://trello.com/b/GxSUgvHG/proyecto-taller-anitech
+          - **Workflow run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          ## Capturas / Evidencia (si aplica)
+
+          <!-- Arrastrar imágenes o GIFs del comportamiento acá -->
+          PREOF
+
+            gh pr create \
+              --base "$BRANCH" \
+              --head "testing" \
+              --title "[Sync] testing → $BRANCH ($AHEAD commit(s) nuevos)" \
+              --body-file /tmp/pr_sync_dev.md \
+              --label "sync: testing->dev"
+
+            echo "PR de sync creado: testing → $BRANCH"
+          done
