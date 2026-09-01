@@ -160,7 +160,7 @@ include '../includes/header.php';
                 </dl>
 
                 <p class="catalog-actions">
-                  <a class="btn" href="solicitudImpresion3d.php">
+                  <a class="btn" href="solicitud-impresion-3d.php">
                     Solicitar servicio
                   </a>
                 </p>

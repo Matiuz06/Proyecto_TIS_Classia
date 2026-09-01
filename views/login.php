@@ -18,8 +18,14 @@ include '../includes/header.php';
 
     <section class="auth-card" aria-labelledby="titulo-login">
       <h2 id="titulo-login">Iniciar sesión</h2>
-      <p class="muted">Usá tu correo y contraseña para continuar.</p>
-      <form action="/login" method="POST">
+      <p>Usá tu correo y contraseña para continuar.</p>
+      
+      <?php if (isset($_GET['registro']) && $_GET['registro'] === 'exitoso'): ?>
+        <div class="alert alert-success">
+          Registro completado con éxito. Ahora podés iniciar sesión.
+        </div>
+      <?php endif; ?>
+      <form action="login.php" method="POST">
         <p>
           <label for="correo">Correo electrónico</label>
           <input type="email" id="correo" name="correo" autocomplete="email" required
@@ -37,7 +43,7 @@ include '../includes/header.php';
         <button type="submit">Iniciar sesión</button>
       </form>
       <p class="auth-links">
-        <a href="restablecer_contrasena.php">¿Olvidaste tu contraseña?</a>
+        <a href="restablecer-contrasena.php">¿Olvidaste tu contraseña?</a>
       </p>
       <p class="auth-links">
         ¿No tenés cuenta? <a href="registro.php">Registrate</a>

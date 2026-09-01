@@ -164,11 +164,11 @@ button:active {
   }
 }
 
-body > main > header {
+body>main>header {
   animation: entrada-principal 1s ease-out 1 both;
 }
 
-body > main > section {
+body>main>section {
   animation: entrada-seccion 1s ease-out 0.35s 1 both;
 }
 
@@ -225,7 +225,7 @@ body > main > section {
   }
 }
 
-body > main > header {
+body>main>header {
   animation: catalogo-header 0.9s ease-out 1 both;
 }
 
@@ -320,15 +320,15 @@ body > main > header {
   }
 }
 
-.page-container > .page-header {
+.page-container>.page-header {
   animation: carrito-header 0.8s ease-out 1 both;
 }
 
-.page-container > .catalog-card {
+.page-container>.catalog-card {
   animation: carrito-producto 1s ease-out 0.2s 1 both;
 }
 
-.page-container > .order-summary {
+.page-container>.order-summary {
   animation: carrito-resumen 1s ease-out 0.35s 1 both;
 }
 
@@ -389,11 +389,11 @@ body > main > header {
   transform: translateY(-2px);
 }
 
-.layout-sidebar > .sidebar {
+.layout-sidebar>.sidebar {
   animation: curso-sidebar 1s ease-out 1 both;
 }
 
-.layout-sidebar > .main-content {
+.layout-sidebar>.main-content {
   animation: curso-contenido 1s ease-out 0.15s 1 both;
 }
 
@@ -402,17 +402,17 @@ body > main > header {
 }
 
 .main-content h3:nth-of-type(1),
-.main-content h3:nth-of-type(1) + p {
+.main-content h3:nth-of-type(1)+p {
   animation: curso-aparecer 0.7s ease-out 0.8s 1 both;
 }
 
 .main-content h3:nth-of-type(2),
-.main-content h3:nth-of-type(2) + p,
+.main-content h3:nth-of-type(2)+p,
 .main-content .flex-row {
   animation: curso-aparecer 0.7s ease-out 1s 1 both;
 }
 
-.main-content > p:last-child {
+.main-content>p:last-child {
   animation: curso-boton 0.7s ease-out 1.2s 1 both;
 }
 
@@ -580,7 +580,6 @@ body > main > header {
   animation-delay: 450ms;
 }
 
-/* Profile Tabs & Buttons Staggered Entrance */
 .profile-tabs button {
   animation: fade-slide-up 1.2s var(--ease-out) both;
 }
@@ -611,4 +610,35 @@ body > main > header {
 
 .profile-tabs button:nth-child(7) {
   animation-delay: 1280ms;
+}
+
+
+.alert {
+  animation: fade-slide-up var(--dur-medium, 300ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+.pub-card {
+  transition: transform var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.pub-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+}
+
+.pub-actions-link:hover {
+  transform: translateY(-1px);
+  text-decoration: underline;
+}
+
+.btn-status:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
+}
+
+.btn-status,
+.pub-actions-link {
+  transition: transform var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
 }

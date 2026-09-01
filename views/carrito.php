@@ -35,7 +35,7 @@ include '../includes/header.php';
         <p>Subtotal: <strong>$29.99</strong></p>
         <p>Descuento: <strong>$0.00</strong></p>
         <p>Total: <strong>$29.99</strong></p>
-        <form action="pasarela_pago.php" method="get">
+        <form action="pasarela-pago.php" method="get">
           <p>
             <label for="cupon">¿Tenés un cupón de descuento?</label>
             <input
