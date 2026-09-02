@@ -38,11 +38,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
 
+      - name: Clean npm cache
+        run: npm cache clean --force
+
       - name: Instalar dependencias
-        run: npm ci || npm install
+        run: npm ci
 
       - name: npm audit
         run: npm audit --audit-level=high
