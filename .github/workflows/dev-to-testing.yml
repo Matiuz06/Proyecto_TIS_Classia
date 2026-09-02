@@ -51,17 +51,20 @@ jobs:
           git fetch origin testing
           echo "Rama testing sincronizada."
 
-      # ── 3b. Verificar si la rama dev tiene commits nuevos respecto a testing ──
-      - name: "Verificar si hay commits nuevos respecto a testing"
+      # ── 3b. Verificar si la rama dev tiene commits propios y cambios reales respecto a testing ──
+      - name: "Verificar si hay cambios reales respecto a testing"
         id: check-ahead
         env:
           DEV_BRANCH: ${{ github.ref_name }}
         run: |
-          AHEAD=$(git rev-list "origin/testing..origin/$DEV_BRANCH" --count 2>/dev/null || echo "0")
-          echo "Commits nuevos en '$DEV_BRANCH' respecto a 'testing': $AHEAD"
-          if [ "$AHEAD" -eq 0 ]; then
+          AHEAD=$(git rev-list --no-merges "origin/testing..origin/$DEV_BRANCH" --count 2>/dev/null || echo "0")
+          FILE_DIFF=$(git diff --name-only "origin/testing" "origin/$DEV_BRANCH" 2>/dev/null | wc -l)
+          echo "Commits propios en '$DEV_BRANCH' (excluyendo merge commits): $AHEAD"
+          echo "Archivos modificados entre '$DEV_BRANCH' y 'testing': $FILE_DIFF"
+
+          if [ "$AHEAD" -eq 0 ] || [ "$FILE_DIFF" -eq 0 ]; then
             echo "ahead=false" >> "$GITHUB_OUTPUT"
-            echo "La rama '$DEV_BRANCH' no tiene commits nuevos respecto a 'testing'. No es necesario crear PR."
+            echo "La rama '$DEV_BRANCH' no tiene cambios de codigo reales respecto a 'testing' (0 archivos modificados o solo merge commits). No es necesario crear PR."
           else
             echo "ahead=true" >> "$GITHUB_OUTPUT"
           fi
