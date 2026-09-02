@@ -4,9 +4,11 @@ CREATE DATABASE IF NOT EXISTS classia_db
 
 USE classia_db;
 
-CREATE USER IF NOT EXISTS 'classia_user'@'localhost' IDENTIFIED BY 'Classia2026!';
-GRANT ALL PRIVILEGES ON classia_db.* TO 'classia_user'@'localhost';
+
+CREATE USER IF NOT EXISTS 'classia_user'@'localhost' IDENTIFIED BY 'CONTRASENA_LOCAL';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, INDEX ON classia_db.* TO 'classia_user'@'localhost';
 FLUSH PRIVILEGES;
+
 
 CREATE TABLE IF NOT EXISTS roles (
     id_rol INT AUTO_INCREMENT PRIMARY KEY,
