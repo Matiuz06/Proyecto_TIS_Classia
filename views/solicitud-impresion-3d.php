@@ -7,7 +7,7 @@
       name="description"
       content="Solicita un presupuesto personalizado para diseño e impresión 3D en Classia." />
     <title>Solicitar impresión 3D | Classia</title>
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
     <link rel="stylesheet" href="../css/animation.css" />
     <link rel="stylesheet" href="../css/style.css" />
   </head>
@@ -19,7 +19,7 @@
           class="site-brand"
           href="../index.php"
           aria-label="Classia - Inicio">
-          <img src="../assets/logoC.png" alt="Classia" />
+          <img src="../assets/images/logo-classia.png" alt="Classia" />
         </a>
 
         <nav class="site-nav" aria-label="Navegación principal">

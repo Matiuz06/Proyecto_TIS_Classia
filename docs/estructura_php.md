@@ -1,70 +1,94 @@
-# Estructura PHP
+# Estructura PHP y Arquitectura Backend — Classia
 
-Este documento define la estructura inicial del backend PHP para Classia.
+Este documento define la arquitectura y organización técnica del backend PHP para la plataforma **Classia**.
 
-## Carpetas
+---
 
-- `config/`: configuracion global del backend.
-- `config/database.php`: conexion PDO centralizada a la base de datos.
-- `includes/`: codigo PHP reutilizable, como validaciones, helpers o componentes comunes.
-- `php/auth/`: futura logica de login, registro y logout.
-- `php/usuarios/`: futura logica relacionada con usuarios.
-- `php/publicaciones/`: futura logica de cursos y servicios.
-- `php/solicitudes/`: futura logica relacionada con solicitudes de servicios.
-- `php/contrataciones/`: futura logica de contrataciones.
-- `php/pagos/`: futura simulacion y registro de pagos.
-- `php/valoraciones/`: futura logica de valoraciones.
-- `sql/`: esquema, scripts y recursos relacionados con la base de datos.
-- `docs/`: documentacion tecnica y modelos.
+## Estructura de carpetas y módulos
 
-## Paginas y logica
+- `config/`: Configuración global del backend.
+  - `config/database.php`: Conexión centralizada PDO a MariaDB/MySQL con manejo de variables de entorno y sentencias preparadas.
+- `includes/`: Código PHP reutilizable y componentes compartidos de presentación.
+  - `includes/header.php`: Barra de navegación modular con control de estado de sesión.
+  - `includes/footer.php`: Pie de página institucional modular.
+- `views/`: Vistas y páginas de la aplicación implementadas en PHP (`login.php`, `registro.php`, `panel-proveedor.php`, `panel-administrador.php`, `crear-publicacion.php`, `editar-publicacion.php`, etc.).
+- `php/auth/`: Lógica de autenticación, control de acceso y sesiones.
+  - `session.php`: Helper de funciones de sesión (`iniciar_sesion`, `requerir_autenticacion`, `establecer_usuario_sesion`, etc.).
+  - `logout.php`: Procesamiento de cierre de sesión y destrucción de cookies.
+- `php/usuarios/`: Lógica de usuarios.
+  - `registro.php`: Procesamiento de registro de nuevos usuarios con validación de datos, verificación de unicidad de email y hash seguro (`password_hash`).
+- `php/publicaciones/`: Lógica y controladores del ciclo de vida de cursos y servicios.
+  - `crear_publicacion.php`: Alta de nuevas publicaciones vinculadas al usuario autenticado.
+  - `editar_publicacion.php`: Edición de publicaciones existentes y alternancia de estados (`publicado`, `borrador`, `pausado`).
+  - `obtener_publicaciones.php`: Funciones helper (`obtenerPublicacionesPorUsuario`) para alimentar vistas dinámicas.
+- `php/solicitudes/`: Futura lógica relacionada con solicitudes de servicios personalizados.
+- `php/contrataciones/`: Futura lógica de carrito y contrataciones.
+- `php/pagos/`: Futura simulación y registro de pagos.
+- `php/valoraciones/`: Futura lógica de valoraciones y cálculo de reseñas.
+- `sql/`: Esquema relacional DDL (`schema.sql`), scripts y recursos de base de datos.
+- `docs/`: Documentación técnica, modelos UML (casos de uso, clases, secuencia) y diseño relacional (MER).
 
-Las paginas actuales deben mantenerse en `index.html` y `html/` hasta la tarea de migracion HTML a PHP.
+---
 
-La logica PHP debe ir dentro de `php/`, separada por responsabilidad. Por ejemplo:
+## Vistas y páginas PHP
 
-- `php/auth/procesar_login.php`
-- `php/publicaciones/crear_publicacion.php`
-- `php/publicaciones/detalle_publicacion.php`
+La plataforma completó la migración a PHP:
+- El punto de entrada es `index.php` en la raíz.
+- Las vistas residen en `views/*.php` y hacen uso de `require_once` para incorporar `includes/header.php` y `includes/footer.php`.
+- Los formularios envían peticiones POST hacia las vistas o controladores en `php/` procesando de forma segura las operaciones.
 
-Los archivos reutilizables deben ir en `includes/`.
+## Base de datos y persistencia
 
-## Base de datos
+La conexión PDO a la base de datos se centraliza en `config/database.php` y expone la variable `$pdo` para los scripts que la requieran.
 
-La conexion PDO a la base de datos esta en `config/database.php` y deja disponible la variable `$pdo` para los archivos que la incluyan.
+La configuración de conexión se gestiona mediante variables de entorno en un archivo `.env` local (tomando como referencia `.env.example`).
 
-Valores locales predeterminados:
+El esquema DDL relacional está disponible en `sql/schema.sql` e implementa integridad referencial completa (Foreign Keys, restricciones UNIQUE y tablas en 3FN).
 
-- `DB_HOST`: `localhost`
-- `DB_PORT`: `3306`
-- `DB_NAME`: `classia_db`
-- `DB_USER`: `root`
-- `DB_PASSWORD`: vacia
+---
 
-Estos valores pueden reemplazarse con variables de entorno del mismo nombre. El archivo `.env.example` muestra los nombres esperados, pero el proyecto no carga archivos `.env` automaticamente ni requiere paquetes externos.
+## Reutilización y rutas relativas con `__DIR__`
 
-Los scripts SQL deben guardarse en `sql/`. El archivo `sql/schema.sql` sera incorporado desde la rama que contiene el modelo de base de datos.
-
-## Reutilizacion con require_once
-
-Para incluir configuracion o archivos reutilizables se recomienda usar rutas basadas en `__DIR__`:
-
-```php
-require_once __DIR__ . "/ruta/al/archivo.php";
-```
-
-Ejemplo para reutilizar la conexion desde un archivo dentro de `php/usuarios/`:
+Para incluir configuración, helpers o componentes reutilizables se deben utilizar rutas absolutas basadas en `__DIR__`:
 
 ```php
 require_once __DIR__ . "/../../config/database.php";
-
-$stmt = $pdo->prepare("SELECT 1");
+require_once __DIR__ . "/../auth/session.php";
 ```
 
-## Convenciones
+---
 
-- Archivos PHP: `snake_case`.
-- Tablas: plural y `snake_case`, por ejemplo `usuarios`, `roles`, `publicaciones`, `contrataciones`, `valoraciones`.
-- Claves primarias y foraneas: respetar las denominaciones establecidas en `sql/schema.sql`, por ejemplo `id_usuario`, `id_publicacion`, `id_contratacion`, `id_valoracion`, `id_solicitud`.
-- No colocar credenciales reales en archivos del repositorio.
-- No mezclar logica PHP nueva dentro de HTML hasta la tarea correspondiente.
+## Manejo de sesiones y autenticación
+
+El control de sesiones se gestiona en `php/auth/session.php`.
+
+### Funciones disponibles:
+- `iniciar_sesion()`: Inicia la sesión de forma segura únicamente si no existe una activa.
+- `establecer_usuario_sesion($id_usuario, $nombre, $email, $id_rol)`: Regenera el ID de sesión (`session_regenerate_id(true)`) y almacena los datos mínimos del usuario.
+- `esta_autenticado()`: Retorna `true` si existe `$_SESSION["usuario"]` con datos válidos.
+- `usuario_actual()`: Devuelve el array con la información del usuario autenticado o `null`.
+- `requerir_autenticacion($login_url)`: Redirige a `$login_url` si no hay sesión activa.
+- `cerrar_sesion()`: Limpia `$_SESSION`, destruye la cookie de sesión y finaliza la sesión en el servidor.
+
+### Estructura de datos en sesión:
+```php
+$_SESSION["usuario"] = [
+    "id_usuario" => 1,
+    "nombre" => "Nombre del Usuario",
+    "email" => "usuario@classia.local",
+    "id_rol" => 2, // 1: Administrador, 2: Proveedor/Docente, 3: Estudiante/Cliente
+];
+```
+
+> ⚠️ **Política de seguridad de sesión:** Nunca deben almacenarse contraseñas, hashes, instancias de PDO ni tokens confidenciales dentro de `$_SESSION`.
+
+---
+
+## Convenciones de nomenclatura y desarrollo
+
+- **Archivos PHP:** `camelCase` o `snake_case` según el contexto del módulo (`crearPublicacion.php`, `session.php`).
+- **Tablas:** Plural y `snake_case` (`usuarios`, `roles`, `publicaciones`, `solicitudes`, `contrataciones`, `detalles_contratacion`, `pagos`, `valoraciones`).
+- **Claves primarias y foráneas:** Denominaciones estandarizadas en `sql/schema.sql` (`id_usuario`, `id_publicacion`, `id_contratacion`, `id_solicitud`, `id_rol`, etc.).
+- **Consultas SQL:** Obligatoriamente parametrizadas mediante Sentencias Preparadas PDO (`$pdo->prepare()`) para mitigar SQL Injection.
+- **Credenciales:** Prohibido subir contraseñas o datos de producción al repositorio.
+

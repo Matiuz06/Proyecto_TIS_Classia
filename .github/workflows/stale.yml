@@ -1,4 +1,4 @@
-name: "🧹 Gestión de Issues y PRs inactivos"
+name: "Gestion de Issues y PRs inactivos"
 
 on:
   schedule:
@@ -14,13 +14,13 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/stale@v11
+      - uses: actions/stale@v9
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-stale: 14
           days-before-close: 7
-          stale-issue-message: "Este issue no ha tenido actividad por 14 días. Se marcará como inactivo (stale) y se cerrará en 7 días si no se registra nueva actividad."
-          stale-pr-message: "Este PR no ha tenido actividad por 14 días. Se marcará como inactivo (stale) y se cerrará en 7 días si no se actualiza."
+          stale-issue-message: "Este issue no ha tenido actividad por 14 dias. Se marcara como inactivo (stale) y se cerrara en 7 dias si no se registra nueva actividad."
+          stale-pr-message: "Este PR no ha tenido actividad por 14 dias. Se marcara como inactivo (stale) y se cerrara en 7 dias si no se actualiza."
           stale-issue-label: "stale"
           stale-pr-label: "stale"
           exempt-issue-labels: "prioridad: alta"

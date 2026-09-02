@@ -7,7 +7,7 @@
   <meta name="description"
     content="Política de privacidad de Classia. Conocé cómo recopilamos, usamos y protegemos tus datos personales conforme a la Ley 18.331 de Uruguay." />
   <title>Política de privacidad — Classia</title>
-  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+  <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
   <link rel="stylesheet" href="../css/animation.css" />
   <link rel="stylesheet" href="../css/style.css" />
 </head>
@@ -16,7 +16,7 @@
   <header class="site-header">
     <div class="site-header__inner">
       <a class="site-brand" href="../index.php">
-        <img src="../assets/logoC.png" alt="Classia" />
+        <img src="../assets/images/logo-classia.png" alt="Classia" />
       </a>
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="../index.php">Inicio</a>

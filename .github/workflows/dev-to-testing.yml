@@ -1,0 +1,198 @@
+name: "Dev → Testing: Crear PR automático"
+
+# ─────────────────────────────────────────────────────────────
+# Se dispara cuando cualquier dev hace push a su rama Dev-*
+# ─────────────────────────────────────────────────────────────
+on:
+  push:
+    branches:
+      - "Dev-**"
+
+# ─────────────────────────────────────────────────────────────
+# Permisos necesarios:
+#   - contents: read  → para hacer checkout y merge de prueba
+#   - pull-requests: write → para crear el PR automático
+#
+# NOTA SOBRE EL TOKEN:
+#   El GITHUB_TOKEN estándar SÍ puede crear PRs con estos permisos.
+#   Sin embargo, los PRs creados por GITHUB_TOKEN NO disparan otros
+#   workflows (limitación de seguridad de GitHub). Si necesitás que
+#   el PR dispare checks automáticos (lint, conventional-commits, etc.)
+#   deberás crear un PAT (Personal Access Token) con scope "repo" y
+#   guardarlo como secret: Settings → Secrets → GH_PAT.
+#   Luego reemplazá `secrets.GITHUB_TOKEN` por `secrets.GH_PAT` abajo.
+# ─────────────────────────────────────────────────────────────
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-and-create-pr:
+    name: "Verificar conflictos y crear PR hacia testing"
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Obtener todo el historial para poder hacer merge de prueba ──
+      - name: "Checkout completo del repositorio"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 2. Configurar git con identidad del bot ──
+      - name: "Configurar identidad de Git"
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # ── 3. Sincronizar la rama testing remota ──
+      - name: "Sincronizar rama testing desde origin"
+        run: |
+          git fetch origin testing
+          echo "Rama testing sincronizada."
+
+      # ── 4. Chequear conflictos de merge (sin modificar nada) ──
+      - name: "Verificar conflictos con testing"
+        id: conflict-check
+        env:
+          DEV_BRANCH: ${{ github.ref_name }}
+        run: |
+          echo "Comprobando si '$DEV_BRANCH' puede mergearse sobre 'testing' sin conflictos..."
+
+          # Crear rama temporal de prueba basada en testing
+          git checkout -b temp-conflict-check origin/testing
+
+          # Intentar merge sin commit (solo detectar conflictos)
+          if git merge --no-commit --no-ff "origin/$DEV_BRANCH" 2>&1; then
+            echo "conflict=false" >> "$GITHUB_OUTPUT"
+            echo "No hay conflictos. Se puede crear el PR."
+          else
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+            echo "Se detectaron conflictos entre '$DEV_BRANCH' y 'testing'."
+          fi
+
+          # Limpiar siempre, con o sin conflicto
+          git merge --abort 2>/dev/null || true
+          git checkout "$DEV_BRANCH" 2>/dev/null || git checkout -
+
+      # ── 5. Fallar explícitamente si hay conflictos ──
+      - name: "Reportar conflictos y detener"
+        if: steps.conflict-check.outputs.conflict == 'true'
+        env:
+          DEV_BRANCH: ${{ github.ref_name }}
+        run: |
+          echo ""
+          echo "══════════════════════════════════════════════════════"
+          echo "  CONFLICTOS DETECTADOS — PR no creado"
+          echo "══════════════════════════════════════════════════════"
+          echo ""
+          echo "  Rama origen : $DEV_BRANCH"
+          echo "  Rama destino: testing"
+          echo ""
+          echo "  Acción requerida:"
+          echo "  1. Actualizá tu rama local con los últimos cambios de testing:"
+          echo "     git fetch origin"
+          echo "     git checkout $DEV_BRANCH"
+          echo "     git merge origin/testing"
+          echo ""
+          echo "  2. Resolvé los conflictos marcados en los archivos."
+          echo "  3. Commitá los cambios y volvé a hacer push."
+          echo ""
+          exit 1
+
+      # ── 6. Crear el PR automático si no hay conflictos ──
+      - name: "Crear Pull Request hacia testing"
+        if: steps.conflict-check.outputs.conflict == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEV_BRANCH: ${{ github.ref_name }}
+          COMMIT_SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          DEV_NAME="${DEV_BRANCH#Dev-}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+
+          PR_TITLE="[Auto] $DEV_BRANCH → testing ($SHORT_SHA)"
+
+          # ── Escribir body en archivo temporal (evita problemas de escaping) ──
+          cat > /tmp/pr_body.md << PREOF
+          ## Descripción
+
+          Integración automática de cambios desde \`$DEV_BRANCH\` hacia \`testing\`.
+          Generado por el workflow [dev-to-testing]($RUN_URL) al detectar el push \`$SHORT_SHA\`.
+
+          > **Este PR requiere aprobación de al menos un dev antes de mergearse.**
+
+          ## Requerimientos implementados / afectados
+
+          <!--
+            Completar manualmente con los REQ del SRS cubiertos por este PR.
+            Funcionales:    REQ-AUT-NN · REQ-USR-NN · REQ-CUR-NN · REQ-CON-NN · REQ-BUS-NN
+                            REQ-INS-NN · REQ-ACT-NN · REQ-EVA-NN · REQ-CAL-NN · REQ-COM-NN
+                            REQ-PAN-NN · REQ-SER-NN · REQ-PAG-NN · REQ-VAL-NN · REQ-ADM-NN
+            No funcionales: RNF-NN (01–24)
+            Dominio:        RN-NN  (01–14)
+          -->
+
+          | Código | Descripción |
+          |---|---|
+          | \`REQ-XXX-NN\` | _completar_ |
+
+          ## Tipo de cambio
+
+          - [ ] Fix (corrección de un bug)
+          - [ ] Feature (nueva funcionalidad — implementa requerimiento del SRS)
+          - [ ] Refactor (sin cambio de comportamiento)
+          - [ ] Documentación
+          - [x] CI/CD
+
+          ## Cómo probar
+
+          <!--
+            Describir los pasos para verificar los cambios de esta integración:
+            1. Ir a '...'
+            2. Verificar que ...
+          -->
+
+          1. Revisar los cambios incluidos en este PR.
+          2. Verificar localmente en la rama \`testing\` que el comportamiento es correcto.
+
+          ## Checklist
+
+          - [ ] El código pasa el lint (HTMLHint / stylelint / ESLint)
+          - [ ] Probé los cambios localmente en el navegador
+          - [ ] No introduje secretos ni credenciales en el código
+          - [ ] Actualicé la documentación si corresponde
+          - [ ] Asocié este PR a una Issue en GitHub (Closes #...)
+          - [ ] La tarjeta correspondiente en Trello fue movida a "En Review"
+          - [ ] La tabla de requerimientos está completa (al menos una fila)
+
+          ## Vinculaciones
+
+          - **Closes Issue:** Closes #
+          - **Tarjeta Trello:** https://trello.com/b/GxSUgvHG/proyecto-taller-anitech
+          - **Workflow run:** $RUN_URL
+
+          ## Capturas / Evidencia (si aplica)
+
+          <!-- Arrastrar imágenes o GIFs del comportamiento acá -->
+          PREOF
+
+          EXISTING_PR=$(gh pr list \
+            --base testing \
+            --head "$DEV_BRANCH" \
+            --state open \
+            --json number \
+            --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "Ya existe el PR #$EXISTING_PR para '$DEV_BRANCH' → 'testing'. No se crea uno nuevo."
+          else
+            gh pr create \
+              --base "testing" \
+              --head "$DEV_BRANCH" \
+              --title "$PR_TITLE" \
+              --body-file /tmp/pr_body.md \
+              --label "sync: dev->testing"
+            echo "PR creado exitosamente: '$DEV_BRANCH' → 'testing'"
+          fi
