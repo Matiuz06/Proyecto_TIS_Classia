@@ -1,300 +1,236 @@
 # Classia
 
-**Classia** es una plataforma web orientada a la **gestión educativa y contratación de servicios vinculados a la educación**, desarrollada como proyecto académico integrador.
+**Classia** es una plataforma web orientada a la **gestión educativa y contratación de servicios vinculados a la educación**, desarrollada por **AniTech** como proyecto académico integrador.
 
-La propuesta busca reunir en un mismo entorno digital diferentes actores, recursos y servicios educativos, proporcionando una experiencia organizada, accesible y sencilla tanto para quienes desean aprender como para quienes ofrecen cursos o servicios especializados.
-
----
-
-## 🎯 Objetivo del proyecto
-
-El objetivo principal de Classia es desarrollar una plataforma capaz de centralizar distintas actividades relacionadas con la educación y los servicios educativos.
-
-La plataforma busca facilitar procesos como:
-
-- Acceso y registro de usuarios.
-- Exploración de cursos y servicios.
-- Inscripción y contratación.
-- Gestión de perfiles.
-- Seguimiento de cursos.
-- Publicación y administración de servicios.
-- Gestión de solicitudes.
-- Valoraciones.
-- Procesos de compra y pago.
-- Interacción entre estudiantes, docentes/proveedores y administradores.
-
-La finalidad es construir una solución que permita integrar estas funcionalidades dentro de una interfaz coherente, clara y fácil de utilizar.
+La propuesta centraliza en un único entorno digital a diferentes actores, recursos y servicios educativos, proporcionando una experiencia organizada, accesible, segura y moderna tanto para estudiantes como para docentes/proveedores y administradores.
 
 ---
 
-## 👥 Roles de la plataforma
+## Objetivo del proyecto
 
-Classia contempla diferentes perfiles de usuario, cada uno con funcionalidades específicas.
+El objetivo principal de Classia es construir un Entorno Virtual de Aprendizaje (EVA) y catálogo de servicios educativos capaz de gestionar de forma integral el ciclo formativo y comercial:
 
-### Estudiantes
-
-Los estudiantes pueden explorar contenidos educativos, acceder a cursos, consultar actividades y gestionar recursos relacionados con su aprendizaje.
-
-### Docentes / Proveedores
-
-Este perfil puede crear, publicar y gestionar tanto **cursos** como **servicios educativos** dentro de la plataforma.
-
-Entre sus posibilidades se encuentran:
-
-- Crear y administrar cursos.
-- Publicar y gestionar servicios.
-- Recibir solicitudes o contrataciones.
-- Gestionar el contenido asociado a sus publicaciones.
-- Interactuar con los usuarios que acceden a sus cursos o servicios.
-- Consultar y administrar su actividad dentro de la plataforma.
-
-### Administradores
-
-Los administradores se encargan de gestionar aspectos generales del sistema y supervisar su correcto funcionamiento.
+- Acceso y registro seguro de usuarios con asignación de roles.
+- Exploración de cursos y servicios con filtros y categorías.
+- Inscripción en cursos y contratación de servicios especializados.
+- Gestión de perfiles y paneles dedicados por rol (Estudiante, Proveedor/Docente, Administrador).
+- Creación, edición, publicación y administración de publicaciones (cursos y servicios) con persistencia en base de datos.
+- Gestión de solicitudes personalizadas.
+- Flujo de carrito, pasarela de pago simulada y confirmación.
+- Sistema de valoraciones y reseñas.
+- Manejo seguro de sesiones y control de acceso (RBAC).
 
 ---
 
-## 🧩 Funcionalidades contempladas
+## Roles de la plataforma
 
-El proyecto incluye interfaces y flujos relacionados con:
+Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 
-- Página principal.
-- Inicio de sesión.
-- Registro de usuarios.
-- Recuperación y cambio de contraseña.
-- Configuración inicial del usuario.
-- Gestión de perfiles.
-- Catálogo de cursos y servicios.
-- Visualización detallada de servicios.
-- Visualización de cursos.
-- Solicitud de servicios personalizados.
-- Carrito de compras.
-- Pasarela de pago.
-- Confirmación de compra.
-- Sistema de valoraciones.
-- Panel de docente/proveedor.
+### Estudiantes / Clientes (Rol 3)
+- Explorar el catálogo de cursos y servicios con filtros avanzados.
+- Consultar detalles de publicaciones, programas formativos y paquetes.
+- Solicitar servicios personalizados (e.g. impresión 3D, tutorías, robótica).
+- Gestionar su carrito de compras y simular el proceso de pago.
+- Visualizar sus cursos inscritos, historial de contrataciones y certificados en su perfil.
+- Emitir valoraciones y comentarios sobre cursos y servicios completados.
 
-Estas funcionalidades forman parte de una implementación progresiva del sistema.
+### Docentes / Proveedores (Rol 2)
+- Acceder a su **Panel de Proveedor** con estadísticas y métricas de actividad.
+- Crear nuevas publicaciones especificando título, descripción, precio, categoría y modalidad (curso o servicio).
+- Editar publicaciones existentes y gestionar su estado (`publicado`, `borrador`, `pausado`, `archivado`).
+- Consultar y gestionar en tiempo real el listado dinámico de sus cursos y servicios activos.
+- Recibir y gestionar solicitudes de servicios personalizadas.
+- Administrar el contenido de sus cursos y calificaciones.
 
----
-
-## 🛍️ Cursos y servicios educativos
-
-Classia no está pensada únicamente como una plataforma de cursos.
-
-También contempla la posibilidad de ofrecer y contratar diferentes **servicios vinculados al ámbito educativo**, permitiendo la interacción entre usuarios y docentes/proveedores.
-
-Algunos ejemplos de servicios que puede soportar la plataforma son:
-
-- Formación y capacitación.
-- Mentorías.
-- Proyectos educativos.
-- Diseño de recursos didácticos.
-- Diseño e impresión 3D.
-- Robótica y automatización.
-- Otros servicios especializados.
+### Administradores (Rol 1)
+- Acceso al **Panel de Administrador** para la supervisión global de la plataforma.
+- Gestión y moderación de usuarios, roles y permisos.
+- Moderación de publicaciones, cursos y servicios ofertados.
+- Administración de categorías institucionales y métricas globales.
 
 ---
 
-## 🖥️ Estructura general del proyecto
+## Estructura del proyecto
 
-La estructura del proyecto se organiza principalmente de la siguiente manera:
+El proyecto cuenta con una arquitectura modular en **PHP**, separando la capa de presentación, la lógica de negocio, la configuración y el acceso a datos:
 
 ```text
-Proyecto/
-│
-├── index.html
-├── html/
-│   ├── login.html
-│   ├── registro.html
-│   ├── usuario.html
-│   ├── catalogo.html
-│   ├── curso.html
-│   ├── servicioDetalle.html
-│   ├── carrito.html
-│   ├── pasarela_pago.html
-│   ├── confirmacion.html
-│   ├── valoracion.html
-│   ├── panelProveedor.html
-│   └── ...
+Proyecto_TIS_Classia/
+├── index.php                      # Punto de entrada principal de la plataforma
+├── config/
+│   └── database.php               # Conexión centralizada PDO a MariaDB / MySQL
+├── includes/
+│   ├── header.php                 # Encabezado modular con navegación y estado de sesión
+│   └── footer.php                 # Pie de página institucional modular
+├── views/                         # Vistas y páginas de la aplicación (.php)
+│   ├── login.php                  # Inicio de sesión con feedback y redirecciones
+│   ├── registro.php               # Formulario de registro con validaciones
+│   ├── panel-proveedor.php        # Panel del proveedor con listado dinámico de publicaciones
+│   ├── panel-administrador.php    # Panel de gestión y métricas administrativas
+│   ├── crear-publicacion.php      # Interfaz de creación de cursos y servicios
+│   ├── editar-publicacion.php     # Interfaz de edición y gestión de estado
+│   ├── catalogo.php               # Catálogo interactivo de cursos y servicios
+│   ├── curso.php                  # Vista detallada de contenido de un curso
+│   ├── servicio-detalle.php       # Vista de detalle y paquetes de servicios
+│   ├── form-solicitar-servicio.php# Formulario de solicitud personalizada
+│   ├── solicitud-impresion-3d.php # Formulario especializado de impresión 3D
+│   ├── carrito.php                # Carrito de compras
+│   ├── pasarela-pago.php          # Simulación de pasarela de pago segura
+│   ├── confirmacion.php           # Confirmación de contratación
+│   ├── usuario.php                # Perfil del usuario estudiante
+│   ├── valoracion.php             # Formulario de emisión de reseñas
+│   ├── cambiar-contrasena.php     # Cambio de credenciales de usuario
+│   ├── restablecer-contrasena.php # Recuperación de contraseña
+│   ├── primeros-pasos.php         # Guía de onboarding para nuevos usuarios
+│   └── politica-privacidad.php    # Política de privacidad (Ley 18.331 / URCDP)
+├── php/                           # Lógica de backend organizada por módulo
+│   ├── auth/
+│   │   ├── session.php            # Helper de sesiones seguras y control de acceso
+│   │   └── logout.php             # Cierre seguro de sesión y destrucción de cookies
+│   ├── usuarios/
+│   │   └── registro.php           # Procesamiento de registro, validaciones y hash seguro
+│   ├── publicaciones/
+│   │   ├── crear_publicacion.php  # Procesamiento de alta de cursos y servicios (PDO)
+│   │   ├── editar_publicacion.php # Procesamiento de edición y actualización de estado
+│   │   └── obtener_publicaciones.php # Helpers para consulta de publicaciones por usuario
+│   ├── contrataciones/            # Lógica en desarrollo de contrataciones
+│   ├── pagos/                     # Lógica en desarrollo de pagos
+│   ├── solicitudes/               # Lógica en desarrollo de solicitudes
+│   └── valoraciones/              # Lógica en desarrollo de valoraciones
+├── sql/
+│   └── schema.sql                 # Esquema relacional DDL (MariaDB / MySQL)
+├── docs/                          # Documentación técnica, modelos y diagramas UML
+│   ├── estructura_php.md          # Guía de arquitectura backend y sesiones
+│   ├── estilo_y_nomenclatura.md   # Convenciones oficiales de nombrado y estructura
+│   ├── mer_classia.md             # Modelo Entidad-Relación formal
+│   ├── modelo_relacional_classia.md # Modelo relacional normalizado
+│   ├── diagrama_de_clases_classia.md # Diagrama de clases de dominio UML
+│   ├── casos_de_uso_classia.md    # Especificación y diagrama de casos de uso
+│   └── diagramas_de_secuencia_classia.md # Diagramas de secuencia de flujos principales
 ├── css/
-│   └── style.css
+│   ├── style.css                  # Hoja de estilos principal (Design Tokens, variables, responsive)
+│   └── animation.css              # Microinteracciones, keyframes y accesibilidad
 ├── js/
-│   └── script.js
-├── assets/
-├── scripts/
-└── package.json
+│   └── script.js                  # Interacciones dinámicas en el cliente
+├── assets/                        # Recursos multimedia, imágenes e íconos
+│   └── images/                    # Imágenes de marca, logotipos e íconos normalizados
+├── scripts/                       # Scripts auxiliares y validaciones de seguridad
+├── .github/                       # CI/CD Workflows, templates de PR/Issue y linters
+├── .env.example                   # Ejemplo de variables de entorno de base de datos
+└── package.json                   # Herramientas de calidad de código y linters
 ```
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## Tecnologías utilizadas
 
-El proyecto utiliza principalmente:
+### Backend y Base de Datos
+- **PHP 8.x**: Lenguaje de servidor para controladores, helpers de sesión y endpoints modulares.
+- **PDO (PHP Data Objects)**: Capa de abstracción segura para persistencia con soporte de sentencias preparadas contra SQL Injection.
+- **MariaDB / MySQL**: Motor de base de datos relacional estructurado en tercera forma normal (3FN) con integridad referencial completa.
 
-- **HTML5** para la estructura de las páginas.
-- **CSS3** para estilos y diseño visual.
-- **JavaScript** para interacción y comportamiento del lado del cliente.
-- **Node.js** y **npm** como soporte para herramientas de desarrollo y validación.
-- **Git** y **GitHub** para control de versiones y gestión del código fuente.
+### Frontend y Diseño
+- **HTML5 semántico**: Estructura accesible con atributos ARIA y optimización SEO.
+- **CSS3 / Vanilla CSS**: Sistema de diseño basado en 55+ Design Tokens, variables CSS, Flexbox/CSS Grid y soporte `@media (prefers-reduced-motion)` para accesibilidad WCAG AA.
+- **JavaScript (Vanilla)**: Interacciones del cliente, validaciones dinámicas y componentes de interfaz.
+
+### Calidad, CI/CD y Seguridad
+- **Node.js & npm**: Entorno para herramientas de análisis estático (Stylelint, HTMLHint, ESLint, HTML Validate, Lighthouse CI).
+- **GitHub Actions**: Integración continua con validación de seguridad (Gitleaks, Semgrep SAST, cabeceras CSP, verificación de referencias SRS).
+- **Git & GitHub**: Flujo de trabajo basado en ramas de desarrollo (`Dev-*`, `Testing`, `main`) y Conventional Commits.
 
 ---
 
-## ✅ Calidad y validación del código
+## Instalación y ejecución local
 
-El proyecto contempla el uso de herramientas de análisis y validación para mantener una estructura de código consistente.
+### 1. Requisitos previos
+- **PHP 8.0 o superior** con extensión `pdo_mysql` habilitada.
+- **MariaDB 10.4+** o **MySQL 8.0+** (vía XAMPP, Laragon, Docker o servicio local).
+- **Node.js 18+** y **npm** (opcional, para herramientas de análisis de código).
 
-Entre ellas pueden encontrarse:
+### 2. Configuración de la base de datos
+1. Iniciar el servicio de base de datos (MariaDB/MySQL).
+2. Crear la base de datos e importar el esquema DDL:
+   ```bash
+   mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS classia_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   mysql -u root -p classia_db < sql/schema.sql
+   ```
+3. Configurar las credenciales en caso de no usar los valores por defecto (`localhost:3306`, usuario `root`, contraseña vacía, base `classia_db`). Se pueden definir las variables de entorno `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` y `DB_PASSWORD`.
 
-- HTMLHint.
-- HTML Validate.
-- Stylelint.
-- ESLint.
-- Herramientas de análisis relacionadas con buenas prácticas y seguridad.
+### 3. Iniciar el servidor web local
 
-Para instalar las dependencias del proyecto:
+**Opción A — Servidor integrado de PHP (Recomendado para desarrollo rápido):**
+```bash
+php -S localhost:8000
+```
+Abrir en el navegador: [http://localhost:8000](http://localhost:8000)
+
+**Opción B — XAMPP / Laragon:**
+Ubicar el proyecto dentro de la carpeta `htdocs` (o `www`) y acceder a través de: `http://localhost/Proyecto_TIS_Classia/`
+
+---
+
+## Calidad y validación del código
+
+Para ejecutar las herramientas de análisis estático:
 
 ```bash
 npm install
-```
-
-Para ejecutar las validaciones disponibles:
-
-```bash
 npm run lint
 ```
 
----
-
-## 🚀 Ejecución local
-
-El proyecto puede ejecutarse mediante un servidor web local.
-
-Por ejemplo:
-
+Para verificar reglas de estilo CSS de forma individual:
 ```bash
-npx http-server
+npm run lint:css
 ```
 
-Luego se debe acceder desde el navegador a la dirección indicada por el servidor.
+---
 
-También puede utilizarse cualquier otro servidor local compatible con HTML, CSS y JavaScript.
+## 🔐 Seguridad y cumplimiento normativo
+
+El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SECURITY.md):
+
+- **Almacenamiento seguro de credenciales (`RNF-01`, `RNF-02`):** Las contraseñas se hashean utilizando `password_hash()` con algoritmo **bcrypt** nativo.
+- **Prevención de inyecciones SQL (`RNF-03`):** Todas las consultas con parámetros utilizan sentencias preparadas PDO (`prepare()` + `execute()`).
+- **Gestión de sesiones (`RNF-14`):** Identificadores de sesión regenerados tras autenticación (`session_regenerate_id(true)`), cookies `HttpOnly` y borrado total en logout.
+- **Protección de datos (`RNF-10`, `RNF-11`):** Cumplimiento con la **Ley N.º 18.331** de Protección de Datos Personales de Uruguay y derechos ARCO.
+- **SAST y Secret Detection:** Escaneo continuo en CI/CD con Semgrep y Gitleaks.
 
 ---
 
-## 🎨 Principios de diseño
+## 📌 Estado actual del proyecto
 
-La interfaz de Classia busca mantener:
+Actualmente el proyecto cuenta con:
 
-- Navegación clara.
-- Consistencia visual.
-- Buena jerarquía de información.
-- Componentes reutilizables.
-- Diseño adaptable a diferentes dispositivos.
-- Accesibilidad.
-- Retroalimentación visual.
-- Organización clara de cursos y servicios.
-- Experiencia de usuario sencilla e intuitiva.
+- [x] **Arquitectura PHP modular** completada con vistas `.php`, `includes/header.php` y `includes/footer.php`.
+- [x] **Base de datos relacional** normalizada e implementada en `sql/schema.sql`.
+- [x] **Manejo seguro de sesiones** en `php/auth/session.php` y cierre de sesión en `php/auth/logout.php`.
+- [x] **Registro de usuarios** funcional en `php/usuarios/registro.php` con validación de unicidad de email y hash de contraseñas.
+- [x] **CRUD de publicaciones** (cursos y servicios) operativo en `php/publicaciones/` con creación, edición, cambio de estados y visualización dinámica en `panelProveedor.php`.
+- [x] **Modelado técnico UML completo** en `docs/` (Casos de uso, clases, secuencia, MER y modelo relacional).
+- [x] **Pipelines de CI/CD automatizados** para linting, seguridad y verificación de trazabilidad.
 
 ---
 
-## 🔐 Seguridad
+## 🔮 Próximos pasos
 
-El proyecto contempla progresivamente buenas prácticas relacionadas con:
-
-- Autenticación.
-- Gestión de contraseñas.
-- Validación de datos.
-- Protección de información.
-- Control de acceso según roles.
-- Gestión segura de sesiones.
-- Revisión de dependencias.
-- Aplicación de buenas prácticas de desarrollo.
-
-La implementación completa de estos mecanismos dependerá de la integración con el backend y la base de datos.
+- Implementación del inicio de sesión con autenticación contra base de datos (`php/auth/login.php`).
+- Módulo de contrataciones y persistencia de compras (`php/contrataciones/`).
+- Módulo de gestión y respuesta a solicitudes de servicios personalizados (`php/solicitudes/`).
+- Sistema dinámico de valoraciones y cálculo de promedios (`php/valoraciones/`).
+- Panel de administración con métricas y moderación activa (`php/admin/`).
 
 ---
 
-## 📌 Estado del proyecto
+## 📚 Documentación técnica adicional
 
-Classia se encuentra actualmente **en desarrollo**.
+En el directorio [`docs/`](docs/) se encuentran disponibles los documentos de especificación técnica:
+- [Arquitectura PHP](docs/estructura_php.md)
+- [Diagrama de Casos de Uso](docs/casos_de_uso_classia.md)
+- [Diagrama de Clases de Dominio](docs/diagrama_de_clases_classia.md)
+- [Diagramas de Secuencia UML](docs/diagramas_de_secuencia_classia.md)
+- [Modelo Entidad-Relación (MER)](docs/mer_classia.md)
+- [Modelo Relacional de Base de Datos](docs/modelo_relacional_classia.md)
+- [Guía de Contribución y Sprints](CONTRIBUTING.md)
+- [Política de Seguridad](SECURITY.md)
 
-La versión actual está enfocada principalmente en la construcción de:
-
-- Interfaces.
-- Navegación.
-- Flujos de usuario.
-- Componentes visuales.
-- Diseño responsive.
-- Organización de módulos.
-- Validación del frontend.
-
-Algunas funcionalidades pueden utilizar datos simulados mientras se desarrollan las siguientes etapas.
-
----
-
-## 🔮 Desarrollo futuro
-
-Entre las futuras incorporaciones se contempla:
-
-- Backend.
-- Base de datos.
-- Autenticación real.
-- Sistema completo de roles y permisos.
-- Persistencia de usuarios.
-- Persistencia de cursos y servicios.
-- Gestión de contrataciones.
-- Historial de operaciones.
-- Sistema de notificaciones.
-- Mejoras de accesibilidad.
-- Mejoras de experiencia de usuario.
-- Integración completa entre usuarios y docentes/proveedores.
-
----
-
-## 📚 Contexto académico
-
-Classia surge como un proyecto integrador cuyo propósito es aplicar conocimientos de diferentes áreas del desarrollo de software dentro de una solución común.
-
-El proyecto permite trabajar de manera progresiva conceptos relacionados con:
-
-- Análisis de requerimientos.
-- Ingeniería de software.
-- Diseño de interfaces.
-- Desarrollo frontend.
-- Programación.
-- Bases de datos.
-- Seguridad informática.
-- Control de versiones.
-- Documentación.
-- Pruebas de software.
-- Accesibilidad.
-- Experiencia de usuario.
-
----
-
-## 🌱 Visión del proyecto
-
-La visión de Classia es evolucionar hacia un **ecosistema digital educativo** en el que aprendizaje, enseñanza y prestación de servicios puedan gestionarse desde una misma plataforma.
-
-Más que funcionar únicamente como un catálogo de cursos, Classia busca explorar un modelo donde distintos actores del ámbito educativo puedan conectarse, compartir recursos, crear cursos, ofrecer servicios y gestionar sus actividades desde un entorno común.
-
----
-
-## ⚠️ Aviso
-
-Este proyecto se encuentra en desarrollo académico.
-
-Determinadas funcionalidades, usuarios, cursos, servicios, valoraciones, precios y operaciones presentes en la plataforma pueden utilizar información ficticia o simulada exclusivamente con fines de desarrollo, prueba y demostración.
-
----
-
-## Estructura PHP
-
-La estructura inicial del backend PHP queda separada del frontend actual:
-
-- `config/`: configuracion global del backend, incluida la futura conexion a la base de datos.
-- `includes/`: codigo PHP reutilizable.
-- `php/`: logica PHP organizada por modulo.
-- `sql/`: esquema, scripts y recursos relacionados con la base de datos.
-- `docs/`: documentacion tecnica interna.

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Configuración inicial del perfil y las preferencias del usuario en Classia." />
   <title>Primeros pasos — Classia</title>
-  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+  <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
   <link rel="stylesheet" href="../css/animation.css" />
   <link rel="stylesheet" href="../css/style.css" />
 </head>
@@ -15,7 +15,7 @@
   <header class="site-header">
     <div class="site-header__inner">
       <a class="site-brand" href="../index.php">
-        <img src="../assets/logoC.png" alt="Logo Classia" />
+        <img src="../assets/images/logo-classia.png" alt="Logo Classia" />
       </a>
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="../index.php">Inicio</a>
