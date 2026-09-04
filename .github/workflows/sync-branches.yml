@@ -64,7 +64,19 @@ jobs:
       - name: "Fetch de todas las ramas"
         run: git fetch --all
 
+      - name: "Verificar si main tiene cambios respecto a testing"
+        id: check-main-diff
+        run: |
+          FILE_DIFF=$(git diff --name-only origin/testing origin/main 2>/dev/null | wc -l)
+          if [ "$FILE_DIFF" -eq 0 ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "main y testing no tienen diferencias de archivos. Omitiendo sync."
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: "Verificar conflictos main → testing"
+        if: steps.check-main-diff.outputs.has_changes == 'true'
         id: main-conflict
         run: |
           git checkout -b temp-main-sync origin/testing
@@ -73,13 +85,12 @@ jobs:
             echo "Merge limpio: main puede aplicarse sobre testing."
           else
             echo "conflict=true" >> "$GITHUB_OUTPUT"
-            echo "Hay conflictos entre main y testing."
           fi
           git merge --abort 2>/dev/null || true
           git checkout -
 
       - name: "Aplicar merge main → testing (sin conflictos)"
-        if: steps.main-conflict.outputs.conflict == 'false'
+        if: steps.check-main-diff.outputs.has_changes == 'true' && steps.main-conflict.outputs.conflict == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -89,7 +100,7 @@ jobs:
           echo "testing actualizado con los cambios de main."
 
       - name: "Crear PR de sync main → testing (con conflictos)"
-        if: steps.main-conflict.outputs.conflict == 'true'
+        if: steps.check-main-diff.outputs.has_changes == 'true' && steps.main-conflict.outputs.conflict == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -216,14 +227,15 @@ jobs:
             DEV_NAME="${BRANCH#Dev-}"
 
             # Verificar si testing tiene algo nuevo respecto a la rama Dev-*
-            AHEAD=$(git rev-list "origin/$BRANCH..origin/testing" --count 2>/dev/null || echo "0")
+            AHEAD=$(git rev-list --no-merges "origin/$BRANCH..origin/testing" --count 2>/dev/null || echo "0")
+            FILE_DIFF=$(git diff --name-only "origin/$BRANCH" "origin/testing" 2>/dev/null | wc -l)
 
-            if [ "$AHEAD" -eq 0 ]; then
-              echo "$BRANCH ya está al día con testing. Saltando."
+            if [ "$AHEAD" -eq 0 ] || [ "$FILE_DIFF" -eq 0 ]; then
+              echo "$BRANCH ya está al día con testing (0 archivos modificados o solo merge commits). Saltando."
               continue
             fi
 
-            echo "testing está $AHEAD commit(s) adelante de $BRANCH."
+            echo "testing está $AHEAD commit(s) propios adelante de $BRANCH ($FILE_DIFF archivos modificados)."
 
             # Verificar conflictos
             git checkout -b "temp-sync-$BRANCH" "origin/$BRANCH" 2>/dev/null || \
