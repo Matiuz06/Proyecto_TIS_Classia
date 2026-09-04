@@ -1,7 +1,26 @@
 <?php
-$title      = 'Catálogo de cursos y servicios';
+require_once __DIR__ . '/../config/database.php';
+$sql = "SELECT id_publicacion, titulo, descripcion, precio, tipo 
+        FROM publicaciones 
+        WHERE estado = 'Activo'";
+
+$stmt = $pdo->query($sql);
+$publicaciones = $stmt->fetchAll();
+
+$cursos = [];
+$servicios = [];
+
+foreach ($publicaciones as $publicacion) {
+    if ($publicacion['tipo'] === 'Curso') {
+        $cursos[] = $publicacion;
+    } elseif ($publicacion['tipo'] === 'Servicio') {
+        $servicios[] = $publicacion;
+    }
+}
+
+$title = 'Catálogo de cursos y servicios';
 $description = 'Catálogo de cursos y servicios educativos disponibles en Classia.';
-$cssPrefix  = '..';
+$cssPrefix = '..';
 $activePage = 'catalogo';
 include '../includes/header.php';
 ?>
@@ -96,76 +115,117 @@ include '../includes/header.php';
           </header>
 
           <div class="catalog-grid">
-            <article class="catalog-card" aria-labelledby="curso-demo">
-              <div class="placeholder-visual" aria-hidden="true">Curso img</div>
-              <div>
-                <h3 id="curso-demo">Robótica para principiantes</h3>
-                <p>
-                  Introducción a conceptos básicos de robótica educativa,
-                  sensores y pensamiento computacional.
-                </p>
-                <dl>
-                  <div>
-                    <dt>Modalidad</dt>
-                    <dd>Virtual</dd>
-                  </div>
-                  <div>
-                    <dt>Duración</dt>
-                    <dd>6 horas</dd>
-                  </div>
-                  <div>
-                    <dt>Nivel</dt>
-                    <dd>Inicial</dd>
-                  </div>
-                </dl>
-                <p class="catalog-actions">
-                  <a class="btn" href="curso.php">Ver curso</a>
-                </p>
-              </div>
-            </article>
-            <h2 id="titulo-servicios">Servicios</h2>
-            <p>Distintos servicios según tu necesidad.</p>
+            <?php foreach ($cursos as $curso): ?>
 
-            <article
-              class="catalog-card"
-              aria-labelledby="servicio-impresion-3d">
+            <article class="catalog-card">
+
               <div class="placeholder-visual" aria-hidden="true">
-                Servicio img
+                Curso img
               </div>
 
               <div>
-                <h3 id="servicio-impresion-3d">Diseño e impresión 3D</h3>
+
+                <h3>
+                  <?php echo htmlspecialchars($curso['titulo']); ?>
+                </h3>
 
                 <p>
-                  Diseñamos y materializamos tus ideas mediante modelado e
-                  impresión 3D, adaptándonos a las características y necesidades
-                  de cada proyecto.
+                  <?php echo htmlspecialchars($curso['descripcion']); ?>
                 </p>
 
                 <dl>
+
                   <div>
-                    <dt>Modalidad</dt>
-                    <dd>Virtual / Presencial</dd>
+
+                    <dt>Precio</dt>
+
+                    <dd>
+                      $<?php echo number_format($curso['precio'], 2, ',', '.'); ?>
+                    </dd>
+
                   </div>
 
                   <div>
+
                     <dt>Tipo</dt>
-                    <dd>Servicio personalizado</dd>
+
+                    <dd>
+                      <?php echo htmlspecialchars($curso['tipo']); ?>
+                    </dd>
+
                   </div>
 
-                  <div>
-                    <dt>Entrega</dt>
-                    <dd>A coordinar</dd>
-                  </div>
                 </dl>
 
                 <p class="catalog-actions">
-                  <a class="btn" href="solicitud-impresion-3d.php">
-                    Solicitar servicio
+
+                  <a class="btn" href="curso.php">
+                    Ver curso
                   </a>
+
                 </p>
+
               </div>
+
             </article>
+
+            <?php endforeach; ?>
+
+            <?php foreach ($servicios as $servicio): ?>
+
+              <article class="catalog-card">
+
+                <div class="placeholder-visual" aria-hidden="true">
+                  Servicio img
+                </div>
+
+                <div>
+
+                  <h3>
+                    <?php echo htmlspecialchars($servicio['titulo']); ?>
+                  </h3>
+
+                  <p>
+                    <?php echo htmlspecialchars($servicio['descripcion']); ?>
+                  </p>
+
+                  <dl>
+
+                    <div>
+
+                      <dt>Precio</dt>
+
+                      <dd>
+                        $<?php echo number_format($servicio['precio'], 2, ',', '.'); ?>
+                      </dd>
+
+                    </div>
+
+                    <div>
+
+                      <dt>Tipo</dt>
+
+                      <dd>
+                        <?php echo htmlspecialchars($servicio['tipo']); ?>
+                      </dd>
+
+                    </div>
+
+                  </dl>
+
+                  <p class="catalog-actions">
+
+                    <a class="btn" href="servicio-detalle.php">
+                      Solicitar servicio
+                    </a>
+
+                  </p>
+
+                </div>
+
+              </article>
+
+            <?php endforeach; ?>
 
             <section class="empty-state" aria-labelledby="sin-mas-cursos">
               <h3 id="sin-mas-cursos">Aún no hay más cursos publicados</h3>
