@@ -1,3 +1,8 @@
+<?php
+require_once '../php/auth/roles.php';
+
+requerir_rol(ROL_ADMIN, 'usuario.php');
+?>
 <!doctype html>
 <html lang="es">
   <head>
@@ -23,8 +28,10 @@
         <nav class="site-nav" aria-label="Navegaci&oacute;n principal">
           <a href="../index.php" aria-current="page">Inicio</a>
           <a href="catalogo.php">Cat&aacute;logo</a>
+          <a href="solicitudes-docente.php">Solicitudes docentes</a>
           <a href="carrito.php">Carrito</a>
-          <a href="login.php">Mi cuenta</a>
+          <a href="usuario.php">Mi cuenta</a>
+          <a href="../php/auth/logout.php">Cerrar sesi&oacute;n</a>
         </nav>
       </div>
     </header>
