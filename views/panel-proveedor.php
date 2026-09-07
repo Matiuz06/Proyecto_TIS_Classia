@@ -1,4 +1,12 @@
-<?php require_once '../php/publicaciones/obtener_publicaciones.php'; ?>
+<?php
+require_once '../php/auth/roles.php';
+
+requerir_rol(ROL_DOCENTE, 'usuario.php');
+
+$usuario = usuario_actual();
+
+require_once '../php/publicaciones/obtener_publicaciones.php';
+?>
 <!doctype html>
 <html lang="es">
   <head>
@@ -26,7 +34,8 @@
           <a href="../index.php">Inicio</a>
           <a href="catalogo.php">Catálogo</a>
           <a href="carrito.php">Carrito</a>
-          <a href="login.php" aria-current="page">Mi cuenta</a>
+          <a href="usuario.php">Mi cuenta</a>
+          <a href="../php/auth/logout.php">Cerrar sesión</a>
         </nav>
       </div>
     </header>
@@ -53,7 +62,7 @@
 
         <p>
           Sesión iniciada como
-          <strong>Ana Fernández</strong>
+          <strong><?php echo htmlspecialchars($usuario['nombre']); ?></strong>
         </p>
 
         <nav aria-label="Acciones rápidas del proveedor">
@@ -500,7 +509,7 @@
           <p>Información visible para los posibles clientes y estudiantes.</p>
         </header>
 
-        <h3>Ana Fernández</h3>
+        <h3><?php echo htmlspecialchars($usuario['nombre']); ?></h3>
 
         <p>
           Docente de Informática y desarrolladora especializada en tecnología

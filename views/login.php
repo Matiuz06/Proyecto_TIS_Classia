@@ -60,7 +60,7 @@ include '../includes/header.php';
 
         <?php endif; ?>
 
-        <form action="../php/auth/procesar_login.php" method="POST">
+        <form action="../php/auth/procesarLogin.php" method="POST">
 
             <p>
 

@@ -1,4 +1,18 @@
 <?php
+require_once '../php/auth/session.php';
+
+requerir_autenticacion('login.php');
+
+$usuario = usuario_actual();
+$roles = [
+    1 => 'Estudiante / Cliente',
+    2 => 'Docente / Proveedor',
+    3 => 'Administrador',
+];
+$rol_actual = $roles[(int) $usuario['id_rol']] ?? 'Usuario';
+$mensaje_acceso = $_SESSION['mensaje_acceso'] ?? '';
+unset($_SESSION['mensaje_acceso']);
+
 $title     = 'Perfil de usuario';
 $cssPrefix = '..';
 $activePage = 'cuenta';
@@ -13,10 +27,16 @@ include '../includes/header.php';
   </div>
 
   <main class="motion-entry">
+    <?php if ($mensaje_acceso !== ''): ?>
+      <div class="alert alert-danger">
+        <?php echo htmlspecialchars($mensaje_acceso); ?>
+      </div>
+    <?php endif; ?>
+
     <section class="profile-hero" aria-labelledby="perfil-usuario">
       <p>Bienvenido/a,</p>
-      <h1 id="perfil-usuario">Carlos "Chacho" Ramos</h1>
-      <p>Perfil de Usuario (Estudiante, Cliente)</p>
+      <h1 id="perfil-usuario"><?php echo htmlspecialchars($usuario['nombre']); ?></h1>
+      <p>Perfil de Usuario (<?php echo htmlspecialchars($rol_actual); ?>)</p>
       <p>
         <strong>7</strong> Cursos completados | <strong>2</strong> Servicios
         contratados
@@ -36,12 +56,13 @@ include '../includes/header.php';
       <h2 id="informacion-cuenta">Información básica de la cuenta</h2>
       <p>
         <label for="nombre-cuenta">Nombre:*</label><br />
-        <input type="text" id="nombre-cuenta" value="Carlos Alberto" readonly />
+        <input type="text" id="nombre-cuenta" value="<?php echo htmlspecialchars($usuario['nombre']); ?>" readonly />
       </p>
       <p>
-        <label for="apellido-cuenta">Apellido:*</label><br />
-        <input type="text" id="apellido-cuenta" value="Ramos Cruz" readonly />
+        <label for="email-cuenta">Email:*</label><br />
+        <input type="email" id="email-cuenta" value="<?php echo htmlspecialchars($usuario['email']); ?>" readonly />
       </p>
+      <p>Rol actual: <strong><?php echo htmlspecialchars($rol_actual); ?></strong></p>
       <p>
         <label for="idioma-cuenta">Idioma predeterminado:</label><br />
         <select id="idioma-cuenta">
