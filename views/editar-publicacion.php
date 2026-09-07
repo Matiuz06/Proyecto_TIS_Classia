@@ -1,4 +1,8 @@
 <?php
+require_once '../php/auth/roles.php';
+
+requerir_rol(ROL_DOCENTE, 'usuario.php');
+
 require_once '../php/publicaciones/editar_publicacion.php';
 require_once '../php/publicaciones/obtener_publicaciones.php';
 
