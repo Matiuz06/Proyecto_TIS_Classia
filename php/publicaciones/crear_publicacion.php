@@ -1,8 +1,8 @@
 <?php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../auth/roles.php';
+
+requerir_rol(ROL_DOCENTE, '../../views/usuario.php');
 
 require_once __DIR__ . '/../../config/database.php';
 
@@ -12,7 +12,8 @@ if (empty($_SESSION['csrf_token'])) {
 
 $errores = [];
 
-$id_usuario_autenticado = $_SESSION['id_usuario'] ?? 2;
+$usuario = usuario_actual();
+$id_usuario_autenticado = (int) ($usuario['id_usuario'] ?? 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = trim($_POST['titulo'] ?? '');

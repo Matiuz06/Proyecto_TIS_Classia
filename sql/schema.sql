@@ -70,6 +70,20 @@ CREATE TABLE IF NOT EXISTS solicitudes (
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS solicitudes_docente (
+    id_solicitud_docente INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL DEFAULT 'Pendiente',
+    motivo TEXT NULL,
+    fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_respuesta DATETIME NULL,
+    CONSTRAINT fk_solicitudes_docente_usuarios
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_solicitudes_docente_estado (estado),
+    INDEX idx_solicitudes_docente_usuario_estado (id_usuario, estado)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS contrataciones (
     id_contratacion INT AUTO_INCREMENT PRIMARY KEY,
     fecha_contratacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
