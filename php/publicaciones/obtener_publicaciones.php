@@ -1,9 +1,36 @@
 <?php
 
 require_once __DIR__ . '/../auth/session.php';
-
 require_once __DIR__ . '/../../config/database.php';
 
+// Obtiene las publicaciones activas organizadas por cursos y servicios para el catálogo
+function obtener_publicaciones_catalogo(PDO $pdo): array
+{
+    $sql = "SELECT id_publicacion, titulo, descripcion, precio, tipo 
+            FROM publicaciones 
+            WHERE estado = 'Activo'";
+
+    $stmt = $pdo->query($sql);
+    $publicaciones = $stmt->fetchAll();
+
+    $cursos = [];
+    $servicios = [];
+
+    foreach ($publicaciones as $publicacion) {
+        if ($publicacion['tipo'] === 'Curso') {
+            $cursos[] = $publicacion;
+        } elseif ($publicacion['tipo'] === 'Servicio') {
+            $servicios[] = $publicacion;
+        }
+    }
+
+    return [
+        'cursos'    => $cursos,
+        'servicios' => $servicios,
+    ];
+}
+
+// Variables predeterminadas para vistas de administración y proveedor que incluyen este archivo
 $usuario = usuario_actual();
 $id_usuario_autenticado = (int) ($usuario['id_usuario'] ?? 0);
 

@@ -139,7 +139,9 @@ CREATE TABLE IF NOT EXISTS valoraciones (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_valoraciones_contrataciones
         FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
-        ON DELETE SET NULL ON UPDATE CASCADE
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT uq_valoraciones_contratacion_usuario
+        UNIQUE (id_contratacion, id_usuario)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO roles (id_rol, nombre_rol, descripcion) VALUES

@@ -54,3 +54,15 @@ function ruta_login_por_contexto(): string
 
     return "../../views/login.php";
 }
+
+function nombre_rol(int $id_rol): string
+{
+    $nombres = [
+        ROL_ESTUDIANTE => 'Estudiante / Cliente',
+        ROL_DOCENTE    => 'Docente / Proveedor',
+        ROL_ADMIN      => 'Administrador',
+    ];
+
+    return $nombres[$id_rol] ?? 'Usuario';
+}
+
