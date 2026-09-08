@@ -1,50 +1,33 @@
 <?php
 require_once '../php/auth/roles.php';
 require_once '../config/database.php';
+require_once '../php/solicitudes/solicitar_docente.php';
 
 requerir_rol(ROL_ESTUDIANTE, 'usuario.php');
 
-$usuario = usuario_actual();
-$mensaje = '';
-$error = '';
+$usuario    = usuario_actual();
+$id_usuario = (int) $usuario['id_usuario'];
+$mensaje    = '';
+$error      = '';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$stmt = $pdo->prepare(
-    "SELECT COUNT(*) FROM solicitudes_docente WHERE id_usuario = :id_usuario AND estado = 'Pendiente'"
-);
-$stmt->execute(['id_usuario' => $usuario['id_usuario']]);
-$tiene_pendiente = (int) $stmt->fetchColumn() > 0;
+$tiene_pendiente = tiene_solicitud_docente_pendiente($pdo, $id_usuario);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token_recibido = $_POST['csrf_token'] ?? '';
-    $motivo = trim($_POST['motivo'] ?? '');
+    $motivo         = trim($_POST['motivo'] ?? '');
 
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
-        $error = 'La sesion del formulario expiro. Recarga la pagina e intenta nuevamente.';
-    } elseif ($tiene_pendiente) {
-        $error = 'Ya tenes una solicitud pendiente.';
-    } else {
-        try {
-            $stmt = $pdo->prepare(
-                "INSERT INTO solicitudes_docente (id_usuario, estado, motivo)
-                 VALUES (:id_usuario, 'Pendiente', :motivo)"
-            );
-            $stmt->execute([
-                'id_usuario' => $usuario['id_usuario'],
-                'motivo' => $motivo !== '' ? $motivo : null,
-            ]);
-
-            $mensaje = 'Solicitud enviada correctamente.';
-            $tiene_pendiente = true;
-        } catch (PDOException $e) {
-            error_log('Error al crear solicitud docente: ' . $e->getMessage());
-            $error = 'No se pudo enviar la solicitud. Intenta nuevamente.';
-        }
+    $resultado = crear_solicitud_docente($pdo, $id_usuario, $motivo, $token_recibido, $_SESSION['csrf_token'] ?? '');
+    $error   = $resultado['error'];
+    $mensaje = $resultado['mensaje'];
+    if ($resultado['exito']) {
+        $tiene_pendiente = true;
     }
 }
+
 
 $title = 'Solicitar ser docente';
 $description = 'Solicitud para convertirse en docente o proveedor en Classia.';
