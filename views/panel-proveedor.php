@@ -42,7 +42,7 @@ require_once '../php/publicaciones/obtener_publicaciones.php';
 
     <main class="provider-dashboard">
       <?php if (isset($_GET['mensaje'])): ?>
-        <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 12px 16px; margin: 15px 0; border-radius: 6px; font-weight: bold;">
+        <div class="alert alert-success">
           <?php 
             if ($_GET['mensaje'] === 'creada') echo "Publicación creada exitosamente.";
             elseif ($_GET['mensaje'] === 'actualizada') echo "Publicación actualizada correctamente.";

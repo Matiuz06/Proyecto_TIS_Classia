@@ -26,6 +26,11 @@ foreach ($publicaciones as $publicacion) {
         $servicios[] = $publicacion;
     }
 }
+require_once __DIR__ . '/../php/publicaciones/obtener_publicaciones.php';
+
+$catalogo = obtener_publicaciones_catalogo($pdo);
+$cursos = $catalogo['cursos'];
+$servicios = $catalogo['servicios'];
 
 $title = 'Catalogo de cursos y servicios';
 $description = 'Catalogo de cursos y servicios educativos disponibles en Classia.';
