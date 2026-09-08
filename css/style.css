@@ -590,6 +590,7 @@ dd {
   background: var(--color-brand-primary-hover);
 }
 
+.sidebar h2,
 .sidebar h3,
 .sidebar h4,
 .sidebar a {
@@ -1748,3 +1749,32 @@ th {
   border-radius: var(--radius-sm, 4px);
   border: 1px solid var(--color-border, #ccc);
 }
+
+.alert-muted {
+  background-color: #f1f3f5;
+  color: #495057;
+  border: 1px solid #ced4da;
+}
+
+.account-item {
+  margin-bottom: 0.75rem;
+}
+
+.account-item-rating {
+  margin-top: 0.25rem;
+  font-size: 0.9em;
+  color: var(--color-text-muted, #4a5568);
+}
+
+.account-item-rating .rating-stars {
+  font-weight: 600;
+  color: #b7791f;
+}
+
+.valoracion-card {
+  margin-bottom: 1.5rem;
+}
+
+.valoracion-links {
+  margin-top: 1.5rem;
+}

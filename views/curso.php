@@ -7,7 +7,7 @@ include '../includes/header.php';
 
     <div class="layout-sidebar">
       <aside class="sidebar">
-        <h2 style="color: white">Contenido del curso</h2>
+        <h2>Contenido del curso</h2>
 
         <h4>Módulo 1 — Introducción</h4>
         <ul>

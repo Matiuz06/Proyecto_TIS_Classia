@@ -1,22 +1,10 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
-$sql = "SELECT id_publicacion, titulo, descripcion, precio, tipo 
-        FROM publicaciones 
-        WHERE estado = 'Activo'";
+require_once __DIR__ . '/../php/publicaciones/obtener_publicaciones.php';
 
-$stmt = $pdo->query($sql);
-$publicaciones = $stmt->fetchAll();
-
-$cursos = [];
-$servicios = [];
-
-foreach ($publicaciones as $publicacion) {
-    if ($publicacion['tipo'] === 'Curso') {
-        $cursos[] = $publicacion;
-    } elseif ($publicacion['tipo'] === 'Servicio') {
-        $servicios[] = $publicacion;
-    }
-}
+$catalogo = obtener_publicaciones_catalogo($pdo);
+$cursos = $catalogo['cursos'];
+$servicios = $catalogo['servicios'];
 
 $title = 'Catálogo de cursos y servicios';
 $description = 'Catálogo de cursos y servicios educativos disponibles en Classia.';

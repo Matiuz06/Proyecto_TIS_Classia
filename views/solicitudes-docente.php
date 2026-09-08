@@ -1,6 +1,7 @@
 <?php
 require_once '../php/auth/roles.php';
 require_once '../config/database.php';
+require_once '../php/solicitudes/gestionar_solicitudes_docente.php';
 
 requerir_rol(ROL_ADMIN, 'usuario.php');
 
@@ -13,82 +14,16 @@ if (empty($_SESSION['csrf_token'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token_recibido = $_POST['csrf_token'] ?? '';
-    $accion = $_POST['accion'] ?? '';
-    $id_solicitud = (int) ($_POST['id_solicitud_docente'] ?? 0);
+    $accion         = $_POST['accion'] ?? '';
+    $id_solicitud   = (int) ($_POST['id_solicitud_docente'] ?? 0);
 
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
-        $error = 'La sesion del formulario expiro. Recarga la pagina e intenta nuevamente.';
-    } elseif ($id_solicitud <= 0 || !in_array($accion, ['aprobar', 'rechazar'], true)) {
-        $error = 'Solicitud invalida.';
-    } elseif ($accion === 'aprobar') {
-        try {
-            $pdo->beginTransaction();
-
-            $stmt = $pdo->prepare(
-                "SELECT id_usuario
-                 FROM solicitudes_docente
-                 WHERE id_solicitud_docente = :id_solicitud AND estado = 'Pendiente'
-                 FOR UPDATE"
-            );
-            $stmt->execute(['id_solicitud' => $id_solicitud]);
-            $solicitud = $stmt->fetch();
-
-            if (!$solicitud) {
-                $pdo->rollBack();
-                $error = 'La solicitud ya fue procesada.';
-            } else {
-                $stmt = $pdo->prepare(
-                    "UPDATE solicitudes_docente
-                     SET estado = 'Aprobada', fecha_respuesta = CURRENT_TIMESTAMP
-                     WHERE id_solicitud_docente = :id_solicitud"
-                );
-                $stmt->execute(['id_solicitud' => $id_solicitud]);
-
-                $stmt = $pdo->prepare(
-                    "UPDATE usuarios SET id_rol = :id_rol WHERE id_usuario = :id_usuario"
-                );
-                $stmt->execute([
-                    'id_rol' => ROL_DOCENTE,
-                    'id_usuario' => $solicitud['id_usuario'],
-                ]);
-
-                $pdo->commit();
-                $mensaje = 'Solicitud aprobada.';
-            }
-        } catch (PDOException $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-
-            error_log('Error al aprobar solicitud docente: ' . $e->getMessage());
-            $error = 'No se pudo aprobar la solicitud.';
-        }
-    } else {
-        try {
-            $stmt = $pdo->prepare(
-                "UPDATE solicitudes_docente
-                 SET estado = 'Rechazada', fecha_respuesta = CURRENT_TIMESTAMP
-                 WHERE id_solicitud_docente = :id_solicitud AND estado = 'Pendiente'"
-            );
-            $stmt->execute(['id_solicitud' => $id_solicitud]);
-
-            $mensaje = $stmt->rowCount() > 0 ? 'Solicitud rechazada.' : 'La solicitud ya fue procesada.';
-        } catch (PDOException $e) {
-            error_log('Error al rechazar solicitud docente: ' . $e->getMessage());
-            $error = 'No se pudo rechazar la solicitud.';
-        }
-    }
+    $resultado = procesar_decision_solicitud_docente($pdo, $id_solicitud, $accion, $token_recibido, $_SESSION['csrf_token'] ?? '');
+    $error   = $resultado['error'];
+    $mensaje = $resultado['mensaje'];
 }
 
-$stmt = $pdo->query(
-    "SELECT sd.id_solicitud_docente, sd.estado, sd.motivo, sd.fecha_solicitud,
-            u.nombre, u.apellido, u.email
-     FROM solicitudes_docente sd
-     INNER JOIN usuarios u ON u.id_usuario = sd.id_usuario
-     WHERE sd.estado = 'Pendiente'
-     ORDER BY sd.fecha_solicitud ASC"
-);
-$solicitudes = $stmt->fetchAll();
+$solicitudes = obtener_solicitudes_docente_pendientes($pdo);
+
 
 $title = 'Solicitudes docentes';
 $description = 'Revision de solicitudes para rol docente en Classia.';
