@@ -26,7 +26,7 @@ El objetivo principal de Classia es construir un Entorno Virtual de Aprendizaje 
 
 Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 
-### Estudiantes / Clientes (Rol 3)
+### Estudiantes / Clientes (id_rol = 1)
 - Explorar el catálogo de cursos y servicios con filtros avanzados.
 - Consultar detalles de publicaciones, programas formativos y paquetes.
 - Solicitar servicios personalizados (e.g. impresión 3D, tutorías, robótica).
@@ -34,15 +34,15 @@ Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 - Visualizar sus cursos inscritos, historial de contrataciones y certificados en su perfil.
 - Emitir valoraciones y comentarios sobre cursos y servicios completados.
 
-### Docentes / Proveedores (Rol 2)
+### Docentes / Proveedores (id_rol = 2)
 - Acceder a su **Panel de Proveedor** con estadísticas y métricas de actividad.
 - Crear nuevas publicaciones especificando título, descripción, precio, categoría y modalidad (curso o servicio).
-- Editar publicaciones existentes y gestionar su estado (`publicado`, `borrador`, `pausado`, `archivado`).
+- Editar publicaciones existentes y gestionar su estado (`Activo`, `Inactivo`, `Pausado`).
 - Consultar y gestionar en tiempo real el listado dinámico de sus cursos y servicios activos.
-- Recibir y gestionar solicitudes de servicios personalizadas.
+- Recibir y gestionar solicitudes de servicios personalizadas (flujo solicitud docente).
 - Administrar el contenido de sus cursos y calificaciones.
 
-### Administradores (Rol 1)
+### Administradores (id_rol = 3)
 - Acceso al **Panel de Administrador** para la supervisión global de la plataforma.
 - Gestión y moderación de usuarios, roles y permisos.
 - Moderación de publicaciones, cursos y servicios ofertados.
@@ -202,35 +202,38 @@ El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SEC
 
 Actualmente el proyecto cuenta con:
 
-- [x] **Arquitectura PHP modular** completada con vistas `.php`, `includes/header.php` y `includes/footer.php`.
-- [x] **Base de datos relacional** normalizada e implementada en `sql/schema.sql`.
+- [x] **Arquitectura PHP modular** completada con 20 vistas `.php`, `includes/header.php` y `includes/footer.php`.
+- [x] **Base de datos relacional** normalizada e implementada en `sql/schema.sql` (9 tablas, 3FN, integridad referencial completa).
 - [x] **Manejo seguro de sesiones** en `php/auth/session.php` y cierre de sesión en `php/auth/logout.php`.
-- [x] **Registro de usuarios** funcional en `php/usuarios/registro.php` con validación de unicidad de email y hash de contraseñas.
-- [x] **CRUD de publicaciones** (cursos y servicios) operativo en `php/publicaciones/` con creación, edición, cambio de estados y visualización dinámica en `panelProveedor.php`.
-- [x] **Modelado técnico UML completo** en `docs/` (Casos de uso, clases, secuencia, MER y modelo relacional).
-- [x] **Pipelines de CI/CD automatizados** para linting, seguridad y verificación de trazabilidad.
+- [x] **Registro de usuarios** funcional en `php/usuarios/registro.php` con validación de unicidad de email, hash bcrypt y protección CSRF.
+- [x] **CRUD de publicaciones** (cursos y servicios) operativo en `php/publicaciones/` con creación, edición, cambio de estados y visualización dinámica en `panel-proveedor.php`.
+- [x] **Flujo de solicitud docente** diseñado e implementado en vistas (`form-solicitar-servicio.php`, `solicitud-impresion-3d.php`); backend en `php/solicitudes/` planificado para próxima entrega.
+- [x] **Modelado técnico UML completo** en `docs/` (Casos de uso, clases, secuencia, MER, modelo relacional) — actualizado a estado real del sistema.
+- [x] **Registro de pruebas funcionales** documentado en `docs/pruebas_classia.md` (48 casos de prueba).
+- [x] **Pipelines de CI/CD automatizados** para linting, seguridad (Gitleaks, Semgrep SAST) y verificación de trazabilidad.
 
 ---
 
 ## 🔮 Próximos pasos
 
 - Implementación del inicio de sesión con autenticación contra base de datos (`php/auth/login.php`).
+- Persistencia del flujo de solicitud docente (`php/solicitudes/crear_solicitud.php`).
 - Módulo de contrataciones y persistencia de compras (`php/contrataciones/`).
-- Módulo de gestión y respuesta a solicitudes de servicios personalizados (`php/solicitudes/`).
 - Sistema dinámico de valoraciones y cálculo de promedios (`php/valoraciones/`).
-- Panel de administración con métricas y moderación activa (`php/admin/`).
+- Panel de administración con métricas y moderación activa.
 
 ---
 
 ## 📚 Documentación técnica adicional
 
 En el directorio [`docs/`](docs/) se encuentran disponibles los documentos de especificación técnica:
-- [Arquitectura PHP](docs/estructura_php.md)
+- [Arquitectura PHP y Conexión BD](docs/estructura_php.md)
 - [Diagrama de Casos de Uso](docs/casos_de_uso_classia.md)
 - [Diagrama de Clases de Dominio](docs/diagrama_de_clases_classia.md)
 - [Diagramas de Secuencia UML](docs/diagramas_de_secuencia_classia.md)
 - [Modelo Entidad-Relación (MER)](docs/mer_classia.md)
 - [Modelo Relacional de Base de Datos](docs/modelo_relacional_classia.md)
+- [Registro de Pruebas Funcionales](docs/pruebas_classia.md)
 - [Guía de Contribución y Sprints](CONTRIBUTING.md)
 - [Política de Seguridad](SECURITY.md)
 
