@@ -46,8 +46,22 @@ $currentUser = usuario_actual();
         <a href="<?= $carritoHref ?>"<?= $activePage === 'carrito' ? ' aria-current="page"' : '' ?>>Carrito</a>
 
         <?php if (!$isAuth): ?>
-          <a href="<?= $loginHref ?>"<?= $activePage === 'cuenta' ? ' aria-current="page"' : '' ?>>Iniciar sesión</a>
-          <a href="<?= $registroHref ?>">Registrarse</a>
+          <div class="user-nav-dropdown">
+            <a href="<?= $loginHref ?>" class="user-nav-trigger" title="Acceder a tu cuenta">
+              <span class="user-nav-name">Cuenta</span>
+              <img src="<?= $cssPrefix ?>/assets/images/default-avatar.svg" alt="Cuenta" class="user-nav-avatar" />
+              <span class="user-nav-caret" aria-hidden="true">&#9662;</span>
+            </a>
+
+            <div class="user-dropdown-menu" role="menu" aria-label="Opciones de acceso">
+              <a href="<?= $loginHref ?>" role="menuitem" class="user-dropdown-item<?= in_array($activePage, ['login', 'cuenta'], true) ? ' active' : '' ?>">
+                Iniciar sesión
+              </a>
+              <a href="<?= $registroHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'registro' ? ' active' : '' ?>">
+                Registrarse
+              </a>
+            </div>
+          </div>
         <?php else: ?>
           <?php
             $navAvatarSrc = !empty($currentUser['foto_perfil'])
