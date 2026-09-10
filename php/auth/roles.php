@@ -40,7 +40,7 @@ function requerir_rol(int $id_rol, string $redirigir): void
     }
 
     $_SESSION["mensaje_acceso"] = "No tenes permisos para acceder a esta seccion.";
-    header("Location: " . $redirigir);
+    header("Location: " . ruta_acceso_denegado_por_contexto());
     exit;
 }
 
@@ -58,8 +58,13 @@ function requerir_cualquier_rol(array $roles, string $redirigir): void
     }
 
     $_SESSION["mensaje_acceso"] = "No tenes permisos para acceder a esta seccion.";
-    header("Location: " . $redirigir);
+    header("Location: " . ruta_acceso_denegado_por_contexto());
     exit;
+}
+
+function ruta_acceso_denegado_por_contexto(): string
+{
+    return dirname(ruta_login_por_contexto()) . "/acceso-denegado.php";
 }
 
 function ruta_login_por_contexto(): string
