@@ -56,7 +56,6 @@ try {
     ]);
 
     $usuario = $stmt->fetch();
-
 } catch (Throwable $e) {
     error_log("Error en login: " . $e->getMessage());
 
@@ -78,10 +77,16 @@ if (
 
 establecer_usuario_sesion(
     (int) $usuario["id_usuario"],
-    $usuario["nombre"],
+    $usuario["nombre"] . (!empty($usuario["apellido"]) ? ' ' . $usuario["apellido"] : ''),
     $usuario["email"],
     (int) $usuario["id_rol"]
 );
 
-header("Location: " . LOGIN_OK_URL);
+if ((int) $usuario["id_rol"] === 3) {
+    header("Location: ../../views/panel-administrador.php");
+} elseif ((int) $usuario["id_rol"] === 2) {
+    header("Location: ../../views/panel-proveedor.php");
+} else {
+    header("Location: " . LOGIN_OK_URL);
+}
 exit;
