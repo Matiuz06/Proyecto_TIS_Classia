@@ -162,16 +162,16 @@ INSERT IGNORE INTO categorias (id_categoria, nombre_categoria, descripcion) VALU
 (10, 'Gestión de Proyectos Tecnológicos', 'Metodologías ágiles, Scrum y dirección de proyectos de software');
 
 INSERT IGNORE INTO usuarios (id_usuario, nombre, apellido, email, password_hash, telefono, fecha_registro, id_rol) VALUES
-(1, 'Carlos', 'Admin', 'admin@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1155443322', '2026-01-10 09:00:00', 3),
-(2, 'María', 'Docente', 'docente@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1199887766', '2026-01-15 10:30:00', 2),
-(3, 'Roberto', 'Gómez', 'roberto.gomez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1144332211', '2026-01-20 11:15:00', 2),
-(4, 'Lucía', 'Fernández', 'lucia.fernandez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1133221100', '2026-02-01 14:00:00', 2),
-(5, 'Gonzalo', 'Martínez', 'gonzalo.martinez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1122110099', '2026-02-05 16:45:00', 2),
-(6, 'Juan', 'Pérez', 'estudiante@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1122334455', '2026-02-10 12:00:00', 1),
-(7, 'Ana', 'Silva', 'ana.silva@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1166778899', '2026-02-12 13:20:00', 1),
-(8, 'Diego', 'López', 'diego.lopez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1177889900', '2026-02-15 15:10:00', 1),
-(9, 'Sofía', 'Rodríguez', 'sofia.rodriguez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1188990011', '2026-02-18 17:30:00', 1),
-(10, 'Martín', 'Benítez', 'martin.benitez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1199001122', '2026-02-20 09:45:00', 1);
+(1, 'Carlos', 'Admin', 'admin@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1155443322', '2026-01-10 09:00:00', 3),
+(2, 'María', 'Docente', 'docente@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1199887766', '2026-01-15 10:30:00', 2),
+(3, 'Roberto', 'Gómez', 'roberto.gomez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1144332211', '2026-01-20 11:15:00', 2),
+(4, 'Lucía', 'Fernández', 'lucia.fernandez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1133221100', '2026-02-01 14:00:00', 2),
+(5, 'Gonzalo', 'Martínez', 'gonzalo.martinez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1122110099', '2026-02-05 16:45:00', 2),
+(6, 'Juan', 'Pérez', 'estudiante@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1122334455', '2026-02-10 12:00:00', 1),
+(7, 'Ana', 'Silva', 'ana.silva@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1166778899', '2026-02-12 13:20:00', 1),
+(8, 'Diego', 'López', 'diego.lopez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1177889900', '2026-02-15 15:10:00', 1),
+(9, 'Sofía', 'Rodríguez', 'sofia.rodriguez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1188990011', '2026-02-18 17:30:00', 1),
+(10, 'Martín', 'Benítez', 'martin.benitez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1199001122', '2026-02-20 09:45:00', 1);
 
 INSERT IGNORE INTO publicaciones (id_publicacion, titulo, descripcion, precio, tipo, estado, fecha_creacion, id_usuario, id_categoria) VALUES
 (1, 'Curso Completo de PHP y MySQL', 'Aprende backend desde cero hasta crear sistemas dinámicos seguros con PDO.', 15000.00, 'Curso', 'Activo', '2026-02-21 10:00:00', 2, 1),

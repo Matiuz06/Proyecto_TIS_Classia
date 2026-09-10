@@ -6,7 +6,7 @@ function iniciar_sesion(): void
         return;
     }
 
-    if (PHP_VERSION_ID >= 70300) {
+    if (!headers_sent() && PHP_VERSION_ID >= 70300) {
         session_set_cookie_params([
             "lifetime" => 0,
             "path" => "/",
@@ -16,7 +16,9 @@ function iniciar_sesion(): void
         ]);
     }
 
-    session_start();
+    if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 }
 
 function establecer_usuario_sesion(int $id_usuario, string $nombre, string $email, int $id_rol): void
@@ -30,6 +32,7 @@ function establecer_usuario_sesion(int $id_usuario, string $nombre, string $emai
         "email" => $email,
         "id_rol" => $id_rol,
     ];
+    $_SESSION["id_usuario"] = $id_usuario;
 }
 
 function esta_autenticado(): bool
