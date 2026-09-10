@@ -1,60 +1,89 @@
 <?php
-require_once '../php/auth/roles.php';
-require_once '../config/database.php';
-require_once '../php/valoraciones/obtener_contrataciones_valorables.php';
-
-requerir_autenticacion('login.php');
-
-$usuario    = usuario_actual();
-$id_usuario = (int) $usuario['id_usuario'];
-$rol_actual = nombre_rol((int) $usuario['id_rol']);
-
-$mensaje_acceso = $_SESSION['mensaje_acceso'] ?? '';
-unset($_SESSION['mensaje_acceso']);
-
-$mensaje_exito = '';
-if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'valoracion_guardada') {
-    $mensaje_exito = '¡Tu valoración fue registrada correctamente! Gracias por compartir tu opinión.';
-}
-
-$resumen_contrataciones = obtener_resumen_contrataciones_usuario($pdo, $id_usuario);
-$cursos_contratados     = $resumen_contrataciones['cursos'];
-$servicios_contratados  = $resumen_contrataciones['servicios'];
+require_once '../php/usuarios/perfil.php';
 
 $title      = 'Perfil de usuario';
 $cssPrefix  = '..';
+$jsPrefix    = '..';
+
 $activePage = 'cuenta';
 include '../includes/header.php';
 ?>
 
-  <div id="panel-admin" hidden>
-    <strong>Modo Administrador Activo:</strong>
-    <a href="usuario.php">Gestionar Usuarios</a> |
-    <a href="usuario.php">Configuración Global</a> |
-    <a href="usuario.php">Reportes del Sistema</a>
-  </div>
+  <?php if (es_admin()): ?>
+    <div id="panel-admin" class="alert alert-info role-banner">
+      <strong>Modo Administrador Activo:</strong>
+      <a href="panel-administrador.php" class="banner-link">Ir al Panel de Administración</a> |
+      <a href="catalogo.php">Gestionar Catálogo</a>
+    </div>
+  <?php elseif (es_docente()): ?>
+    <div id="panel-docente" class="alert alert-info role-banner">
+      <strong>Modo Docente/Proveedor Activo:</strong>
+      <a href="panel-proveedor.php" class="banner-link">Ir a mi Panel de Proveedor</a> |
+      <a href="crear-publicacion.php">Publicar nuevo contenido</a>
+    </div>
+  <?php endif; ?>
 
   <main class="motion-entry">
-    <?php if ($mensaje_acceso !== ''): ?>
+    <?php if (!empty($mensaje_acceso)): ?>
       <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($mensaje_acceso); ?>
       </div>
     <?php endif; ?>
 
-    <?php if ($mensaje_exito !== ''): ?>
+    <?php if (!empty($mensaje_error)): ?>
+      <div class="alert alert-danger" role="alert">
+        <?php echo htmlspecialchars($mensaje_error); ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if (!empty($mensaje_exito)): ?>
       <div class="alert alert-success" role="status">
         <?php echo htmlspecialchars($mensaje_exito); ?>
       </div>
     <?php endif; ?>
 
     <section class="profile-hero" aria-labelledby="perfil-usuario">
-      <p>Bienvenido/a,</p>
-      <h1 id="perfil-usuario"><?php echo htmlspecialchars($usuario['nombre']); ?></h1>
-      <p>Perfil de Usuario (<?php echo htmlspecialchars($rol_actual); ?>)</p>
-      <p>
-        <strong><?php echo count($cursos_contratados); ?></strong> Cursos contratados | 
-        <strong><?php echo count($servicios_contratados); ?></strong> Servicios contratados
-      </p>
+      <div class="profile-hero-content">
+        <div class="profile-avatar-wrapper">
+          <?php 
+            $fotoPerfilSrc = !empty($userData['foto_perfil']) 
+              ? ($cssPrefix . '/' . htmlspecialchars($userData['foto_perfil'])) 
+              : ($cssPrefix . '/assets/images/default-avatar.svg');
+          ?>
+          <img src="<?php echo $fotoPerfilSrc; ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre']); ?>" class="profile-avatar-img" />
+          
+          <div class="profile-avatar-actions">
+            <form action="../php/usuarios/foto_perfil.php" method="POST" enctype="multipart/form-data" class="profile-photo-form">
+              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>" />
+              <input type="hidden" name="accion" value="subir" />
+              <label class="btn-avatar-upload" title="Subir nueva foto de perfil">
+                <span>Cambiar foto</span>
+                <input type="file" name="foto_perfil" accept="image/jpeg,image/png,image/webp,image/gif" onchange="this.form.submit()" class="visually-hidden" />
+              </label>
+            </form>
+
+            <?php if (!empty($userData['foto_perfil'])): ?>
+              <form action="../php/usuarios/foto_perfil.php" method="POST" class="profile-photo-remove-form">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>" />
+                <input type="hidden" name="accion" value="eliminar" />
+                <button type="submit" class="btn-avatar-remove" onclick="return confirm('¿Seguro que deseas quitar tu foto de perfil?')" title="Quitar foto de perfil">
+                  Quitar foto
+                </button>
+              </form>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <div class="profile-hero-text">
+          <p class="profile-greeting">Bienvenido/a,</p>
+          <h1 id="perfil-usuario"><?php echo htmlspecialchars($userData['nombre'] . ' ' . ($userData['apellido'] ?? '')); ?></h1>
+          <p>Perfil de Usuario (<?php echo htmlspecialchars($rol_actual); ?>) · <strong><?php echo htmlspecialchars($userData['email']); ?></strong></p>
+          <p>
+            <strong><?php echo count($cursos_contratados); ?></strong> Cursos contratados | 
+            <strong><?php echo count($servicios_contratados); ?></strong> Servicios contratados
+          </p>
+        </div>
+      </div>
     </section>
 
     <nav class="profile-tabs" aria-label="Secciones de la cuenta">
@@ -68,12 +97,20 @@ include '../includes/header.php';
     <section class="account-section" aria-labelledby="informacion-cuenta">
       <h2 id="informacion-cuenta">Información básica de la cuenta</h2>
       <p>
-        <label for="nombre-cuenta">Nombre:*</label><br />
-        <input type="text" id="nombre-cuenta" value="<?php echo htmlspecialchars($usuario['nombre']); ?>" readonly />
+        <label for="nombre-cuenta">Nombre:</label><br />
+        <input type="text" id="nombre-cuenta" value="<?php echo htmlspecialchars($userData['nombre']); ?>" readonly />
       </p>
       <p>
-        <label for="email-cuenta">Email:*</label><br />
-        <input type="email" id="email-cuenta" value="<?php echo htmlspecialchars($usuario['email']); ?>" readonly />
+        <label for="apellido-cuenta">Apellido:</label><br />
+        <input type="text" id="apellido-cuenta" value="<?php echo htmlspecialchars($userData['apellido'] ?? ''); ?>" readonly />
+      </p>
+      <p>
+        <label for="email-cuenta">Email:</label><br />
+        <input type="email" id="email-cuenta" value="<?php echo htmlspecialchars($userData['email']); ?>" readonly />
+      </p>
+      <p>
+        <label for="fecha-cuenta">Fecha de registro:</label><br />
+        <input type="text" id="fecha-cuenta" value="<?php echo !empty($userData['fecha_registro']) ? date('d/m/Y H:i', strtotime($userData['fecha_registro'])) : '-'; ?>" readonly />
       </p>
       <p>Rol actual: <strong><?php echo htmlspecialchars($rol_actual); ?></strong></p>
       <p>
@@ -98,7 +135,7 @@ include '../includes/header.php';
       <h2 id="cursos-inscriptos">Mis cursos contratados</h2>
       <?php if (empty($cursos_contratados)): ?>
         <p>Aún no estás inscripto en ningún curso.</p>
-        <p><a class="btn" href="catalogo.php">Ver catálogo de cursos</a></p>
+        <p><a class="btn" href="catalogo.php?tipo=curso">Ver catálogo de cursos</a></p>
       <?php else: ?>
         <p>Cursos en los que estás inscripto:</p>
         <ul>
@@ -106,6 +143,7 @@ include '../includes/header.php';
             <li class="account-item">
               <strong><?php echo htmlspecialchars($curso['titulo']); ?></strong>
               — Estado: <em><?php echo htmlspecialchars($curso['estado']); ?></em>
+              [<a href="curso.php?id=<?php echo (int)$curso['id_publicacion']; ?>">Continuar curso</a>]
 
               <?php if (!empty($curso['id_valoracion'])): ?>
                 <div class="account-item-rating">
@@ -129,6 +167,7 @@ include '../includes/header.php';
       <h2 id="servicios-contratados">Mis servicios contratados</h2>
       <?php if (empty($servicios_contratados)): ?>
         <p>No tenés servicios solicitados a proveedores en este momento.</p>
+        <p><a class="btn" href="catalogo.php?tipo=servicio">Contratar nuevo servicio</a></p>
       <?php else: ?>
         <p>Servicios solicitados a proveedores:</p>
         <ul>
@@ -136,6 +175,7 @@ include '../includes/header.php';
             <li class="account-item">
               <strong><?php echo htmlspecialchars($servicio['titulo']); ?></strong>
               — Estado: <em><?php echo htmlspecialchars($servicio['estado']); ?></em>
+              [<a href="servicio-detalle.php?id=<?php echo (int)$servicio['id_publicacion']; ?>">Ver detalles</a>]
 
               <?php if (!empty($servicio['id_valoracion'])): ?>
                 <div class="account-item-rating">
@@ -150,21 +190,22 @@ include '../includes/header.php';
             </li>
           <?php endforeach; ?>
         </ul>
+        <p><a class="btn" href="catalogo.php?tipo=servicio">Contratar nuevo servicio</a></p>
       <?php endif; ?>
-
-      <p><a class="btn" href="catalogo.php">Contratar nuevo servicio</a></p>
     </section>
+
+    <hr />
 
     <section class="account-section" aria-labelledby="certificados">
       <h2 id="certificados">Mis certificados</h2>
-      <p>Certificado de Finalización: Robótica para principiantes (demo)</p>
+      <p>Certificados disponibles según tus cursos finalizados.</p>
     </section>
 
     <hr />
 
     <section class="account-section" aria-labelledby="estadisticas">
       <h2 id="estadisticas">Estadísticas</h2>
-      <p>Resumen de aprendizaje e ingresos por cursos/servicios prestados.</p>
+      <p>Resumen de aprendizaje e historial de participación en la plataforma.</p>
     </section>
   </main>
 

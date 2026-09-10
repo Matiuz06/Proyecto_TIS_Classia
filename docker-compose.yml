@@ -1,0 +1,49 @@
+services:
+  web:
+    build: .
+    image: proyecto_tis_classia-web:latest
+    container_name: classia_web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-classia_db}
+      DB_USER: ${DB_USER:-classia_user}
+      DB_PASSWORD: ${DB_PASSWORD:-1234}
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: classia_db
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-classia_db}
+      MYSQL_USER: ${DB_USER:-classia_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-1234}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: classia_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      - db
+
+volumes:
+  db_data:

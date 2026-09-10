@@ -1,6 +1,10 @@
 <?php
-$title      = 'Curso';
+require_once '../php/publicaciones/detalle_curso.php';
+
+$title      = $curso ? htmlspecialchars($curso['titulo']) : 'Curso';
 $cssPrefix  = '..';
+$jsPrefix    = '..';
+
 $activePage = 'catalogo';
 include '../includes/header.php';
 ?>
@@ -19,8 +23,8 @@ include '../includes/header.php';
         <h4>Módulo 2 — Desarrollo</h4>
         <ul>
           <li>Bienvenida al Módulo 2 (Video · 1 min)</li>
-          <li><strong>Introducción a las funciones (Video · 3 min)</strong></li>
-          <li>Crear una función básica (Video · 2 min)</li>
+          <li><strong><?= htmlspecialchars($curso ? $curso['titulo'] : 'Introducción a las funciones') ?> (Video · 3 min)</strong></li>
+          <li>Crear una práctica básica (Video · 2 min)</li>
           <li>Lectura complementaria (PDF)</li>
           <li>Cuestionario del módulo (Actividad)</li>
         </ul>
@@ -33,19 +37,32 @@ include '../includes/header.php';
       </aside>
 
       <main class="main-content">
-        <h1>Introducción a las funciones</h1>
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <a href="catalogo.php?tipo=curso">← Volver al catálogo</a>
+        </nav>
 
-        <video controls aria-label="Video de demostración del curso">
+        <h1><?= htmlspecialchars($curso ? $curso['titulo'] : 'Introducción a las funciones') ?></h1>
+
+        <?php if ($curso): ?>
+          <p class="badge"><?= htmlspecialchars($curso['nombre_categoria']) ?></p>
+          <p><strong>Docente:</strong> <?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?> | <strong>Precio:</strong> $<?= number_format($curso['precio'], 2, ',', '.') ?></p>
+        <?php endif; ?>
+
+        <?php if (!empty($curso['imagen'])): ?>
+          <div class="course-banner-media">
+            <img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" class="course-banner-img" />
+          </div>
+        <?php endif; ?>
+
+        <video controls aria-label="Video de demostración del curso" class="course-demo-video">
           Tu navegador no soporta video.
         </video>
 
         <hr />
 
-        <h3>Descripción del material</h3>
+        <h3>Descripción del curso</h3>
         <p>
-          En este video vamos a explorar el concepto de funciones dentro de la
-          programación. Una función es un bloque de código reutilizable que
-          realiza una tarea específica.
+          <?= nl2br(htmlspecialchars($curso ? $curso['descripcion'] : 'En este video vamos a explorar el concepto de funciones dentro de la programación. Una función es un bloque de código reutilizable que realiza una tarea específica.')) ?>
         </p>
 
         <h3>Chat de Consultas</h3>
@@ -58,14 +75,10 @@ include '../includes/header.php';
           <button type="button">Enviar</button>
         </div>
 
-        <p>
-          <a href="usuario.php" class="btn">Continuar aprendizaje</a>
+        <p class="mt-section">
+          <a href="usuario.php" class="btn">Ir a mis cursos</a>
         </p>
       </main>
     </div>
 
-    <footer class="site-footer">
-      <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
-    </footer>
-</body>
-</html>
+<?php include '../includes/footer.php'; ?>

@@ -17,7 +17,11 @@ include 'includes/header.php';
         </p>
         <p class="action-row">
           <a class="btn" href="views/catalogo.php">Explorar catálogo</a>
-          <a href="views/registro.php">Crear cuenta</a>
+          <?php if (!$isAuth): ?>
+            <a href="views/registro.php">Crear cuenta</a>
+          <?php else: ?>
+            <a href="views/usuario.php">Mi cuenta</a>
+          <?php endif; ?>
         </p>
       </header>
 
