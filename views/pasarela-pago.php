@@ -1,6 +1,8 @@
 <?php
 $title     = 'Pasarela de pago';
 $cssPrefix = '..';
+$jsPrefix    = '..';
+
 $activePage = 'carrito';
 include '../includes/header.php';
 ?>

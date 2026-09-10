@@ -1,44 +1,20 @@
 <?php
 require_once '../php/auth/roles.php';
 
-requerir_rol(ROL_DOCENTE, 'usuario.php');
+requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 
 $usuario = usuario_actual();
 
 require_once '../php/publicaciones/obtener_publicaciones.php';
+
+$title       = 'Panel proveedor';
+$description = 'Panel de gestión para proveedores de cursos y servicios en Classia.';
+$cssPrefix   = '..';
+$jsPrefix    = '..';
+
+$activePage  = 'panel-proveedor';
+include '../includes/header.php';
 ?>
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <meta
-      name="description"
-      content="Panel de gestión para proveedores de cursos y servicios en Classia." />
-
-    <title>Panel proveedor</title>
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../css/animation.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-  </head>
-
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="../index.php">
-          <img src="../assets/logoC.png" />
-        </a>
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.php">Inicio</a>
-          <a href="catalogo.php">Catálogo</a>
-          <a href="carrito.php">Carrito</a>
-          <a href="usuario.php">Mi cuenta</a>
-          <a href="../php/auth/logout.php">Cerrar sesión</a>
-        </nav>
-      </div>
-    </header>
 
     <main class="provider-dashboard">
       <?php if (isset($_GET['mensaje'])): ?>
@@ -263,6 +239,11 @@ require_once '../php/publicaciones/obtener_publicaciones.php';
           <div class="publicaciones-lista">
             <?php foreach ($publicaciones_proveedor as $pub): ?>
               <article class="pub-card">
+                <?php if (!empty($pub['imagen'])): ?>
+                  <div class="pub-card-thumb">
+                    <img src="../<?php echo htmlspecialchars($pub['imagen']); ?>" alt="<?php echo htmlspecialchars($pub['titulo']); ?>" />
+                  </div>
+                <?php endif; ?>
                 <header>
                   <h4>
                     <a href="servicio-detalle.php?id=<?php echo $pub['id_publicacion']; ?>">
@@ -346,6 +327,11 @@ require_once '../php/publicaciones/obtener_publicaciones.php';
         <?php endif; ?>
       </section>
 
+      <section id="solicitudes" aria-labelledby="titulo-solicitudes">
+        <header>
+          <h2 id="titulo-solicitudes">Solicitudes recibidas</h2>
+          <p>Gestiona las solicitudes de tus clientes y estudiantes.</p>
+        </header>
 
         <article>
           <header>
@@ -630,43 +616,4 @@ require_once '../php/publicaciones/obtener_publicaciones.php';
       </section>
     </main>
 
-    <footer class="site-footer">
-      <p>
-        Classia — Plataforma de comercialización de cursos y servicios
-        educativos
-      </p>
-
-      <nav aria-label="Navegación secundaria">
-        <ul>
-          <li>
-            <a href="../index.php">Inicio</a>
-          </li>
-
-          <li>
-            <a href="catalogo.php">Catálogo</a>
-          </li>
-
-          <li>
-            <a href="usuario.php">Mi perfil</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Acerca de</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Contacto</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Privacidad</a>
-          </li>
-        </ul>
-      </nav>
-
-      <p>
-        <small> &copy; 2026 Classia. Todos los derechos reservados. </small>
-      </p>
-    </footer>
-  </body>
-</html>
+<?php include '../includes/footer.php'; ?>

@@ -1,6 +1,5 @@
 <?php
 require_once '../php/auth/roles.php';
-require_once '../config/database.php';
 require_once '../php/solicitudes/gestionar_solicitudes_docente.php';
 
 requerir_rol(ROL_ADMIN, 'usuario.php');
@@ -17,17 +16,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion         = $_POST['accion'] ?? '';
     $id_solicitud   = (int) ($_POST['id_solicitud_docente'] ?? 0);
 
-    $resultado = procesar_decision_solicitud_docente($pdo, $id_solicitud, $accion, $token_recibido, $_SESSION['csrf_token'] ?? '');
+    $resultado = procesar_decision_solicitud_docente($id_solicitud, $accion, $token_recibido, $_SESSION['csrf_token'] ?? '');
     $error   = $resultado['error'];
     $mensaje = $resultado['mensaje'];
 }
 
-$solicitudes = obtener_solicitudes_docente_pendientes($pdo);
+$solicitudes = obtener_solicitudes_docente_pendientes();
 
 
 $title = 'Solicitudes docentes';
 $description = 'Revision de solicitudes para rol docente en Classia.';
 $cssPrefix = '..';
+$jsPrefix    = '..';
+
 $activePage = 'panel-administrador';
 include '../includes/header.php';
 ?>

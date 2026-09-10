@@ -43,9 +43,11 @@ try {
         "SELECT
             id_usuario,
             nombre,
+            apellido,
             email,
             password_hash,
-            id_rol
+            id_rol,
+            foto_perfil
          FROM usuarios
          WHERE email = :email
          LIMIT 1"
@@ -79,7 +81,8 @@ establecer_usuario_sesion(
     (int) $usuario["id_usuario"],
     $usuario["nombre"] . (!empty($usuario["apellido"]) ? ' ' . $usuario["apellido"] : ''),
     $usuario["email"],
-    (int) $usuario["id_rol"]
+    (int) $usuario["id_rol"],
+    $usuario["foto_perfil"] ?? null
 );
 
 if ((int) $usuario["id_rol"] === 3) {

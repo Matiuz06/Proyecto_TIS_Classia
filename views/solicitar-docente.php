@@ -1,6 +1,5 @@
 <?php
 require_once '../php/auth/roles.php';
-require_once '../config/database.php';
 require_once '../php/solicitudes/solicitar_docente.php';
 
 requerir_rol(ROL_ESTUDIANTE, 'usuario.php');
@@ -14,13 +13,13 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$tiene_pendiente = tiene_solicitud_docente_pendiente($pdo, $id_usuario);
+$tiene_pendiente = tiene_solicitud_docente_pendiente($id_usuario);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token_recibido = $_POST['csrf_token'] ?? '';
     $motivo         = trim($_POST['motivo'] ?? '');
 
-    $resultado = crear_solicitud_docente($pdo, $id_usuario, $motivo, $token_recibido, $_SESSION['csrf_token'] ?? '');
+    $resultado = crear_solicitud_docente($id_usuario, $motivo, $token_recibido, $_SESSION['csrf_token'] ?? '');
     $error   = $resultado['error'];
     $mensaje = $resultado['mensaje'];
     if ($resultado['exito']) {
@@ -32,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $title = 'Solicitar ser docente';
 $description = 'Solicitud para convertirse en docente o proveedor en Classia.';
 $cssPrefix = '..';
+$jsPrefix    = '..';
+
 $activePage = 'solicitar-docente';
 include '../includes/header.php';
 ?>

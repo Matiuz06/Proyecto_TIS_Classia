@@ -1,31 +1,12 @@
-<!doctype html>
-<html lang="es">
+<?php
+$title       = 'Política de privacidad — Classia';
+$description = 'Política de privacidad de Classia. Conocé cómo recopilamos, usamos y protegemos tus datos personales conforme a la Ley 18.331 de Uruguay.';
+$cssPrefix   = '..';
+$jsPrefix    = '..';
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description"
-    content="Política de privacidad de Classia. Conocé cómo recopilamos, usamos y protegemos tus datos personales conforme a la Ley 18.331 de Uruguay." />
-  <title>Política de privacidad — Classia</title>
-  <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
-  <link rel="stylesheet" href="../css/animation.css" />
-  <link rel="stylesheet" href="../css/style.css" />
-</head>
-
-<body>
-  <header class="site-header">
-    <div class="site-header__inner">
-      <a class="site-brand" href="../index.php">
-        <img src="../assets/images/logo-classia.png" alt="Classia" />
-      </a>
-      <nav class="site-nav" aria-label="Navegación principal">
-        <a href="../index.php">Inicio</a>
-        <a href="catalogo.php">Catálogo</a>
-        <a href="carrito.php">Carrito</a>
-        <a href="login.php">Mi cuenta</a>
-      </nav>
-    </div>
-  </header>
+$activePage  = '';
+include '../includes/header.php';
+?>
 
   <main class="privacy-page motion-entry">
 
@@ -584,31 +565,4 @@
 
   </main>
 
-  <footer class="site-footer">
-    <p>Classia — Plataforma de comercialización de servicios educativos</p>
-
-    <nav aria-label="Navegación secundaria">
-      <ul>
-        <li>
-          <a href="../index.php">Inicio</a>
-        </li>
-
-        <li>
-          <a href="catalogo.php">Servicios</a>
-        </li>
-
-        <li>
-          <a href="politica_privacidad.php" aria-current="page">Privacidad</a>
-        </li>
-
-        <li>
-          <a href="mailto:privacidad@classia.uy">Contacto</a>
-        </li>
-      </ul>
-    </nav>
-
-    <p>© 2026 Classia. Todos los derechos reservados.</p>
-  </footer>
-</body>
-
-</html>
+<?php include '../includes/footer.php'; ?>

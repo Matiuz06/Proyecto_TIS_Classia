@@ -21,18 +21,27 @@ function iniciar_sesion(): void
     }
 }
 
-function establecer_usuario_sesion(int $id_usuario, string $nombre, string $email, int $id_rol): void
+function establecer_usuario_sesion(int $id_usuario, string $nombre, string $email, int $id_rol, ?string $foto_perfil = null): void
 {
     iniciar_sesion();
     session_regenerate_id(true);
 
     $_SESSION["usuario"] = [
-        "id_usuario" => $id_usuario,
-        "nombre" => $nombre,
-        "email" => $email,
-        "id_rol" => $id_rol,
+        "id_usuario"  => $id_usuario,
+        "nombre"      => $nombre,
+        "email"       => $email,
+        "id_rol"      => $id_rol,
+        "foto_perfil" => $foto_perfil,
     ];
     $_SESSION["id_usuario"] = $id_usuario;
+}
+
+function actualizar_foto_sesion(?string $foto_perfil): void
+{
+    iniciar_sesion();
+    if (isset($_SESSION["usuario"])) {
+        $_SESSION["usuario"]["foto_perfil"] = $foto_perfil;
+    }
 }
 
 function esta_autenticado(): bool

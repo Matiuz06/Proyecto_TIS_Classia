@@ -17,6 +17,8 @@ unset($_SESSION["login_email"]);
 $title = 'Iniciar sesión';
 $description = 'Inicio de sesión en Classia.';
 $cssPrefix = '..';
+$jsPrefix    = '..';
+
 $bodyClass = 'auth-page';
 $activePage = 'cuenta';
 

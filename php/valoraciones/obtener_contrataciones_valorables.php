@@ -3,8 +3,17 @@
 require_once __DIR__ . '/../../config/database.php';
 
 // Obtiene las contrataciones del usuario con su titulo, estado y valoracion
-function obtener_contrataciones_usuario($pdo, $id_usuario)
+function obtener_contrataciones_usuario($arg1, $arg2 = null): array
 {
+    global $pdo;
+    if ($arg1 instanceof PDO) {
+        $db = $arg1;
+        $id_usuario = (int) $arg2;
+    } else {
+        $id_usuario = (int) $arg1;
+        $db = ($arg2 instanceof PDO) ? $arg2 : $pdo;
+    }
+
     $sql = "SELECT c.*, dc.id_publicacion, p.titulo, p.tipo,
                    v.id_valoracion, v.puntuacion, v.comentario, v.fecha_valoracion
             FROM contrataciones c
@@ -14,16 +23,16 @@ function obtener_contrataciones_usuario($pdo, $id_usuario)
             WHERE c.id_usuario = :id_usuario
             ORDER BY c.fecha_contratacion DESC";
 
-    $stmt = $pdo->prepare($sql);
+    $stmt = $db->prepare($sql);
     $stmt->execute(['id_usuario' => $id_usuario]);
 
-    return $stmt->fetchAll();
+    return $stmt->fetchAll() ?: [];
 }
 
 // Retorna las contrataciones del usuario agrupadas por cursos y servicios.
-function obtener_resumen_contrataciones_usuario(PDO $pdo, int $id_usuario): array
+function obtener_resumen_contrataciones_usuario($arg1, $arg2 = null): array
 {
-    $contrataciones = obtener_contrataciones_usuario($pdo, $id_usuario);
+    $contrataciones = obtener_contrataciones_usuario($arg1, $arg2);
     $cursos = [];
     $servicios = [];
 
@@ -42,9 +51,20 @@ function obtener_resumen_contrataciones_usuario(PDO $pdo, int $id_usuario): arra
 }
 
 // Prepara los datos necesarios para la vista de valoración de contrataciones.
-function obtener_contexto_valoracion(PDO $pdo, int $id_usuario, int $id_contratacion_solicitada = 0): array
+function obtener_contexto_valoracion($arg1, $arg2 = 0, $arg3 = null): array
 {
-    $mis_contrataciones = obtener_contrataciones_usuario($pdo, $id_usuario);
+    global $pdo;
+    if ($arg1 instanceof PDO) {
+        $db = $arg1;
+        $id_usuario = (int) $arg2;
+        $id_contratacion_solicitada = (int) $arg3;
+    } else {
+        $id_usuario = (int) $arg1;
+        $id_contratacion_solicitada = (int) $arg2;
+        $db = ($arg3 instanceof PDO) ? $arg3 : $pdo;
+    }
+
+    $mis_contrataciones = obtener_contrataciones_usuario($id_usuario, $db);
 
     $contrataciones_pendientes = [];
     foreach ($mis_contrataciones as $c) {
