@@ -1,10 +1,16 @@
 <?php
+require_once '../php/auth/roles.php';
+
+requerir_rol(ROL_DOCENTE, 'usuario.php');
+
 require_once '../php/publicaciones/editar_publicacion.php';
 require_once '../php/publicaciones/obtener_publicaciones.php';
 
 $title       = 'Editar publicación';
 $description = 'Modificación de cursos o servicios en Classia.';
 $cssPrefix   = '..';
+$jsPrefix    = '..';
+
 $bodyClass   = 'auth-page';
 $activePage  = 'cuenta';
 
@@ -33,7 +39,7 @@ include '../includes/header.php';
       <?php endif; ?>
 
       <?php if ($publicacion): ?>
-        <form action="editar-publicacion.php?id=<?php echo (int)$publicacion['id_publicacion']; ?>" method="POST">
+        <form action="editar-publicacion.php?id=<?php echo (int)$publicacion['id_publicacion']; ?>" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
           <input type="hidden" name="id_publicacion" value="<?php echo (int)$publicacion['id_publicacion']; ?>">
 
@@ -78,6 +84,26 @@ include '../includes/header.php';
               name="precio"
               required
               value="<?php echo htmlspecialchars($_POST['precio'] ?? $publicacion['precio']); ?>" />
+          </p>
+
+          <p>
+            <label for="imagen">Imagen de portada / vista previa</label>
+            <?php if (!empty($publicacion['imagen'])): ?>
+              <div class="current-image-preview">
+                <img src="../<?php echo htmlspecialchars($publicacion['imagen']); ?>" alt="Imagen actual" class="pub-preview-img" />
+                <label class="checkbox-label">
+                  <input type="checkbox" name="eliminar_imagen" value="1" />
+                  Quitar imagen actual
+                </label>
+              </div>
+            <?php endif; ?>
+            <input
+              type="file"
+              id="imagen"
+              name="imagen"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              class="form-file-input" />
+            <small class="muted">Subir una nueva imagen reemplazará la actual. Formatos: JPG, PNG, WEBP, GIF (máx 5MB).</small>
           </p>
 
           <p>

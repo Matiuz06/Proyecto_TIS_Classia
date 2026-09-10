@@ -1,6 +1,8 @@
 <?php
 $title     = 'Restablecer contraseña';
 $cssPrefix = '..';
+$jsPrefix    = '..';
+
 $activePage = 'cuenta';
 include '../includes/header.php';
 ?>

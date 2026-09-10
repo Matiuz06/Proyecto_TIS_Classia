@@ -1,39 +1,24 @@
-<?php require_once '../php/publicaciones/obtener_publicaciones.php'; ?>
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
+<?php
+require_once '../php/auth/roles.php';
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 
-    <meta
-      name="description"
-      content="Panel de gestión para proveedores de cursos y servicios en Classia." />
+$usuario = usuario_actual();
 
-    <title>Panel proveedor</title>
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../css/animation.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-  </head>
+require_once '../php/publicaciones/obtener_publicaciones.php';
 
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="../index.php">
-          <img src="../assets/logoC.png" />
-        </a>
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.php">Inicio</a>
-          <a href="catalogo.php">Catálogo</a>
-          <a href="carrito.php">Carrito</a>
-          <a href="login.php" aria-current="page">Mi cuenta</a>
-        </nav>
-      </div>
-    </header>
+$title       = 'Panel proveedor';
+$description = 'Panel de gestión para proveedores de cursos y servicios en Classia.';
+$cssPrefix   = '..';
+$jsPrefix    = '..';
+
+$activePage  = 'panel-proveedor';
+include '../includes/header.php';
+?>
 
     <main class="provider-dashboard">
       <?php if (isset($_GET['mensaje'])): ?>
-        <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 12px 16px; margin: 15px 0; border-radius: 6px; font-weight: bold;">
+        <div class="alert alert-success">
           <?php 
             if ($_GET['mensaje'] === 'creada') echo "Publicación creada exitosamente.";
             elseif ($_GET['mensaje'] === 'actualizada') echo "Publicación actualizada correctamente.";
@@ -53,7 +38,7 @@
 
         <p>
           Sesión iniciada como
-          <strong>Ana Fernández</strong>
+          <strong><?php echo htmlspecialchars($usuario['nombre']); ?></strong>
         </p>
 
         <nav aria-label="Acciones rápidas del proveedor">
@@ -254,6 +239,11 @@
           <div class="publicaciones-lista">
             <?php foreach ($publicaciones_proveedor as $pub): ?>
               <article class="pub-card">
+                <?php if (!empty($pub['imagen'])): ?>
+                  <div class="pub-card-thumb">
+                    <img src="../<?php echo htmlspecialchars($pub['imagen']); ?>" alt="<?php echo htmlspecialchars($pub['titulo']); ?>" />
+                  </div>
+                <?php endif; ?>
                 <header>
                   <h4>
                     <a href="servicio-detalle.php?id=<?php echo $pub['id_publicacion']; ?>">
@@ -337,6 +327,11 @@
         <?php endif; ?>
       </section>
 
+      <section id="solicitudes" aria-labelledby="titulo-solicitudes">
+        <header>
+          <h2 id="titulo-solicitudes">Solicitudes recibidas</h2>
+          <p>Gestiona las solicitudes de tus clientes y estudiantes.</p>
+        </header>
 
         <article>
           <header>
@@ -500,7 +495,7 @@
           <p>Información visible para los posibles clientes y estudiantes.</p>
         </header>
 
-        <h3>Ana Fernández</h3>
+        <h3><?php echo htmlspecialchars($usuario['nombre']); ?></h3>
 
         <p>
           Docente de Informática y desarrolladora especializada en tecnología
@@ -621,43 +616,4 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <p>
-        Classia — Plataforma de comercialización de cursos y servicios
-        educativos
-      </p>
-
-      <nav aria-label="Navegación secundaria">
-        <ul>
-          <li>
-            <a href="../index.php">Inicio</a>
-          </li>
-
-          <li>
-            <a href="catalogo.php">Catálogo</a>
-          </li>
-
-          <li>
-            <a href="usuario.php">Mi perfil</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Acerca de</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Contacto</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Privacidad</a>
-          </li>
-        </ul>
-      </nav>
-
-      <p>
-        <small> &copy; 2026 Classia. Todos los derechos reservados. </small>
-      </p>
-    </footer>
-  </body>
-</html>
+<?php include '../includes/footer.php'; ?>

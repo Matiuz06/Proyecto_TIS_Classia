@@ -1,6 +1,8 @@
 <?php
 $title     = 'Pasarela de pago';
 $cssPrefix = '..';
+$jsPrefix    = '..';
+
 $activePage = 'carrito';
 include '../includes/header.php';
 ?>
@@ -10,7 +12,7 @@ include '../includes/header.php';
 
       <h1>Pasarela de Pago</h1>
 
-      <form action="confirmacion.php" method="GET">
+      <form action="confirmacion.php" method="POST">
         <p>
           <label for="email"><strong>Correo electrónico:*</strong></label
           ><br />

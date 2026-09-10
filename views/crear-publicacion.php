@@ -1,10 +1,16 @@
 <?php
+require_once '../php/auth/roles.php';
+
+requerir_rol(ROL_DOCENTE, 'usuario.php');
+
 require_once '../php/publicaciones/crear_publicacion.php';
 require_once '../php/publicaciones/obtener_publicaciones.php';
 
 $title       = 'Crear publicación';
 $description = 'Publicación de nuevos cursos o servicios en Classia.';
 $cssPrefix   = '..';
+$jsPrefix    = '..';
+
 $bodyClass   = 'auth-page';
 $activePage  = 'cuenta';
 
@@ -33,7 +39,7 @@ include '../includes/header.php';
         </div>
       <?php endif; ?>
 
-      <form action="crear-publicacion.php" method="POST">
+      <form action="crear-publicacion.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
 
         <p>
@@ -79,6 +85,17 @@ include '../includes/header.php';
             required
             value="<?php echo htmlspecialchars($_POST['precio'] ?? ''); ?>"
             placeholder="Ej: 1500.00" />
+        </p>
+
+        <p>
+          <label for="imagen">Imagen de portada / vista previa (opcional)</label>
+          <input
+            type="file"
+            id="imagen"
+            name="imagen"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            class="form-file-input" />
+          <small class="muted">Formatos permitidos: JPG, PNG, WEBP, GIF. Máximo 5MB.</small>
         </p>
 
         <p>

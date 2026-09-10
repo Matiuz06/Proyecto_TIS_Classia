@@ -1,38 +1,12 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Solicita un presupuesto personalizado para diseño e impresión 3D en Classia." />
-    <title>Solicitar impresión 3D | Classia</title>
-    <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
-    <link rel="stylesheet" href="../css/animation.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-  </head>
+<?php
+$title       = 'Solicitar impresión 3D | Classia';
+$description = 'Solicita un presupuesto personalizado para diseño e impresión 3D en Classia.';
+$cssPrefix   = '..';
+$jsPrefix    = '..';
 
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a
-          class="site-brand"
-          href="../index.php"
-          aria-label="Classia - Inicio">
-          <img src="../assets/images/logo-classia.png" alt="Classia" />
-        </a>
-
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.php"> Inicio </a>
-
-          <a href="catalogo.php" aria-current="page"> Catálogo </a>
-
-          <a href="carrito.php"> Carrito </a>
-
-          <a href="login.php"> Mi cuenta </a>
-        </nav>
-      </div>
-    </header>
+$activePage  = 'catalogo';
+include '../includes/header.php';
+?>
 
     <main class="solicitud-3d">
       <nav class="breadcrumb" aria-label="Ruta de navegación">
@@ -429,10 +403,4 @@
         </aside>
       </div>
     </main>
-    <footer class="site-footer">
-      <p>
-        &copy; 2026 Classia. Cursos y servicios educativos en un solo lugar.
-      </p>
-    </footer>
-  </body>
-</html>
+<?php include '../includes/footer.php'; ?>

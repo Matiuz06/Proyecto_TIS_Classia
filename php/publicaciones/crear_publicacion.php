@@ -1,10 +1,10 @@
 <?php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../utils/upload_helper.php';
+
+requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], '../../views/usuario.php');
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -12,7 +12,8 @@ if (empty($_SESSION['csrf_token'])) {
 
 $errores = [];
 
-$id_usuario_autenticado = $_SESSION['id_usuario'] ?? 2;
+$usuario = usuario_actual();
+$id_usuario_autenticado = (int) ($usuario['id_usuario'] ?? 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = trim($_POST['titulo'] ?? '');
@@ -27,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($titulo) || empty($descripcion) || empty($precio) || empty($tipo) || $id_categoria <= 0) {
-        $errores[] = "Todos los campos son obligatorios.";
+        $errores[] = "Todos los campos obligatorios deben ser completados.";
     }
 
     if (!in_array($tipo, ['Curso', 'Servicio'], true)) {
@@ -46,17 +47,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    $ruta_imagen = null;
+    if (empty($errores) && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $res_upload = guardar_imagen_subida($_FILES['imagen'], 'publicaciones', 5);
+        if ($res_upload['ok']) {
+            $ruta_imagen = $res_upload['ruta'];
+        } else {
+            $errores[] = $res_upload['error'];
+        }
+    }
+
     if (empty($errores)) {
         try {
-            $sql = "INSERT INTO publicaciones (titulo, descripcion, precio, tipo, estado, id_usuario, id_categoria) 
-                    VALUES (:titulo, :descripcion, :precio, :tipo, 'Activo', :id_usuario, :id_categoria)";
+            $sql = "INSERT INTO publicaciones (titulo, descripcion, precio, tipo, estado, imagen, id_usuario, id_categoria) 
+                    VALUES (:titulo, :descripcion, :precio, :tipo, 'Activo', :imagen, :id_usuario, :id_categoria)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
-                'titulo' => $titulo,
-                'descripcion' => $descripcion,
-                'precio' => (float)$precio,
-                'tipo' => $tipo,
-                'id_usuario' => $id_usuario_autenticado,
+                'titulo'       => $titulo,
+                'descripcion'  => $descripcion,
+                'precio'       => (float)$precio,
+                'tipo'         => $tipo,
+                'imagen'       => $ruta_imagen,
+                'id_usuario'   => $id_usuario_autenticado,
                 'id_categoria' => $id_categoria
             ]);
 
@@ -64,6 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         } catch (PDOException $e) {
             error_log("Error SQL al crear publicación: " . $e->getMessage());
+            if ($ruta_imagen) {
+                eliminar_imagen_subida($ruta_imagen);
+            }
             $errores[] = "Ocurrió un error al guardar la publicación. Por favor, intentá nuevamente.";
         }
     }

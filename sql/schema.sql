@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     telefono VARCHAR(30) NULL,
     fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_rol INT NOT NULL,
+    foto_perfil VARCHAR(255) NULL DEFAULT NULL,
     CONSTRAINT fk_usuarios_roles
         FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
         ON DELETE RESTRICT ON UPDATE CASCADE
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     precio DECIMAL(10,2) NOT NULL,
     tipo ENUM('Curso', 'Servicio') NOT NULL,
     estado ENUM('Activo', 'Inactivo', 'Pausado') NOT NULL DEFAULT 'Activo',
+    imagen VARCHAR(255) NULL DEFAULT NULL,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_usuario INT NOT NULL,
     id_categoria INT NOT NULL,
@@ -68,6 +70,20 @@ CREATE TABLE IF NOT EXISTS solicitudes (
     CONSTRAINT fk_solicitudes_publicaciones
         FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
         ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS solicitudes_docente (
+    id_solicitud_docente INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL DEFAULT 'Pendiente',
+    motivo TEXT NULL,
+    fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_respuesta DATETIME NULL,
+    CONSTRAINT fk_solicitudes_docente_usuarios
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_solicitudes_docente_estado (estado),
+    INDEX idx_solicitudes_docente_usuario_estado (id_usuario, estado)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS contrataciones (
@@ -125,7 +141,9 @@ CREATE TABLE IF NOT EXISTS valoraciones (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_valoraciones_contrataciones
         FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
-        ON DELETE SET NULL ON UPDATE CASCADE
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT uq_valoraciones_contratacion_usuario
+        UNIQUE (id_contratacion, id_usuario)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO roles (id_rol, nombre_rol, descripcion) VALUES
@@ -146,16 +164,16 @@ INSERT IGNORE INTO categorias (id_categoria, nombre_categoria, descripcion) VALU
 (10, 'Gestión de Proyectos Tecnológicos', 'Metodologías ágiles, Scrum y dirección de proyectos de software');
 
 INSERT IGNORE INTO usuarios (id_usuario, nombre, apellido, email, password_hash, telefono, fecha_registro, id_rol) VALUES
-(1, 'Carlos', 'Admin', 'admin@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1155443322', '2026-01-10 09:00:00', 3),
-(2, 'María', 'Docente', 'docente@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1199887766', '2026-01-15 10:30:00', 2),
-(3, 'Roberto', 'Gómez', 'roberto.gomez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1144332211', '2026-01-20 11:15:00', 2),
-(4, 'Lucía', 'Fernández', 'lucia.fernandez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1133221100', '2026-02-01 14:00:00', 2),
-(5, 'Gonzalo', 'Martínez', 'gonzalo.martinez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1122110099', '2026-02-05 16:45:00', 2),
-(6, 'Juan', 'Pérez', 'estudiante@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1122334455', '2026-02-10 12:00:00', 1),
-(7, 'Ana', 'Silva', 'ana.silva@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1166778899', '2026-02-12 13:20:00', 1),
-(8, 'Diego', 'López', 'diego.lopez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1177889900', '2026-02-15 15:10:00', 1),
-(9, 'Sofía', 'Rodríguez', 'sofia.rodriguez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1188990011', '2026-02-18 17:30:00', 1),
-(10, 'Martín', 'Benítez', 'martin.benitez@classia.com', '$2y$10$e.1234567890123456789012345678901234567890123456789012', '1199001122', '2026-02-20 09:45:00', 1);
+(1, 'Carlos', 'Admin', 'admin@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1155443322', '2026-01-10 09:00:00', 3),
+(2, 'María', 'Docente', 'docente@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1199887766', '2026-01-15 10:30:00', 2),
+(3, 'Roberto', 'Gómez', 'roberto.gomez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1144332211', '2026-01-20 11:15:00', 2),
+(4, 'Lucía', 'Fernández', 'lucia.fernandez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1133221100', '2026-02-01 14:00:00', 2),
+(5, 'Gonzalo', 'Martínez', 'gonzalo.martinez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1122110099', '2026-02-05 16:45:00', 2),
+(6, 'Juan', 'Pérez', 'estudiante@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1122334455', '2026-02-10 12:00:00', 1),
+(7, 'Ana', 'Silva', 'ana.silva@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1166778899', '2026-02-12 13:20:00', 1),
+(8, 'Diego', 'López', 'diego.lopez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1177889900', '2026-02-15 15:10:00', 1),
+(9, 'Sofía', 'Rodríguez', 'sofia.rodriguez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1188990011', '2026-02-18 17:30:00', 1),
+(10, 'Martín', 'Benítez', 'martin.benitez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1199001122', '2026-02-20 09:45:00', 1);
 
 INSERT IGNORE INTO publicaciones (id_publicacion, titulo, descripcion, precio, tipo, estado, fecha_creacion, id_usuario, id_categoria) VALUES
 (1, 'Curso Completo de PHP y MySQL', 'Aprende backend desde cero hasta crear sistemas dinámicos seguros con PDO.', 15000.00, 'Curso', 'Activo', '2026-02-21 10:00:00', 2, 1),

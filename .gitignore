@@ -3,3 +3,8 @@ node_modules/
 *.log
 .env
 .github/CODEOWNERS
+
+# Docker personal setup
+Dockerfile
+docker-compose.yml
+.dockerignore
