@@ -1,6 +1,5 @@
 <?php
 require_once '../php/auth/roles.php';
-require_once '../config/database.php';
 require_once '../php/valoraciones/obtener_contrataciones_valorables.php';
 
 requerir_autenticacion('login.php');
@@ -18,7 +17,7 @@ unset($_SESSION['valoracion_errores'], $_SESSION['valoracion_input']);
 
 $id_contratacion_solicitada = (int) ($input_previo['id_contratacion'] ?? $_GET['contratacion'] ?? 0);
 
-$contexto                  = obtener_contexto_valoracion($pdo, $id_usuario, $id_contratacion_solicitada);
+$contexto                  = obtener_contexto_valoracion($id_usuario, $id_contratacion_solicitada);
 $contrataciones_pendientes = $contexto['contrataciones_pendientes'];
 $contratacion_seleccionada = $contexto['contratacion_seleccionada'];
 $error_mensaje             = $contexto['error_mensaje'];
@@ -26,6 +25,8 @@ $error_mensaje             = $contexto['error_mensaje'];
 $title       = 'Valoración';
 $description = 'Dejá tu valoración y opinión sobre cursos y servicios contratados en Classia.';
 $cssPrefix   = '..';
+$jsPrefix    = '..';
+
 $activePage  = 'cuenta';
 include '../includes/header.php';
 ?>

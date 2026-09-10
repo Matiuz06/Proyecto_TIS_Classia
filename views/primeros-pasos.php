@@ -1,30 +1,12 @@
-<!doctype html>
-<html lang="es">
+<?php
+$title       = 'Primeros pasos — Classia';
+$description = 'Configuración inicial del perfil y las preferencias del usuario en Classia.';
+$cssPrefix   = '..';
+$jsPrefix    = '..';
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Configuración inicial del perfil y las preferencias del usuario en Classia." />
-  <title>Primeros pasos — Classia</title>
-  <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
-  <link rel="stylesheet" href="../css/animation.css" />
-  <link rel="stylesheet" href="../css/style.css" />
-</head>
-
-<body>
-  <header class="site-header">
-    <div class="site-header__inner">
-      <a class="site-brand" href="../index.php">
-        <img src="../assets/images/logo-classia.png" alt="Logo Classia" />
-      </a>
-      <nav class="site-nav" aria-label="Navegación principal">
-        <a href="../index.php">Inicio</a>
-        <a href="catalogo.php">Catálogo</a>
-        <a href="carrito.php">Carrito</a>
-        <a href="login.php" aria-current="page">Mi cuenta</a>
-      </nav>
-    </div>
-  </header>
+$activePage  = 'cuenta';
+include '../includes/header.php';
+?>
 
   <main class="onboarding-page motion-entry">
     <header class="onboarding-header">
@@ -439,18 +421,4 @@
     </form>
   </main>
 
-  <footer class="site-footer">
-    <p>Classia — Plataforma de comercialización de servicios educativos</p>
-    <nav aria-label="Navegación secundaria">
-      <ul>
-        <li><a href="../index.php">Inicio</a></li>
-        <li><a href="catalogo.php">Servicios</a></li>
-        <li><a href="politica_privacidad.php">Privacidad</a></li>
-        <li><a href="../index.php">Contacto</a></li>
-      </ul>
-    </nav>
-    <p>© 2026 Classia. Todos los derechos reservados.</p>
-  </footer>
-</body>
-
-</html>
+<?php include '../includes/footer.php'; ?>

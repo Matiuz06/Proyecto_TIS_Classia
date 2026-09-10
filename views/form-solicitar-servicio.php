@@ -1,30 +1,12 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Formulario para solicitar un servicio personalizado en Classia." />
-    <title>Solicitud de servicio</title>
-    <link rel="icon" type="image/png" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="../css/animation.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="../index.php">
-          <img src="../assets/logoC.png" />
-        </a>
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.php">Inicio</a>
-          <a href="catalogo.php" aria-current="page">Catálogo</a>
-          <a href="carrito.php">Carrito</a>
-          <a href="login.php">Mi cuenta</a>
-        </nav>
-      </div>
-    </header>
+<?php
+$title       = 'Solicitud de servicio - Classia';
+$description = 'Formulario para solicitar un servicio personalizado en Classia.';
+$cssPrefix   = '..';
+$jsPrefix    = '..';
+
+$activePage  = 'catalogo';
+include '../includes/header.php';
+?>
 
     <main>
       <nav aria-label="Ruta de navegación">
@@ -751,39 +733,4 @@
       </form>
     </main>
 
-    <footer class="site-footer">
-      <p>
-        Classia — Plataforma de comercialización de cursos y servicios
-        educativos
-      </p>
-
-      <nav aria-label="Navegación secundaria">
-        <ul>
-          <li>
-            <a href="../index.php">Inicio</a>
-          </li>
-
-          <li>
-            <a href="catalogo.php">Catálogo</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Acerca de</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Contacto</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Privacidad</a>
-          </li>
-        </ul>
-      </nav>
-
-      <p>
-        <small> &copy; 2026 Classia. Todos los derechos reservados. </small>
-      </p>
-    </footer>
-  </body>
-</html>
+<?php include '../includes/footer.php'; ?>

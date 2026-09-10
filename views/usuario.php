@@ -3,45 +3,87 @@ require_once '../php/usuarios/perfil.php';
 
 $title      = 'Perfil de usuario';
 $cssPrefix  = '..';
+$jsPrefix    = '..';
+
 $activePage = 'cuenta';
 include '../includes/header.php';
 ?>
 
   <?php if (es_admin()): ?>
-    <div id="panel-admin" class="alert alert-info" style="margin: 1rem auto; max-width: 1120px; border-radius: 8px;">
+    <div id="panel-admin" class="alert alert-info role-banner">
       <strong>Modo Administrador Activo:</strong>
-      <a href="panel-administrador.php" style="font-weight: bold; margin-left: 0.5rem;">Ir al Panel de Administración</a> |
+      <a href="panel-administrador.php" class="banner-link">Ir al Panel de Administración</a> |
       <a href="catalogo.php">Gestionar Catálogo</a>
     </div>
   <?php elseif (es_docente()): ?>
-    <div id="panel-docente" class="alert alert-info" style="margin: 1rem auto; max-width: 1120px; border-radius: 8px;">
+    <div id="panel-docente" class="alert alert-info role-banner">
       <strong>Modo Docente/Proveedor Activo:</strong>
-      <a href="panel-proveedor.php" style="font-weight: bold; margin-left: 0.5rem;">Ir a mi Panel de Proveedor</a> |
+      <a href="panel-proveedor.php" class="banner-link">Ir a mi Panel de Proveedor</a> |
       <a href="crear-publicacion.php">Publicar nuevo contenido</a>
     </div>
   <?php endif; ?>
 
   <main class="motion-entry">
-    <?php if ($mensaje_acceso !== ''): ?>
+    <?php if (!empty($mensaje_acceso)): ?>
       <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($mensaje_acceso); ?>
       </div>
     <?php endif; ?>
 
-    <?php if ($mensaje_exito !== ''): ?>
+    <?php if (!empty($mensaje_error)): ?>
+      <div class="alert alert-danger" role="alert">
+        <?php echo htmlspecialchars($mensaje_error); ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if (!empty($mensaje_exito)): ?>
       <div class="alert alert-success" role="status">
         <?php echo htmlspecialchars($mensaje_exito); ?>
       </div>
     <?php endif; ?>
 
     <section class="profile-hero" aria-labelledby="perfil-usuario">
-      <p>Bienvenido/a,</p>
-      <h1 id="perfil-usuario"><?php echo htmlspecialchars($userData['nombre'] . ' ' . ($userData['apellido'] ?? '')); ?></h1>
-      <p>Perfil de Usuario (<?php echo htmlspecialchars($rol_actual); ?>) · <strong><?php echo htmlspecialchars($userData['email']); ?></strong></p>
-      <p>
-        <strong><?php echo count($cursos_contratados); ?></strong> Cursos contratados | 
-        <strong><?php echo count($servicios_contratados); ?></strong> Servicios contratados
-      </p>
+      <div class="profile-hero-content">
+        <div class="profile-avatar-wrapper">
+          <?php 
+            $fotoPerfilSrc = !empty($userData['foto_perfil']) 
+              ? ($cssPrefix . '/' . htmlspecialchars($userData['foto_perfil'])) 
+              : ($cssPrefix . '/assets/images/default-avatar.svg');
+          ?>
+          <img src="<?php echo $fotoPerfilSrc; ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre']); ?>" class="profile-avatar-img" />
+          
+          <div class="profile-avatar-actions">
+            <form action="../php/usuarios/foto_perfil.php" method="POST" enctype="multipart/form-data" class="profile-photo-form">
+              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>" />
+              <input type="hidden" name="accion" value="subir" />
+              <label class="btn-avatar-upload" title="Subir nueva foto de perfil">
+                <span>Cambiar foto</span>
+                <input type="file" name="foto_perfil" accept="image/jpeg,image/png,image/webp,image/gif" onchange="this.form.submit()" class="visually-hidden" />
+              </label>
+            </form>
+
+            <?php if (!empty($userData['foto_perfil'])): ?>
+              <form action="../php/usuarios/foto_perfil.php" method="POST" class="profile-photo-remove-form">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>" />
+                <input type="hidden" name="accion" value="eliminar" />
+                <button type="submit" class="btn-avatar-remove" onclick="return confirm('¿Seguro que deseas quitar tu foto de perfil?')" title="Quitar foto de perfil">
+                  Quitar foto
+                </button>
+              </form>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <div class="profile-hero-text">
+          <p class="profile-greeting">Bienvenido/a,</p>
+          <h1 id="perfil-usuario"><?php echo htmlspecialchars($userData['nombre'] . ' ' . ($userData['apellido'] ?? '')); ?></h1>
+          <p>Perfil de Usuario (<?php echo htmlspecialchars($rol_actual); ?>) · <strong><?php echo htmlspecialchars($userData['email']); ?></strong></p>
+          <p>
+            <strong><?php echo count($cursos_contratados); ?></strong> Cursos contratados | 
+            <strong><?php echo count($servicios_contratados); ?></strong> Servicios contratados
+          </p>
+        </div>
+      </div>
     </section>
 
     <nav class="profile-tabs" aria-label="Secciones de la cuenta">

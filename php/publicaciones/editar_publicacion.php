@@ -1,10 +1,10 @@
 <?php
 
 require_once __DIR__ . '/../auth/roles.php';
-
-requerir_rol(ROL_DOCENTE, '../../views/usuario.php');
-
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../utils/upload_helper.php';
+
+requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], '../../views/usuario.php');
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -14,21 +14,27 @@ $errores = [];
 $publicacion = null;
 $usuario = usuario_actual();
 $id_usuario_autenticado = (int) ($usuario['id_usuario'] ?? 0);
+$es_admin_usuario = es_admin();
 
 $id_publicacion = (int)($_GET['id'] ?? $_POST['id_publicacion'] ?? 0);
 
 if ($id_publicacion > 0) {
-    $stmt_check = $pdo->prepare("SELECT * FROM publicaciones WHERE id_publicacion = :id_pub AND id_usuario = :id_user");
-    $stmt_check->execute([
-        'id_pub' => $id_publicacion,
-        'id_user' => $id_usuario_autenticado
-    ]);
+    if ($es_admin_usuario) {
+        $stmt_check = $pdo->prepare("SELECT * FROM publicaciones WHERE id_publicacion = :id_pub");
+        $stmt_check->execute(['id_pub' => $id_publicacion]);
+    } else {
+        $stmt_check = $pdo->prepare("SELECT * FROM publicaciones WHERE id_publicacion = :id_pub AND id_usuario = :id_user");
+        $stmt_check->execute([
+            'id_pub' => $id_publicacion,
+            'id_user' => $id_usuario_autenticado
+        ]);
+    }
     $publicacion = $stmt_check->fetch();
 
     if (!$publicacion) {
         $errores[] = "No tenés permisos para modificar esta publicación o la misma no existe.";
     }
-} else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $errores[] = "Publicación no especificada.";
 }
 
@@ -43,11 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
         $nuevo_estado = $_POST['cambiar_estado'];
         if (in_array($nuevo_estado, ['Activo', 'Inactivo', 'Pausado'], true)) {
             try {
-                $stmt_estado = $pdo->prepare("UPDATE publicaciones SET estado = :estado WHERE id_publicacion = :id_pub AND id_usuario = :id_user");
+                $stmt_estado = $pdo->prepare("UPDATE publicaciones SET estado = :estado WHERE id_publicacion = :id_pub");
                 $stmt_estado->execute([
                     'estado' => $nuevo_estado,
                     'id_pub' => $id_publicacion,
-                    'id_user' => $id_usuario_autenticado
                 ]);
                 header("Location: panel-proveedor.php?mensaje=estado_actualizado");
                 exit;
@@ -65,9 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
         $tipo = trim($_POST['tipo'] ?? '');
         $id_categoria = (int)($_POST['id_categoria'] ?? 0);
         $estado = trim($_POST['estado'] ?? 'Activo');
+        $eliminar_imagen = !empty($_POST['eliminar_imagen']);
 
         if (empty($titulo) || empty($descripcion) || empty($precio) || empty($tipo) || $id_categoria <= 0) {
-            $errores[] = "Todos los campos son obligatorios.";
+            $errores[] = "Todos los campos obligatorios deben ser completados.";
         }
 
         if (!in_array($tipo, ['Curso', 'Servicio'], true)) {
@@ -82,21 +88,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
             $errores[] = "El precio debe ser un número mayor a cero.";
         }
 
+        $ruta_imagen = $publicacion['imagen'];
+
+        if ($eliminar_imagen && $ruta_imagen) {
+            eliminar_imagen_subida($ruta_imagen);
+            $ruta_imagen = null;
+        }
+
+        if (empty($errores) && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $res_upload = guardar_imagen_subida($_FILES['imagen'], 'publicaciones', 5);
+            if ($res_upload['ok']) {
+                if ($ruta_imagen && $ruta_imagen !== $res_upload['ruta']) {
+                    eliminar_imagen_subida($ruta_imagen);
+                }
+                $ruta_imagen = $res_upload['ruta'];
+            } else {
+                $errores[] = $res_upload['error'];
+            }
+        }
+
         if (empty($errores)) {
             try {
                 $sql = "UPDATE publicaciones 
-                        SET titulo = :titulo, descripcion = :descripcion, precio = :precio, tipo = :tipo, id_categoria = :id_categoria, estado = :estado 
-                        WHERE id_publicacion = :id_pub AND id_usuario = :id_user";
+                        SET titulo = :titulo, descripcion = :descripcion, precio = :precio, tipo = :tipo, 
+                            id_categoria = :id_categoria, estado = :estado, imagen = :imagen 
+                        WHERE id_publicacion = :id_pub";
                 $stmt_update = $pdo->prepare($sql);
                 $stmt_update->execute([
-                    'titulo' => $titulo,
-                    'descripcion' => $descripcion,
-                    'precio' => (float)$precio,
-                    'tipo' => $tipo,
+                    'titulo'       => $titulo,
+                    'descripcion'  => $descripcion,
+                    'precio'       => (float)$precio,
+                    'tipo'         => $tipo,
                     'id_categoria' => $id_categoria,
-                    'estado' => $estado,
-                    'id_pub' => $id_publicacion,
-                    'id_user' => $id_usuario_autenticado
+                    'estado'       => $estado,
+                    'imagen'       => $ruta_imagen,
+                    'id_pub'       => $id_publicacion,
                 ]);
 
                 header("Location: panel-proveedor.php?mensaje=actualizada");

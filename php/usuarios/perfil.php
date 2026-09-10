@@ -6,6 +6,10 @@ require_once __DIR__ . '/../valoraciones/obtener_contrataciones_valorables.php';
 
 requerir_autenticacion('login.php');
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $usuario    = usuario_actual();
 $id_usuario = (int) $usuario['id_usuario'];
 $rol_actual = nombre_rol((int) $usuario['id_rol']);
@@ -13,7 +17,12 @@ $rol_actual = nombre_rol((int) $usuario['id_rol']);
 $mensaje_acceso = $_SESSION['mensaje_acceso'] ?? '';
 unset($_SESSION['mensaje_acceso']);
 
-$mensaje_exito = '';
+$mensaje_error = $_SESSION['error_perfil'] ?? '';
+unset($_SESSION['error_perfil']);
+
+$mensaje_exito = $_SESSION['exito_perfil'] ?? '';
+unset($_SESSION['exito_perfil']);
+
 if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'valoracion_guardada') {
     $mensaje_exito = '¡Tu valoración fue registrada correctamente! Gracias por compartir tu opinión.';
 }
@@ -22,6 +31,10 @@ try {
     $stmt_user = $pdo->prepare("SELECT u.*, r.nombre_rol FROM usuarios u JOIN roles r ON u.id_rol = r.id_rol WHERE u.id_usuario = :id");
     $stmt_user->execute(['id' => $id_usuario]);
     $userData = $stmt_user->fetch() ?: $usuario;
+
+    if (!empty($userData['foto_perfil']) && ($usuario['foto_perfil'] ?? '') !== $userData['foto_perfil']) {
+        actualizar_foto_sesion($userData['foto_perfil']);
+    }
 
     $resumen_contrataciones = obtener_resumen_contrataciones_usuario($pdo, $id_usuario);
     $cursos_contratados     = $resumen_contrataciones['cursos'];

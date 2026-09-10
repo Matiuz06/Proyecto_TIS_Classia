@@ -3,6 +3,8 @@ require_once '../php/publicaciones/detalle_curso.php';
 
 $title      = $curso ? htmlspecialchars($curso['titulo']) : 'Curso';
 $cssPrefix  = '..';
+$jsPrefix    = '..';
+
 $activePage = 'catalogo';
 include '../includes/header.php';
 ?>
@@ -35,7 +37,7 @@ include '../includes/header.php';
       </aside>
 
       <main class="main-content">
-        <nav aria-label="Ruta de navegación" style="margin-bottom: 1rem;">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
           <a href="catalogo.php?tipo=curso">← Volver al catálogo</a>
         </nav>
 
@@ -46,7 +48,13 @@ include '../includes/header.php';
           <p><strong>Docente:</strong> <?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?> | <strong>Precio:</strong> $<?= number_format($curso['precio'], 2, ',', '.') ?></p>
         <?php endif; ?>
 
-        <video controls aria-label="Video de demostración del curso" style="margin-top: 1rem;">
+        <?php if (!empty($curso['imagen'])): ?>
+          <div class="course-banner-media">
+            <img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" class="course-banner-img" />
+          </div>
+        <?php endif; ?>
+
+        <video controls aria-label="Video de demostración del curso" class="course-demo-video">
           Tu navegador no soporta video.
         </video>
 
@@ -67,14 +75,10 @@ include '../includes/header.php';
           <button type="button">Enviar</button>
         </div>
 
-        <p style="margin-top: 1.5rem;">
+        <p class="mt-section">
           <a href="usuario.php" class="btn">Ir a mis cursos</a>
         </p>
       </main>
     </div>
 
-    <footer class="site-footer">
-      <p>&copy; 2026 Classia. Todos los derechos reservados.</p>
-    </footer>
-</body>
-</html>
+<?php include '../includes/footer.php'; ?>

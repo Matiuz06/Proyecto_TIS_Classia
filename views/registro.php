@@ -4,6 +4,8 @@ require_once '../php/usuarios/registro.php';
 $title      = 'Crear cuenta';
 $description = 'Registro de usuario en Classia.';
 $cssPrefix  = '..';
+$jsPrefix    = '..';
+
 $bodyClass  = 'auth-page';
 $activePage = 'cuenta';
 include '../includes/header.php';

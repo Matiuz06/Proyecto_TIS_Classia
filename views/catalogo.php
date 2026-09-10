@@ -4,6 +4,8 @@ require_once '../php/publicaciones/catalogo.php';
 $title      = 'Catálogo de cursos y servicios';
 $description = 'Catálogo de cursos y servicios educativos disponibles en Classia.';
 $cssPrefix  = '..';
+$jsPrefix    = '..';
+
 $activePage = 'catalogo';
 include '../includes/header.php';
 ?>
@@ -74,7 +76,7 @@ include '../includes/header.php';
               </label>
             </fieldset>
             <button type="submit">Aplicar filtros</button>
-            <a href="catalogo.php" class="botonLimpiar" style="display:inline-block; text-align:center; text-decoration:none; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid var(--color-border); border-radius: 4px;">Limpiar</a>
+            <a href="catalogo.php" class="btn-ghost botonLimpiar">Limpiar</a>
           </form>
         </aside>
 
@@ -98,10 +100,16 @@ include '../includes/header.php';
                   <p>Cursos diversos para un aprendizaje profundo.</p>
                 </header>
 
-                <div class="catalog-grid" style="margin-bottom: 2rem;">
+                <div class="catalog-grid catalog-grid--courses">
                   <?php foreach ($cursos as $curso): ?>
                     <article class="catalog-card" aria-labelledby="curso-<?= $curso['id_publicacion'] ?>">
-                      <div class="placeholder-visual" aria-hidden="true">Curso</div>
+                      <?php if (!empty($curso['imagen'])): ?>
+                        <div class="catalog-card-media">
+                          <img class="catalog-card-image" src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" />
+                        </div>
+                      <?php else: ?>
+                        <div class="placeholder-visual" aria-hidden="true">Curso</div>
+                      <?php endif; ?>
                       <div>
                         <h3 id="curso-<?= $curso['id_publicacion'] ?>"><?= htmlspecialchars($curso['titulo']) ?></h3>
                         <p><?= htmlspecialchars($curso['descripcion']) ?></p>
@@ -140,7 +148,13 @@ include '../includes/header.php';
                 <div class="catalog-grid">
                   <?php foreach ($servicios as $serv): ?>
                     <article class="catalog-card" aria-labelledby="servicio-<?= $serv['id_publicacion'] ?>">
-                      <div class="placeholder-visual" aria-hidden="true">Servicio</div>
+                      <?php if (!empty($serv['imagen'])): ?>
+                        <div class="catalog-card-media">
+                          <img class="catalog-card-image" src="../<?= htmlspecialchars($serv['imagen']) ?>" alt="<?= htmlspecialchars($serv['titulo']) ?>" />
+                        </div>
+                      <?php else: ?>
+                        <div class="placeholder-visual" aria-hidden="true">Servicio</div>
+                      <?php endif; ?>
                       <div>
                         <h3 id="servicio-<?= $serv['id_publicacion'] ?>"><?= htmlspecialchars($serv['titulo']) ?></h3>
                         <p><?= htmlspecialchars($serv['descripcion']) ?></p>
@@ -173,8 +187,4 @@ include '../includes/header.php';
       </div>
     </main>
 
-    <footer class="site-footer">
-      <p>&copy; 2026 Classia. Plataforma educativa para estudiantes, docentes y administradores.</p>
-    </footer>
-</body>
-</html>
+<?php include '../includes/footer.php'; ?>

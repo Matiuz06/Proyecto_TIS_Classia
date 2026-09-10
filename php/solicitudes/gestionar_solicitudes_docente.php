@@ -4,8 +4,10 @@ require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 
 // Obtiene todas las solicitudes docentes pendientes de revisión
-function obtener_solicitudes_docente_pendientes(PDO $pdo): array
+function obtener_solicitudes_docente_pendientes(?PDO $pdo_param = null): array
 {
+    global $pdo;
+    $db = $pdo_param ?? $pdo;
     $sql = "SELECT sd.id_solicitud_docente, sd.estado, sd.motivo, sd.fecha_solicitud,
                    u.nombre, u.apellido, u.email
             FROM solicitudes_docente sd
@@ -13,13 +15,15 @@ function obtener_solicitudes_docente_pendientes(PDO $pdo): array
             WHERE sd.estado = 'Pendiente'
             ORDER BY sd.fecha_solicitud ASC";
 
-    $stmt = $pdo->query($sql);
+    $stmt = $db->query($sql);
     return $stmt->fetchAll();
 }
 
 // Procesa la decisión (aprobar o rechazar) de una solicitud docente
-function procesar_decision_solicitud_docente(PDO $pdo, int $id_solicitud, string $accion, string $token_recibido, string $csrf_session): array
+function procesar_decision_solicitud_docente(int $id_solicitud, string $accion, string $token_recibido, string $csrf_session, ?PDO $pdo_param = null): array
 {
+    global $pdo;
+    $db = $pdo_param ?? $pdo;
     if (empty($csrf_session) || !hash_equals($csrf_session, $token_recibido)) {
         return [
             'error'   => 'La sesión del formulario expiró. Recargá la página e intentá nuevamente.',

@@ -1,31 +1,14 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Detalle de un servicio educativo o tecnológico publicado en Classia." />
-    <title>Diseño e impresión de recursos didácticos 3D</title>
-    <link rel="stylesheet" href="../css/animation.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
-  </head>
+<?php
+require_once '../php/publicaciones/detalle_servicio.php';
 
-  <body>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="../index.php">
-          <img src="../assets/images/logo-classia.png" alt="Classia" />
-        </a>
-        <nav class="site-nav" aria-label="Navegación principal">
-          <a href="../index.php">Inicio</a>
-          <a href="catalogo.php" aria-current="page">Catálogo</a>
-          <a href="carrito.php">Carrito</a>
-          <a href="login.php">Mi cuenta</a>
-        </nav>
-      </div>
-    </header>
+$title       = $servicio ? htmlspecialchars($servicio['titulo']) : 'Diseño e impresión de recursos didácticos 3D';
+$description = 'Detalle de un servicio educativo o tecnológico publicado en Classia.';
+$cssPrefix   = '..';
+$jsPrefix    = '..';
+
+$activePage  = 'catalogo';
+include '../includes/header.php';
+?>
 
     <main>
       <nav aria-label="Ruta de navegación">
@@ -35,29 +18,30 @@
           </li>
 
           <li>
-            <a href="catalogo.php">Servicios</a>
-          </li>
-
-          <li>
-            <a href="catalogo.php?tipo=servicio&categoria=diseno-impresion-3d">
-              Diseño e impresión 3D
-            </a>
+            <a href="catalogo.php?tipo=servicio">Servicios</a>
           </li>
 
           <li aria-current="page">
-            Diseño e impresión de recursos didácticos 3D
+            <?= htmlspecialchars($servicio ? $servicio['titulo'] : 'Diseño e impresión de recursos didácticos 3D') ?>
           </li>
         </ol>
       </nav>
 
       <article>
         <header>
-          <p>Diseño e impresión 3D</p>
+          <p><?= htmlspecialchars($servicio ? $servicio['nombre_categoria'] : 'Diseño e impresión 3D') ?></p>
 
-          <h1>Diseño e impresión de recursos didácticos 3D</h1>
+          <h1><?= htmlspecialchars($servicio ? $servicio['titulo'] : 'Diseño e impresión de recursos didácticos 3D') ?></h1>
+
+          <?php if (!empty($servicio['imagen'])): ?>
+            <div class="service-banner-media">
+              <img src="../<?= htmlspecialchars($servicio['imagen']) ?>" alt="<?= htmlspecialchars($servicio['titulo']) ?>" class="service-banner-img" />
+            </div>
+          <?php endif; ?>
 
           <p>
-            Diseño y fabricación de piezas, maquetas, prototipos y materiales
+            <?= nl2br(htmlspecialchars($servicio ? $servicio['descripcion'] : 'Diseño y fabricación de piezas, maquetas, prototipos y materiales didácticos personalizados mediante tecnología de impresión 3D FDM y resina, adaptados a requerimientos pedagógicos o técnicos.')) ?>
+          </p>
             personalizados para centros educativos, docentes y estudiantes.
           </p>
 
@@ -533,39 +517,4 @@
       </article>
     </main>
 
-    <footer class="site-footer">
-      <p>
-        Classia — Plataforma de comercialización de cursos y servicios
-        educativos
-      </p>
-
-      <nav aria-label="Navegación secundaria">
-        <ul>
-          <li>
-            <a href="../index.php">Inicio</a>
-          </li>
-
-          <li>
-            <a href="catalogo.php">Catálogo</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Acerca de</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Contacto</a>
-          </li>
-
-          <li>
-            <a href="../index.php">Privacidad</a>
-          </li>
-        </ul>
-      </nav>
-
-      <p>
-        <small> &copy; 2026 Classia. Todos los derechos reservados. </small>
-      </p>
-    </footer>
-  </body>
-</html>
+<?php include '../includes/footer.php'; ?>
