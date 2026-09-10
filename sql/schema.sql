@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     telefono VARCHAR(30) NULL,
     fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_rol INT NOT NULL,
+    foto_perfil VARCHAR(255) NULL DEFAULT NULL,
     CONSTRAINT fk_usuarios_roles
         FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
         ON DELETE RESTRICT ON UPDATE CASCADE
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     precio DECIMAL(10,2) NOT NULL,
     tipo ENUM('Curso', 'Servicio') NOT NULL,
     estado ENUM('Activo', 'Inactivo', 'Pausado') NOT NULL DEFAULT 'Activo',
+    imagen VARCHAR(255) NULL DEFAULT NULL,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_usuario INT NOT NULL,
     id_categoria INT NOT NULL,
