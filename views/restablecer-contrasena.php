@@ -1,7 +1,13 @@
 <?php
+require_once '../php/auth/session.php';
+iniciar_sesion();
+
+$mensaje_error = $_SESSION['error_restablecer'] ?? '';
+unset($_SESSION['error_restablecer']);
+
 $title     = 'Restablecer contraseña';
 $cssPrefix = '..';
-$jsPrefix    = '..';
+$jsPrefix  = '..';
 
 $activePage = 'cuenta';
 include '../includes/header.php';
@@ -10,12 +16,17 @@ include '../includes/header.php';
     <div class="card-container">
       <span class="brand-mark">Classia</span>
       <h1>Restablecer Contraseña</h1>
-      <p>Ingresa tu correo para enviarte las instrucciones de recuperación.</p>
+      <p>Ingresá tu correo electrónico registrado y tu nueva contraseña para actualizarla.</p>
 
-      <form action="/restablecer_contra" method="POST">
+      <?php if (!empty($mensaje_error)): ?>
+        <div class="alert alert-danger" role="alert">
+          <?= htmlspecialchars($mensaje_error) ?>
+        </div>
+      <?php endif; ?>
+
+      <form action="../php/auth/procesar_restablecer_clave.php" method="POST">
         <p>
-          <label for="correo1"><strong>Correo registrado:*</strong></label
-          ><br />
+          <label for="correo1"><strong>Correo registrado:*</strong></label><br />
           <input
             type="email"
             id="correo1"
@@ -25,26 +36,26 @@ include '../includes/header.php';
         </p>
 
         <p>
-          <label for="cont2"><strong>Nueva contraseña:*</strong></label
-          ><br />
+          <label for="cont2"><strong>Nueva contraseña:*</strong></label><br />
           <input
             type="password"
             id="cont2"
             name="nueva_contrasena"
-            placeholder="Nueva contraseña"
+            placeholder="Nueva contraseña (mínimo 6 caracteres)"
+            minlength="6"
             required />
         </p>
 
-        <button type="submit">Enviar Restablecimiento</button>
+        <button type="submit" class="btn">Restablecer Contraseña</button>
       </form>
 
       <hr />
 
       <p>
-        <a href="login.php">← Iniciar Sesión</a>
+        <a href="login.php" class="link">← Iniciar Sesión</a>
       </p>
       <p>
-        <a href="registro.php">¿No tienes cuenta? Regístrate</a>
+        <a href="registro.php" class="link">¿No tienes cuenta? Regístrate</a>
       </p>
     </div>
 
