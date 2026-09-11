@@ -152,6 +152,11 @@ include '../includes/header.php';
                         </dl>
                         <p class="catalog-actions">
                           <a class="btn" href="curso.php?id=<?= $curso['id_publicacion'] ?>">Ver curso</a>
+                          <form action="../php/contrataciones/carrito.php" method="post">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                            <input type="hidden" name="id_publicacion" value="<?= (int) $curso['id_publicacion'] ?>">
+                            <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
+                          </form>
                         </p>
                       </div>
                     </article>
@@ -200,6 +205,11 @@ include '../includes/header.php';
                         </dl>
                         <p class="catalog-actions">
                           <a class="btn" href="servicio-detalle.php?id=<?= $serv['id_publicacion'] ?>">Solicitar servicio</a>
+                          <form action="../php/contrataciones/carrito.php" method="post">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                            <input type="hidden" name="id_publicacion" value="<?= (int) $serv['id_publicacion'] ?>">
+                            <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
+                          </form>
                         </p>
                       </div>
                     </article>
