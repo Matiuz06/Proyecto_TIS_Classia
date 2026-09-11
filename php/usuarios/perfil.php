@@ -32,8 +32,14 @@ try {
     $stmt_user->execute(['id' => $id_usuario]);
     $userData = $stmt_user->fetch() ?: $usuario;
 
-    if (!empty($userData['foto_perfil']) && ($usuario['foto_perfil'] ?? '') !== $userData['foto_perfil']) {
-        actualizar_foto_sesion($userData['foto_perfil']);
+    if ($userData) {
+        if (!empty($userData['foto_perfil']) && ($usuario['foto_perfil'] ?? '') !== $userData['foto_perfil']) {
+            actualizar_foto_sesion($userData['foto_perfil']);
+        }
+        if (isset($userData['id_rol']) && (int) $userData['id_rol'] !== (int) ($usuario['id_rol'] ?? 0)) {
+            $_SESSION['usuario']['id_rol'] = (int) $userData['id_rol'];
+            $rol_actual = $userData['nombre_rol'] ?? nombre_rol((int) $userData['id_rol']);
+        }
     }
 
     $resumen_contrataciones = obtener_resumen_contrataciones_usuario($pdo, $id_usuario);
