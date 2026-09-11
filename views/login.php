@@ -94,7 +94,7 @@ include '../includes/header.php';
         </div>
 
         <a
-            href="#"
+            href="login-google.php"
             class="btn-google"
             id="btn-google-login"
             aria-label="Iniciar sesión con Google"
