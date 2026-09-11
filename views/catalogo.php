@@ -1,12 +1,12 @@
 <?php
 require_once '../php/publicaciones/catalogo.php';
 
-$title      = 'Catálogo de cursos y servicios';
+$title       = 'Catálogo de cursos y servicios';
 $description = 'Catálogo de cursos y servicios educativos disponibles en Classia.';
-$cssPrefix  = '..';
+$cssPrefix   = '..';
 $jsPrefix    = '..';
 
-$activePage = 'catalogo';
+$activePage  = 'catalogo';
 include '../includes/header.php';
 ?>
 
@@ -24,6 +24,9 @@ include '../includes/header.php';
           class="catalog-tools">
           <?php if (!empty($tipo_filtro)): ?>
             <input type="hidden" name="tipo" value="<?= htmlspecialchars($tipo_filtro) ?>" />
+          <?php endif; ?>
+          <?php if ($categoria_filtro > 0): ?>
+            <input type="hidden" name="categoria" value="<?= (int) $categoria_filtro ?>" />
           <?php endif; ?>
           <p>
             <label for="busqueda">Buscar en Classia</label>
@@ -45,6 +48,7 @@ include '../includes/header.php';
             <?php if (!empty($busqueda)): ?>
               <input type="hidden" name="busqueda" value="<?= htmlspecialchars($busqueda) ?>" />
             <?php endif; ?>
+            
             <fieldset>
               <legend>Tipo</legend>
               <label for="tipo-todos">
@@ -75,8 +79,23 @@ include '../includes/header.php';
                 Servicios
               </label>
             </fieldset>
-            <button type="submit">Aplicar filtros</button>
-            <a href="catalogo.php" class="btn-ghost botonLimpiar">Limpiar</a>
+
+            <fieldset class="filter-category-fieldset">
+              <legend>Disciplina / Orientación</legend>
+              <select name="categoria" id="filtro-categoria" class="filter-category-select">
+                <option value="0">Todas las disciplinas</option>
+                <?php foreach ($categorias as $cat): ?>
+                  <option value="<?= (int) $cat['id_categoria'] ?>" <?= ($categoria_filtro === (int)$cat['id_categoria']) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($cat['nombre_categoria']) ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </fieldset>
+
+            <div class="filter-buttons-wrapper">
+              <button type="submit" class="btn">Aplicar filtros</button>
+              <a href="catalogo.php" class="btn-ghost botonLimpiar">Limpiar</a>
+            </div>
           </form>
         </aside>
 
@@ -120,7 +139,11 @@ include '../includes/header.php';
                           </div>
                           <div>
                             <dt>Docente</dt>
-                            <dd><?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?></dd>
+                            <dd>
+                              <a href="proveedor.php?id=<?= (int)$curso['id_usuario'] ?>" class="provider-name-link">
+                                <?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?>
+                              </a>
+                            </dd>
                           </div>
                           <div>
                             <dt>Precio</dt>
@@ -129,6 +152,11 @@ include '../includes/header.php';
                         </dl>
                         <p class="catalog-actions">
                           <a class="btn" href="curso.php?id=<?= $curso['id_publicacion'] ?>">Ver curso</a>
+                          <form action="../php/contrataciones/carrito.php" method="post">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                            <input type="hidden" name="id_publicacion" value="<?= (int) $curso['id_publicacion'] ?>">
+                            <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
+                          </form>
                         </p>
                       </div>
                     </article>
@@ -140,7 +168,6 @@ include '../includes/header.php';
             <?php if (empty($tipo_filtro) || $tipo_filtro === 'servicio'): ?>
               <?php if (!empty($servicios)): ?>
                 <header>
-                  <p>Soluciones personalizadas</p>
                   <h2 id="titulo-servicios">Servicios (<?= count($servicios) ?>)</h2>
                   <p>Distintos servicios según tu necesidad.</p>
                 </header>
@@ -165,7 +192,11 @@ include '../includes/header.php';
                           </div>
                           <div>
                             <dt>Proveedor</dt>
-                            <dd><?= htmlspecialchars($serv['autor_nombre'] . ' ' . $serv['autor_apellido']) ?></dd>
+                            <dd>
+                              <a href="proveedor.php?id=<?= (int)$serv['id_usuario'] ?>" class="provider-name-link">
+                                <?= htmlspecialchars($serv['autor_nombre'] . ' ' . $serv['autor_apellido']) ?>
+                              </a>
+                            </dd>
                           </div>
                           <div>
                             <dt>Precio</dt>
@@ -174,6 +205,11 @@ include '../includes/header.php';
                         </dl>
                         <p class="catalog-actions">
                           <a class="btn" href="servicio-detalle.php?id=<?= $serv['id_publicacion'] ?>">Solicitar servicio</a>
+                          <form action="../php/contrataciones/carrito.php" method="post">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                            <input type="hidden" name="id_publicacion" value="<?= (int) $serv['id_publicacion'] ?>">
+                            <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
+                          </form>
                         </p>
                       </div>
                     </article>

@@ -1,9 +1,25 @@
 <?php
 
+require_once __DIR__ . '/../auth/session.php';
+iniciar_sesion();
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 require_once __DIR__ . '/../../config/database.php';
 
 $busqueda = trim($_GET['busqueda'] ?? '');
 $tipo_filtro = trim($_GET['tipo'] ?? '');
+$categoria_filtro = isset($_GET['categoria']) ? (int) $_GET['categoria'] : 0;
+
+$categorias = [];
+try {
+    $stmt_cat = $pdo->query("SELECT id_categoria, nombre_categoria FROM categorias ORDER BY nombre_categoria ASC");
+    $categorias = $stmt_cat->fetchAll();
+} catch (PDOException $e) {
+    error_log("Error al consultar categorias: " . $e->getMessage());
+}
 
 $sql = "SELECT p.*, c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido 
         FROM publicaciones p 
@@ -21,6 +37,11 @@ if ($tipo_filtro === 'curso') {
     $sql .= " AND p.tipo = 'Curso'";
 } elseif ($tipo_filtro === 'servicio') {
     $sql .= " AND p.tipo = 'Servicio'";
+}
+
+if ($categoria_filtro > 0) {
+    $sql .= " AND p.id_categoria = :categoria";
+    $params['categoria'] = $categoria_filtro;
 }
 
 $sql .= " ORDER BY p.fecha_creacion DESC";

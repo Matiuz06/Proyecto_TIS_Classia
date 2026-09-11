@@ -1,84 +1,185 @@
 <?php
 require_once '../php/publicaciones/detalle_curso.php';
 
-$title      = $curso ? htmlspecialchars($curso['titulo']) : 'Curso';
-$cssPrefix  = '..';
+$title       = $curso ? htmlspecialchars($curso['titulo']) : 'Curso no encontrado';
+$description = $curso ? htmlspecialchars(mb_strimwidth($curso['descripcion'], 0, 150, '...')) : 'Detalle del curso en Classia.';
+$cssPrefix   = '..';
 $jsPrefix    = '..';
 
-$activePage = 'catalogo';
+$activePage  = 'catalogo';
 include '../includes/header.php';
 ?>
 
-    <div class="layout-sidebar">
-      <aside class="sidebar">
-        <h2>Contenido del curso</h2>
+  <main class="product-detail-container motion-entry">
+    <nav aria-label="Ruta de navegación" class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li><a href="../index.php">Inicio</a> /</li>
+        <li><a href="catalogo.php?tipo=curso">Cursos</a> /</li>
+        <li aria-current="page">
+          <?= htmlspecialchars($curso ? $curso['titulo'] : 'Detalle') ?>
+        </li>
+      </ol>
+    </nav>
 
-        <h4>Módulo 1 — Introducción</h4>
-        <ul>
-          <li>Bienvenida al módulo (Video · 2 min)</li>
-          <li>Introducción teórica (PDF)</li>
-          <li>Actividad práctica 1</li>
-        </ul>
+    <?php if (!$curso): ?>
+      <section class="empty-state" aria-labelledby="sin-curso">
+        <h1 id="sin-curso">Curso no encontrado</h1>
+        <p>El curso que buscas no existe o no se encuentra disponible actualmente.</p>
+        <p><a href="catalogo.php?tipo=curso" class="btn">Explorar catálogo de cursos</a></p>
+      </section>
+    <?php else: ?>
+      <div class="product-detail-layout">
+        
+        <!-- Columna Izquierda: Información del Curso -->
+        <article class="product-main-content">
+          <header class="product-header">
+            <span class="badge badge-course">
+              <?= htmlspecialchars($curso['nombre_categoria']) ?>
+            </span>
+            <h1 class="product-title"><?= htmlspecialchars($curso['titulo']) ?></h1>
 
-        <h4>Módulo 2 — Desarrollo</h4>
-        <ul>
-          <li>Bienvenida al Módulo 2 (Video · 1 min)</li>
-          <li><strong><?= htmlspecialchars($curso ? $curso['titulo'] : 'Introducción a las funciones') ?> (Video · 3 min)</strong></li>
-          <li>Crear una práctica básica (Video · 2 min)</li>
-          <li>Lectura complementaria (PDF)</li>
-          <li>Cuestionario del módulo (Actividad)</li>
-        </ul>
+            <div class="product-meta-row">
+              <div>
+                <span>Docente: </span>
+                <a href="proveedor.php?id=<?= (int)$curso['autor_id'] ?>" class="provider-link">
+                  <?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?>
+                </a>
+              </div>
+              <div>
+                <a href="#valoraciones-curso" class="rating-link">
+                  ⭐ <strong><?= $promedio_calificacion > 0 ? $promedio_calificacion . ' / 5' : 'Sin calificar' ?></strong>
+                  (<?= $total_resenas ?> <?= $total_resenas === 1 ? 'valoración' : 'valoraciones' ?>)
+                </a>
+              </div>
+            </div>
 
-        <h4>Módulo 3 — Cierre</h4>
-        <ul>
-          <li>Proyecto final (Actividad)</li>
-          <li>Video de cierre (Video · 4 min)</li>
-        </ul>
-      </aside>
+            <?php if (!empty($curso['imagen'])): ?>
+              <div class="product-media-wrapper">
+                <img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" />
+              </div>
+            <?php else: ?>
+              <div class="course-video-wrapper">
+                <video controls aria-label="Video de vista previa" class="course-demo-video">
+                  Tu navegador no admite video HTML5.
+                </video>
+              </div>
+            <?php endif; ?>
 
-      <main class="main-content">
-        <nav class="breadcrumb" aria-label="Ruta de navegación">
-          <a href="catalogo.php?tipo=curso">← Volver al catálogo</a>
-        </nav>
+            <div class="product-body">
+              <h3>Acerca de este curso</h3>
+              <p><?= nl2br(htmlspecialchars($curso['descripcion'])) ?></p>
+            </div>
+          </header>
 
-        <h1><?= htmlspecialchars($curso ? $curso['titulo'] : 'Introducción a las funciones') ?></h1>
+          <hr class="section-divider" />
 
-        <?php if ($curso): ?>
-          <p class="badge"><?= htmlspecialchars($curso['nombre_categoria']) ?></p>
-          <p><strong>Docente:</strong> <?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?> | <strong>Precio:</strong> $<?= number_format($curso['precio'], 2, ',', '.') ?></p>
-        <?php endif; ?>
+          <!-- Temario y Módulos -->
+          <section aria-labelledby="temario-curso">
+            <h2 id="temario-curso">Contenido del programa</h2>
+            <div class="syllabus-container">
+              <div class="syllabus-module-header">
+                Módulo 1: Fundamentos y Conceptos Clave (3 lecciones · 45 min)
+              </div>
+              <ul class="syllabus-module-list">
+                <li>Introducción y objetivos de aprendizaje</li>
+                <li>Configuración del entorno de trabajo</li>
+                <li>Primeros pasos y conceptos teóricos esenciales</li>
+              </ul>
 
-        <?php if (!empty($curso['imagen'])): ?>
-          <div class="course-banner-media">
-            <img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" class="course-banner-img" />
+              <div class="syllabus-module-header syllabus-module-header--middle">
+                Módulo 2: Desarrollo Práctico y Casos Reales (5 lecciones · 2h 15m)
+              </div>
+              <ul class="syllabus-module-list">
+                <li>Arquitectura y aplicación de buenas prácticas</li>
+                <li>Resolución guiada de ejercicios prácticos</li>
+                <li>Taller interactivo paso a paso</li>
+              </ul>
+
+              <div class="syllabus-module-header syllabus-module-header--middle">
+                Módulo 3: Proyecto Final y Certificación (2 lecciones · 1h)
+              </div>
+              <ul class="syllabus-module-list">
+                <li>Integración integral de los conocimientos</li>
+                <li>Evaluación final y entrega de certificado</li>
+              </ul>
+            </div>
+          </section>
+
+          <hr class="section-divider" />
+
+          <!-- Reseñas del Curso -->
+          <section id="valoraciones-curso" aria-labelledby="titulo-resenas-curso">
+            <h2 id="titulo-resenas-curso">
+              Opiniones de estudiantes (<?= $total_resenas ?>)
+            </h2>
+
+            <?php if (empty($resenas)): ?>
+              <p class="text-muted">Aún no hay reseñas registradas para este curso.</p>
+            <?php else: ?>
+              <div class="review-list">
+                <?php foreach ($resenas as $res): ?>
+                  <article class="review-card">
+                    <div class="review-card__header">
+                      <strong><?= htmlspecialchars($res['nombre'] . ' ' . ($res['apellido'] ?? '')) ?></strong>
+                      <span class="review-card__stars">
+                        <?= str_repeat('★', (int)$res['puntuacion']) . str_repeat('☆', 5 - (int)$res['puntuacion']) ?>
+                        (<?= (int)$res['puntuacion'] ?>/5)
+                      </span>
+                    </div>
+                    <p class="review-card__date">
+                      <?= date('d/m/Y', strtotime($res['fecha_valoracion'])) ?>
+                    </p>
+                    <p class="review-card__body">
+                      "<?= htmlspecialchars($res['comentario'] ?? 'Sin comentario.') ?>"
+                    </p>
+                  </article>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </section>
+        </article>
+
+        <!-- Columna Derecha: Tarjeta de Compra / Inscripción -->
+        <aside class="product-sidebar-sticky">
+          <div class="product-card-pricing">
+            <p class="product-card-pricing__label">Precio del curso</p>
+            <div class="product-card-pricing__amount">
+              $<?= number_format($curso['precio'], 2, ',', '.') ?>
+            </div>
+
+            <ul class="product-card-pricing__features">
+              <li>✓ Acceso completo e ilimitado de por vida</li>
+              <li>✓ Materiales y recursos descargables</li>
+              <li>✓ Certificado digital de finalización</li>
+              <li>✓ Asesoría directa con el docente</li>
+            </ul>
+
+            <?php if ($comprado): ?>
+              <div class="alert alert-success alert-enrolled">
+                <strong>¡Ya estás inscripto en este curso!</strong>
+              </div>
+              <a href="usuario.php" class="btn btn-full">
+                Ver en Mi Perfil
+              </a>
+            <?php else: ?>
+              <form action="carrito.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>" />
+                <input type="hidden" name="id_publicacion" value="<?= (int)$curso['id_publicacion'] ?>" />
+                <input type="hidden" name="accion" value="agregar" />
+                <button type="submit" class="btn product-card-pricing__btn">
+                  Inscribirme al curso
+                </button>
+              </form>
+            <?php endif; ?>
+
+            <div class="more-courses-box">
+              <a href="catalogo.php?tipo=curso" class="link">← Ver más cursos</a>
+            </div>
           </div>
-        <?php endif; ?>
+        </aside>
 
-        <video controls aria-label="Video de demostración del curso" class="course-demo-video">
-          Tu navegador no soporta video.
-        </video>
-
-        <hr />
-
-        <h3>Descripción del curso</h3>
-        <p>
-          <?= nl2br(htmlspecialchars($curso ? $curso['descripcion'] : 'En este video vamos a explorar el concepto de funciones dentro de la programación. Una función es un bloque de código reutilizable que realiza una tarea específica.')) ?>
-        </p>
-
-        <h3>Chat de Consultas</h3>
-        <p>Asistente virtual: ¿Tienes alguna duda sobre este módulo?</p>
-        <div class="flex-row">
-          <input
-            type="text"
-            aria-label="Pregunta para el chat de consultas"
-            placeholder="Escribe tu pregunta..." />
-          <button type="button">Enviar</button>
-        </div>
-
-        <p class="mt-section">
-          <a href="usuario.php" class="btn">Ir a mis cursos</a>
-        </p>
-      </main>
-    </div>
+      </div>
+    <?php endif; ?>
+  </main>
 
 <?php include '../includes/footer.php'; ?>
