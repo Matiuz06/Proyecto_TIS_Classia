@@ -21,7 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($id_publicacion, $_SESSION['carrito_publicaciones'], true)) {
             $_SESSION['carrito_publicaciones'][] = $id_publicacion;
         }
-        header('Location: catalogo.php?carrito=agregado');
+        $destino = !empty($_POST['redirect']) ? $_POST['redirect'] : 'carrito.php';
+        header("Location: " . $destino);
         exit;
     } elseif ($accion === 'quitar' && $id_publicacion > 0) {
         $_SESSION['carrito_publicaciones'] = array_values(array_filter(
