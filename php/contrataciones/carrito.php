@@ -21,7 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($id_publicacion, $_SESSION['carrito_publicaciones'], true)) {
             $_SESSION['carrito_publicaciones'][] = $id_publicacion;
         }
-        $destino = !empty($_POST['redirect']) ? $_POST['redirect'] : 'carrito.php';
+        $destinos_permitidos = [
+            'catalogo' => '../../views/catalogo.php?carrito=agregado',
+            'carrito'  => '../../views/carrito.php',
+        ];
+        $clave_destino = $_POST['redirect'] ?? 'carrito';
+        $destino = $destinos_permitidos[$clave_destino] ?? $destinos_permitidos['carrito'];
         header("Location: " . $destino);
         exit;
     } elseif ($accion === 'quitar' && $id_publicacion > 0) {

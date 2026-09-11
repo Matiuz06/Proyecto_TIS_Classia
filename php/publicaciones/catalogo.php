@@ -1,5 +1,12 @@
 <?php
 
+require_once __DIR__ . '/../auth/session.php';
+iniciar_sesion();
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 require_once __DIR__ . '/../../config/database.php';
 
 $busqueda = trim($_GET['busqueda'] ?? '');
