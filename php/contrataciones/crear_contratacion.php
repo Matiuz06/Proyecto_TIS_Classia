@@ -98,9 +98,7 @@ try {
 
     $pdo->commit();
 
-    unset($_SESSION['carrito_publicaciones']);
-
-    header('Location: ../../views/confirmacion.php?id_contratacion=' . $id_contratacion);
+    header('Location: ../../views/pasarela-pago.php?id_contratacion=' . $id_contratacion);
     exit;
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) {

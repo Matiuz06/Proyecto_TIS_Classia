@@ -43,7 +43,9 @@ $currentUser = usuario_actual();
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="<?= $indexHref ?>"<?= $activePage === 'inicio' ? ' aria-current="page"' : '' ?>>Inicio</a>
         <a href="<?= $catalogoHref ?>"<?= $activePage === 'catalogo' ? ' aria-current="page"' : '' ?>>Catálogo</a>
-        <a href="<?= $carritoHref ?>"<?= $activePage === 'carrito' ? ' aria-current="page"' : '' ?>>Carrito</a>
+        <?php if ($isAuth): ?>
+          <a href="<?= $carritoHref ?>"<?= $activePage === 'carrito' ? ' aria-current="page"' : '' ?>>Carrito</a>
+        <?php endif; ?>
 
         <?php if (!$isAuth): ?>
           <div class="user-nav-dropdown">
@@ -56,9 +58,6 @@ $currentUser = usuario_actual();
             <div class="user-dropdown-menu" role="menu" aria-label="Opciones de acceso">
               <a href="<?= $loginHref ?>" role="menuitem" class="user-dropdown-item<?= in_array($activePage, ['login', 'cuenta'], true) ? ' active' : '' ?>">
                 Iniciar sesión
-              </a>
-              <a href="<?= $registroHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'registro' ? ' active' : '' ?>">
-                Registrarse
               </a>
             </div>
           </div>
