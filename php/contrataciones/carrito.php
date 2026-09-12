@@ -9,6 +9,11 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST'
+    && ($_POST['accion'] ?? '') === 'agregar') {
+    requerir_autenticacion('../../views/login.php');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token_recibido = $_POST['csrf_token'] ?? '';
     $accion = $_POST['accion'] ?? '';
