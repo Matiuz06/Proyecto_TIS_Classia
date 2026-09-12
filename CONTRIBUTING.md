@@ -90,6 +90,14 @@ Los sprints tienen una duración de **2 semanas** y se gestionan mediante **Mile
 - `style(RNF-18): ajustar contraste en botones principales según WCAG`
 - `docs: actualizar guía de contribución con flujo de Trello y Sprints`
 
+La plantilla versionada `.gitmessage` ayuda a completar contexto, cambios y
+validación sin reemplazar la convención del título. Para activarla en este
+repositorio:
+
+```bash
+git config commit.template .gitmessage
+```
+
 ### Plantilla de Pull Request
 
 Todo PR debe completar la plantilla predefinida en `.github/pull_request_template.md`:
