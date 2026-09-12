@@ -3,6 +3,7 @@ require_once __DIR__ . '/../php/auth/session.php';
 iniciar_sesion();
 
 require_once __DIR__ . '/../php/auth/roles.php';
+require_once __DIR__ . '/../php/auth/onboarding_guard.php';
 
 $title       = $title       ?? 'Classia';
 $description = $description ?? 'Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada.';
@@ -22,6 +23,8 @@ $panelAdminHref       = ($cssPrefix === '.') ? 'views/panel-administrador.php' :
 
 $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
+$onboardingHref = ($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php';
+requerir_onboarding_completo($onboardingHref);
 ?>
 <!doctype html>
 <html lang="es">

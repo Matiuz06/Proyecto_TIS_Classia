@@ -123,7 +123,7 @@ include '../includes/header.php';
         <span>o continuá con</span>
       </div>
 
-      <a href="login-google.php" class="btn-google" id="btn-google-registro" aria-label="Registrarse con Google">
+      <a href="../php/auth/google_oauth_inicio.php" class="btn-google" id="btn-google-registro" aria-label="Registrarse con Google">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" aria-hidden="true" focusable="false">
           <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.86l6.1-6.1C34.46 3.06 29.52 1 24 1 14.82 1 6.97 6.48 3.41 14.34l7.12 5.53C12.3 13.38 17.68 9.5 24 9.5z"/>
           <path fill="#4285F4" d="M46.52 24.5c0-1.64-.15-3.22-.42-4.75H24v9h12.7c-.55 2.97-2.2 5.48-4.68 7.17l7.18 5.58C43.18 37.5 46.52 31.5 46.52 24.5z"/>

@@ -19,6 +19,25 @@ function oauth_error(string $mensaje): never
     exit;
 }
 
+function generar_nombre_usuario_google(PDO $pdo, string $email): string
+{
+    $base = strtolower((string) preg_replace('/[^a-z0-9]+/i', '_', strstr($email, '@', true) ?: 'usuario'));
+    $base = trim(substr($base, 0, 24), '_');
+    $base = $base !== '' ? $base : 'usuario';
+    $nombre_usuario = $base;
+    $numero = 1;
+
+    $stmt = $pdo->prepare('SELECT id_usuario FROM usuarios WHERE nombre_usuario = :nombre_usuario LIMIT 1');
+    while (true) {
+        $stmt->execute(['nombre_usuario' => $nombre_usuario]);
+        if (!$stmt->fetch()) {
+            return $nombre_usuario;
+        }
+        $sufijo = '_' . $numero++;
+        $nombre_usuario = substr($base, 0, 30 - strlen($sufijo)) . $sufijo;
+    }
+}
+
 if (isset($_GET['error'])) {
     $google_error = htmlspecialchars($_GET['error']);
     error_log("Google OAuth error: {$google_error}");
@@ -117,8 +136,9 @@ if ($google_apellido === '') {
 }
 
 try {
+    $onboarding_step_usuario = 1;
     $stmt = $pdo->prepare("
-        SELECT id_usuario, nombre, apellido, email, id_rol, foto_perfil
+        SELECT id_usuario, nombre, apellido, email, id_rol, foto_perfil, onboarding_step
         FROM usuarios
         WHERE email = :email
         LIMIT 1
@@ -127,6 +147,7 @@ try {
     $usuario = $stmt->fetch();
 
     if ($usuario) {
+        $onboarding_step_usuario = (int) ($usuario['onboarding_step'] ?? 1);
         if ($google_foto && empty($usuario['foto_perfil'])) {
             $pdo->prepare("UPDATE usuarios SET foto_perfil = :foto WHERE id_usuario = :id")
                 ->execute(['foto' => $google_foto, 'id' => $usuario['id_usuario']]);
@@ -144,12 +165,13 @@ try {
         $password_hash = password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT);
 
         $stmt_insert = $pdo->prepare("
-            INSERT INTO usuarios (nombre, apellido, email, password_hash, id_rol, foto_perfil, fecha_registro)
-            VALUES (:nombre, :apellido, :email, :pass, :rol, :foto, CURRENT_TIMESTAMP)
+            INSERT INTO usuarios (nombre, apellido, nombre_usuario, genero, email, password_hash, id_rol, foto_perfil, email_verificado, onboarding_step, fecha_registro)
+            VALUES (:nombre, :apellido, :nombre_usuario, 'sin-especificar', :email, :pass, :rol, :foto, 1, 1, CURRENT_TIMESTAMP)
         ");
         $stmt_insert->execute([
             'nombre'   => $google_nombre,
             'apellido' => $google_apellido,
+            'nombre_usuario' => generar_nombre_usuario_google($pdo, $google_email),
             'email'    => $google_email,
             'pass'     => $password_hash,
             'rol'      => ROL_ESTUDIANTE,
@@ -170,7 +192,11 @@ try {
     // ── 8. Redirigir según rol ───────────────────────────────────────────────
     $id_rol = (int) ($_SESSION['usuario']['id_rol'] ?? ROL_ESTUDIANTE);
 
-    if ($id_rol === ROL_ADMIN) {
+    $onboarding_pendiente = $id_rol === ROL_ESTUDIANTE && $onboarding_step_usuario <= 9;
+
+    if ($onboarding_pendiente) {
+        header('Location: ../../views/primeros-pasos.php');
+    } elseif ($id_rol === ROL_ADMIN) {
         header('Location: ../../views/panel-administrador.php');
     } elseif ($id_rol === ROL_DOCENTE) {
         header('Location: ../../views/panel-proveedor.php');
