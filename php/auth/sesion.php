@@ -6,9 +6,13 @@ function iniciar_sesion(): void
         return;
     }
 
+    $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+    $host = preg_replace('/:\d+$/', '', $host);
+    $es_entorno_local = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
+
     if (!headers_sent() && PHP_VERSION_ID >= 70300) {
         session_set_cookie_params([
-            "lifetime" => 0,
+            "lifetime" => $es_entorno_local ? 60 * 60 * 24 * 30 : 0,
             "path" => "/",
             "secure" => !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off",
             "httponly" => true,

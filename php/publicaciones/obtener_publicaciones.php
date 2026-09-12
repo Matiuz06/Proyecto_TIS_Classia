@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../auth/session.php';
+require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 // Obtiene las publicaciones activas organizadas por cursos y servicios para el catálogo

@@ -1,4 +1,15 @@
 <?php
+$paso_actual = 1;
+$errores_onboarding = [];
+$datos_onboarding = [];
+$usuario_onboarding = [];
+require_once '../php/usuarios/onboarding.php';
+
+if (($usuario_onboarding['onboarding_step'] ?? 0) > 9) {
+    header('Location: usuario.php?onboarding=completo');
+    exit;
+}
+
 $title       = 'Primeros pasos — Classia';
 $description = 'Configuración inicial del perfil y las preferencias del usuario en Classia.';
 $cssPrefix   = '..';
@@ -19,9 +30,14 @@ include '../includes/header.php';
       </p>
     </header>
 
-    <form action="usuario.php" method="get">
+    <form action="../php/usuarios/onboarding.php" method="post">
+      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+      <input type="hidden" name="paso" value="<?= $paso_actual ?>">
+      <?php if ($errores_onboarding): ?>
+        <div class="alert alert-danger"><ul><?php foreach ($errores_onboarding as $error): ?><li><?= htmlspecialchars($error) ?></li><?php endforeach; ?></ul></div>
+      <?php endif; ?>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(1, $paso_actual) ?>"<?= atributo_paso(1, $paso_actual) ?><?= $paso_actual === 1 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">1</span> Datos personales y profesionales
         </legend>
@@ -32,12 +48,12 @@ include '../includes/header.php';
         <div class="form-grid form-grid--2col">
           <div class="form-group">
             <label for="nombre">Nombre</label>
-            <input type="text" id="nombre" name="nombre" autocomplete="given-name" required />
+            <input type="text" id="nombre" name="nombre" autocomplete="given-name" value="<?= htmlspecialchars($usuario_onboarding['nombre'] ?? '') ?>" required />
           </div>
 
           <div class="form-group">
             <label for="apellido">Apellido</label>
-            <input type="text" id="apellido" name="apellido" autocomplete="family-name" required />
+            <input type="text" id="apellido" name="apellido" autocomplete="family-name" value="<?= htmlspecialchars($usuario_onboarding['apellido'] ?? '') ?>" required />
           </div>
         </div>
 
@@ -63,7 +79,7 @@ include '../includes/header.php';
           <div class="form-group">
             <label for="otra-profesion">Otra profesión u ocupación</label>
             <input type="text" id="otra-profesion" name="otra_profesion"
-              placeholder="Completa este campo si seleccionaste otra ocupación" />
+              placeholder="Completa este campo si seleccionaste otra ocupación" disabled />
           </div>
         </div>
 
@@ -86,7 +102,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(2, $paso_actual) ?>"<?= atributo_paso(2, $paso_actual) ?><?= $paso_actual === 2 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">2</span> ¿Cómo pensás utilizar la plataforma?
         </legend>
@@ -94,43 +110,43 @@ include '../includes/header.php';
 
         <div class="options-grid">
           <label class="option-card" for="uso-explorar">
-            <input type="checkbox" id="uso-explorar" name="uso_plataforma" value="explorar-servicios" />
+            <input type="checkbox" id="uso-explorar" name="uso_plataforma[]" value="explorar-servicios" />
             <span class="option-text">Explorar cursos y servicios educativos</span>
           </label>
 
           <label class="option-card" for="uso-contratar">
-            <input type="checkbox" id="uso-contratar" name="uso_plataforma" value="contratar-servicios" />
+            <input type="checkbox" id="uso-contratar" name="uso_plataforma[]" value="contratar-servicios" />
             <span class="option-text">Contratar servicios para mí</span>
           </label>
 
           <label class="option-card" for="uso-institucion">
-            <input type="checkbox" id="uso-institucion" name="uso_plataforma" value="contratar-institucion" />
+            <input type="checkbox" id="uso-institucion" name="uso_plataforma[]" value="contratar-institucion" />
             <span class="option-text">Contratar formación o servicios para una institución</span>
           </label>
 
           <label class="option-card" for="uso-publicar">
-            <input type="checkbox" id="uso-publicar" name="uso_plataforma" value="publicar-servicios" />
+            <input type="checkbox" id="uso-publicar" name="uso_plataforma[]" value="publicar-servicios" />
             <span class="option-text">Publicar y comercializar mis propios servicios</span>
           </label>
 
           <label class="option-card" for="uso-aprender">
-            <input type="checkbox" id="uso-aprender" name="uso_plataforma" value="formacion-personal" />
+            <input type="checkbox" id="uso-aprender" name="uso_plataforma[]" value="formacion-personal" />
             <span class="option-text">Ampliar mi formación profesional</span>
           </label>
 
           <label class="option-card" for="uso-asesoramiento">
-            <input type="checkbox" id="uso-asesoramiento" name="uso_plataforma" value="buscar-asesoramiento" />
+            <input type="checkbox" id="uso-asesoramiento" name="uso_plataforma[]" value="buscar-asesoramiento" />
             <span class="option-text">Buscar mentoría o acompañamiento especializado</span>
           </label>
 
           <label class="option-card" for="uso-proyectos">
-            <input type="checkbox" id="uso-proyectos" name="uso_plataforma" value="desarrollar-proyectos" />
+            <input type="checkbox" id="uso-proyectos" name="uso_plataforma[]" value="desarrollar-proyectos" />
             <span class="option-text">Encontrar apoyo para desarrollar un proyecto</span>
           </label>
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(3, $paso_actual) ?>"<?= atributo_paso(3, $paso_actual) ?><?= $paso_actual === 3 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">3</span> Categorías de interés
         </legend>
@@ -140,58 +156,58 @@ include '../includes/header.php';
 
         <div class="options-grid">
           <label class="option-card" for="categoria-cursos">
-            <input type="checkbox" id="categoria-cursos" name="categorias" value="cursos" />
+            <input type="checkbox" id="categoria-cursos" name="categorias[]" value="cursos" />
             <span class="option-text">Cursos presenciales, virtuales o híbridos</span>
           </label>
 
           <label class="option-card" for="categoria-proyectos">
-            <input type="checkbox" id="categoria-proyectos" name="categorias" value="proyectos-educativos" />
+            <input type="checkbox" id="categoria-proyectos" name="categorias[]" value="proyectos-educativos" />
             <span class="option-text">Proyectos educativos</span>
           </label>
 
           <label class="option-card" for="categoria-formacion">
-            <input type="checkbox" id="categoria-formacion" name="categorias" value="formacion-institucional" />
+            <input type="checkbox" id="categoria-formacion" name="categorias[]" value="formacion-institucional" />
             <span class="option-text">Formación para empresas e instituciones</span>
           </label>
 
           <label class="option-card" for="categoria-3d">
-            <input type="checkbox" id="categoria-3d" name="categorias" value="diseno-impresion-3d" />
+            <input type="checkbox" id="categoria-3d" name="categorias[]" value="diseno-impresion-3d" />
             <span class="option-text">Diseño e impresión 3D</span>
           </label>
 
           <label class="option-card" for="categoria-robotica">
-            <input type="checkbox" id="categoria-robotica" name="categorias" value="robotica-automatizacion" />
+            <input type="checkbox" id="categoria-robotica" name="categorias[]" value="robotica-automatizacion" />
             <span class="option-text">Robótica y automatización</span>
           </label>
 
           <label class="option-card" for="categoria-mentorias">
-            <input type="checkbox" id="categoria-mentorias" name="categorias" value="mentorias" />
+            <input type="checkbox" id="categoria-mentorias" name="categorias[]" value="mentorias" />
             <span class="option-text">Mentorías y acompañamiento especializado</span>
           </label>
 
           <label class="option-card" for="categoria-programacion">
-            <input type="checkbox" id="categoria-programacion" name="categorias" value="programacion" />
+            <input type="checkbox" id="categoria-programacion" name="categorias[]" value="programacion" />
             <span class="option-text">Programación y desarrollo web</span>
           </label>
 
           <label class="option-card" for="categoria-diseno">
-            <input type="checkbox" id="categoria-diseno" name="categorias" value="diseno" />
+            <input type="checkbox" id="categoria-diseno" name="categorias[]" value="diseno" />
             <span class="option-text">Diseño gráfico, multimedia y experiencia de usuario</span>
           </label>
 
           <label class="option-card" for="categoria-educacion">
-            <input type="checkbox" id="categoria-educacion" name="categorias" value="educacion" />
+            <input type="checkbox" id="categoria-educacion" name="categorias[]" value="educacion" />
             <span class="option-text">Educación, didáctica y evaluación</span>
           </label>
 
           <label class="option-card" for="categoria-gestion">
-            <input type="checkbox" id="categoria-gestion" name="categorias" value="gestion" />
+            <input type="checkbox" id="categoria-gestion" name="categorias[]" value="gestion" />
             <span class="option-text">Gestión institucional y de proyectos</span>
           </label>
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(4, $paso_actual) ?>"<?= atributo_paso(4, $paso_actual) ?><?= $paso_actual === 4 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">4</span> Modalidades preferidas
         </legend>
@@ -199,33 +215,33 @@ include '../includes/header.php';
 
         <div class="options-grid">
           <label class="option-card" for="modalidad-virtual">
-            <input type="checkbox" id="modalidad-virtual" name="modalidades" value="virtual" />
+            <input type="checkbox" id="modalidad-virtual" name="modalidades[]" value="virtual" />
             <span class="option-text">Virtual</span>
           </label>
 
           <label class="option-card" for="modalidad-presencial">
-            <input type="checkbox" id="modalidad-presencial" name="modalidades" value="presencial" />
+            <input type="checkbox" id="modalidad-presencial" name="modalidades[]" value="presencial" />
             <span class="option-text">Presencial</span>
           </label>
 
           <label class="option-card" for="modalidad-hibrida">
-            <input type="checkbox" id="modalidad-hibrida" name="modalidades" value="hibrida" />
+            <input type="checkbox" id="modalidad-hibrida" name="modalidades[]" value="hibrida" />
             <span class="option-text">Híbrida</span>
           </label>
 
           <label class="option-card" for="modalidad-entregable">
-            <input type="checkbox" id="modalidad-entregable" name="modalidades" value="producto-entregable" />
+            <input type="checkbox" id="modalidad-entregable" name="modalidades[]" value="producto-entregable" />
             <span class="option-text">Producto o trabajo entregable</span>
           </label>
 
           <label class="option-card" for="modalidad-indiferente">
-            <input type="checkbox" id="modalidad-indiferente" name="modalidades" value="sin-preferencia" />
+            <input type="checkbox" id="modalidad-indiferente" name="modalidades[]" value="sin-preferencia" />
             <span class="option-text">No tengo una modalidad preferida</span>
           </label>
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(5, $paso_actual) ?>"<?= atributo_paso(5, $paso_actual) ?><?= $paso_actual === 5 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">5</span> Nivel de experiencia
         </legend>
@@ -254,7 +270,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(6, $paso_actual) ?>"<?= atributo_paso(6, $paso_actual) ?><?= $paso_actual === 6 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">6</span> Preferencias de contratación
         </legend>
@@ -288,26 +304,26 @@ include '../includes/header.php';
 
         <div class="options-grid">
           <label class="option-card" for="servicios-gratuitos">
-            <input type="checkbox" id="servicios-gratuitos" name="preferencias_contratacion"
+            <input type="checkbox" id="servicios-gratuitos" name="preferencias_contratacion[]"
               value="mostrar-gratuitos" />
             <span class="option-text">Mostrar primero los servicios gratuitos</span>
           </label>
 
           <label class="option-card" for="mejor-valorados">
-            <input type="checkbox" id="mejor-valorados" name="preferencias_contratacion"
+            <input type="checkbox" id="mejor-valorados" name="preferencias_contratacion[]"
               value="mostrar-mejor-valorados" />
             <span class="option-text">Priorizar servicios mejor valorados</span>
           </label>
 
           <label class="option-card" for="servicios-locales">
-            <input type="checkbox" id="servicios-locales" name="preferencias_contratacion"
+            <input type="checkbox" id="servicios-locales" name="preferencias_contratacion[]"
               value="mostrar-servicios-locales" />
             <span class="option-text">Mostrar servicios presenciales cercanos a mi ubicación</span>
           </label>
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(7, $paso_actual) ?>"<?= atributo_paso(7, $paso_actual) ?><?= $paso_actual === 7 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">7</span> Comunicación y notificaciones
         </legend>
@@ -315,35 +331,35 @@ include '../includes/header.php';
 
         <div class="options-grid">
           <label class="option-card" for="notificacion-recomendaciones">
-            <input type="checkbox" id="notificacion-recomendaciones" name="notificaciones" value="recomendaciones"
+            <input type="checkbox" id="notificacion-recomendaciones" name="notificaciones[]" value="recomendaciones"
               checked />
             <span class="option-text">Recomendaciones relacionadas con mis intereses</span>
           </label>
 
           <label class="option-card" for="notificacion-promociones">
-            <input type="checkbox" id="notificacion-promociones" name="notificaciones" value="promociones" />
+            <input type="checkbox" id="notificacion-promociones" name="notificaciones[]" value="promociones" />
             <span class="option-text">Promociones, descuentos y cupones</span>
           </label>
 
           <label class="option-card" for="notificacion-mensajes">
-            <input type="checkbox" id="notificacion-mensajes" name="notificaciones" value="mensajes" checked />
+            <input type="checkbox" id="notificacion-mensajes" name="notificaciones[]" value="mensajes" checked />
             <span class="option-text">Mensajes de clientes o proveedores</span>
           </label>
 
           <label class="option-card" for="notificacion-contrataciones">
-            <input type="checkbox" id="notificacion-contrataciones" name="notificaciones" value="contrataciones"
+            <input type="checkbox" id="notificacion-contrataciones" name="notificaciones[]" value="contrataciones"
               checked />
             <span class="option-text">Confirmaciones y novedades sobre contrataciones</span>
           </label>
 
           <label class="option-card" for="notificacion-nuevos-servicios">
-            <input type="checkbox" id="notificacion-nuevos-servicios" name="notificaciones" value="nuevos-servicios" />
+            <input type="checkbox" id="notificacion-nuevos-servicios" name="notificaciones[]" value="nuevos-servicios" />
             <span class="option-text">Nuevos servicios de las categorías seleccionadas</span>
           </label>
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(8, $paso_actual) ?>"<?= atributo_paso(8, $paso_actual) ?><?= $paso_actual === 8 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">8</span> Perfil como proveedor
         </legend>
@@ -385,7 +401,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step">
+      <fieldset class="onboarding-step<?= clase_paso(9, $paso_actual) ?>"<?= atributo_paso(9, $paso_actual) ?><?= $paso_actual === 9 ? '' : ' hidden style="display:none!important"' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">9</span> Privacidad y personalización
         </legend>
@@ -406,7 +422,7 @@ include '../includes/header.php';
           <label class="option-card" for="acepta-privacidad">
             <input type="checkbox" id="acepta-privacidad" name="acepta_privacidad" value="si" required />
             <span class="option-text">
-              Confirmo que leí y acepto la <a href="politica_privacidad.php"
+              Confirmo que leí y acepto la <a href="politica-privacidad.php"
                 style="color: var(--color-brand-primary); font-weight: 600;">política de privacidad</a> y el tratamiento
               de mis datos personales.
             </span>
@@ -415,10 +431,44 @@ include '../includes/header.php';
       </fieldset>
 
       <div class="onboarding-actions">
-        <a href="usuario.php" class="btn btn-secondary">Omitir por ahora</a>
-        <button type="submit" class="btn btn-primary">Guardar y continuar</button>
+        <?php if ($paso_actual > 1): ?>
+          <button type="submit" name="accion" value="retroceder" class="btn btn-secondary" formnovalidate>
+            Retroceder
+          </button>
+        <?php endif; ?>
+        <button type="submit" class="btn btn-primary"><?= $paso_actual === 9 ? 'Finalizar configuración' : 'Guardar y continuar' ?></button>
       </div>
     </form>
   </main>
+
+<script>
+  const datosOnboarding = <?= json_encode($datos_onboarding, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+  Object.entries(datosOnboarding).forEach(([clave, valor]) => {
+    const controles = document.querySelectorAll(`[name="${clave}"], [name="${clave}[]"]`);
+    controles.forEach((control) => {
+      if (control.type === 'checkbox' || control.type === 'radio') {
+        control.checked = Array.isArray(valor) ? valor.includes(control.value) : valor === control.value;
+      } else {
+        control.value = valor;
+      }
+    });
+  });
+
+  const profesion = document.getElementById('profesion');
+  const otraProfesion = document.getElementById('otra-profesion');
+
+  const actualizarOtraProfesion = () => {
+    const habilitada = profesion.value === 'otro';
+    otraProfesion.disabled = !habilitada;
+    otraProfesion.required = habilitada;
+
+    if (!habilitada) {
+      otraProfesion.value = '';
+    }
+  };
+
+  profesion.addEventListener('change', actualizarOtraProfesion);
+  actualizarOtraProfesion();
+</script>
 
 <?php include '../includes/footer.php'; ?>

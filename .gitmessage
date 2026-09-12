@@ -1,0 +1,13 @@
+# <tipo>(<código-requerimiento>): descripción breve
+#
+# Contexto:
+# Qué problema resuelve este cambio.
+#
+# Cambios:
+# -
+#
+# Validación:
+# -
+#
+# Tipos válidos: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+# Requerimientos: REQ-XXX-NN, RNF-NN o RN-NN cuando corresponda.
