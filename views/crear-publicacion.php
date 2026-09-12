@@ -1,4 +1,5 @@
 <?php
+$categorias = [];
 require_once '../php/auth/roles.php';
 
 requerir_rol(ROL_DOCENTE, 'usuario.php');
@@ -85,6 +86,31 @@ include '../includes/header.php';
             required
             value="<?php echo htmlspecialchars($_POST['precio'] ?? ''); ?>"
             placeholder="Ej: 1500.00" />
+        </p>
+
+        <p>
+          <label for="modalidad">Modalidad</label>
+          <select id="modalidad" name="modalidad" class="form-select-full">
+            <option value="">Sin especificar</option>
+            <?php foreach (['virtual' => 'Virtual', 'presencial' => 'Presencial', 'hibrida' => 'Híbrida', 'producto-entregable' => 'Producto entregable'] as $valor => $etiqueta): ?>
+              <option value="<?= $valor ?>" <?= ($_POST['modalidad'] ?? '') === $valor ? 'selected' : '' ?>><?= $etiqueta ?></option>
+            <?php endforeach; ?>
+          </select>
+        </p>
+
+        <p>
+          <label for="nivel_experiencia">Nivel de experiencia</label>
+          <select id="nivel_experiencia" name="nivel_experiencia" class="form-select-full">
+            <option value="">Sin especificar</option>
+            <?php foreach (['inicial' => 'Inicial', 'intermedio' => 'Intermedio', 'avanzado' => 'Avanzado', 'depende-categoria' => 'Depende de la categoría'] as $valor => $etiqueta): ?>
+              <option value="<?= $valor ?>" <?= ($_POST['nivel_experiencia'] ?? '') === $valor ? 'selected' : '' ?>><?= $etiqueta ?></option>
+            <?php endforeach; ?>
+          </select>
+        </p>
+
+        <p>
+          <label for="duracion_horas">Duración aproximada (horas)</label>
+          <input type="number" min="1" max="10000" id="duracion_horas" name="duracion_horas" value="<?= htmlspecialchars($_POST['duracion_horas'] ?? '') ?>" placeholder="Opcional" />
         </p>
 
         <p>

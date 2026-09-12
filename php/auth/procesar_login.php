@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/session.php";
+require_once __DIR__ . "/sesion.php";
 
 const LOGIN_URL = "../../views/login.php";
 const LOGIN_OK_URL = "../../views/usuario.php";
@@ -19,6 +19,12 @@ function volver_login(string $mensaje, string $email = ""): void
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     header("Location: " . LOGIN_URL);
     exit;
+}
+
+iniciar_sesion();
+$token_csrf = $_POST['csrf_token'] ?? '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_csrf)) {
+    volver_login("La sesión del formulario expiró. Recargá la página e intentá nuevamente.");
 }
 
 $email = trim($_POST["email"] ?? "");
@@ -48,6 +54,7 @@ try {
             password_hash,
             id_rol,
             foto_perfil
+            ,email_verificado
          FROM usuarios
          WHERE email = :email
          LIMIT 1"
@@ -75,6 +82,10 @@ if (
         "Email o contraseña incorrectos.",
         $email
     );
+}
+
+if (isset($usuario['email_verificado']) && !(int) $usuario['email_verificado']) {
+    volver_login('Confirmá tu correo electrónico antes de iniciar sesión.', $email);
 }
 
 establecer_usuario_sesion(
