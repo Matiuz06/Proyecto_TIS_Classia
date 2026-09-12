@@ -3,6 +3,7 @@ $title      = 'Classia';
 $description = 'Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada.';
 $cssPrefix  = '.';
 $jsPrefix   = '.';
+$bodyClass  = 'home-page';
 $activePage = 'inicio';
 include 'includes/header.php';
 ?>

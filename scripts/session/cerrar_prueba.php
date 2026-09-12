@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/../../php/auth/session.php";
+require_once __DIR__ . "/../../php/auth/sesion.php";
 
 cerrar_sesion();
 ?>

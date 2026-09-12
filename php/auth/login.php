@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
@@ -32,11 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = "Por favor, ingresá tu correo electrónico y contraseña.";
     } else {
         try {
-            $stmt = $pdo->prepare("SELECT id_usuario, nombre, apellido, email, password_hash, id_rol FROM usuarios WHERE email = :email LIMIT 1");
+            $stmt = $pdo->prepare("SELECT id_usuario, nombre, apellido, email, password_hash, id_rol, email_verificado FROM usuarios WHERE email = :email LIMIT 1");
             $stmt->execute(['email' => $correo]);
             $usuario = $stmt->fetch();
 
             if ($usuario && password_verify($contrasena, $usuario['password_hash'])) {
+                if (!(int) $usuario['email_verificado']) {
+                    $errores[] = "Confirmá tu correo electrónico antes de iniciar sesión.";
+                }
+            }
+
+            if (!$errores && $usuario && password_verify($contrasena, $usuario['password_hash'])) {
                 establecer_usuario_sesion(
                     (int)$usuario['id_usuario'],
                     $usuario['nombre'] . ' ' . $usuario['apellido'],
@@ -53,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header("Location: usuario.php");
                 }
                 exit;
-            } else {
+            } elseif (!$usuario || !password_verify($contrasena, $usuario['password_hash'])) {
                 $errores[] = "El correo electrónico o la contraseña ingresada son incorrectos.";
             }
         } catch (PDOException $e) {

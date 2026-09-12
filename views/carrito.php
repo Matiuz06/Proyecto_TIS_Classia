@@ -1,5 +1,9 @@
 <?php
-require_once '../php/contrataciones/carrito.php';
+require_once __DIR__ . '/../php/contrataciones/carrito.php';
+
+$mensaje_error = $mensaje_error ?? '';
+$items = $items ?? [];
+$total = $total ?? 0;
 
 $title = 'Carrito de compras';
 $cssPrefix = '..';

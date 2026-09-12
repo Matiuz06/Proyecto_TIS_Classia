@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
