@@ -1,13 +1,15 @@
 <?php
-require_once '../php/publicaciones/catalogo.php';
+require_once __DIR__ . '/../php/publicaciones/catalogo.php';
 
 $title       = 'Catálogo de cursos y servicios';
 $description = 'Catálogo de cursos y servicios educativos disponibles en Classia.';
 $cssPrefix   = '..';
 $jsPrefix    = '..';
+$bodyClass   = 'catalog-page';
 
 $activePage  = 'catalogo';
 include '../includes/header.php';
+$puedeAgregar = esta_autenticado();
 ?>
 
     <main>
@@ -100,6 +102,41 @@ include '../includes/header.php';
         </aside>
 
         <section id="catalogo-contenido" aria-labelledby="titulo-contenido">
+          <?php if (!empty($recomendaciones)): ?>
+            <section class="catalog-recommendations" aria-labelledby="titulo-recomendaciones">
+              <header>
+                <p>Según tus preferencias</p>
+                <h2 id="titulo-recomendaciones">Recomendado para vos</h2>
+                <p>Propuestas relacionadas con lo que elegiste en tus primeros pasos.</p>
+              </header>
+
+              <div class="catalog-grid">
+                <?php foreach ($recomendaciones as $recomendacion): ?>
+                  <?php $esCurso = $recomendacion['tipo'] === 'Curso'; ?>
+                  <article class="catalog-card" aria-labelledby="recomendacion-<?= (int) $recomendacion['id_publicacion'] ?>">
+                    <?php if (!empty($recomendacion['imagen'])): ?>
+                      <div class="catalog-card-media">
+                        <img class="catalog-card-image" src="../<?= htmlspecialchars($recomendacion['imagen']) ?>" alt="<?= htmlspecialchars($recomendacion['titulo']) ?>" />
+                      </div>
+                    <?php else: ?>
+                      <div class="placeholder-visual" aria-hidden="true"><?= $esCurso ? 'Curso' : 'Servicio' ?></div>
+                    <?php endif; ?>
+                    <div>
+                      <h3 id="recomendacion-<?= (int) $recomendacion['id_publicacion'] ?>"><?= htmlspecialchars($recomendacion['titulo']) ?></h3>
+                      <p><?= htmlspecialchars($recomendacion['descripcion']) ?></p>
+                      <p><strong><?= htmlspecialchars($recomendacion['nombre_categoria']) ?></strong> · $<?= number_format($recomendacion['precio'], 2, ',', '.') ?></p>
+                      <p class="catalog-actions">
+                        <a class="btn" href="<?= $esCurso ? 'curso.php' : 'servicio-detalle.php' ?>?id=<?= (int) $recomendacion['id_publicacion'] ?>">
+                          <?= $esCurso ? 'Ver curso' : 'Ver servicio' ?>
+                        </a>
+                      </p>
+                    </div>
+                  </article>
+                <?php endforeach; ?>
+              </div>
+            </section>
+          <?php endif; ?>
+
           <?php if (empty($publicaciones)): ?>
             <section class="empty-state" aria-labelledby="sin-mas-cursos">
               <h3 id="sin-mas-cursos">No se encontraron cursos ni servicios</h3>
@@ -152,11 +189,15 @@ include '../includes/header.php';
                         </dl>
                         <p class="catalog-actions">
                           <a class="btn" href="curso.php?id=<?= $curso['id_publicacion'] ?>">Ver curso</a>
-                          <form action="../php/contrataciones/carrito.php" method="post">
-                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                            <input type="hidden" name="id_publicacion" value="<?= (int) $curso['id_publicacion'] ?>">
-                            <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
-                          </form>
+                          <?php if ($puedeAgregar): ?>
+                            <form action="../php/contrataciones/carrito.php" method="post">
+                              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                              <input type="hidden" name="id_publicacion" value="<?= (int) $curso['id_publicacion'] ?>">
+                              <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
+                            </form>
+                          <?php else: ?>
+                            <a class="btn-ghost" href="login.php">Inicia sesión</a>
+                          <?php endif; ?>
                         </p>
                       </div>
                     </article>
@@ -205,11 +246,15 @@ include '../includes/header.php';
                         </dl>
                         <p class="catalog-actions">
                           <a class="btn" href="servicio-detalle.php?id=<?= $serv['id_publicacion'] ?>">Solicitar servicio</a>
-                          <form action="../php/contrataciones/carrito.php" method="post">
-                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                            <input type="hidden" name="id_publicacion" value="<?= (int) $serv['id_publicacion'] ?>">
-                            <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
-                          </form>
+                          <?php if ($puedeAgregar): ?>
+                            <form action="../php/contrataciones/carrito.php" method="post">
+                              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                              <input type="hidden" name="id_publicacion" value="<?= (int) $serv['id_publicacion'] ?>">
+                              <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
+                            </form>
+                          <?php else: ?>
+                            <a class="btn-ghost" href="login.php">Inicia sesión</a>
+                          <?php endif; ?>
                         </p>
                       </div>
                     </article>
