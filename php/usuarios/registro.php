@@ -5,8 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../auth/session.php';
+require_once __DIR__ . '/../auth/sesion.php';
+require_once __DIR__ . '/../auth/password_policy.php';
 require_once __DIR__ . '/../utils/mailer.php';
+
+if (esta_autenticado()) {
+    header('Location: ../../views/usuario.php');
+    exit;
+}
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -40,10 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!empty($contrasena)) {
-        if (strlen($contrasena) < 8) {
-            $errores[] = "La contraseña debe tener al menos 8 caracteres.";
-        } elseif (!preg_match('/[A-Za-z]/', $contrasena) || !preg_match('/[0-9]/', $contrasena)) {
-            $errores[] = "La contraseña debe incluir al menos una letra y un número.";
+        $errores_password = validar_contrasena($contrasena);
+        foreach ($errores_password as $error_password) {
+            $errores[] = $error_password;
         }
 
         if ($contrasena !== $confirmar_contrasena) {
@@ -87,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             establecer_usuario_sesion((int) $pdo->lastInsertId(), $nombre . ' ' . $apellido, $correo, $id_rol_cliente);
             $_SESSION['registro_correo_enviado'] = $correo_enviado;
-            header("Location: ../views/primeros-pasos.php");
+            header("Location: ../views/confirmar-correo.php?resultado=pendiente");
             exit;
         } catch (PDOException $e) {
             error_log("Error SQL en registro: " . $e->getMessage());

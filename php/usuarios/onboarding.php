@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../auth/session.php';
+require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
@@ -12,11 +12,19 @@ $id_usuario = (int) $_SESSION['usuario']['id_usuario'];
 $pasos_totales = 9;
 $errores_onboarding = [];
 
-$stmt = $pdo->prepare('SELECT nombre, apellido, onboarding_step, onboarding_data FROM usuarios WHERE id_usuario = :id LIMIT 1');
+$stmt = $pdo->prepare('SELECT nombre, apellido, email_verificado, onboarding_step, onboarding_data FROM usuarios WHERE id_usuario = :id LIMIT 1');
 $stmt->execute(['id' => $id_usuario]);
 $usuario_onboarding = $stmt->fetch() ?: [];
+if ((int) ($usuario_onboarding['email_verificado'] ?? 0) !== 1) {
+    header('Location: ../../views/confirmar-correo.php?resultado=pendiente');
+    exit;
+}
 $paso_guardado = (int) ($usuario_onboarding['onboarding_step'] ?? 1);
-if ($paso_guardado > $pasos_totales && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+if ($paso_guardado > $pasos_totales) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        header('Location: ../../views/usuario.php?onboarding=completo');
+        exit;
+    }
     header('Location: ../../views/usuario.php?onboarding=completo');
     exit;
 }
@@ -61,7 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $datos_onboarding[$clave] = is_array($valor) ? array_values($valor) : trim((string) $valor);
         }
 
-        $siguiente_paso = $paso_actual < $pasos_totales ? $paso_actual + 1 : $pasos_totales + 1;
+        if ($paso_actual === 1 && ($datos_onboarding['profesion'] ?? '') !== 'otro') {
+            $datos_onboarding['otra_profesion'] = '';
+        }
+
+        $retroceder = ($_POST['accion'] ?? '') === 'retroceder';
+        $siguiente_paso = $retroceder
+            ? max(1, $paso_actual - 1)
+            : ($paso_actual < $pasos_totales ? $paso_actual + 1 : $pasos_totales + 1);
         $actualizar = $pdo->prepare('UPDATE usuarios SET onboarding_step = :paso, onboarding_data = :datos WHERE id_usuario = :id');
         $actualizar->execute([
             'paso' => $siguiente_paso,

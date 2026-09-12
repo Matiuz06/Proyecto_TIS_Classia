@@ -1,5 +1,5 @@
 <?php
-require_once '../php/auth/session.php';
+require_once '../php/auth/sesion.php';
 
 iniciar_sesion();
 
@@ -50,7 +50,8 @@ include '../includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form action="../php/auth/procesarLogin.php" method="POST">
+        <form action="../php/auth/procesar_login.php" method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" />
             <p>
                 <label for="email">Correo electrónico</label>
                 <input
@@ -94,7 +95,7 @@ include '../includes/header.php';
         </div>
 
         <a
-            href="../php/auth/google_oauth_inicio.php"
+            href="../php/auth/inicio_oauth_google.php"
             class="btn-google"
             id="btn-google-login"
             aria-label="Iniciar sesión con Google"

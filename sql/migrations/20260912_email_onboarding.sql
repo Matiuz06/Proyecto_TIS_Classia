@@ -7,11 +7,18 @@ ALTER TABLE usuarios
     ADD COLUMN onboarding_step TINYINT UNSIGNED NOT NULL DEFAULT 1,
     ADD COLUMN onboarding_data TEXT NULL;
 
+ALTER TABLE usuarios
+    ADD COLUMN password_reset_token CHAR(64) NULL,
+    ADD COLUMN password_reset_expira DATETIME NULL,
+    ADD COLUMN telefono VARCHAR(30) NULL,
+    ADD COLUMN foto_perfil VARCHAR(255) NULL DEFAULT NULL;
+
 UPDATE usuarios SET nombre_usuario = CONCAT('usuario_', id_usuario) WHERE nombre_usuario IS NULL;
 
 ALTER TABLE usuarios MODIFY nombre_usuario VARCHAR(30) NOT NULL;
 
 CREATE INDEX idx_usuarios_verificacion_token ON usuarios (email_verificacion_token);
+CREATE INDEX idx_usuarios_password_reset_token ON usuarios (password_reset_token);
 
 ALTER TABLE publicaciones
     ADD COLUMN modalidad VARCHAR(30) NULL AFTER tipo,

@@ -151,7 +151,7 @@ $puedeAgregar = esta_autenticado();
             <?php if (empty($tipo_filtro) || $tipo_filtro === 'curso'): ?>
               <?php if (!empty($cursos)): ?>
                 <header>
-                  <p>Contenido disponible</p>
+                  <br>
                   <h2 id="titulo-cursos">Cursos (<?= count($cursos) ?>)</h2>
                   <p>Cursos diversos para un aprendizaje profundo.</p>
                 </header>
@@ -209,6 +209,7 @@ $puedeAgregar = esta_autenticado();
             <?php if (empty($tipo_filtro) || $tipo_filtro === 'servicio'): ?>
               <?php if (!empty($servicios)): ?>
                 <header>
+                  <br>
                   <h2 id="titulo-servicios">Servicios (<?= count($servicios) ?>)</h2>
                   <p>Distintos servicios según tu necesidad.</p>
                 </header>
