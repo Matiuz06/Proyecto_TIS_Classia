@@ -1,4 +1,8 @@
 <?php
+$publicaciones_docente = [];
+$resenas = [];
+$promedio_calificacion = 0.0;
+$total_resenas = 0;
 require_once '../php/usuarios/perfil_proveedor.php';
 
 $nombreCompleto = $proveedor ? htmlspecialchars($proveedor['nombre'] . ' ' . ($proveedor['apellido'] ?? '')) : 'Proveedor no encontrado';
@@ -24,11 +28,12 @@ include '../includes/header.php';
         <div class="provider-hero-inner">
           <div class="profile-avatar-wrapper">
             <?php 
-              $fotoSrc = !empty($proveedor['foto_perfil']) 
-                ? ($cssPrefix . '/' . htmlspecialchars($proveedor['foto_perfil'])) 
+              $fotoProveedor = (string) ($proveedor['foto_perfil'] ?? '');
+              $fotoSrc = $fotoProveedor !== ''
+                ? (preg_match('#^https?://#i', $fotoProveedor) ? $fotoProveedor : $cssPrefix . '/' . ltrim($fotoProveedor, '/'))
                 : ($cssPrefix . '/assets/images/default-avatar.svg');
             ?>
-            <img src="<?= $fotoSrc ?>" alt="Foto de <?= $nombreCompleto ?>" class="provider-hero-avatar" />
+            <img src="<?= htmlspecialchars($fotoSrc, ENT_QUOTES, 'UTF-8') ?>" alt="Foto de <?= $nombreCompleto ?>" class="provider-hero-avatar" />
           </div>
 
           <div class="profile-hero-text">
