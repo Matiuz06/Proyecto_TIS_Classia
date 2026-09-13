@@ -1,4 +1,8 @@
 <?php
+$userData = [];
+$rol_actual = 'Usuario';
+$cursos_contratados = [];
+$servicios_contratados = [];
 require_once '../php/usuarios/perfil.php';
 
 $title      = 'Perfil de usuario';
@@ -46,11 +50,12 @@ include '../includes/header.php';
       <div class="profile-hero-content">
         <div class="profile-avatar-wrapper">
           <?php 
-            $fotoPerfilSrc = !empty($userData['foto_perfil']) 
-              ? ($cssPrefix . '/' . htmlspecialchars($userData['foto_perfil'])) 
+            $fotoPerfil = (string) ($userData['foto_perfil'] ?? '');
+            $fotoPerfilSrc = $fotoPerfil !== ''
+              ? (preg_match('#^https?://#i', $fotoPerfil) ? $fotoPerfil : $cssPrefix . '/' . ltrim($fotoPerfil, '/'))
               : ($cssPrefix . '/assets/images/default-avatar.svg');
           ?>
-          <img src="<?php echo $fotoPerfilSrc; ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre']); ?>" class="profile-avatar-img" />
+          <img src="<?php echo htmlspecialchars($fotoPerfilSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre']); ?>" class="profile-avatar-img" />
           
           <div class="profile-avatar-actions">
             <form action="../php/usuarios/foto_perfil.php" method="POST" enctype="multipart/form-data" class="profile-photo-form">

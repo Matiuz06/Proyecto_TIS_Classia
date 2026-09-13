@@ -8,6 +8,7 @@ $jsPrefix    = '..';
 
 $activePage  = 'catalogo';
 include '../includes/header.php';
+$puedeAgregar = esta_autenticado();
 ?>
 
   <main class="product-detail-container motion-entry">
@@ -143,14 +144,21 @@ include '../includes/header.php';
             </ul>
 
             <!-- Enviar al carrito-->
-            <form action="carrito.php" method="POST">
-              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>" />
-              <input type="hidden" name="id_publicacion" value="<?= (int)$servicio['id_publicacion'] ?>" />
-              <input type="hidden" name="accion" value="agregar" />
-              <button type="submit" class="btn product-card-pricing__btn">
-                Continuar con la contratación
-              </button>
-            </form>
+            <?php if ($puedeAgregar): ?>
+              <form action="carrito.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>" />
+                <input type="hidden" name="id_publicacion" value="<?= (int)$servicio['id_publicacion'] ?>" />
+                <input type="hidden" name="accion" value="agregar" />
+                <button type="submit" class="btn product-card-pricing__btn">
+                  Continuar con la contratación
+                </button>
+              </form>
+            <?php else: ?>
+              <div class="purchase-auth-actions">
+                <a class="btn product-card-pricing__btn" href="login.php">Inicia sesión</a>
+                <a href="registro.php">Regístrate</a>
+              </div>
+            <?php endif; ?>
 
             <div class="custom-request-box">
               <p>¿Tienes requerimientos especiales?</p>

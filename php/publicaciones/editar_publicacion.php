@@ -68,6 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
         $descripcion = trim($_POST['descripcion'] ?? '');
         $precio = trim($_POST['precio'] ?? '');
         $tipo = trim($_POST['tipo'] ?? '');
+        $modalidad = trim($_POST['modalidad'] ?? '');
+        $nivel_experiencia = trim($_POST['nivel_experiencia'] ?? '');
+        $duracion_horas = trim($_POST['duracion_horas'] ?? '');
         $id_categoria = (int)($_POST['id_categoria'] ?? 0);
         $estado = trim($_POST['estado'] ?? 'Activo');
         $eliminar_imagen = !empty($_POST['eliminar_imagen']);
@@ -86,6 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
 
         if (!is_numeric($precio) || (float)$precio <= 0) {
             $errores[] = "El precio debe ser un número mayor a cero.";
+        }
+        if ($modalidad !== '' && !in_array($modalidad, ['virtual', 'presencial', 'hibrida', 'producto-entregable'], true)) {
+            $errores[] = "La modalidad seleccionada no es válida.";
+        }
+        if ($nivel_experiencia !== '' && !in_array($nivel_experiencia, ['inicial', 'intermedio', 'avanzado', 'depende-categoria'], true)) {
+            $errores[] = "El nivel de experiencia seleccionado no es válido.";
+        }
+        if ($duracion_horas !== '' && (!ctype_digit($duracion_horas) || (int) $duracion_horas <= 0)) {
+            $errores[] = "La duración debe ser una cantidad de horas válida.";
         }
 
         $ruta_imagen = $publicacion['imagen'];
@@ -110,8 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
         if (empty($errores)) {
             try {
                 $sql = "UPDATE publicaciones 
-                        SET titulo = :titulo, descripcion = :descripcion, precio = :precio, tipo = :tipo, 
-                            id_categoria = :id_categoria, estado = :estado, imagen = :imagen 
+                        SET titulo = :titulo, descripcion = :descripcion, precio = :precio, tipo = :tipo,
+                            modalidad = :modalidad, nivel_experiencia = :nivel_experiencia, duracion_horas = :duracion_horas,
+                            id_categoria = :id_categoria, estado = :estado, imagen = :imagen
                         WHERE id_publicacion = :id_pub";
                 $stmt_update = $pdo->prepare($sql);
                 $stmt_update->execute([
@@ -119,6 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
                     'descripcion'  => $descripcion,
                     'precio'       => (float)$precio,
                     'tipo'         => $tipo,
+                    'modalidad'    => $modalidad !== '' ? $modalidad : null,
+                    'nivel_experiencia' => $nivel_experiencia !== '' ? $nivel_experiencia : null,
+                    'duracion_horas' => $duracion_horas !== '' ? (int) $duracion_horas : null,
                     'id_categoria' => $id_categoria,
                     'estado'       => $estado,
                     'imagen'       => $ruta_imagen,

@@ -16,6 +16,15 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-1234}
     depends_on:
       - db
+      - mailpit
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: classia_mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
 
   db:
     image: mysql:8.0

@@ -1,4 +1,6 @@
 <?php
+$publicacion = null;
+$categorias = [];
 require_once '../php/auth/roles.php';
 
 requerir_rol(ROL_DOCENTE, 'usuario.php');
@@ -84,6 +86,33 @@ include '../includes/header.php';
               name="precio"
               required
               value="<?php echo htmlspecialchars($_POST['precio'] ?? $publicacion['precio']); ?>" />
+          </p>
+
+          <?php $current_modalidad = $_POST['modalidad'] ?? ($publicacion['modalidad'] ?? ''); ?>
+          <p>
+            <label for="modalidad">Modalidad</label>
+            <select id="modalidad" name="modalidad" class="form-select-full">
+              <option value="">Sin especificar</option>
+              <?php foreach (['virtual' => 'Virtual', 'presencial' => 'Presencial', 'hibrida' => 'Híbrida', 'producto-entregable' => 'Producto entregable'] as $valor => $etiqueta): ?>
+                <option value="<?= $valor ?>" <?= $current_modalidad === $valor ? 'selected' : '' ?>><?= $etiqueta ?></option>
+              <?php endforeach; ?>
+            </select>
+          </p>
+
+          <?php $current_nivel = $_POST['nivel_experiencia'] ?? ($publicacion['nivel_experiencia'] ?? ''); ?>
+          <p>
+            <label for="nivel_experiencia">Nivel de experiencia</label>
+            <select id="nivel_experiencia" name="nivel_experiencia" class="form-select-full">
+              <option value="">Sin especificar</option>
+              <?php foreach (['inicial' => 'Inicial', 'intermedio' => 'Intermedio', 'avanzado' => 'Avanzado', 'depende-categoria' => 'Depende de la categoría'] as $valor => $etiqueta): ?>
+                <option value="<?= $valor ?>" <?= $current_nivel === $valor ? 'selected' : '' ?>><?= $etiqueta ?></option>
+              <?php endforeach; ?>
+            </select>
+          </p>
+
+          <p>
+            <label for="duracion_horas">Duración aproximada (horas)</label>
+            <input type="number" min="1" max="10000" id="duracion_horas" name="duracion_horas" value="<?= htmlspecialchars($_POST['duracion_horas'] ?? ($publicacion['duracion_horas'] ?? '')) ?>" placeholder="Opcional" />
           </p>
 
           <p>

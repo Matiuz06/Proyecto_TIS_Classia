@@ -41,12 +41,22 @@ Proyecto_TIS_Classia/
 │   ├── auth/                        # ✅ IMPLEMENTADO
 │   │   ├── session.php              # Helper de sesiones seguras y control de acceso
 │   │   └── logout.php               # Cierre seguro de sesión y destrucción de cookies
+│   │   ├── confirmar_correo.php      # Confirmación del correo mediante token
 │   ├── usuarios/                    # ✅ IMPLEMENTADO
-│   │   └── registro.php             # Registro con validaciones, unicidad de email, bcrypt
+│   │   ├── registro.php             # Registro con validaciones, unicidad de email, bcrypt
+│   │   └── onboarding.php            # Persistencia del progreso y preferencias iniciales
 │   ├── publicaciones/               # ✅ IMPLEMENTADO
 │   │   ├── crear_publicacion.php    # Alta de publicaciones (INSERT PDO con CSRF)
 │   │   ├── editar_publicacion.php   # Edición y cambio de estado (UPDATE PDO con CSRF)
+│   │   ├── catalogo.php              # Consulta y recomendaciones personalizadas
 │   │   └── obtener_publicaciones.php # Helper para consulta dinámica de publicaciones
+│   ├── pagos/
+│   │   ├── pasarela.php              # Consulta de la orden para la vista de pago
+│   │   └── procesar_pago.php         # Validación y persistencia del pago
+│   ├── contacto/
+│   │   └── enviar.php                # Validación y envío del formulario de contacto
+│   └── utils/
+│       └── mailer.php                # Transporte mail()/SMTP y plantillas de correo
 │   ├── solicitudes/                 # 🔄 EN DESARROLLO — vista disponible, backend pendiente
 │   ├── contrataciones/              # 🔄 EN DESARROLLO — vista disponible, backend pendiente
 │   ├── pagos/                       # 🔄 EN DESARROLLO — vista disponible, backend pendiente
@@ -66,6 +76,9 @@ Proyecto_TIS_Classia/
 | Registro de usuarios | ✅ `registro.php` | ✅ `php/usuarios/registro.php` | ✅ INSERT `usuarios` |
 | Crear publicación | ✅ `crear-publicacion.php` | ✅ `php/publicaciones/crear_publicacion.php` | ✅ INSERT `publicaciones` |
 | Editar publicación | ✅ `editar-publicacion.php` | ✅ `php/publicaciones/editar_publicacion.php` | ✅ UPDATE `publicaciones` |
+| Recomendaciones del catálogo | ✅ `catalogo.php` | ✅ `php/publicaciones/catalogo.php` | ✅ `usuarios.onboarding_data` + `publicaciones` |
+| Confirmación de correo | ✅ `confirmar-correo.php` | ✅ `php/auth/confirmar_correo.php` | ✅ token en `usuarios` |
+| Pasarela de pago | ✅ `pasarela-pago.php` | ✅ `php/pagos/pasarela.php` | ✅ SELECT de contratación |
 | Panel proveedor | ✅ `panel-proveedor.php` | ✅ `php/publicaciones/obtener_publicaciones.php` | ✅ SELECT dinámico |
 | Solicitud de servicio | ✅ `form-solicitar-servicio.php` | 🔄 `php/solicitudes/` — pendiente | 🔄 tabla `solicitudes` lista |
 | Solicitud impresión 3D | ✅ `solicitud-impresion-3d.php` | 🔄 pendiente | 🔄 tabla `solicitudes` lista |
