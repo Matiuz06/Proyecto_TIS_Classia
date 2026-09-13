@@ -65,10 +65,10 @@ Este documento registra las **pruebas funcionales realizadas** sobre la platafor
 | ID | Descripción | Resultado | Observaciones |
 |:---:|:---|:---:|:---|
 | P-AUTH-01 | Vista de login renderiza correctamente | ✅ Pasó | `views/login.php` accesible |
-| P-AUTH-02 | Autenticación contra BD | 🔄 Pendiente | `php/auth/login.php` aún no implementado |
-| P-AUTH-03 | Redirección por rol tras login | 🔄 Pendiente | Requiere login.php backend |
+| P-AUTH-02 | Autenticación contra BD | ✅ Implementado | `php/auth/procesar_login.php`, CSRF, contraseña y correo confirmado |
+| P-AUTH-03 | Redirección por rol tras login | ✅ Implementado | Redirección backend según rol |
 | P-AUTH-04 | Cierre de sesión (`logout.php`) | ✅ Pasó | Destruye `$_SESSION`, invalida cookie, redirige |
-| P-AUTH-05 | Sesión expira al cerrar navegador | ✅ Pasó | Cookie `lifetime=0` configurada |
+| P-AUTH-05 | Sesión expira al cerrar navegador | ✅ Pasó | Cookie de navegador fuera de localhost; excepción de desarrollo documentada |
 
 ---
 
@@ -123,7 +123,7 @@ Este documento registra las **pruebas funcionales realizadas** sobre la platafor
 
 | ID | Descripción | Módulo | Dependencia |
 |:---:|:---|:---|:---|
-| P-PEND-01 | Login con autenticación real contra BD | `php/auth/login.php` | Implementación pendiente |
+| P-PEND-01 | Autenticación en dos pasos por correo/celular | `php/auth/` y `sql/migrations/` | Requiere desafío OTP, expiración y enrolamiento |
 | P-PEND-02 | Envío y persistencia de solicitud de servicio | `php/solicitudes/` | Implementación pendiente |
 | P-PEND-03 | Persistencia de contratación y pago | `php/contrataciones/`, `php/pagos/` | Implementación pendiente |
 | P-PEND-04 | Emisión y listado de valoraciones | `php/valoraciones/` | Implementación pendiente |

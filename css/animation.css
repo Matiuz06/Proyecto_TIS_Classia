@@ -164,160 +164,9 @@ button:active {
   }
 }
 
-body>main>header {
-  animation: entrada-principal 1s ease-out 1 both;
-}
-
-body>main>section {
-  animation: entrada-seccion 1s ease-out 0.35s 1 both;
-}
-
-.role-grid .content-card:nth-child(1) {
-  animation: entrada-tarjeta 0.7s ease-out 0.65s 1 both;
-}
-
-.role-grid .content-card:nth-child(2) {
-  animation: entrada-tarjeta 0.7s ease-out 0.85s 1 both;
-}
-
-.role-grid .content-card:nth-child(3) {
-  animation: entrada-tarjeta 0.7s ease-out 1.05s 1 both;
-}
-
-@keyframes entrada-principal {
-  0% {
-    opacity: 0;
-    transform: translateY(60px) scale(0.97);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes entrada-seccion {
-  0% {
-    opacity: 0;
-    transform: translateX(-60px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes entrada-tarjeta {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-
-  70% {
-    opacity: 1;
-    transform: translateY(-6px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-body>main>header {
-  animation: catalogo-header 0.9s ease-out 1 both;
-}
-
-.catalog-filters {
-  animation: catalogo-filtros 1.1s ease-out 0.25s 1 both;
-}
-
-#cursos {
-  animation: catalogo-contenido 1.1s ease-out 0.25s 1 both;
-}
-
-.catalog-card {
-  animation: catalogo-tarjeta 0.8s ease-out 0.75s 1 both;
-}
-
-.empty-state {
-  animation: catalogo-vacio 0.8s ease-out 1s 1 both;
-}
-
-@keyframes catalogo-header {
-  0% {
-    opacity: 0;
-    transform: translateY(-50px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes catalogo-filtros {
-  0% {
-    opacity: 0;
-    transform: translateX(-100vw);
-  }
-
-  70% {
-    opacity: 1;
-    transform: translateX(10px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes catalogo-contenido {
-  0% {
-    opacity: 0;
-    transform: translateX(100vw);
-  }
-
-  70% {
-    opacity: 1;
-    transform: translateX(-10px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes catalogo-tarjeta {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-
-  70% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes catalogo-vacio {
-  0% {
-    opacity: 0;
-    transform: translateY(50px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+body.home-page>main,
+body.catalog-page>main {
+  animation: fade-slide-up var(--dur-medium) var(--ease-out) both;
 }
 
 .page-container>.page-header {
@@ -540,8 +389,12 @@ body>main>header {
   }
 }
 
+.payment-card.motion-entry {
+  animation: entradaPago 1s ease-in-out both;
+}
+
 .onboarding-step {
-  animation: fade-slide-up var(--dur-medium) var(--ease-out) both;
+  animation: none;
 }
 
 .onboarding-step:nth-child(1) {

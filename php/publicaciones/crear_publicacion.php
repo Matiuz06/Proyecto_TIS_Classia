@@ -20,6 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $descripcion = trim($_POST['descripcion'] ?? '');
     $precio = trim($_POST['precio'] ?? '');
     $tipo = trim($_POST['tipo'] ?? '');
+    $modalidad = trim($_POST['modalidad'] ?? '');
+    $nivel_experiencia = trim($_POST['nivel_experiencia'] ?? '');
+    $duracion_horas = trim($_POST['duracion_horas'] ?? '');
     $id_categoria = (int)($_POST['id_categoria'] ?? 0);
     $token_recibido = $_POST['csrf_token'] ?? '';
 
@@ -37,6 +40,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!is_numeric($precio) || (float)$precio <= 0) {
         $errores[] = "El precio debe ser un número mayor a cero.";
+    }
+    if ($modalidad !== '' && !in_array($modalidad, ['virtual', 'presencial', 'hibrida', 'producto-entregable'], true)) {
+        $errores[] = "La modalidad seleccionada no es válida.";
+    }
+    if ($nivel_experiencia !== '' && !in_array($nivel_experiencia, ['inicial', 'intermedio', 'avanzado', 'depende-categoria'], true)) {
+        $errores[] = "El nivel de experiencia seleccionado no es válido.";
+    }
+    if ($duracion_horas !== '' && (!ctype_digit($duracion_horas) || (int) $duracion_horas <= 0)) {
+        $errores[] = "La duración debe ser una cantidad de horas válida.";
     }
 
     if (empty($errores)) {
@@ -59,14 +71,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errores)) {
         try {
-            $sql = "INSERT INTO publicaciones (titulo, descripcion, precio, tipo, estado, imagen, id_usuario, id_categoria) 
-                    VALUES (:titulo, :descripcion, :precio, :tipo, 'Activo', :imagen, :id_usuario, :id_categoria)";
+                $sql = "INSERT INTO publicaciones (titulo, descripcion, precio, tipo, modalidad, nivel_experiencia, duracion_horas, estado, imagen, id_usuario, id_categoria)
+                    VALUES (:titulo, :descripcion, :precio, :tipo, :modalidad, :nivel_experiencia, :duracion_horas, 'Activo', :imagen, :id_usuario, :id_categoria)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 'titulo'       => $titulo,
                 'descripcion'  => $descripcion,
                 'precio'       => (float)$precio,
                 'tipo'         => $tipo,
+                'modalidad'    => $modalidad !== '' ? $modalidad : null,
+                'nivel_experiencia' => $nivel_experiencia !== '' ? $nivel_experiencia : null,
+                'duracion_horas' => $duracion_horas !== '' ? (int) $duracion_horas : null,
                 'imagen'       => $ruta_imagen,
                 'id_usuario'   => $id_usuario_autenticado,
                 'id_categoria' => $id_categoria
