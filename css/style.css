@@ -2892,6 +2892,7 @@ img.user-nav-avatar {
 
 /* ========================================================================== 
    Provider / teacher management
+   ========================================================================== */
 .provider-editor,
 .provider-dashboard {
   width: min(1500px, calc(100% - 2rem));
