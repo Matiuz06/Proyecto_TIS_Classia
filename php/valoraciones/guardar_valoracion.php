@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../auth/session.php';
+require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 const LOGIN_URL = '../../views/login.php';

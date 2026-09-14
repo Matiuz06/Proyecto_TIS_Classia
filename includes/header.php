@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__ . '/../php/auth/session.php';
+require_once __DIR__ . '/../php/auth/sesion.php';
 iniciar_sesion();
 
 require_once __DIR__ . '/../php/auth/roles.php';
-require_once __DIR__ . '/../php/auth/onboarding_guard.php';
+require_once __DIR__ . '/../php/auth/guardia_onboarding.php';
 
 $title       = $title       ?? 'Classia';
 $description = $description ?? 'Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada.';
@@ -66,15 +66,16 @@ requerir_onboarding_completo($onboardingHref);
           </div>
         <?php else: ?>
           <?php
-            $navAvatarSrc = !empty($currentUser['foto_perfil'])
-              ? ($cssPrefix . '/' . htmlspecialchars($currentUser['foto_perfil']))
+            $fotoPerfil = (string) ($currentUser['foto_perfil'] ?? '');
+            $navAvatarSrc = $fotoPerfil !== ''
+              ? (preg_match('#^https?://#i', $fotoPerfil) ? $fotoPerfil : $cssPrefix . '/' . ltrim($fotoPerfil, '/'))
               : ($cssPrefix . '/assets/images/default-avatar.svg');
             $primerNombre = htmlspecialchars(explode(' ', trim($currentUser['nombre'] ?? 'Usuario'))[0]);
           ?>
           <div class="user-nav-dropdown">
             <a href="<?= $cuentaHref ?>" class="user-nav-trigger" title="Ir a mi cuenta (<?= $primerNombre ?>)">
               <span class="user-nav-name"><?= $primerNombre ?></span>
-              <img src="<?= $navAvatarSrc ?>" alt="Avatar de <?= $primerNombre ?>" class="user-nav-avatar" />
+              <img src="<?= htmlspecialchars($navAvatarSrc, ENT_QUOTES, 'UTF-8') ?>" alt="Avatar de <?= $primerNombre ?>" class="user-nav-avatar" />
               <span class="user-nav-caret" aria-hidden="true">&#9662;</span>
             </a>
 

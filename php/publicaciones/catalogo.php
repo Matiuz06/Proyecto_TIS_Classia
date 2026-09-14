@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../auth/session.php';
+require_once __DIR__ . '/../auth/sesion.php';
 iniciar_sesion();
 
 if (empty($_SESSION['csrf_token'])) {
@@ -155,7 +155,8 @@ function puntaje_recomendacion(array $publicacion, array $preferencias): int
 }
 
 $recomendaciones = [];
-if (!empty($preferencias_usuario) && empty($busqueda) && empty($tipo_filtro) && $categoria_filtro === 0) {
+$personalizacion_aceptada = ($preferencias_usuario['acepta_personalizacion'] ?? '') === 'si';
+if ($personalizacion_aceptada && empty($busqueda) && empty($tipo_filtro) && $categoria_filtro === 0) {
     $publicaciones_recomendadas = $publicaciones;
     usort($publicaciones_recomendadas, function (array $a, array $b) use ($preferencias_usuario): int {
         $puntaje_a = puntaje_recomendacion($a, $preferencias_usuario);

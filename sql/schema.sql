@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email_verificado TINYINT(1) NOT NULL DEFAULT 1,
     email_verificacion_token CHAR(64) NULL,
     email_verificacion_expira DATETIME NULL,
+    password_reset_token CHAR(64) NULL,
+    password_reset_expira DATETIME NULL,
     onboarding_step TINYINT UNSIGNED NOT NULL DEFAULT 1,
     onboarding_data TEXT NULL,
     CONSTRAINT fk_usuarios_roles

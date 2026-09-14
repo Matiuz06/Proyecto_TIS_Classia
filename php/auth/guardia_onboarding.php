@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/sesion.php';
 
 function requerir_onboarding_completo(string $url_onboarding): void
 {
@@ -19,7 +19,7 @@ function requerir_onboarding_completo(string $url_onboarding): void
     }
 
     $pagina_actual = basename(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH));
-    if ($pagina_actual === 'primeros-pasos.php') {
+    if (in_array($pagina_actual, ['primeros-pasos.php', 'confirmar-correo.php', 'politica-privacidad.php'], true)) {
         return;
     }
 

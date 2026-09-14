@@ -5,6 +5,11 @@ $datos_onboarding = [];
 $usuario_onboarding = [];
 require_once '../php/usuarios/onboarding.php';
 
+if (($usuario_onboarding['onboarding_step'] ?? 0) > 9) {
+    header('Location: usuario.php?onboarding=completo');
+    exit;
+}
+
 $title       = 'Primeros pasos — Classia';
 $description = 'Configuración inicial del perfil y las preferencias del usuario en Classia.';
 $cssPrefix   = '..';
@@ -23,7 +28,6 @@ include '../includes/header.php';
         proyectos, mentorías y servicios relacionados con tus intereses.
         Podrás modificar estas preferencias más adelante desde tu perfil.
       </p>
-      <p class="step-desc">Paso <?= $paso_actual ?> de 9. Completá cada sección para habilitar la siguiente.</p>
     </header>
 
     <form action="../php/usuarios/onboarding.php" method="post">
@@ -75,7 +79,7 @@ include '../includes/header.php';
           <div class="form-group">
             <label for="otra-profesion">Otra profesión u ocupación</label>
             <input type="text" id="otra-profesion" name="otra_profesion"
-              placeholder="Completa este campo si seleccionaste otra ocupación" />
+              placeholder="Completa este campo si seleccionaste otra ocupación" disabled />
           </div>
         </div>
 
@@ -418,7 +422,7 @@ include '../includes/header.php';
           <label class="option-card" for="acepta-privacidad">
             <input type="checkbox" id="acepta-privacidad" name="acepta_privacidad" value="si" required />
             <span class="option-text">
-              Confirmo que leí y acepto la <a href="politica_privacidad.php"
+              Confirmo que leí y acepto la <a href="politica-privacidad.php"
                 style="color: var(--color-brand-primary); font-weight: 600;">política de privacidad</a> y el tratamiento
               de mis datos personales.
             </span>
@@ -427,6 +431,11 @@ include '../includes/header.php';
       </fieldset>
 
       <div class="onboarding-actions">
+        <?php if ($paso_actual > 1): ?>
+          <button type="submit" name="accion" value="retroceder" class="btn btn-secondary" formnovalidate>
+            Retroceder
+          </button>
+        <?php endif; ?>
         <button type="submit" class="btn btn-primary"><?= $paso_actual === 9 ? 'Finalizar configuración' : 'Guardar y continuar' ?></button>
       </div>
     </form>
@@ -444,6 +453,22 @@ include '../includes/header.php';
       }
     });
   });
+
+  const profesion = document.getElementById('profesion');
+  const otraProfesion = document.getElementById('otra-profesion');
+
+  const actualizarOtraProfesion = () => {
+    const habilitada = profesion.value === 'otro';
+    otraProfesion.disabled = !habilitada;
+    otraProfesion.required = habilitada;
+
+    if (!habilitada) {
+      otraProfesion.value = '';
+    }
+  };
+
+  profesion.addEventListener('change', actualizarOtraProfesion);
+  actualizarOtraProfesion();
 </script>
 
 <?php include '../includes/footer.php'; ?>
