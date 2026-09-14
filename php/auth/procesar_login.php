@@ -27,7 +27,7 @@ if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $tok
     volver_login("La sesión del formulario expiró. Recargá la página e intentá nuevamente.");
 }
 
-$email = trim($_POST["email"] ?? "");
+$email = strtolower(trim($_POST["email"] ?? ""));
 $password = $_POST["password"] ?? "";
 
 if ($email === "") {
@@ -53,8 +53,9 @@ try {
             email,
             password_hash,
             id_rol,
-            foto_perfil
-            ,email_verificado
+            foto_perfil,
+            email_verificado,
+            onboarding_step
          FROM usuarios
          WHERE email = :email
          LIMIT 1"
@@ -100,6 +101,8 @@ if ((int) $usuario["id_rol"] === 3) {
     header("Location: ../../views/panel-administrador.php");
 } elseif ((int) $usuario["id_rol"] === 2) {
     header("Location: ../../views/panel-proveedor.php");
+} elseif ((int) ($usuario["onboarding_step"] ?? 1) <= 9) {
+    header("Location: ../../views/primeros-pasos.php");
 } else {
     header("Location: " . LOGIN_OK_URL);
 }

@@ -2889,3 +2889,253 @@ img.user-nav-avatar {
 .onboarding-header .step-desc {
   text-align: center;
 }
+
+/* ========================================================================== 
+   Provider / teacher management
+   ========================================================================== */
+.provider-editor,
+.provider-dashboard {
+  width: min(1500px, calc(100% - 2rem));
+  max-width: none;
+  margin-inline: auto;
+}
+
+.section-heading {
+  margin-bottom: var(--space-4);
+}
+
+.provider-toolbar,
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin: var(--space-3) 0 var(--space-5);
+}
+
+.provider-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.provider-form details,
+.course-module,
+.content-card,
+.professional-profile section {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.provider-form details,
+.course-module {
+  padding: var(--space-3) var(--space-4);
+}
+
+.provider-form summary,
+.course-module > summary {
+  cursor: pointer;
+  color: var(--color-heading);
+  font-weight: 800;
+  font-size: var(--text-lg);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.form-grid > label {
+  display: grid;
+  gap: var(--space-1);
+  font-weight: 700;
+}
+
+.form-grid-full {
+  grid-column: 1 / -1;
+}
+
+.provider-form input,
+.provider-form select,
+.provider-form textarea,
+.content-card input,
+.content-card select,
+.content-card textarea {
+  width: 100%;
+}
+
+.compact-form {
+  padding-block: var(--space-2);
+}
+
+.course-module-body {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+.course-unit {
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.inline-form {
+  display: inline;
+}
+
+.link-danger {
+  padding: 0;
+  margin-left: .5rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-danger, #b42318);
+  text-decoration: underline;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+
+.dashboard-stats article {
+  padding: var(--space-3);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.dashboard-stats strong {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--text-xl);
+}
+
+.publicaciones-lista,
+.request-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: var(--space-3);
+}
+
+.pub-card,
+.content-card {
+  padding: var(--space-4);
+}
+
+.pub-card-thumb-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+}
+
+.publication-deleted {
+  opacity: .72;
+  border-style: dashed;
+}
+
+.status-chip {
+  display: inline-block;
+  padding: .2rem .6rem;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-weight: 700;
+}
+
+.request-details,
+.profile-meta,
+.pub-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-2);
+}
+
+.request-details > div,
+.profile-meta > div,
+.pub-details > div {
+  padding: var(--space-2);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+}
+
+.message-thread {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.message-thread article {
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-brand-primary);
+  background: var(--color-surface);
+}
+
+.message-thread time {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.professional-profile {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.professional-profile-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.profile-avatar-large {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-3);
+}
+
+.professional-profile section {
+  padding: var(--space-4);
+}
+
+.service-request-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: var(--space-4);
+}
+
+.publication-detail {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (max-width: 800px) {
+  .form-grid,
+  .service-request-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid-full {
+    grid-column: auto;
+  }
+
+  .professional-profile-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

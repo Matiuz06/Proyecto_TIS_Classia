@@ -43,7 +43,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE TABLE IF NOT EXISTS categorias (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nombre_categoria VARCHAR(100) NOT NULL UNIQUE,
-    descripcion TEXT NULL
+    descripcion TEXT NULL,
+    creada_por INT NULL,
+    CONSTRAINT fk_categorias_creador
+        FOREIGN KEY (creada_por) REFERENCES usuarios(id_usuario)
+        ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS publicaciones (
@@ -55,33 +59,37 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     modalidad VARCHAR(30) NULL,
     nivel_experiencia VARCHAR(30) NULL,
     duracion_horas SMALLINT UNSIGNED NULL,
-    estado ENUM('Activo', 'Inactivo', 'Pausado') NOT NULL DEFAULT 'Activo',
+    cupos INT NULL,
+    disponibilidad TEXT NULL,
+    tipo_servicio VARCHAR(60) NULL,
+    estado ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado') NOT NULL DEFAULT 'Activo',
     imagen VARCHAR(255) NULL DEFAULT NULL,
+    eliminado_en DATETIME NULL,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     id_usuario INT NOT NULL,
     id_categoria INT NOT NULL,
-    CONSTRAINT fk_publicaciones_usuarios
-        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_publicaciones_categorias
-        FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
-        ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT fk_publicaciones_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_publicaciones_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS solicitudes (
     id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(200) NOT NULL,
     descripcion TEXT NOT NULL,
-    estado ENUM('Pendiente', 'Aceptada', 'Rechazada', 'Cancelada') NOT NULL DEFAULT 'Pendiente',
+    estado ENUM('Pendiente', 'Aceptada', 'Rechazada', 'Contraoferta', 'En Proceso', 'Realizada', 'Cancelada') NOT NULL DEFAULT 'Pendiente',
+    detalles_json JSON NULL,
+    archivo_adjunto VARCHAR(255) NULL,
+    precio_propuesto DECIMAL(10,2) NULL,
+    fecha_hora_propuesta DATETIME NULL,
+    respuesta_proveedor TEXT NULL,
     fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     id_usuario INT NOT NULL,
     id_publicacion INT NULL,
-    CONSTRAINT fk_solicitudes_usuarios
-        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_solicitudes_publicaciones
-        FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
-        ON DELETE SET NULL ON UPDATE CASCADE
+    id_contratacion INT NULL,
+    CONSTRAINT fk_solicitudes_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_solicitudes_publicaciones FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS solicitudes_docente (
@@ -158,6 +166,79 @@ CREATE TABLE IF NOT EXISTS valoraciones (
         UNIQUE (id_contratacion, id_usuario)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+
+CREATE TABLE IF NOT EXISTS perfiles_profesionales (
+    id_perfil INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL UNIQUE,
+    titulo_profesional VARCHAR(180) NULL,
+    presentacion TEXT NULL,
+    experiencia TEXT NULL,
+    formacion TEXT NULL,
+    certificaciones TEXT NULL,
+    habilidades TEXT NULL,
+    especialidades TEXT NULL,
+    idiomas VARCHAR(255) NULL,
+    ubicacion VARCHAR(150) NULL,
+    modalidad_trabajo VARCHAR(150) NULL,
+    portfolio_url VARCHAR(255) NULL,
+    linkedin_url VARCHAR(255) NULL,
+    tiempo_respuesta VARCHAR(100) NULL,
+    visibilidad ENUM('Registrados','Relacionados') NOT NULL DEFAULT 'Registrados',
+    actualizado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_perfiles_profesionales_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_modulos (
+    id_modulo INT AUTO_INCREMENT PRIMARY KEY,
+    id_publicacion INT NOT NULL,
+    titulo VARCHAR(180) NOT NULL,
+    descripcion TEXT NULL,
+    orden INT NOT NULL DEFAULT 1,
+    CONSTRAINT fk_curso_modulos_publicacion FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_modulos_publicacion_orden (id_publicacion,orden)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_unidades (
+    id_unidad INT AUTO_INCREMENT PRIMARY KEY,
+    id_modulo INT NOT NULL,
+    titulo VARCHAR(180) NOT NULL,
+    descripcion TEXT NULL,
+    orden INT NOT NULL DEFAULT 1,
+    CONSTRAINT fk_curso_unidades_modulo FOREIGN KEY (id_modulo) REFERENCES curso_modulos(id_modulo) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_unidades_modulo_orden (id_modulo,orden)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_recursos (
+    id_recurso INT AUTO_INCREMENT PRIMARY KEY,
+    id_unidad INT NOT NULL,
+    titulo VARCHAR(180) NOT NULL,
+    tipo ENUM('Archivo','PDF','Imagen','Video','Enlace') NOT NULL,
+    url VARCHAR(500) NULL,
+    archivo VARCHAR(255) NULL,
+    descripcion TEXT NULL,
+    orden INT NOT NULL DEFAULT 1,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_curso_recursos_unidad FOREIGN KEY (id_unidad) REFERENCES curso_unidades(id_unidad) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_recursos_unidad_orden (id_unidad,orden)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS solicitud_mensajes (
+    id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
+    id_solicitud INT NOT NULL,
+    id_usuario INT NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_mensaje DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_solicitud_mensajes_solicitud FOREIGN KEY (id_solicitud) REFERENCES solicitudes(id_solicitud) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_solicitud_mensajes_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_solicitud_mensajes_fecha (id_solicitud,fecha_mensaje)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE solicitudes
+    ADD CONSTRAINT fk_solicitudes_contratacion
+    FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
+    ON DELETE SET NULL ON UPDATE CASCADE;
+
 INSERT IGNORE INTO roles (id_rol, nombre_rol, descripcion) VALUES
 (1, 'Cliente/Estudiante', 'Usuario consumidor de cursos y servicios'),
 (2, 'Docente/Proveedor', 'Usuario creador y prestador de servicios educativos'),
@@ -175,17 +256,17 @@ INSERT IGNORE INTO categorias (id_categoria, nombre_categoria, descripcion) VALU
 (9, 'Idiomas y Comunicación Técnica', 'Inglés técnico para desarrolladores y redacción de documentación'),
 (10, 'Gestión de Proyectos Tecnológicos', 'Metodologías ágiles, Scrum y dirección de proyectos de software');
 
-INSERT IGNORE INTO usuarios (id_usuario, nombre, apellido, email, password_hash, telefono, fecha_registro, id_rol) VALUES
-(1, 'Carlos', 'Admin', 'admin@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1155443322', '2026-01-10 09:00:00', 3),
-(2, 'María', 'Docente', 'docente@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1199887766', '2026-01-15 10:30:00', 2),
-(3, 'Roberto', 'Gómez', 'roberto.gomez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1144332211', '2026-01-20 11:15:00', 2),
-(4, 'Lucía', 'Fernández', 'lucia.fernandez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1133221100', '2026-02-01 14:00:00', 2),
-(5, 'Gonzalo', 'Martínez', 'gonzalo.martinez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1122110099', '2026-02-05 16:45:00', 2),
-(6, 'Juan', 'Pérez', 'estudiante@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1122334455', '2026-02-10 12:00:00', 1),
-(7, 'Ana', 'Silva', 'ana.silva@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1166778899', '2026-02-12 13:20:00', 1),
-(8, 'Diego', 'López', 'diego.lopez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1177889900', '2026-02-15 15:10:00', 1),
-(9, 'Sofía', 'Rodríguez', 'sofia.rodriguez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1188990011', '2026-02-18 17:30:00', 1),
-(10, 'Martín', 'Benítez', 'martin.benitez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1199001122', '2026-02-20 09:45:00', 1);
+INSERT IGNORE INTO usuarios (id_usuario, nombre, apellido, email, password_hash, telefono, fecha_registro, id_rol, email_verificado, onboarding_step) VALUES
+(1, 'Carlos', 'Admin', 'admin@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1155443322', '2026-01-10 09:00:00', 3, 1, 10),
+(2, 'María', 'Docente', 'docente@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1199887766', '2026-01-15 10:30:00', 2, 1, 10),
+(3, 'Roberto', 'Gómez', 'roberto.gomez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1144332211', '2026-01-20 11:15:00', 2, 1, 10),
+(4, 'Lucía', 'Fernández', 'lucia.fernandez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1133221100', '2026-02-01 14:00:00', 2, 1, 10),
+(5, 'Gonzalo', 'Martínez', 'gonzalo.martinez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1122110099', '2026-02-05 16:45:00', 2, 1, 10),
+(6, 'Juan', 'Pérez', 'estudiante@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1122334455', '2026-02-10 12:00:00', 1, 1, 10),
+(7, 'Ana', 'Silva', 'ana.silva@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1166778899', '2026-02-12 13:20:00', 1, 1, 10),
+(8, 'Diego', 'López', 'diego.lopez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1177889900', '2026-02-15 15:10:00', 1, 1, 10),
+(9, 'Sofía', 'Rodríguez', 'sofia.rodriguez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1188990011', '2026-02-18 17:30:00', 1, 1, 10),
+(10, 'Martín', 'Benítez', 'martin.benitez@classia.com', '$2y$10$5sRoonQ8BOFLS7jHfFKCmucev28F2JqZyeysT1lpNiYxbP9caKfPe', '1199001122', '2026-02-20 09:45:00', 1, 1, 10);
 
 INSERT IGNORE INTO publicaciones (id_publicacion, titulo, descripcion, precio, tipo, estado, fecha_creacion, id_usuario, id_categoria) VALUES
 (1, 'Curso Completo de PHP y MySQL', 'Aprende backend desde cero hasta crear sistemas dinámicos seguros con PDO.', 15000.00, 'Curso', 'Activo', '2026-02-21 10:00:00', 2, 1),
@@ -258,3 +339,7 @@ INSERT IGNORE INTO valoraciones (id_valoracion, puntuacion, comentario, fecha_va
 (8, 4, 'Contenido didáctico y muy buenos ejercicios prácticos en Figma.', '2026-08-29 15:10:00', 8, 8, 8),
 (9, 3, 'El contenido es bueno aunque me hubiera gustado profundizar más en vocabulario específico.', '2026-08-31 09:20:00', 9, 9, 9),
 (10, 5, 'Gran asesoría en Scrum, ayudó a organizar la dinámica de nuestro equipo.', '2026-09-01 11:00:00', 10, 10, 10);
+
+UPDATE publicaciones SET tipo_servicio='impresion_3d' WHERE id_publicacion=2 AND tipo='Servicio' AND tipo_servicio IS NULL;
+UPDATE publicaciones SET tipo_servicio='mentoria' WHERE id_publicacion=4 AND tipo='Servicio' AND tipo_servicio IS NULL;
+UPDATE publicaciones SET tipo_servicio='formacion_institucional' WHERE id_publicacion=10 AND tipo='Servicio' AND tipo_servicio IS NULL;

@@ -30,7 +30,7 @@ if (empty($ids_carrito)) {
 
 try {
     $stmt_publicacion = $pdo->prepare(
-        "SELECT id_publicacion, titulo, precio, estado
+        "SELECT id_publicacion, titulo, precio, estado, tipo, tipo_servicio, cupos
          FROM publicaciones
          WHERE id_publicacion = :id_publicacion
          LIMIT 1"
@@ -51,6 +51,20 @@ try {
             $_SESSION['carrito_error'] = 'Una de las publicaciones seleccionadas no esta disponible.';
             header('Location: ../../views/carrito.php');
             exit;
+        }
+        if ($publicacion['tipo'] === 'Servicio' && !empty($publicacion['tipo_servicio'])) {
+            $_SESSION['carrito_error'] = 'Este servicio requiere una solicitud personalizada antes de contratarse.';
+            header('Location: ../../views/servicio-detalle.php?id=' . (int)$publicacion['id_publicacion']);
+            exit;
+        }
+        if ($publicacion['tipo'] === 'Curso') {
+            $dup=$pdo->prepare("SELECT COUNT(*) FROM detalles_contratacion dc JOIN contrataciones c ON c.id_contratacion=dc.id_contratacion WHERE c.id_usuario=:u AND dc.id_publicacion=:p AND c.estado IN ('Pendiente','En Proceso','Completada')");
+            $dup->execute(['u'=>$id_usuario,'p'=>$publicacion['id_publicacion']]);
+            if((int)$dup->fetchColumn()>0){$_SESSION['carrito_error']='Ya tenés este curso contratado o pendiente de pago.';header('Location: ../../views/carrito.php');exit;}
+            if(!empty($publicacion['cupos'])){
+                $oc=$pdo->prepare("SELECT COALESCE(SUM(dc.cantidad),0) FROM detalles_contratacion dc JOIN contrataciones c ON c.id_contratacion=dc.id_contratacion WHERE dc.id_publicacion=:p AND c.estado<>'Cancelada'");$oc->execute(['p'=>$publicacion['id_publicacion']]);
+                if((int)$oc->fetchColumn()>=(int)$publicacion['cupos']){$_SESSION['carrito_error']='No quedan cupos disponibles para el curso ' . $publicacion['titulo'] . '.';header('Location: ../../views/carrito.php');exit;}
+            }
         }
 
         $cantidad = 1;

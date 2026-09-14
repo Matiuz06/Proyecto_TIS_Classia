@@ -54,6 +54,7 @@ include '../includes/header.php';
                 <span class="text-muted">trabajos y publicaciones activas</span>
               </div>
             </div>
+            <p><a class="btn" href="perfil-profesional.php?id=<?= (int)$proveedor['id_usuario'] ?>">Ver perfil profesional completo</a></p>
           </div>
         </div>
       </section>

@@ -39,7 +39,7 @@ Proyecto_TIS_Classia/
 │   └── politica-privacidad.php      # Política de privacidad (Ley 18.331 / URCDP)
 ├── php/                             # Lógica de negocio backend organizada por módulo
 │   ├── auth/                        # ✅ IMPLEMENTADO
-│   │   ├── session.php              # Helper de sesiones seguras y control de acceso
+│   │   ├── sesion.php               # Helper canónico de sesiones seguras y control de acceso
 │   │   └── logout.php               # Cierre seguro de sesión y destrucción de cookies
 │   │   ├── confirmar_correo.php      # Confirmación del correo mediante token
 │   ├── usuarios/                    # ✅ IMPLEMENTADO
@@ -72,7 +72,7 @@ Proyecto_TIS_Classia/
 
 | Módulo | Vista frontend | Lógica backend PHP | Persistencia BD |
 |:---|:---:|:---:|:---:|
-| Autenticación / Sesiones | ✅ `login.php` | ✅ `php/auth/session.php` | ✅ tabla `usuarios` |
+| Autenticación / Sesiones | ✅ `login.php` | ✅ `php/auth/sesion.php` | ✅ tabla `usuarios` |
 | Registro de usuarios | ✅ `registro.php` | ✅ `php/usuarios/registro.php` | ✅ INSERT `usuarios` |
 | Crear publicación | ✅ `crear-publicacion.php` | ✅ `php/publicaciones/crear_publicacion.php` | ✅ INSERT `publicaciones` |
 | Editar publicación | ✅ `editar-publicacion.php` | ✅ `php/publicaciones/editar_publicacion.php` | ✅ UPDATE `publicaciones` |
@@ -133,7 +133,7 @@ $usuario = $stmt->fetch();
 
 ## Manejo de Sesiones y Autenticación
 
-El control de sesiones se gestiona en `php/auth/session.php`.
+El control de sesiones se gestiona en `php/auth/sesion.php`.
 
 ### Funciones disponibles
 
