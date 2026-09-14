@@ -85,7 +85,7 @@ Proyecto_TIS_Classia/
 │   └── politica-privacidad.php    # Política de privacidad (Ley 18.331 / URCDP)
 ├── php/                           # Lógica de backend organizada por módulo
 │   ├── auth/
-│   │   ├── session.php            # Helper de sesiones seguras y control de acceso
+│   │   ├── sesion.php             # Helper canónico de sesiones seguras y control de acceso
 │   │   └── logout.php             # Cierre seguro de sesión y destrucción de cookies
 │   ├── usuarios/
 │   │   └── registro.php           # Procesamiento de registro, validaciones y hash seguro
@@ -204,7 +204,7 @@ Actualmente el proyecto cuenta con:
 
 - [x] **Arquitectura PHP modular** completada con 20 vistas `.php`, `includes/header.php` y `includes/footer.php`.
 - [x] **Base de datos relacional** normalizada e implementada en `sql/schema.sql` (9 tablas, 3FN, integridad referencial completa).
-- [x] **Manejo seguro de sesiones** en `php/auth/session.php` y cierre de sesión en `php/auth/logout.php`.
+- [x] **Manejo seguro de sesiones** en `php/auth/sesion.php` y cierre de sesión en `php/auth/logout.php`.
 - [x] **Registro de usuarios** funcional en `php/usuarios/registro.php` con validación de unicidad de email, hash bcrypt y protección CSRF.
 - [x] **CRUD de publicaciones** (cursos y servicios) operativo en `php/publicaciones/` con creación, edición, cambio de estados y visualización dinámica en `panel-proveedor.php`.
 - [x] **Flujo de solicitud docente** diseñado e implementado en vistas (`form-solicitar-servicio.php`, `solicitud-impresion-3d.php`); backend en `php/solicitudes/` planificado para próxima entrega.

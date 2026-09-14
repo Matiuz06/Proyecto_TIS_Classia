@@ -8,6 +8,7 @@ $jsPrefix    = '..';
 
 $activePage  = 'catalogo';
 include '../includes/header.php';
+$puedeAgregar = es_estudiante();
 ?>
 
   <main class="product-detail-container motion-entry">
@@ -140,22 +141,27 @@ include '../includes/header.php';
               <li>✓ Contacto directo con el proveedor</li>
               <li>✓ Seguimiento paso a paso</li>
               <li>✓ Garantía de satisfacción Classia</li>
+              <?php if (!empty($servicio['modalidad'])): ?><li>✓ Modalidad: <?= htmlspecialchars(ucfirst(str_replace('-', ' ', $servicio['modalidad']))) ?></li><?php endif; ?>
+              <?php if (!empty($servicio['duracion_horas'])): ?><li>✓ Duración aproximada: <?= (int)$servicio['duracion_horas'] ?> h</li><?php endif; ?>
+              <?php if (!empty($servicio['disponibilidad'])): ?><li>✓ Disponibilidad: <?= htmlspecialchars($servicio['disponibilidad']) ?></li><?php endif; ?>
             </ul>
 
-            <!-- Enviar al carrito-->
-            <form action="carrito.php" method="POST">
-              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>" />
-              <input type="hidden" name="id_publicacion" value="<?= (int)$servicio['id_publicacion'] ?>" />
-              <input type="hidden" name="accion" value="agregar" />
-              <button type="submit" class="btn product-card-pricing__btn">
-                Continuar con la contratación
-              </button>
-            </form>
-
-            <div class="custom-request-box">
-              <p>¿Tienes requerimientos especiales?</p>
-              <a href="form-solicitar-servicio.php" class="link">Enviar solicitud personalizada</a>
-            </div>
+            <?php if (!empty($plantilla_servicio)): ?>
+              <?php if ($puedeAgregar): ?>
+                <a href="form-solicitar-servicio.php?id=<?= (int)$servicio['id_publicacion'] ?>" class="btn product-card-pricing__btn">Solicitar propuesta personalizada</a>
+              <?php elseif (!esta_autenticado()): ?>
+                <div class="purchase-auth-actions"><a class="btn product-card-pricing__btn" href="login.php">Inicia sesión</a><a href="registro.php">Regístrate</a></div>
+              <?php else: ?>
+                <p class="text-muted">Las solicitudes de servicios se realizan desde una cuenta de estudiante.</p>
+              <?php endif; ?>
+              <div class="custom-request-box"><p>Este servicio utiliza la plantilla: <strong><?= htmlspecialchars($plantilla_servicio['nombre']) ?></strong>.</p></div>
+            <?php else: ?>
+              <?php if ($puedeAgregar): ?>
+                <form action="carrito.php" method="POST"><input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>"><input type="hidden" name="id_publicacion" value="<?= (int)$servicio['id_publicacion'] ?>"><input type="hidden" name="accion" value="agregar"><button type="submit" class="btn product-card-pricing__btn">Continuar con la contratación</button></form>
+              <?php elseif (!esta_autenticado()): ?>
+                <div class="purchase-auth-actions"><a class="btn product-card-pricing__btn" href="login.php">Inicia sesión</a><a href="registro.php">Regístrate</a></div>
+              <?php endif; ?>
+            <?php endif; ?>
           </div>
         </aside>
 

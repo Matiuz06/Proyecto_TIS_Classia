@@ -1,12 +1,17 @@
 <?php
 
-require_once __DIR__ . '/../auth/session.php';
+require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST'
+    && ($_POST['accion'] ?? '') === 'agregar') {
+    requerir_autenticacion('../../views/login.php');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

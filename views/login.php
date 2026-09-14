@@ -1,7 +1,12 @@
 <?php
-require_once '../php/auth/session.php';
+require_once '../php/auth/sesion.php';
 
 iniciar_sesion();
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 
 if (esta_autenticado()) {
     header("Location: usuario.php");
@@ -10,9 +15,11 @@ if (esta_autenticado()) {
 
 $login_error = $_SESSION["login_error"] ?? "";
 $login_email = $_SESSION["login_email"] ?? "";
+$login_success = $_SESSION["login_success"] ?? "";
 
 unset($_SESSION["login_error"]);
 unset($_SESSION["login_email"]);
+unset($_SESSION["login_success"]);
 
 $title = 'Iniciar sesión';
 $description = 'Inicio de sesión en Classia.';
@@ -44,13 +51,20 @@ include '../includes/header.php';
             </div>
         <?php endif; ?>
 
+        <?php if ($login_success !== ""): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($login_success); ?>
+            </div>
+        <?php endif; ?>
+
         <?php if ($login_error !== ""): ?>
             <div class="alert alert-danger auth-error">
                 <?php echo htmlspecialchars($login_error); ?>
             </div>
         <?php endif; ?>
 
-        <form action="../php/auth/procesarLogin.php" method="POST">
+        <form action="../php/auth/procesar_login.php" method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" />
             <p>
                 <label for="email">Correo electrónico</label>
                 <input
@@ -94,7 +108,7 @@ include '../includes/header.php';
         </div>
 
         <a
-            href="../php/auth/google_oauth_inicio.php"
+            href="../php/auth/inicio_oauth_google.php"
             class="btn-google"
             id="btn-google-login"
             aria-label="Iniciar sesión con Google"
