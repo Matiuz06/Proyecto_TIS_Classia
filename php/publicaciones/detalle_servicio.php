@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../solicitudes/plantillas_servicio.php';
 
 $id_servicio = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $servicio = null;
@@ -8,6 +9,7 @@ $resenas = [];
 $promedio_calificacion = 0.0;
 $total_resenas = 0;
 $servicios_relacionados = [];
+$plantilla_servicio = null;
 
 if ($id_servicio > 0) {
     try {
@@ -24,6 +26,7 @@ if ($id_servicio > 0) {
         $servicio = $stmt->fetch();
 
         if ($servicio) {
+            $plantilla_servicio = obtener_plantilla_servicio($servicio['tipo_servicio'] ?? null);
             // Reseñas reales
             $stmt_res = $pdo->prepare("
                 SELECT v.*, u.nombre, u.apellido, u.foto_perfil

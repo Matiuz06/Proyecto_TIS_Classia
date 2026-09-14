@@ -1,0 +1,61 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: proyecto_tis_classia-web:latest
+    container_name: classia_web
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-classia_db}
+      DB_USER: ${DB_USER:-classia_user}
+      DB_PASSWORD: ${DB_PASSWORD:-1234}
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: classia_db
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-classia_db}
+      MYSQL_USER: ${DB_USER:-classia_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-1234}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_PASSWORD}\" mysql --protocol=TCP -h 127.0.0.1 -P 3306 -u \"$${MYSQL_USER}\" --database=\"$${MYSQL_DATABASE}\" -e 'SELECT 1' >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: classia_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
