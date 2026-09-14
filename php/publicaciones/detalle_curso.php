@@ -1,6 +1,8 @@
 <?php
 
 require_once __DIR__ . '/../auth/sesion.php';
+require_once __DIR__ . '/../auth/roles.php';
+require_once __DIR__ . '/contenido_curso.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
@@ -12,6 +14,8 @@ $promedio_calificacion = 0.0;
 $total_resenas = 0;
 $cursos_relacionados = [];
 $comprado = false;
+$contenido_curso = [];
+$puede_ver_recursos = false;
 
 $usuario_actual = usuario_actual();
 
@@ -23,7 +27,7 @@ if ($id_curso > 0) {
             FROM publicaciones p 
             JOIN categorias c ON p.id_categoria = c.id_categoria 
             JOIN usuarios u ON p.id_usuario = u.id_usuario 
-            WHERE p.id_publicacion = :id AND p.tipo = 'Curso' AND p.estado = 'Activo'
+            WHERE p.id_publicacion = :id AND p.tipo = 'Curso'
             LIMIT 1
         ");
         $stmt->execute(['id' => $id_curso]);
@@ -45,6 +49,18 @@ if ($id_curso > 0) {
                 ]);
                 $comprado = ((int) $stmt_compra->fetchColumn()) > 0;
             }
+
+            $es_propietario = $usuario_actual && (int)$usuario_actual['id_usuario'] === (int)$curso['id_usuario'];
+            if ($curso['estado'] !== 'Activo' && !$comprado && !$es_propietario && !es_admin()) {
+                $curso = null;
+            }
+
+            if (!$curso) {
+                return;
+            }
+
+            $contenido_curso = obtener_contenido_curso($pdo, $id_curso);
+            $puede_ver_recursos = $comprado || $es_propietario || es_admin();
 
             // Reseñas del curso
             $stmt_res = $pdo->prepare("

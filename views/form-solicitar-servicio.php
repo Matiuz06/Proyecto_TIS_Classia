@@ -1,10 +1,42 @@
 <?php
-$title       = 'Solicitud de servicio - Classia';
-$description = 'Formulario para solicitar un servicio personalizado en Classia.';
-$cssPrefix   = '..';
-$jsPrefix    = '..';
+require_once '../php/auth/roles.php';
+requerir_rol(ROL_ESTUDIANTE,'usuario.php');
+require_once '../php/solicitudes/solicitudes_servicio.php';
+if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token']=bin2hex(random_bytes(32));
+$id=(int)($_GET['id'] ?? $_POST['id_publicacion'] ?? 0);
+$servicio=obtener_servicio_activo($pdo,$id);
+$plantilla=$servicio?obtener_plantilla_servicio($servicio['tipo_servicio'] ?? null):null;
+$mensaje=''; $error='';
 
-$activePage  = 'catalogo';
+if ($_SERVER['REQUEST_METHOD']==='POST' && $servicio && $plantilla) {
+    $tipo=$servicio['tipo_servicio'] ?? '';
+    $contacto=[
+        'nombre_contacto'=>trim($_POST['nombre']??''),
+        'correo_contacto'=>trim($_POST['correo']??''),
+        'telefono'=>trim($_POST['telefono']??''),
+        'medio_contacto'=>trim($_POST['medio-contacto']??''),
+    ];
+    $map=[]; $fileKey=null;
+    if ($tipo==='impresion_3d') {
+        $map=['nombre_proyecto'=>$_POST['titulo-proyecto-3d']??'','tipo_trabajo'=>$_POST['tipo-trabajo-3d']??'','cantidad'=>$_POST['cantidad-piezas']??'','material'=>$_POST['material-preferido']??'','dimensiones'=>$_POST['medidas']??'','color'=>$_POST['color-preferido']??'','boceto'=>!empty($_FILES['archivo-3d']['name'])?'Sí':'No','descripcion_pieza'=>$_POST['descripcion-3d']??'','uso_previsto'=>$_POST['uso-pieza']??'','fecha_necesaria'=>$_POST['fecha-entrega-3d']??'','presupuesto'=>$_POST['presupuesto-3d']??'']; $fileKey='archivo-3d';
+    } elseif ($tipo==='mentoria') {
+        $map=['tema'=>$_POST['tema-mentoria']??'','dificultades'=>$_POST['descripcion-mentoria']??'','conocimientos_previos'=>$_POST['nivel-conocimiento']??'','objetivo'=>($_POST['comentarios-generales']??'') ?: ($_POST['descripcion-mentoria']??''),'proyecto'=>$_POST['descripcion-mentoria']??'','modalidad_preferida'=>$_POST['modalidad-mentoria']??'','fecha_preferida'=>$_POST['fecha-mentoria']??'','segunda_fecha'=>$_POST['segunda-fecha-mentoria']??'','horario_preferido'=>$_POST['hora-mentoria']??'','duracion'=>$_POST['duracion-mentoria']??'','presupuesto'=>'']; $fileKey='archivo-mentoria';
+    } elseif ($tipo==='proyecto_educativo') {
+        $map=['institucion'=>$_POST['nombre-institucion-proyecto']??'','tipo_institucion'=>$_POST['tipo-institucion-proyecto']??'','nivel_educativo'=>$_POST['nivel-estudiantes']??'','tematicas'=>$_POST['tema-proyecto']??'','necesidad'=>$_POST['necesidad-proyecto']??'','objetivos'=>$_POST['resultado-proyecto']??'','destinatarios'=>trim(($_POST['nivel-estudiantes']??'').' '.($_POST['edad-estudiantes']??'')),'cantidad_participantes'=>$_POST['cantidad-estudiantes']??'','duracion_estimada'=>$_POST['duracion-proyecto']??'','modalidad_proyecto'=>$_POST['modalidad-proyecto']??'','recursos_disponibles'=>$_POST['recursos-disponibles']??'','presupuesto'=>'']; $fileKey='archivo-proyecto';
+    } elseif ($tipo==='formacion_institucional') {
+        $map=['organizacion'=>$_POST['nombre-organizacion']??'','tipo_organizacion'=>$_POST['tipo-organizacion']??'','rubro'=>$_POST['rubro-organizacion']??'','cantidad_participantes'=>$_POST['cantidad-participantes']??'','perfil_participantes'=>$_POST['perfil-participantes']??'','tematica'=>$_POST['tema-formacion']??'','objetivo'=>$_POST['objetivo-formacion']??'','modalidad_preferida'=>$_POST['modalidad-formacion']??'','cantidad_jornadas'=>$_POST['cantidad-jornadas']??'','certificacion'=>$_POST['certificacion']??'','disponibilidad'=>trim(($_POST['fecha-formacion']??'').' '.($_POST['duracion-jornada']??'').' '.($_POST['ubicacion-formacion']??'')),'presupuesto'=>$_POST['presupuesto-formacion']??''];
+    } elseif ($tipo==='robotica_automatizacion') {
+        $map=['nombre_proyecto'=>$_POST['nombre-proyecto-robotica']??'','idea'=>$_POST['problema-robotica']??'','objetivo'=>$_POST['resultado-robotica']??'','nivel_avance'=>$_POST['nivel-avance']??'','componentes'=>$_POST['tecnologia-disponible']??'','tecnologias'=>$_POST['tipo-servicio-robotica']??'','entorno'=>$_POST['modalidad-robotica']??'','restricciones'=>$_POST['comentarios-generales']??'','fecha_objetivo'=>$_POST['fecha-robotica']??'','presupuesto'=>$_POST['presupuesto-robotica']??'']; $fileKey='archivo-robotica';
+    }
+    $_POST['campo']=array_merge($contacto,$map);
+    $_POST['descripcion_general']=trim($_POST['comentarios-generales'] ?? '');
+    if ($fileKey && isset($_FILES[$fileKey])) $_FILES['archivo_adjunto']=$_FILES[$fileKey];
+    $r=crear_solicitud_servicio($pdo,(int)usuario_actual()['id_usuario'],$servicio,$_POST,$_FILES,$_SESSION['csrf_token']);
+    if($r['ok']) $mensaje=$r['mensaje']; else $error=$r['mensaje'];
+}
+$title=$servicio?'Solicitud de '.$servicio['titulo'].' - Classia':'Solicitud de servicio - Classia';
+$description='Formulario para solicitar un servicio personalizado en Classia.';
+$cssPrefix='..'; $jsPrefix='..'; $activePage='catalogo';
 include '../includes/header.php';
 ?>
 
@@ -42,22 +74,27 @@ include '../includes/header.php';
         <h2 id="servicio-seleccionado">Servicio seleccionado</h2>
 
         <article>
-          <p>Diseño e impresión 3D</p>
+          <p><?= $plantilla ? htmlspecialchars($plantilla['nombre']) : 'Servicio personalizado' ?></p>
 
-          <h3>Diseño e impresión de recursos didácticos 3D</h3>
+          <h3><?= $servicio ? htmlspecialchars($servicio['titulo']) : 'Servicio no disponible' ?></h3>
 
           <p>
-            Publicado por
-            <a href="usuario.php"> Taller 3D Norte </a>
+            Publicado por <a href="proveedor.php?id=<?= (int)($servicio['id_usuario'] ?? 0) ?>"><?= $servicio ? htmlspecialchars($servicio['autor_nombre'].' '.$servicio['autor_apellido']) : 'Proveedor' ?></a>
           </p>
 
-          <p>Precio orientativo: desde $850</p>
+          <p>Precio publicado: $<?= $servicio ? number_format((float)$servicio['precio'],2,',','.') : '0,00' ?></p>
 
-          <a href="servicio-detalle.php"> Volver al detalle </a>
+          <a href="servicio-detalle.php?id=<?= $id ?>"> Volver al detalle </a>
         </article>
       </section>
 
-      <form action="confirmacion.php" method="post">
+      <?php if (!$servicio): ?><div class="alert alert-danger">El servicio no existe o no está disponible.</div><?php elseif (!$plantilla): ?><div class="alert alert-danger">Este servicio todavía no tiene una plantilla de solicitud configurada.</div><?php endif; ?>
+      <?php if ($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?> <a href="mis-solicitudes-servicios.php">Ver mis solicitudes</a></div><?php endif; ?>
+      <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
+
+      <form action="form-solicitar-servicio.php?id=<?= $id ?>" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+        <input type="hidden" name="id_publicacion" value="<?= $id ?>">
         <fieldset>
           <legend>Datos de contacto</legend>
 
@@ -101,17 +138,17 @@ include '../includes/header.php';
           <select id="tipo-servicio" name="tipo-servicio" required>
             <option value="">Selecciona un servicio</option>
 
-            <option value="diseno-3d">Diseño y modelado 3D</option>
+            <option value="impresion_3d" <?= (($servicio['tipo_servicio'] ?? '')==='impresion_3d')?'selected':'' ?>>Diseño y modelado 3D</option>
 
-            <option value="mentoria">Mentoría especializada</option>
+            <option value="mentoria" <?= (($servicio['tipo_servicio'] ?? '')==='mentoria')?'selected':'' ?>>Mentoría especializada</option>
 
-            <option value="proyecto-educativo">Proyecto educativo</option>
+            <option value="proyecto_educativo" <?= (($servicio['tipo_servicio'] ?? '')==='proyecto_educativo')?'selected':'' ?>>Proyecto educativo</option>
 
-            <option value="formacion-institucional">
+            <option value="formacion_institucional" <?= (($servicio['tipo_servicio'] ?? '')==='formacion_institucional')?'selected':'' ?>>
               Formación o taller para empresas e instituciones
             </option>
 
-            <option value="robotica-automatizacion">
+            <option value="robotica_automatizacion" <?= (($servicio['tipo_servicio'] ?? '')==='robotica_automatizacion')?'selected':'' ?>>
               Robótica y automatización
             </option>
           </select>
@@ -729,8 +766,29 @@ include '../includes/header.php';
 
         <button type="reset">Limpiar formulario</button>
 
-        <a href="servicio-detalle.php"> Cancelar y volver </a>
+        <a href="servicio-detalle.php?id=<?= $id ?>"> Cancelar y volver </a>
       </form>
     </main>
 
+<script>
+(() => {
+  const tipo = <?= json_encode($servicio['tipo_servicio'] ?? '') ?>;
+  const ids = {
+    impresion_3d: 'solicitud-diseno-3d',
+    mentoria: 'solicitud-mentoria',
+    proyecto_educativo: 'solicitud-proyecto-educativo',
+    formacion_institucional: 'solicitud-formacion',
+    robotica_automatizacion: 'solicitud-robotica'
+  };
+  Object.values(ids).forEach(id => {
+    const heading = document.getElementById(id);
+    if (heading) {
+      const section = heading.closest('section');
+      if (section) section.hidden = id !== ids[tipo];
+    }
+  });
+  const selector = document.getElementById('tipo-servicio');
+  if (selector) { selector.value = tipo; selector.disabled = true; }
+})();
+</script>
 <?php include '../includes/footer.php'; ?>

@@ -20,6 +20,9 @@ $logoutHref   = ($cssPrefix === '.') ? 'php/auth/logout.php' : '../php/auth/logo
 $solicitarDocenteHref = ($cssPrefix === '.') ? 'views/solicitar-docente.php' : 'solicitar-docente.php';
 $panelProveedorHref   = ($cssPrefix === '.') ? 'views/panel-proveedor.php' : 'panel-proveedor.php';
 $panelAdminHref       = ($cssPrefix === '.') ? 'views/panel-administrador.php' : 'panel-administrador.php';
+$misSolicitudesHref = ($cssPrefix === '.') ? 'views/mis-solicitudes-servicios.php' : 'mis-solicitudes-servicios.php';
+$solicitudesProveedorHref = ($cssPrefix === '.') ? 'views/solicitudes-servicios.php' : 'solicitudes-servicios.php';
+$perfilProfesionalHref = ($cssPrefix === '.') ? 'views/editar-perfil-profesional.php' : 'editar-perfil-profesional.php';
 
 $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
@@ -85,6 +88,7 @@ requerir_onboarding_completo($onboardingHref);
               </a>
 
               <?php if (es_estudiante()): ?>
+                <a href="<?= $misSolicitudesHref ?>" role="menuitem" class="user-dropdown-item">Mis solicitudes de servicios</a>
                 <a href="<?= $solicitarDocenteHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'solicitar-docente' ? ' active' : '' ?>">
                   Solicitar ser docente
                 </a>
@@ -95,6 +99,8 @@ requerir_onboarding_completo($onboardingHref);
                 <a href="<?= ($cssPrefix === '.') ? 'views/crear-publicacion.php' : 'crear-publicacion.php' ?>" role="menuitem" class="user-dropdown-item">
                   Crear publicación
                 </a>
+                <a href="<?= $solicitudesProveedorHref ?>" role="menuitem" class="user-dropdown-item">Solicitudes de servicios</a>
+                <a href="<?= $perfilProfesionalHref ?>" role="menuitem" class="user-dropdown-item">Perfil profesional</a>
               <?php elseif (es_admin()): ?>
                 <a href="<?= $panelAdminHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'panel-administrador' ? ' active' : '' ?>">
                   Panel administrador

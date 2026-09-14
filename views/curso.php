@@ -77,33 +77,54 @@ $puedeAgregar = esta_autenticado();
           <!-- Temario y Módulos -->
           <section aria-labelledby="temario-curso">
             <h2 id="temario-curso">Contenido del programa</h2>
-            <div class="syllabus-container">
-              <div class="syllabus-module-header">
-                Módulo 1: Fundamentos y Conceptos Clave (3 lecciones · 45 min)
+            <?php if (empty($contenido_curso)): ?>
+              <p class="text-muted">El docente todavía no cargó módulos para este curso.</p>
+            <?php else: ?>
+              <div class="syllabus-container">
+                <?php foreach ($contenido_curso as $indiceModulo => $modulo): ?>
+                  <div class="syllabus-module-header<?= $indiceModulo > 0 ? ' syllabus-module-header--middle' : '' ?>">
+                    Módulo <?= $indiceModulo + 1 ?>: <?= htmlspecialchars($modulo['titulo']) ?>
+                  </div>
+                  <?php if (!empty($modulo['descripcion'])): ?>
+                    <p><?= nl2br(htmlspecialchars($modulo['descripcion'])) ?></p>
+                  <?php endif; ?>
+                  <?php if (empty($modulo['unidades'])): ?>
+                    <p class="text-muted">Este módulo todavía no tiene unidades.</p>
+                  <?php else: ?>
+                    <ul class="syllabus-module-list">
+                      <?php foreach ($modulo['unidades'] as $unidad): ?>
+                        <li>
+                          <strong><?= htmlspecialchars($unidad['titulo']) ?></strong>
+                          <?php if (!empty($unidad['descripcion'])): ?>
+                            <div><?= nl2br(htmlspecialchars($unidad['descripcion'])) ?></div>
+                          <?php endif; ?>
+                          <?php if (!empty($unidad['recursos'])): ?>
+                            <?php if ($puede_ver_recursos): ?>
+                              <ul class="course-resource-list">
+                                <?php foreach ($unidad['recursos'] as $recurso): ?>
+                                  <li>
+                                    <span><?= htmlspecialchars($recurso['tipo']) ?>:</span>
+                                    <?php if (!empty($recurso['archivo'])): ?>
+                                      <a href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>" target="_blank" rel="noopener"><?= htmlspecialchars($recurso['titulo']) ?></a>
+                                    <?php elseif (!empty($recurso['url'])): ?>
+                                      <a href="<?= htmlspecialchars($recurso['url']) ?>" target="_blank" rel="noopener"><?= htmlspecialchars($recurso['titulo']) ?></a>
+                                    <?php else: ?>
+                                      <?= htmlspecialchars($recurso['titulo']) ?>
+                                    <?php endif; ?>
+                                  </li>
+                                <?php endforeach; ?>
+                              </ul>
+                            <?php else: ?>
+                              <p class="text-muted"><small>Los materiales se habilitan al inscribirte en el curso.</small></p>
+                            <?php endif; ?>
+                          <?php endif; ?>
+                        </li>
+                      <?php endforeach; ?>
+                    </ul>
+                  <?php endif; ?>
+                <?php endforeach; ?>
               </div>
-              <ul class="syllabus-module-list">
-                <li>Introducción y objetivos de aprendizaje</li>
-                <li>Configuración del entorno de trabajo</li>
-                <li>Primeros pasos y conceptos teóricos esenciales</li>
-              </ul>
-
-              <div class="syllabus-module-header syllabus-module-header--middle">
-                Módulo 2: Desarrollo Práctico y Casos Reales (5 lecciones · 2h 15m)
-              </div>
-              <ul class="syllabus-module-list">
-                <li>Arquitectura y aplicación de buenas prácticas</li>
-                <li>Resolución guiada de ejercicios prácticos</li>
-                <li>Taller interactivo paso a paso</li>
-              </ul>
-
-              <div class="syllabus-module-header syllabus-module-header--middle">
-                Módulo 3: Proyecto Final y Certificación (2 lecciones · 1h)
-              </div>
-              <ul class="syllabus-module-list">
-                <li>Integración integral de los conocimientos</li>
-                <li>Evaluación final y entrega de certificado</li>
-              </ul>
-            </div>
+            <?php endif; ?>
           </section>
 
           <hr class="section-divider" />
@@ -149,6 +170,10 @@ $puedeAgregar = esta_autenticado();
             </div>
 
             <ul class="product-card-pricing__features">
+              <?php if (!empty($curso['modalidad'])): ?><li>✓ Modalidad: <?= htmlspecialchars($curso['modalidad']) ?></li><?php endif; ?>
+              <?php if (!empty($curso['duracion_horas'])): ?><li>✓ Duración aproximada: <?= (int)$curso['duracion_horas'] ?> h</li><?php endif; ?>
+              <?php if (!empty($curso['cupos'])): ?><li>✓ Cupos totales: <?= (int)$curso['cupos'] ?></li><?php endif; ?>
+              <?php if (!empty($curso['disponibilidad'])): ?><li>✓ Disponibilidad: <?= htmlspecialchars($curso['disponibilidad']) ?></li><?php endif; ?>
               <li>✓ Acceso completo e ilimitado de por vida</li>
               <li>✓ Materiales y recursos descargables</li>
               <li>✓ Certificado digital de finalización</li>

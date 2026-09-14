@@ -3,6 +3,11 @@ require_once '../php/auth/sesion.php';
 
 iniciar_sesion();
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+
 if (esta_autenticado()) {
     header("Location: usuario.php");
     exit;
@@ -10,9 +15,11 @@ if (esta_autenticado()) {
 
 $login_error = $_SESSION["login_error"] ?? "";
 $login_email = $_SESSION["login_email"] ?? "";
+$login_success = $_SESSION["login_success"] ?? "";
 
 unset($_SESSION["login_error"]);
 unset($_SESSION["login_email"]);
+unset($_SESSION["login_success"]);
 
 $title = 'Iniciar sesión';
 $description = 'Inicio de sesión en Classia.';
@@ -41,6 +48,12 @@ include '../includes/header.php';
         <?php if (isset($_GET['registro']) && $_GET['registro'] === 'exitoso'): ?>
             <div class="alert alert-success">
                 Registro completado con éxito. Ahora podés iniciar sesión.
+            </div>
+        <?php endif; ?>
+
+        <?php if ($login_success !== ""): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($login_success); ?>
             </div>
         <?php endif; ?>
 

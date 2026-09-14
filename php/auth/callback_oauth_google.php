@@ -123,6 +123,11 @@ if (empty($perfil['email'])) {
     oauth_error('No se pudo obtener el email de tu cuenta Google. Asegurate de otorgar los permisos necesarios.');
 }
 
+if (array_key_exists('email_verified', $perfil) && !$perfil['email_verified']) {
+    error_log('Google OAuth: Google informó un correo no verificado');
+    oauth_error('Tu cuenta de Google debe tener el correo verificado para iniciar sesión.');
+}
+
 $google_email  = strtolower(trim($perfil['email']));
 $google_nombre = trim($perfil['given_name']  ?? '');
 $google_apellido = trim($perfil['family_name'] ?? '');
@@ -148,6 +153,11 @@ try {
 
     if ($usuario) {
         $onboarding_step_usuario = (int) ($usuario['onboarding_step'] ?? 1);
+
+        // Si Google autenticó este mismo correo, podemos considerarlo verificado.
+        $pdo->prepare("UPDATE usuarios SET email_verificado = 1 WHERE id_usuario = :id")
+            ->execute(['id' => $usuario['id_usuario']]);
+
         if ($google_foto && empty($usuario['foto_perfil'])) {
             $pdo->prepare("UPDATE usuarios SET foto_perfil = :foto WHERE id_usuario = :id")
                 ->execute(['foto' => $google_foto, 'id' => $usuario['id_usuario']]);
