@@ -1,12 +1,17 @@
 <?php
 
-require_once __DIR__ . '/../auth/session.php';
+require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST'
+    && ($_POST['accion'] ?? '') === 'agregar') {
+    requerir_autenticacion('../../views/login.php');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,7 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($id_publicacion, $_SESSION['carrito_publicaciones'], true)) {
             $_SESSION['carrito_publicaciones'][] = $id_publicacion;
         }
-        header('Location: catalogo.php?carrito=agregado');
+        $destinos_permitidos = [
+            'catalogo' => '../../views/catalogo.php?carrito=agregado',
+            'carrito'  => '../../views/carrito.php',
+        ];
+        $clave_destino = $_POST['redirect'] ?? 'carrito';
+        $destino = $destinos_permitidos[$clave_destino] ?? $destinos_permitidos['carrito'];
+        header("Location: " . $destino);
         exit;
     } elseif ($accion === 'quitar' && $id_publicacion > 0) {
         $_SESSION['carrito_publicaciones'] = array_values(array_filter(

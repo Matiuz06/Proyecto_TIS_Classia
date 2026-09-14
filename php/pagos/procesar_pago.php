@@ -1,115 +1,131 @@
 <?php
 
+require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
-
-requerir_rol(ROL_ESTUDIANTE, '../../views/usuario.php');
-
 require_once __DIR__ . '/../../config/database.php';
+
+iniciar_sesion();
+requerir_autenticacion('../../views/login.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../../views/carrito.php');
     exit;
 }
 
-$usuario = usuario_actual();
-$id_usuario = (int) $usuario['id_usuario'];
-$id_contratacion = (int) ($_POST['id_contratacion'] ?? 0);
-$metodo_pago = $_POST['metodo_pago'] ?? '';
-$titular = trim($_POST['titular'] ?? '');
-$numero_tarjeta = preg_replace('/\D+/', '', $_POST['numero_tarjeta'] ?? '');
-$fecha_expiracion = trim($_POST['fecha_expiracion'] ?? '');
-$cvv = preg_replace('/\D+/', '', $_POST['cvv'] ?? '');
-$token = $_POST['csrf_token'] ?? '';
-$metodos_validos = ['Tarjeta', 'Transferencia', 'MercadoPago', 'Efectivo'];
-
-function volver_pasarela(int $id_contratacion, string $mensaje): void
-{
-    $_SESSION['pago_error'] = $mensaje;
-    header('Location: ../../views/pasarela-pago.php?id_contratacion=' . $id_contratacion);
+$token_recibido = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
+    $_SESSION['pago_error'] = 'La sesión del formulario expiró. Intentá nuevamente.';
+    $id_c = (int) ($_POST['id_contratacion'] ?? 0);
+    header('Location: ../../views/pasarela-pago.php' . ($id_c > 0 ? "?id_contratacion=$id_c" : ''));
     exit;
 }
 
+$usuario = usuario_actual();
+$id_usuario = (int) $usuario['id_usuario'];
+$id_contratacion = (int) ($_POST['id_contratacion'] ?? 0);
+$email = trim($_POST['email'] ?? '');
+$numero_tarjeta = preg_replace('/\s+/', '', $_POST['numero_tarjeta'] ?? '');
+$fecha_exp = trim($_POST['fecha_expiracion'] ?? '');
+$cvv = trim($_POST['cvv'] ?? '');
+
 if ($id_contratacion <= 0) {
-    volver_pasarela(0, 'Contratacion invalida.');
+    $_SESSION['carrito_error'] = 'No se encontró la orden a abonar.';
+    header('Location: ../../views/carrito.php');
+    exit;
 }
 
-if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-    volver_pasarela($id_contratacion, 'La sesion del formulario expiro. Recarga la pagina e intenta nuevamente.');
+if ($numero_tarjeta === '' || !preg_match('/^[0-9]{13,19}$/', $numero_tarjeta)) {
+    $_SESSION['pago_error'] = 'El número de tarjeta es inválido. Debe contener entre 13 y 19 dígitos numéricos.';
+    header("Location: ../../views/pasarela-pago.php?id_contratacion=$id_contratacion");
+    exit;
 }
 
-if (!in_array($metodo_pago, $metodos_validos, true)) {
-    volver_pasarela($id_contratacion, 'Metodo de pago invalido.');
+if (!preg_match('/^(0[1-9]|1[0-2])\/([0-9]{2})$/', $fecha_exp, $matches)) {
+    $_SESSION['pago_error'] = 'La fecha de vencimiento debe tener formato MM/AA.';
+    header("Location: ../../views/pasarela-pago.php?id_contratacion=$id_contratacion");
+    exit;
 }
 
-if ($titular === '' || strlen($numero_tarjeta) < 13 || strlen($numero_tarjeta) > 19 || !preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $fecha_expiracion) || strlen($cvv) < 3 || strlen($cvv) > 4) {
-    volver_pasarela($id_contratacion, 'Los datos de pago no tienen un formato valido.');
+$mes_exp = (int) $matches[1];
+$ano_exp = 2000 + (int) $matches[2];
+$mes_actual = (int) date('m');
+$ano_actual = (int) date('Y');
+
+if ($ano_exp < $ano_actual || ($ano_exp === $ano_actual && $mes_exp < $mes_actual)) {
+    $_SESSION['pago_error'] = 'La tarjeta ingresada se encuentra vencida.';
+    header("Location: ../../views/pasarela-pago.php?id_contratacion=$id_contratacion");
+    exit;
+}
+
+if (!preg_match('/^[0-9]{3,4}$/', $cvv)) {
+    $_SESSION['pago_error'] = 'El código de seguridad (CVV) debe tener 3 o 4 dígitos numéricos.';
+    header("Location: ../../views/pasarela-pago.php?id_contratacion=$id_contratacion");
+    exit;
 }
 
 try {
-    $stmt = $pdo->prepare(
-        "SELECT id_contratacion, monto_total, estado
-         FROM contrataciones
-         WHERE id_contratacion = :id_contratacion AND id_usuario = :id_usuario
-         LIMIT 1"
-    );
-    $stmt->execute([
-        'id_contratacion' => $id_contratacion,
-        'id_usuario' => $id_usuario,
-    ]);
+    $stmt = $pdo->prepare("SELECT id_contratacion, monto_total, estado FROM contrataciones WHERE id_contratacion = :id AND id_usuario = :id_usuario LIMIT 1");
+    $stmt->execute(['id' => $id_contratacion, 'id_usuario' => $id_usuario]);
     $contratacion = $stmt->fetch();
 
     if (!$contratacion) {
-        volver_pasarela($id_contratacion, 'La contratacion no existe o no pertenece a tu cuenta.');
-    }
-
-    $stmt = $pdo->prepare(
-        "SELECT id_pago
-         FROM pagos
-         WHERE id_contratacion = :id_contratacion AND estado_pago = 'Aprobado'
-         LIMIT 1"
-    );
-    $stmt->execute(['id_contratacion' => $id_contratacion]);
-
-    if ($stmt->fetch()) {
-        header('Location: ../../views/confirmacion.php?id_contratacion=' . $id_contratacion);
+        $_SESSION['carrito_error'] = 'No se encontró la contratación especificada.';
+        header('Location: ../../views/carrito.php');
         exit;
     }
 
     if ($contratacion['estado'] !== 'Pendiente') {
-        volver_pasarela($id_contratacion, 'Esta contratacion no esta pendiente de pago.');
+        $_SESSION['pago_error'] = 'Esta contratación ya fue procesada o no admite un nuevo pago.';
+        header("Location: ../../views/pasarela-pago.php?id_contratacion=$id_contratacion");
+        exit;
     }
 
-    $referencia = 'CLASSIA-' . date('Ymd') . '-' . bin2hex(random_bytes(4));
+    $stmt_pago_existente = $pdo->prepare("SELECT COUNT(*) FROM pagos WHERE id_contratacion=:id AND estado_pago='Aprobado'");
+    $stmt_pago_existente->execute(['id'=>$id_contratacion]);
+    if ((int)$stmt_pago_existente->fetchColumn() > 0) {
+        $_SESSION['pago_error'] = 'Esta contratación ya tiene un pago aprobado.';
+        header("Location: ../../views/pasarela-pago.php?id_contratacion=$id_contratacion");
+        exit;
+    }
 
     $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare(
-        "INSERT INTO pagos (monto, metodo_pago, estado_pago, transaccion_ref, id_contratacion)
-         VALUES (:monto, :metodo_pago, 'Aprobado', :transaccion_ref, :id_contratacion)"
-    );
-    $stmt->execute([
-        'monto' => (float) $contratacion['monto_total'],
-        'metodo_pago' => $metodo_pago,
-        'transaccion_ref' => $referencia,
-        'id_contratacion' => $id_contratacion,
+    // Estándar PCI-DSS: NO guardar números de tarjeta completos ni CVV en la BD.
+    // Solo guardamos referencia enmascarada tokenizada (ej: CARD-****-1234)
+    $ultimos4 = substr($numero_tarjeta, -4);
+    $token_transaccion = 'CARD-AUTH-****-' . $ultimos4 . '-' . strtoupper(bin2hex(random_bytes(3)));
+
+    $stmt_pago = $pdo->prepare("
+        INSERT INTO pagos (monto, metodo_pago, estado_pago, fecha_pago, transaccion_ref, id_contratacion)
+        VALUES (:monto, 'Tarjeta', 'Aprobado', CURRENT_TIMESTAMP, :transaccion_ref, :id_contratacion)
+    ");
+    $stmt_pago->execute([
+        'monto'            => $contratacion['monto_total'],
+        'transaccion_ref'  => $token_transaccion,
+        'id_contratacion'  => $id_contratacion,
     ]);
 
-    $stmt = $pdo->prepare(
-        "UPDATE contrataciones
-         SET estado = 'En Proceso'
-         WHERE id_contratacion = :id_contratacion AND estado = 'Pendiente'"
-    );
-    $stmt->execute(['id_contratacion' => $id_contratacion]);
+    $stmt_tipo = $pdo->prepare("SELECT COUNT(*) FROM detalles_contratacion dc JOIN publicaciones p ON p.id_publicacion=dc.id_publicacion WHERE dc.id_contratacion=:id AND p.tipo='Servicio'");
+    $stmt_tipo->execute(['id'=>$id_contratacion]);
+    $tieneServicio=((int)$stmt_tipo->fetchColumn())>0;
+    $nuevoEstado=$tieneServicio?'En Proceso':'Completada';
+    $stmt_up_con=$pdo->prepare("UPDATE contrataciones SET estado=:estado WHERE id_contratacion=:id");
+    $stmt_up_con->execute(['estado'=>$nuevoEstado,'id'=>$id_contratacion]);
+    if($tieneServicio){$stmt_sol=$pdo->prepare("UPDATE solicitudes SET estado='En Proceso' WHERE id_contratacion=:id AND estado='Aceptada'");$stmt_sol->execute(['id'=>$id_contratacion]);}
 
     $pdo->commit();
 
-    header('Location: ../../views/confirmacion.php?id_contratacion=' . $id_contratacion);
+    // Limpiar carrito tras pago exitoso
+    unset($_SESSION['carrito_publicaciones']);
+
+    header("Location: ../../views/confirmacion.php?id_contratacion=$id_contratacion");
     exit;
-} catch (Throwable $e) {
+} catch (PDOException $e) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-
-    error_log('Error al procesar pago: ' . $e->getMessage());
-    volver_pasarela($id_contratacion, 'No se pudo procesar el pago.');
+    error_log("Error al procesar pago: " . $e->getMessage());
+    $_SESSION['pago_error'] = 'Ocurrió un error al procesar la transacción de pago.';
+    header("Location: ../../views/pasarela-pago.php?id_contratacion=$id_contratacion");
+    exit;
 }

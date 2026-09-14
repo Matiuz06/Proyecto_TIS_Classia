@@ -3,6 +3,7 @@ $title      = 'Classia';
 $description = 'Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada.';
 $cssPrefix  = '.';
 $jsPrefix   = '.';
+$bodyClass  = 'home-page';
 $activePage = 'inicio';
 include 'includes/header.php';
 ?>
@@ -17,11 +18,6 @@ include 'includes/header.php';
         </p>
         <p class="action-row">
           <a class="btn" href="views/catalogo.php">Explorar catálogo</a>
-          <?php if (!$isAuth): ?>
-            <a href="views/registro.php">Crear cuenta</a>
-          <?php else: ?>
-            <a href="views/usuario.php">Mi cuenta</a>
-          <?php endif; ?>
         </p>
       </header>
 

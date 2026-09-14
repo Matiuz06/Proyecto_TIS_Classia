@@ -1,8 +1,9 @@
 <?php
-require_once __DIR__ . '/../php/auth/session.php';
+require_once __DIR__ . '/../php/auth/sesion.php';
 iniciar_sesion();
 
 require_once __DIR__ . '/../php/auth/roles.php';
+require_once __DIR__ . '/../php/auth/guardia_onboarding.php';
 
 $title       = $title       ?? 'Classia';
 $description = $description ?? 'Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada.';
@@ -19,9 +20,14 @@ $logoutHref   = ($cssPrefix === '.') ? 'php/auth/logout.php' : '../php/auth/logo
 $solicitarDocenteHref = ($cssPrefix === '.') ? 'views/solicitar-docente.php' : 'solicitar-docente.php';
 $panelProveedorHref   = ($cssPrefix === '.') ? 'views/panel-proveedor.php' : 'panel-proveedor.php';
 $panelAdminHref       = ($cssPrefix === '.') ? 'views/panel-administrador.php' : 'panel-administrador.php';
+$misSolicitudesHref = ($cssPrefix === '.') ? 'views/mis-solicitudes-servicios.php' : 'mis-solicitudes-servicios.php';
+$solicitudesProveedorHref = ($cssPrefix === '.') ? 'views/solicitudes-servicios.php' : 'solicitudes-servicios.php';
+$perfilProfesionalHref = ($cssPrefix === '.') ? 'views/editar-perfil-profesional.php' : 'editar-perfil-profesional.php';
 
 $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
+$onboardingHref = ($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php';
+requerir_onboarding_completo($onboardingHref);
 ?>
 <!doctype html>
 <html lang="es">
@@ -43,7 +49,9 @@ $currentUser = usuario_actual();
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="<?= $indexHref ?>"<?= $activePage === 'inicio' ? ' aria-current="page"' : '' ?>>Inicio</a>
         <a href="<?= $catalogoHref ?>"<?= $activePage === 'catalogo' ? ' aria-current="page"' : '' ?>>Catálogo</a>
-        <a href="<?= $carritoHref ?>"<?= $activePage === 'carrito' ? ' aria-current="page"' : '' ?>>Carrito</a>
+        <?php if ($isAuth): ?>
+          <a href="<?= $carritoHref ?>"<?= $activePage === 'carrito' ? ' aria-current="page"' : '' ?>>Carrito</a>
+        <?php endif; ?>
 
         <?php if (!$isAuth): ?>
           <div class="user-nav-dropdown">
@@ -57,22 +65,20 @@ $currentUser = usuario_actual();
               <a href="<?= $loginHref ?>" role="menuitem" class="user-dropdown-item<?= in_array($activePage, ['login', 'cuenta'], true) ? ' active' : '' ?>">
                 Iniciar sesión
               </a>
-              <a href="<?= $registroHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'registro' ? ' active' : '' ?>">
-                Registrarse
-              </a>
             </div>
           </div>
         <?php else: ?>
           <?php
-            $navAvatarSrc = !empty($currentUser['foto_perfil'])
-              ? ($cssPrefix . '/' . htmlspecialchars($currentUser['foto_perfil']))
+            $fotoPerfil = (string) ($currentUser['foto_perfil'] ?? '');
+            $navAvatarSrc = $fotoPerfil !== ''
+              ? (preg_match('#^https?://#i', $fotoPerfil) ? $fotoPerfil : $cssPrefix . '/' . ltrim($fotoPerfil, '/'))
               : ($cssPrefix . '/assets/images/default-avatar.svg');
             $primerNombre = htmlspecialchars(explode(' ', trim($currentUser['nombre'] ?? 'Usuario'))[0]);
           ?>
           <div class="user-nav-dropdown">
             <a href="<?= $cuentaHref ?>" class="user-nav-trigger" title="Ir a mi cuenta (<?= $primerNombre ?>)">
               <span class="user-nav-name"><?= $primerNombre ?></span>
-              <img src="<?= $navAvatarSrc ?>" alt="Avatar de <?= $primerNombre ?>" class="user-nav-avatar" />
+              <img src="<?= htmlspecialchars($navAvatarSrc, ENT_QUOTES, 'UTF-8') ?>" alt="Avatar de <?= $primerNombre ?>" class="user-nav-avatar" />
               <span class="user-nav-caret" aria-hidden="true">&#9662;</span>
             </a>
 
@@ -82,6 +88,7 @@ $currentUser = usuario_actual();
               </a>
 
               <?php if (es_estudiante()): ?>
+                <a href="<?= $misSolicitudesHref ?>" role="menuitem" class="user-dropdown-item">Mis solicitudes de servicios</a>
                 <a href="<?= $solicitarDocenteHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'solicitar-docente' ? ' active' : '' ?>">
                   Solicitar ser docente
                 </a>
@@ -92,6 +99,8 @@ $currentUser = usuario_actual();
                 <a href="<?= ($cssPrefix === '.') ? 'views/crear-publicacion.php' : 'crear-publicacion.php' ?>" role="menuitem" class="user-dropdown-item">
                   Crear publicación
                 </a>
+                <a href="<?= $solicitudesProveedorHref ?>" role="menuitem" class="user-dropdown-item">Solicitudes de servicios</a>
+                <a href="<?= $perfilProfesionalHref ?>" role="menuitem" class="user-dropdown-item">Perfil profesional</a>
               <?php elseif (es_admin()): ?>
                 <a href="<?= $panelAdminHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'panel-administrador' ? ' active' : '' ?>">
                   Panel administrador

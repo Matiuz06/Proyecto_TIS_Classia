@@ -2,16 +2,46 @@
 
 require_once __DIR__ . '/../../config/database.php';
 
+function asegurar_tabla_solicitudes_docente(PDO $db): void
+{
+    try {
+        $db->exec("
+            CREATE TABLE IF NOT EXISTS solicitudes_docente (
+                id_solicitud_docente INT AUTO_INCREMENT PRIMARY KEY,
+                id_usuario INT NOT NULL,
+                estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL DEFAULT 'Pendiente',
+                motivo TEXT NULL,
+                fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                fecha_respuesta DATETIME NULL,
+                CONSTRAINT fk_solicitudes_docente_usuarios
+                    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+                    ON DELETE CASCADE ON UPDATE CASCADE,
+                INDEX idx_solicitudes_docente_estado (estado),
+                INDEX idx_solicitudes_docente_usuario_estado (id_usuario, estado)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ");
+    } catch (PDOException $e) {
+        error_log("Error al asegurar tabla solicitudes_docente: " . $e->getMessage());
+    }
+}
+
 function tiene_solicitud_docente_pendiente(int $id_usuario, ?PDO $pdo_param = null): bool
 {
     global $pdo;
     $db = $pdo_param ?? $pdo;
-    $stmt = $db->prepare(
-        "SELECT COUNT(*) FROM solicitudes_docente WHERE id_usuario = :id_usuario AND estado = 'Pendiente'"
-    );
-    $stmt->execute(['id_usuario' => $id_usuario]);
+    asegurar_tabla_solicitudes_docente($db);
 
-    return (int) $stmt->fetchColumn() > 0;
+    try {
+        $stmt = $db->prepare(
+            "SELECT COUNT(*) FROM solicitudes_docente WHERE id_usuario = :id_usuario AND estado = 'Pendiente'"
+        );
+        $stmt->execute(['id_usuario' => $id_usuario]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    } catch (PDOException $e) {
+        error_log("Error al comprobar solicitud pendiente: " . $e->getMessage());
+        return false;
+    }
 }
 
 // Procesa el registro de una nueva solicitud docente
@@ -19,6 +49,8 @@ function crear_solicitud_docente(int $id_usuario, string $motivo, string $token_
 {
     global $pdo;
     $db = $pdo_param ?? $pdo;
+    asegurar_tabla_solicitudes_docente($db);
+
     if (empty($csrf_session) || !hash_equals($csrf_session, $token_recibido)) {
         return [
             'error'   => 'La sesión del formulario expiró. Recargá la página e intentá nuevamente.',

@@ -1,5 +1,5 @@
 <?php
-require_once '../php/auth/session.php';
+require_once '../php/auth/sesion.php';
 
 requerir_autenticacion('login.php');
 

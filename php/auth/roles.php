@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/session.php";
+require_once __DIR__ . "/sesion.php";
 
 const ROL_ESTUDIANTE = 1;
 const ROL_DOCENTE = 2;
@@ -40,7 +40,7 @@ function requerir_rol(int $id_rol, string $redirigir): void
     }
 
     $_SESSION["mensaje_acceso"] = "No tenes permisos para acceder a esta seccion.";
-    header("Location: " . ruta_acceso_denegado_por_contexto());
+    header("Location: " . $redirigir);
     exit;
 }
 
@@ -58,13 +58,8 @@ function requerir_cualquier_rol(array $roles, string $redirigir): void
     }
 
     $_SESSION["mensaje_acceso"] = "No tenes permisos para acceder a esta seccion.";
-    header("Location: " . ruta_acceso_denegado_por_contexto());
+    header("Location: " . $redirigir);
     exit;
-}
-
-function ruta_acceso_denegado_por_contexto(): string
-{
-    return dirname(ruta_login_por_contexto()) . "/acceso-denegado.php";
 }
 
 function ruta_login_por_contexto(): string

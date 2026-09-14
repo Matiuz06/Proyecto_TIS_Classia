@@ -1,4 +1,8 @@
 <?php
+$userData = [];
+$rol_actual = 'Usuario';
+$cursos_contratados = [];
+$servicios_contratados = [];
 require_once '../php/usuarios/perfil.php';
 
 $title      = 'Perfil de usuario';
@@ -46,11 +50,12 @@ include '../includes/header.php';
       <div class="profile-hero-content">
         <div class="profile-avatar-wrapper">
           <?php 
-            $fotoPerfilSrc = !empty($userData['foto_perfil']) 
-              ? ($cssPrefix . '/' . htmlspecialchars($userData['foto_perfil'])) 
+            $fotoPerfil = (string) ($userData['foto_perfil'] ?? '');
+            $fotoPerfilSrc = $fotoPerfil !== ''
+              ? (preg_match('#^https?://#i', $fotoPerfil) ? $fotoPerfil : $cssPrefix . '/' . ltrim($fotoPerfil, '/'))
               : ($cssPrefix . '/assets/images/default-avatar.svg');
           ?>
-          <img src="<?php echo $fotoPerfilSrc; ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre']); ?>" class="profile-avatar-img" />
+          <img src="<?php echo htmlspecialchars($fotoPerfilSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre']); ?>" class="profile-avatar-img" />
           
           <div class="profile-avatar-actions">
             <form action="../php/usuarios/foto_perfil.php" method="POST" enctype="multipart/form-data" class="profile-photo-form">
@@ -98,35 +103,37 @@ include '../includes/header.php';
       <h2 id="informacion-cuenta">Información básica de la cuenta</h2>
       <p>
         <label for="nombre-cuenta">Nombre:</label><br />
-        <input type="text" id="nombre-cuenta" value="<?php echo htmlspecialchars($userData['nombre']); ?>" readonly />
+        <input type="text" id="nombre-cuenta" value="<?php echo htmlspecialchars($userData['nombre']); ?>" readonly disabled />
       </p>
       <p>
         <label for="apellido-cuenta">Apellido:</label><br />
-        <input type="text" id="apellido-cuenta" value="<?php echo htmlspecialchars($userData['apellido'] ?? ''); ?>" readonly />
+        <input type="text" id="apellido-cuenta" value="<?php echo htmlspecialchars($userData['apellido'] ?? ''); ?>" readonly disabled />
       </p>
       <p>
         <label for="email-cuenta">Email:</label><br />
-        <input type="email" id="email-cuenta" value="<?php echo htmlspecialchars($userData['email']); ?>" readonly />
+        <input type="email" id="email-cuenta" value="<?php echo htmlspecialchars($userData['email']); ?>" readonly disabled />
+      </p>
+      <p>
+        <label for="telefono-cuenta">Número de teléfono:</label><br />
+        <input type="text" id="telefono-cuenta" value="<?php echo htmlspecialchars($userData['telefono'] ?? 'No especificado'); ?>" readonly disabled />
       </p>
       <p>
         <label for="fecha-cuenta">Fecha de registro:</label><br />
-        <input type="text" id="fecha-cuenta" value="<?php echo !empty($userData['fecha_registro']) ? date('d/m/Y H:i', strtotime($userData['fecha_registro'])) : '-'; ?>" readonly />
+        <input type="text" id="fecha-cuenta" value="<?php echo !empty($userData['fecha_registro']) ? date('d/m/Y H:i', strtotime($userData['fecha_registro'])) : '-'; ?>" readonly disabled />
       </p>
-      <p>Rol actual: <strong><?php echo htmlspecialchars($rol_actual); ?></strong></p>
-      <p>
-        <label for="idioma-cuenta">Idioma predeterminado:</label><br />
-        <select id="idioma-cuenta">
-          <option>Español (Spanish)</option>
-          <option>Inglés (English)</option>
-        </select>
+
+      <p class="mt-section">
+        <a href="editar-perfil.php" class="btn">Modificar datos personales</a>
       </p>
-      <p>
-        <label for="pais-cuenta">País o región:*</label><br />
-        <select id="pais-cuenta">
-          <option>Uruguay</option>
-          <option>Argentina</option>
-        </select>
-      </p>
+
+      <div class="account-security-card">
+        <h3>Seguridad de la cuenta</h3>
+        <p>Podés cambiar tu clave actual o restablecerla en caso de olvido.</p>
+        <div class="account-security-actions">
+          <a href="cambiar-contrasena.php" class="btn">Cambiar contraseña</a>
+          <a href="restablecer-contrasena.php" class="btn btn-ghost">Restablecer contraseña</a>
+        </div>
+      </div>
     </section>
 
     <hr />
