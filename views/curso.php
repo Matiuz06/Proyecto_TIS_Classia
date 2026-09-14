@@ -77,7 +77,6 @@ $puedeAgregar = esta_autenticado();
           <!-- Temario y Módulos -->
           <section aria-labelledby="temario-curso">
             <h2 id="temario-curso">Contenido del programa</h2>
-<<<<<<< HEAD
             <?php if (empty($contenido_curso)): ?>
               <p class="text-muted">El docente todavía no cargó módulos para este curso.</p>
             <?php else: ?>
@@ -128,37 +127,6 @@ $puedeAgregar = esta_autenticado();
             <?php endif; ?>
           </section>
 
-=======
-            <div class="syllabus-container">
-              <div class="syllabus-module-header">
-                Módulo 1: Fundamentos y Conceptos Clave (3 lecciones · 45 min)
-              </div>
-              <ul class="syllabus-module-list">
-                <li>Introducción y objetivos de aprendizaje</li>
-                <li>Configuración del entorno de trabajo</li>
-                <li>Primeros pasos y conceptos teóricos esenciales</li>
-              </ul>
-
-              <div class="syllabus-module-header syllabus-module-header--middle">
-                Módulo 2: Desarrollo Práctico y Casos Reales (5 lecciones · 2h 15m)
-              </div>
-              <ul class="syllabus-module-list">
-                <li>Arquitectura y aplicación de buenas prácticas</li>
-                <li>Resolución guiada de ejercicios prácticos</li>
-                <li>Taller interactivo paso a paso</li>
-              </ul>
-
-              <div class="syllabus-module-header syllabus-module-header--middle">
-                Módulo 3: Proyecto Final y Certificación (2 lecciones · 1h)
-              </div>
-              <ul class="syllabus-module-list">
-                <li>Integración integral de los conocimientos</li>
-                <li>Evaluación final y entrega de certificado</li>
-              </ul>
-            </div>
-          </section>
-
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
           <hr class="section-divider" />
 
           <!-- Reseñas del Curso -->
@@ -202,13 +170,10 @@ $puedeAgregar = esta_autenticado();
             </div>
 
             <ul class="product-card-pricing__features">
-<<<<<<< HEAD
               <?php if (!empty($curso['modalidad'])): ?><li>✓ Modalidad: <?= htmlspecialchars($curso['modalidad']) ?></li><?php endif; ?>
               <?php if (!empty($curso['duracion_horas'])): ?><li>✓ Duración aproximada: <?= (int)$curso['duracion_horas'] ?> h</li><?php endif; ?>
               <?php if (!empty($curso['cupos'])): ?><li>✓ Cupos totales: <?= (int)$curso['cupos'] ?></li><?php endif; ?>
               <?php if (!empty($curso['disponibilidad'])): ?><li>✓ Disponibilidad: <?= htmlspecialchars($curso['disponibilidad']) ?></li><?php endif; ?>
-=======
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
               <li>✓ Acceso completo e ilimitado de por vida</li>
               <li>✓ Materiales y recursos descargables</li>
               <li>✓ Certificado digital de finalización</li>

@@ -42,29 +42,14 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
             header('Location: panel-proveedor.php?mensaje=estado_actualizado');
             exit;
         }
-<<<<<<< HEAD
     } elseif (empty($errores)) {
         $datos=$_POST;
         $datos['tipo']=$publicacion['tipo'];
         $errores=array_merge($errores,validar_datos_publicacion($datos));
-=======
-    } else {
-        $titulo = trim($_POST['titulo'] ?? '');
-        $descripcion = trim($_POST['descripcion'] ?? '');
-        $precio = trim($_POST['precio'] ?? '');
-        $tipo = trim($_POST['tipo'] ?? '');
-        $modalidad = trim($_POST['modalidad'] ?? '');
-        $nivel_experiencia = trim($_POST['nivel_experiencia'] ?? '');
-        $duracion_horas = trim($_POST['duracion_horas'] ?? '');
-        $id_categoria = (int)($_POST['id_categoria'] ?? 0);
-        $estado = trim($_POST['estado'] ?? 'Activo');
-        $eliminar_imagen = !empty($_POST['eliminar_imagen']);
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 
         $estado=$_POST['estado'] ?? $publicacion['estado'];
         if (!in_array($estado,['Activo','Pausado','Inactivo','Eliminado'],true)) $errores[]='Estado no válido.';
 
-<<<<<<< HEAD
         $categoria=['ok'=>false,'id'=>0,'error'=>''];
         if (empty($errores)) {
             try {
@@ -73,45 +58,6 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
             } catch(PDOException $e) {
                 error_log('Categoría publicación: '.$e->getMessage());
                 $errores[]='No se pudo procesar la categoría.';
-=======
-        if (!in_array($tipo, ['Curso', 'Servicio'], true)) {
-            $errores[] = "El tipo de publicación seleccionado no es válido.";
-        }
-
-        if (!in_array($estado, ['Activo', 'Inactivo', 'Pausado'], true)) {
-            $errores[] = "El estado seleccionado no es válido.";
-        }
-
-        if (!is_numeric($precio) || (float)$precio <= 0) {
-            $errores[] = "El precio debe ser un número mayor a cero.";
-        }
-        if ($modalidad !== '' && !in_array($modalidad, ['virtual', 'presencial', 'hibrida', 'producto-entregable'], true)) {
-            $errores[] = "La modalidad seleccionada no es válida.";
-        }
-        if ($nivel_experiencia !== '' && !in_array($nivel_experiencia, ['inicial', 'intermedio', 'avanzado', 'depende-categoria'], true)) {
-            $errores[] = "El nivel de experiencia seleccionado no es válido.";
-        }
-        if ($duracion_horas !== '' && (!ctype_digit($duracion_horas) || (int) $duracion_horas <= 0)) {
-            $errores[] = "La duración debe ser una cantidad de horas válida.";
-        }
-
-        $ruta_imagen = $publicacion['imagen'];
-
-        if ($eliminar_imagen && $ruta_imagen) {
-            eliminar_imagen_subida($ruta_imagen);
-            $ruta_imagen = null;
-        }
-
-        if (empty($errores) && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $res_upload = guardar_imagen_subida($_FILES['imagen'], 'publicaciones', 5);
-            if ($res_upload['ok']) {
-                if ($ruta_imagen && $ruta_imagen !== $res_upload['ruta']) {
-                    eliminar_imagen_subida($ruta_imagen);
-                }
-                $ruta_imagen = $res_upload['ruta'];
-            } else {
-                $errores[] = $res_upload['error'];
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
             }
         }
 
@@ -128,7 +74,6 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
 
         if (empty($errores)) {
             try {
-<<<<<<< HEAD
                 $q=$pdo->prepare("UPDATE publicaciones SET
                     titulo=:titulo, descripcion=:descripcion, precio=:precio, tipo=:tipo,
                     modalidad=:modalidad, nivel_experiencia=:nivel, duracion_horas=:duracion,
@@ -151,29 +96,6 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
                 $q->execute($pp);
                 if ($rutaAnterior && $rutaAnterior!==$rutaNueva) eliminar_imagen_subida($rutaAnterior);
                 header('Location: panel-proveedor.php?mensaje=actualizada');
-=======
-                $sql = "UPDATE publicaciones 
-                        SET titulo = :titulo, descripcion = :descripcion, precio = :precio, tipo = :tipo,
-                            modalidad = :modalidad, nivel_experiencia = :nivel_experiencia, duracion_horas = :duracion_horas,
-                            id_categoria = :id_categoria, estado = :estado, imagen = :imagen
-                        WHERE id_publicacion = :id_pub";
-                $stmt_update = $pdo->prepare($sql);
-                $stmt_update->execute([
-                    'titulo'       => $titulo,
-                    'descripcion'  => $descripcion,
-                    'precio'       => (float)$precio,
-                    'tipo'         => $tipo,
-                    'modalidad'    => $modalidad !== '' ? $modalidad : null,
-                    'nivel_experiencia' => $nivel_experiencia !== '' ? $nivel_experiencia : null,
-                    'duracion_horas' => $duracion_horas !== '' ? (int) $duracion_horas : null,
-                    'id_categoria' => $id_categoria,
-                    'estado'       => $estado,
-                    'imagen'       => $ruta_imagen,
-                    'id_pub'       => $id_publicacion,
-                ]);
-
-                header("Location: panel-proveedor.php?mensaje=actualizada");
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
                 exit;
             } catch(PDOException $e) {
                 error_log('Editar publicación: '.$e->getMessage());

@@ -74,7 +74,6 @@ try {
         exit;
     }
 
-<<<<<<< HEAD
     if ($contratacion['estado'] !== 'Pendiente') {
         $_SESSION['pago_error'] = 'Esta contratación ya fue procesada o no admite un nuevo pago.';
         header("Location: ../../views/pasarela-pago.php?id_contratacion=$id_contratacion");
@@ -89,8 +88,6 @@ try {
         exit;
     }
 
-=======
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
     $pdo->beginTransaction();
 
     // Estándar PCI-DSS: NO guardar números de tarjeta completos ni CVV en la BD.
@@ -108,7 +105,6 @@ try {
         'id_contratacion'  => $id_contratacion,
     ]);
 
-<<<<<<< HEAD
     $stmt_tipo = $pdo->prepare("SELECT COUNT(*) FROM detalles_contratacion dc JOIN publicaciones p ON p.id_publicacion=dc.id_publicacion WHERE dc.id_contratacion=:id AND p.tipo='Servicio'");
     $stmt_tipo->execute(['id'=>$id_contratacion]);
     $tieneServicio=((int)$stmt_tipo->fetchColumn())>0;
@@ -116,10 +112,6 @@ try {
     $stmt_up_con=$pdo->prepare("UPDATE contrataciones SET estado=:estado WHERE id_contratacion=:id");
     $stmt_up_con->execute(['estado'=>$nuevoEstado,'id'=>$id_contratacion]);
     if($tieneServicio){$stmt_sol=$pdo->prepare("UPDATE solicitudes SET estado='En Proceso' WHERE id_contratacion=:id AND estado='Aceptada'");$stmt_sol->execute(['id'=>$id_contratacion]);}
-=======
-    $stmt_up_con = $pdo->prepare("UPDATE contrataciones SET estado = 'Completada' WHERE id_contratacion = :id");
-    $stmt_up_con->execute(['id' => $id_contratacion]);
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 
     $pdo->commit();
 

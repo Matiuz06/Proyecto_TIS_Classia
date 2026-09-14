@@ -9,10 +9,7 @@ $resenas = [];
 $promedio_calificacion = 0.0;
 $total_resenas = 0;
 $servicios_relacionados = [];
-<<<<<<< HEAD
 $plantilla_servicio = null;
-=======
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 
 if ($id_servicio > 0) {
     try {
@@ -29,10 +26,7 @@ if ($id_servicio > 0) {
         $servicio = $stmt->fetch();
 
         if ($servicio) {
-<<<<<<< HEAD
             $plantilla_servicio = obtener_plantilla_servicio($servicio['tipo_servicio'] ?? null);
-=======
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
             // Reseñas reales
             $stmt_res = $pdo->prepare("
                 SELECT v.*, u.nombre, u.apellido, u.foto_perfil
