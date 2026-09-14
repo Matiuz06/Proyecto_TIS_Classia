@@ -1,13 +1,5 @@
 <?php
 
-<<<<<<< HEAD
-=======
-<<<<<<<< HEAD:php/auth/session.php
-// Compatibilidad temporal con código antiguo.
-// Toda la lógica real de sesión está centralizada en sesion.php.
-require_once __DIR__ . '/sesion.php';
-========
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 function iniciar_sesion(): void
 {
     if (session_status() !== PHP_SESSION_NONE) {
@@ -16,50 +8,63 @@ function iniciar_sesion(): void
 
     $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
     $host = preg_replace('/:\d+$/', '', $host);
-    $es_entorno_local = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
+
+    $es_entorno_local = in_array(
+        $host,
+        ['localhost', '127.0.0.1', '::1'],
+        true
+    );
 
     if (!headers_sent() && PHP_VERSION_ID >= 70300) {
         session_set_cookie_params([
-            "lifetime" => $es_entorno_local ? 60 * 60 * 24 * 30 : 0,
-            "path" => "/",
-            "secure" => !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off",
-            "httponly" => true,
-            "samesite" => "Lax",
+            'lifetime' => $es_entorno_local ? 60 * 60 * 24 * 30 : 0,
+            'path' => '/',
+            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'httponly' => true,
+            'samesite' => 'Lax',
         ]);
     }
 
     if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-<<<<<<< HEAD
 
-    if (session_status() === PHP_SESSION_ACTIVE && empty($_SESSION["csrf_token"])) {
-        $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+    if (
+        session_status() === PHP_SESSION_ACTIVE
+        && empty($_SESSION['csrf_token'])
+    ) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
-=======
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 }
 
-function establecer_usuario_sesion(int $id_usuario, string $nombre, string $email, int $id_rol, ?string $foto_perfil = null): void
-{
+function establecer_usuario_sesion(
+    int $id_usuario,
+    string $nombre,
+    string $email,
+    int $id_rol,
+    ?string $foto_perfil = null
+): void {
     iniciar_sesion();
+
     session_regenerate_id(true);
 
-    $_SESSION["usuario"] = [
-        "id_usuario"  => $id_usuario,
-        "nombre"      => $nombre,
-        "email"       => $email,
-        "id_rol"      => $id_rol,
-        "foto_perfil" => $foto_perfil,
+    $_SESSION['usuario'] = [
+        'id_usuario' => $id_usuario,
+        'nombre' => $nombre,
+        'email' => $email,
+        'id_rol' => $id_rol,
+        'foto_perfil' => $foto_perfil,
     ];
-    $_SESSION["id_usuario"] = $id_usuario;
+
+    $_SESSION['id_usuario'] = $id_usuario;
 }
 
 function actualizar_foto_sesion(?string $foto_perfil): void
 {
     iniciar_sesion();
-    if (isset($_SESSION["usuario"])) {
-        $_SESSION["usuario"]["foto_perfil"] = $foto_perfil;
+
+    if (isset($_SESSION['usuario'])) {
+        $_SESSION['usuario']['foto_perfil'] = $foto_perfil;
     }
 }
 
@@ -67,21 +72,26 @@ function esta_autenticado(): bool
 {
     iniciar_sesion();
 
-    if (!isset($_SESSION["usuario"]) || !is_array($_SESSION["usuario"])) {
+    if (
+        !isset($_SESSION['usuario'])
+        || !is_array($_SESSION['usuario'])
+    ) {
         return false;
     }
 
     return isset(
-        $_SESSION["usuario"]["id_usuario"],
-        $_SESSION["usuario"]["nombre"],
-        $_SESSION["usuario"]["email"],
-        $_SESSION["usuario"]["id_rol"]
+        $_SESSION['usuario']['id_usuario'],
+        $_SESSION['usuario']['nombre'],
+        $_SESSION['usuario']['email'],
+        $_SESSION['usuario']['id_rol']
     );
 }
 
 function usuario_actual(): ?array
 {
-    return esta_autenticado() ? $_SESSION["usuario"] : null;
+    return esta_autenticado()
+        ? $_SESSION['usuario']
+        : null;
 }
 
 function requerir_autenticacion(string $login_url): void
@@ -100,34 +110,30 @@ function cerrar_sesion(): void
 
     $_SESSION = [];
 
-    if (ini_get("session.use_cookies")) {
+    if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();
 
         if (PHP_VERSION_ID >= 70300) {
-            setcookie(session_name(), "", [
-                "expires" => time() - 42000,
-                "path" => $params["path"],
-                "domain" => $params["domain"],
-                "secure" => $params["secure"],
-                "httponly" => $params["httponly"],
-                "samesite" => $params["samesite"] ?? "Lax",
+            setcookie(session_name(), '', [
+                'expires' => time() - 42000,
+                'path' => $params['path'],
+                'domain' => $params['domain'],
+                'secure' => $params['secure'],
+                'httponly' => $params['httponly'],
+                'samesite' => $params['samesite'] ?? 'Lax',
             ]);
         } else {
             setcookie(
                 session_name(),
-                "",
+                '',
                 time() - 42000,
-                $params["path"],
-                $params["domain"],
-                $params["secure"],
-                $params["httponly"]
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
             );
         }
     }
 
     session_destroy();
 }
-<<<<<<< HEAD
-=======
->>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e:php/auth/sesion.php
->>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
