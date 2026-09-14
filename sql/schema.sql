@@ -59,10 +59,14 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     modalidad VARCHAR(30) NULL,
     nivel_experiencia VARCHAR(30) NULL,
     duracion_horas SMALLINT UNSIGNED NULL,
+<<<<<<< HEAD
     cupos INT NULL,
     disponibilidad TEXT NULL,
     tipo_servicio VARCHAR(60) NULL,
     estado ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado') NOT NULL DEFAULT 'Activo',
+=======
+    estado ENUM('Activo', 'Inactivo', 'Pausado') NOT NULL DEFAULT 'Activo',
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
     imagen VARCHAR(255) NULL DEFAULT NULL,
     eliminado_en DATETIME NULL,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

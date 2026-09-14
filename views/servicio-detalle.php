@@ -8,7 +8,11 @@ $jsPrefix    = '..';
 
 $activePage  = 'catalogo';
 include '../includes/header.php';
+<<<<<<< HEAD
 $puedeAgregar = es_estudiante();
+=======
+$puedeAgregar = esta_autenticado();
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 ?>
 
   <main class="product-detail-container motion-entry">
@@ -141,6 +145,7 @@ $puedeAgregar = es_estudiante();
               <li>✓ Contacto directo con el proveedor</li>
               <li>✓ Seguimiento paso a paso</li>
               <li>✓ Garantía de satisfacción Classia</li>
+<<<<<<< HEAD
               <?php if (!empty($servicio['modalidad'])): ?><li>✓ Modalidad: <?= htmlspecialchars(ucfirst(str_replace('-', ' ', $servicio['modalidad']))) ?></li><?php endif; ?>
               <?php if (!empty($servicio['duracion_horas'])): ?><li>✓ Duración aproximada: <?= (int)$servicio['duracion_horas'] ?> h</li><?php endif; ?>
               <?php if (!empty($servicio['disponibilidad'])): ?><li>✓ Disponibilidad: <?= htmlspecialchars($servicio['disponibilidad']) ?></li><?php endif; ?>
@@ -165,6 +170,34 @@ $puedeAgregar = es_estudiante();
           </div>
         </aside>
 
+=======
+            </ul>
+
+            <!-- Enviar al carrito-->
+            <?php if ($puedeAgregar): ?>
+              <form action="carrito.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>" />
+                <input type="hidden" name="id_publicacion" value="<?= (int)$servicio['id_publicacion'] ?>" />
+                <input type="hidden" name="accion" value="agregar" />
+                <button type="submit" class="btn product-card-pricing__btn">
+                  Continuar con la contratación
+                </button>
+              </form>
+            <?php else: ?>
+              <div class="purchase-auth-actions">
+                <a class="btn product-card-pricing__btn" href="login.php">Inicia sesión</a>
+                <a href="registro.php">Regístrate</a>
+              </div>
+            <?php endif; ?>
+
+            <div class="custom-request-box">
+              <p>¿Tienes requerimientos especiales?</p>
+              <a href="form-solicitar-servicio.php" class="link">Enviar solicitud personalizada</a>
+            </div>
+          </div>
+        </aside>
+
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
       </div>
     <?php endif; ?>
   </main>

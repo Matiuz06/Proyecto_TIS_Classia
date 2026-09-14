@@ -1,5 +1,13 @@
 <?php
 
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:php/auth/session.php
+// Compatibilidad temporal con código antiguo.
+// Toda la lógica real de sesión está centralizada en sesion.php.
+require_once __DIR__ . '/sesion.php';
+========
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 function iniciar_sesion(): void
 {
     if (session_status() !== PHP_SESSION_NONE) {
@@ -23,10 +31,13 @@ function iniciar_sesion(): void
     if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
         session_start();
     }
+<<<<<<< HEAD
 
     if (session_status() === PHP_SESSION_ACTIVE && empty($_SESSION["csrf_token"])) {
         $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
     }
+=======
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 }
 
 function establecer_usuario_sesion(int $id_usuario, string $nombre, string $email, int $id_rol, ?string $foto_perfil = null): void
@@ -116,3 +127,7 @@ function cerrar_sesion(): void
 
     session_destroy();
 }
+<<<<<<< HEAD
+=======
+>>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e:php/auth/sesion.php
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e

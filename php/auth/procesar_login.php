@@ -1,5 +1,13 @@
 <?php
 
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:php/auth/procesarLogin.php
+// Compatibilidad temporal con formularios antiguos.
+// El único procesador real de correo + contraseña es procesar_login.php.
+require __DIR__ . '/procesar_login.php';
+========
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 require_once __DIR__ . "/sesion.php";
 
 const LOGIN_URL = "../../views/login.php";
@@ -27,7 +35,11 @@ if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $tok
     volver_login("La sesión del formulario expiró. Recargá la página e intentá nuevamente.");
 }
 
+<<<<<<< HEAD
 $email = strtolower(trim($_POST["email"] ?? ""));
+=======
+$email = trim($_POST["email"] ?? "");
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
 $password = $_POST["password"] ?? "";
 
 if ($email === "") {
@@ -53,9 +65,14 @@ try {
             email,
             password_hash,
             id_rol,
+<<<<<<< HEAD
             foto_perfil,
             email_verificado,
             onboarding_step
+=======
+            foto_perfil
+            ,email_verificado
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
          FROM usuarios
          WHERE email = :email
          LIMIT 1"
@@ -101,9 +118,17 @@ if ((int) $usuario["id_rol"] === 3) {
     header("Location: ../../views/panel-administrador.php");
 } elseif ((int) $usuario["id_rol"] === 2) {
     header("Location: ../../views/panel-proveedor.php");
+<<<<<<< HEAD
 } elseif ((int) ($usuario["onboarding_step"] ?? 1) <= 9) {
     header("Location: ../../views/primeros-pasos.php");
 } else {
     header("Location: " . LOGIN_OK_URL);
 }
 exit;
+=======
+} else {
+    header("Location: " . LOGIN_OK_URL);
+}
+exit;
+>>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e:php/auth/procesar_login.php
+>>>>>>> 187b1cca0ceb4e5a72ed2c4a005b042108a51e1e
