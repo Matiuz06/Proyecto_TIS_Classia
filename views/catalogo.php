@@ -14,11 +14,9 @@ $puedeAgregar = esta_autenticado();
 
     <main>
       <header>
-        <p>Catálogo</p>
-        <h1>Cursos y servicios educativos</h1>
-        <p>
-          Explorá las propuestas educativas y técnicas de nuestros docentes y especialistas en Classia.
-        </p>
+        <p><?= __t('catalog_title') ?></p>
+        <h1><?= __t('catalog_heading') ?></h1>
+        <p><?= __t('catalog_sub') ?></p>
         <form
           action="catalogo.php"
           method="get"
@@ -31,21 +29,21 @@ $puedeAgregar = esta_autenticado();
             <input type="hidden" name="categoria" value="<?= (int) $categoria_filtro ?>" />
           <?php endif; ?>
           <p>
-            <label for="busqueda">Buscar en Classia</label>
+            <label for="busqueda"><?= __t('btn_search') ?></label>
             <input
               id="Barrabusqueda"
               type="search"
               name="busqueda"
               value="<?= htmlspecialchars($busqueda) ?>"
-              placeholder="Curso, docente, servicio o temática" />
+              placeholder="<?= __t('catalog_search_ph') ?>" />
           </p>
-          <button type="submit" class="btnAlignIzq">Buscar</button>
+          <button type="submit" class="btnAlignIzq"><?= __t('btn_search') ?></button>
         </form>
       </header>
 
       <div class="catalog-layout">
         <aside class="catalog-filters" aria-labelledby="titulo-filtros">
-          <h2 id="titulo-filtros">Filtros</h2>
+          <h2 id="titulo-filtros"><?= __t('catalog_filters') ?></h2>
           <form action="catalogo.php" method="get">
             <?php if (!empty($busqueda)): ?>
               <input type="hidden" name="busqueda" value="<?= htmlspecialchars($busqueda) ?>" />
