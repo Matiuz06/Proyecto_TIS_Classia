@@ -50,7 +50,7 @@ $puedeAgregar = esta_autenticado();
             <?php endif; ?>
             
             <fieldset>
-              <legend>Tipo</legend>
+              <legend><?= __t('filter_type', 'Tipo') ?></legend>
               <label for="tipo-todos">
                 <input
                   type="radio"
@@ -58,7 +58,7 @@ $puedeAgregar = esta_autenticado();
                   name="tipo"
                   value=""
                   <?= empty($tipo_filtro) ? 'checked' : '' ?> />
-                Todos
+                <?= __t('filter_all', 'Todos') ?>
               </label>
               <label for="tipo-curso">
                 <input
@@ -67,7 +67,7 @@ $puedeAgregar = esta_autenticado();
                   name="tipo"
                   value="curso"
                   <?= $tipo_filtro === 'curso' ? 'checked' : '' ?> />
-                Cursos
+                <?= __t('catalog_courses', 'Cursos') ?>
               </label>
               <label for="tipo-servicio">
                 <input
@@ -76,12 +76,12 @@ $puedeAgregar = esta_autenticado();
                   name="tipo"
                   value="servicio"
                   <?= $tipo_filtro === 'servicio' ? 'checked' : '' ?> />
-                Servicios
+                <?= __t('catalog_services', 'Servicios') ?>
               </label>
             </fieldset>
 
             <fieldset class="filter-category-fieldset">
-              <legend>Disciplina / Orientación</legend>
+              <legend><?= __t('filter_discipline', 'Disciplina / Orientación') ?></legend>
               <select name="categoria" id="filtro-categoria" class="filter-category-select">
                 <option value="0"><?= __t('cat_all_disciplines', 'Todas las disciplinas') ?></option>
                 <?php foreach ($categorias as $cat): ?>
@@ -93,8 +93,8 @@ $puedeAgregar = esta_autenticado();
             </fieldset>
 
             <div class="filter-buttons-wrapper">
-              <button type="submit" class="btn">Aplicar filtros</button>
-              <a href="catalogo.php" class="btn-ghost botonLimpiar">Limpiar</a>
+              <button type="submit" class="btn"><?= __t('btn_apply_filters', 'Aplicar filtros') ?></button>
+              <a href="catalogo.php" class="btn-ghost botonLimpiar"><?= __t('btn_clear', 'Limpiar') ?></a>
             </div>
           </form>
         </aside>
@@ -103,9 +103,9 @@ $puedeAgregar = esta_autenticado();
           <?php if (!empty($recomendaciones)): ?>
             <section class="catalog-recommendations" aria-labelledby="titulo-recomendaciones">
               <header>
-                <p>Según tus preferencias</p>
-                <h2 id="titulo-recomendaciones">Recomendado para vos</h2>
-                <p>Propuestas relacionadas con lo que elegiste en tus primeros pasos.</p>
+                <p><?= __t('catalog_preferences', 'Según tus preferencias') ?></p>
+                <h2 id="titulo-recomendaciones"><?= __t('catalog_recommended', 'Recomendado para vos') ?></h2>
+                <p><?= __t('catalog_recommended_sub', 'Propuestas relacionadas con lo que elegiste en tus primeros pasos.') ?></p>
               </header>
 
               <div class="catalog-grid">
@@ -117,7 +117,7 @@ $puedeAgregar = esta_autenticado();
                         <img class="catalog-card-image" src="../<?= htmlspecialchars($recomendacion['imagen']) ?>" alt="<?= htmlspecialchars($recomendacion['titulo']) ?>" />
                       </div>
                     <?php else: ?>
-                      <div class="placeholder-visual" aria-hidden="true"><?= $esCurso ? 'Curso' : 'Servicio' ?></div>
+                      <div class="placeholder-visual" aria-hidden="true"><?= $esCurso ? __t('label_course') : __t('label_service') ?></div>
                     <?php endif; ?>
                     <div>
                       <h3 id="recomendacion-<?= (int) $recomendacion['id_publicacion'] ?>"><?= htmlspecialchars($recomendacion['titulo']) ?></h3>
@@ -125,7 +125,7 @@ $puedeAgregar = esta_autenticado();
                       <p><strong><?= htmlspecialchars(__t_db($recomendacion['nombre_categoria'])) ?></strong> · $<?= number_format($recomendacion['precio'], 2, ',', '.') ?></p>
                       <p class="catalog-actions">
                         <a class="btn" href="<?= $esCurso ? 'curso.php' : 'servicio-detalle.php' ?>?id=<?= (int) $recomendacion['id_publicacion'] ?>">
-                          <?= $esCurso ? 'Ver curso' : 'Ver servicio' ?>
+                          <?= $esCurso ? __t('btn_view_course') : __t('btn_view_service') ?>
                         </a>
                       </p>
                     </div>
@@ -137,12 +137,11 @@ $puedeAgregar = esta_autenticado();
 
           <?php if (empty($publicaciones)): ?>
             <section class="empty-state" aria-labelledby="sin-mas-cursos">
-              <h3 id="sin-mas-cursos">No se encontraron cursos ni servicios</h3>
+              <h3 id="sin-mas-cursos"><?= __t('catalog_empty') ?></h3>
               <p>
-                No encontramos publicaciones que coincidan con tu búsqueda<?= !empty($busqueda) ? ' ("' . htmlspecialchars($busqueda) . '")' : '' ?>.
-                Intentá con otras palabras clave o limpiá los filtros.
+                <?= __t('catalog_empty_sub') ?>
               </p>
-              <p><a href="catalogo.php" class="btn">Ver todo el catálogo</a></p>
+              <p><a href="catalogo.php" class="btn"><?= __t('btn_view_catalog') ?></a></p>
             </section>
           <?php else: ?>
 
@@ -150,8 +149,8 @@ $puedeAgregar = esta_autenticado();
               <?php if (!empty($cursos)): ?>
                 <header>
                   <br>
-                  <h2 id="titulo-cursos">Cursos (<?= count($cursos) ?>)</h2>
-                  <p>Cursos diversos para un aprendizaje profundo.</p>
+                  <h2 id="titulo-cursos"><?= __t('catalog_courses') ?> (<?= count($cursos) ?>)</h2>
+                  <p><?= __t('catalog_courses_sub') ?></p>
                 </header>
 
                 <div class="catalog-grid catalog-grid--courses">
@@ -162,7 +161,7 @@ $puedeAgregar = esta_autenticado();
                           <img class="catalog-card-image" src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" />
                         </div>
                       <?php else: ?>
-                        <div class="placeholder-visual" aria-hidden="true">Curso</div>
+                        <div class="placeholder-visual" aria-hidden="true"><?= __t('label_course') ?></div>
                       <?php endif; ?>
                       <div>
                         <h3 id="curso-<?= $curso['id_publicacion'] ?>"><?= htmlspecialchars($curso['titulo']) ?></h3>
@@ -173,7 +172,7 @@ $puedeAgregar = esta_autenticado();
                             <dd><?= htmlspecialchars(__t_db($curso['nombre_categoria'])) ?></dd>
                           </div>
                           <div>
-                            <dt>Docente</dt>
+                            <dt><?= __t('label_instructor', 'Docente') ?></dt>
                             <dd>
                               <a href="proveedor.php?id=<?= (int)$curso['id_usuario'] ?>" class="provider-name-link">
                                 <?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?>
@@ -181,20 +180,20 @@ $puedeAgregar = esta_autenticado();
                             </dd>
                           </div>
                           <div>
-                            <dt>Precio</dt>
+                            <dt><?= __t('label_price', 'Precio') ?></dt>
                             <dd><strong>$<?= number_format($curso['precio'], 2, ',', '.') ?></strong></dd>
                           </div>
                         </dl>
                         <p class="catalog-actions">
-                          <a class="btn" href="curso.php?id=<?= $curso['id_publicacion'] ?>">Ver curso</a>
+                          <a class="btn" href="curso.php?id=<?= $curso['id_publicacion'] ?>"><?= __t('btn_view_course') ?></a>
                           <?php if ($puedeAgregar): ?>
                             <form action="../php/contrataciones/carrito.php" method="post">
                               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                               <input type="hidden" name="id_publicacion" value="<?= (int) $curso['id_publicacion'] ?>">
-                              <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
+                              <button type="submit" name="accion" value="agregar"><?= __t('btn_add_cart') ?></button>
                             </form>
                           <?php else: ?>
-                            <a class="btn-ghost" href="login.php">Inicia sesión</a>
+                            <a class="btn-ghost" href="login.php"><?= __t('catalog_login_hint') ?></a>
                           <?php endif; ?>
                         </p>
                       </div>
@@ -208,8 +207,8 @@ $puedeAgregar = esta_autenticado();
               <?php if (!empty($servicios)): ?>
                 <header>
                   <br>
-                  <h2 id="titulo-servicios">Servicios (<?= count($servicios) ?>)</h2>
-                  <p>Distintos servicios según tu necesidad.</p>
+                  <h2 id="titulo-servicios"><?= __t('catalog_services') ?> (<?= count($servicios) ?>)</h2>
+                  <p><?= __t('catalog_services_sub') ?></p>
                 </header>
 
                 <div class="catalog-grid">
@@ -220,7 +219,7 @@ $puedeAgregar = esta_autenticado();
                           <img class="catalog-card-image" src="../<?= htmlspecialchars($serv['imagen']) ?>" alt="<?= htmlspecialchars($serv['titulo']) ?>" />
                         </div>
                       <?php else: ?>
-                        <div class="placeholder-visual" aria-hidden="true">Servicio</div>
+                        <div class="placeholder-visual" aria-hidden="true"><?= __t('label_service') ?></div>
                       <?php endif; ?>
                       <div>
                         <h3 id="servicio-<?= $serv['id_publicacion'] ?>"><?= htmlspecialchars($serv['titulo']) ?></h3>
@@ -231,7 +230,7 @@ $puedeAgregar = esta_autenticado();
                             <dd><?= htmlspecialchars(__t_db($serv['nombre_categoria'])) ?></dd>
                           </div>
                           <div>
-                            <dt>Proveedor</dt>
+                            <dt><?= __t('label_provider', 'Proveedor') ?></dt>
                             <dd>
                               <a href="proveedor.php?id=<?= (int)$serv['id_usuario'] ?>" class="provider-name-link">
                                 <?= htmlspecialchars($serv['autor_nombre'] . ' ' . $serv['autor_apellido']) ?>
@@ -239,20 +238,20 @@ $puedeAgregar = esta_autenticado();
                             </dd>
                           </div>
                           <div>
-                            <dt>Precio</dt>
+                            <dt><?= __t('label_price', 'Precio') ?></dt>
                             <dd><strong>$<?= number_format($serv['precio'], 2, ',', '.') ?></strong></dd>
                           </div>
                         </dl>
                         <p class="catalog-actions">
-                          <a class="btn" href="servicio-detalle.php?id=<?= $serv['id_publicacion'] ?>">Solicitar servicio</a>
+                          <a class="btn" href="servicio-detalle.php?id=<?= $serv['id_publicacion'] ?>"><?= __t('btn_request_service') ?></a>
                           <?php if ($puedeAgregar): ?>
                             <form action="../php/contrataciones/carrito.php" method="post">
                               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                               <input type="hidden" name="id_publicacion" value="<?= (int) $serv['id_publicacion'] ?>">
-                              <button type="submit" name="accion" value="agregar">Agregar al carrito</button>
+                              <button type="submit" name="accion" value="agregar"><?= __t('btn_add_cart') ?></button>
                             </form>
                           <?php else: ?>
-                            <a class="btn-ghost" href="login.php">Inicia sesión</a>
+                            <a class="btn-ghost" href="login.php"><?= __t('catalog_login_hint') ?></a>
                           <?php endif; ?>
                         </p>
                       </div>

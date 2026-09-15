@@ -70,7 +70,7 @@ include 'includes/header.php';
           <h2 id="categorias-heading"><?= __t('sec_categories') ?></h2>
           <p><?= __t('sec_categories_sub') ?></p>
         </div>
-        <a href="views/catalogo.php" class="link u-font-semibold u-text-xs">Ver todas &rarr;</a>
+        <a href="views/catalogo.php" class="link u-font-semibold u-text-xs"><?= __t('sec_view_all') ?></a>
       </div>
 
       <div class="home-carousel-container">
@@ -79,48 +79,48 @@ include 'includes/header.php';
             <div class="home-category-icon-box" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
             </div>
-            <h3 class="home-category-title">Programación & Web</h3>
-            <p class="home-category-desc">Desarrollo Frontend, Backend con PHP, JavaScript y Bases de Datos relacionales.</p>
+            <h3 class="home-category-title"><?= __t('cat_programming') ?></h3>
+            <p class="home-category-desc"><?= __t('cat_desc_programming') ?></p>
           </a>
 
           <a href="views/catalogo.php?categoria=Ciberseguridad" class="home-category-card">
             <div class="home-category-icon-box" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
             </div>
-            <h3 class="home-category-title">Ciberseguridad & Redes</h3>
-            <p class="home-category-desc">Autenticación multifactor, cifrado de datos, arquitectura segura y buenas prácticas.</p>
+            <h3 class="home-category-title"><?= __t('cat_cybersecurity') ?></h3>
+            <p class="home-category-desc"><?= __t('cat_desc_cybersecurity') ?></p>
           </a>
 
           <a href="views/catalogo.php?categoria=Impresion3D" class="home-category-card">
             <div class="home-category-icon-box" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </div>
-            <h3 class="home-category-title">Impresión 3D & Prototipos</h3>
-            <p class="home-category-desc">Modelado tridimensional, preparación de archivos G-Code y fabricación aditiva.</p>
+            <h3 class="home-category-title"><?= __t('cat_3d_prototypes') ?></h3>
+            <p class="home-category-desc"><?= __t('cat_desc_3d_prototypes') ?></p>
           </a>
 
           <a href="views/catalogo.php?categoria=InteligenciaArtificial" class="home-category-card">
             <div class="home-category-icon-box" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
             </div>
-            <h3 class="home-category-title">Inteligencia Artificial</h3>
-            <p class="home-category-desc">Modelos de lenguaje, agentes autónomos y automatización de procesos técnicos.</p>
+            <h3 class="home-category-title"><?= __t('cat_ai') ?></h3>
+            <p class="home-category-desc"><?= __t('cat_desc_ai') ?></p>
           </a>
 
           <a href="views/catalogo.php?categoria=Diseno" class="home-category-card">
             <div class="home-category-icon-box" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2z"></path></svg>
             </div>
-            <h3 class="home-category-title">Diseño UX / UI</h3>
-            <p class="home-category-desc">Diseño de interfaces intuitivas, sistemas de diseño accesibles y prototipado.</p>
+            <h3 class="home-category-title"><?= __t('cat_ux_ui') ?></h3>
+            <p class="home-category-desc"><?= __t('cat_desc_ux_ui') ?></p>
           </a>
 
           <a href="views/catalogo.php?categoria=Negocios" class="home-category-card">
             <div class="home-category-icon-box" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             </div>
-            <h3 class="home-category-title">Gestión & Consultoría</h3>
-            <p class="home-category-desc">Gestión ágil de proyectos tecnológicos, liderazgo técnico y consultoría formativa.</p>
+            <h3 class="home-category-title"><?= __t('cat_management_consulting') ?></h3>
+            <p class="home-category-desc"><?= __t('cat_desc_management_consulting') ?></p>
           </a>
         </div>
       </div>
@@ -132,7 +132,7 @@ include 'includes/header.php';
           <h2 id="recientes-heading"><?= __t('sec_recent_courses') ?></h2>
           <p><?= __t('sec_recent_sub') ?></p>
         </div>
-        <a href="views/catalogo.php" class="link u-font-semibold u-text-xs">Explorar catálogo completo &rarr;</a>
+        <a href="views/catalogo.php" class="link u-font-semibold u-text-xs"><?= __t('btn_view_catalog') ?> &rarr;</a>
       </div>
 
       <div class="grid grid-3">
@@ -156,8 +156,8 @@ include 'includes/header.php';
                   <img src="<?= htmlspecialchars($cover_src) ?>" alt="<?= htmlspecialchars($pub['titulo']) ?>" class="card-media-img" loading="lazy" />
                 </div>
                 <div class="u-flex-between u-mb-md">
-                  <span class="badge"><?= htmlspecialchars($pub['tipo']) ?></span>
-                  <span class="u-text-xs u-text-muted u-font-semibold"><?= htmlspecialchars($pub['nombre_categoria']) ?></span>
+                  <span class="badge"><?= htmlspecialchars(__t_db($pub['tipo'])) ?></span>
+                  <span class="u-text-xs u-text-muted u-font-semibold"><?= htmlspecialchars(__t_db($pub['nombre_categoria'])) ?></span>
                 </div>
                 <h3 class="u-mt-0 u-text-lg"><?= htmlspecialchars($pub['titulo']) ?></h3>
                 <p class="u-text-base u-text-muted u-line-height-base">
@@ -167,7 +167,7 @@ include 'includes/header.php';
 
               <div class="content-card-footer">
                 <div>
-                  <span class="u-text-xs u-text-muted display-block">Docente</span>
+                  <span class="u-text-xs u-text-muted display-block"><?= __t('label_instructor') ?></span>
                   <span class="u-text-sm u-font-semibold"><?= htmlspecialchars($pub['docente_nombre'] . ' ' . $pub['docente_apellido']) ?></span>
                 </div>
                 <div class="u-right">
@@ -196,30 +196,30 @@ include 'includes/header.php';
             <div class="card-media-wrapper">
               <img src="assets/images/cybersecurity_lab.jpg" alt="Seguridad Web" class="card-media-img" loading="lazy" />
             </div>
-            <span class="badge">Curso</span>
-            <h3>Arquitectura de Software y Seguridad Web</h3>
-            <p>Aprende patrones de autenticación 2FA, OAuth2 y diseño de sistemas robustos y escalables.</p>
-            <p class="role-card-action"><a href="views/catalogo.php" class="link">Ver catálogo &rarr;</a></p>
+            <span class="badge"><?= __t('label_course') ?></span>
+            <h3><?= __t('fallback_c1_title') ?></h3>
+            <p><?= __t('fallback_c1_desc') ?></p>
+            <p class="role-card-action"><a href="views/catalogo.php" class="link"><?= __t('btn_view_catalog') ?> &rarr;</a></p>
           </article>
 
           <article class="content-card motion-card">
             <div class="card-media-wrapper">
               <img src="assets/images/printing3d_lab.jpg" alt="Impresión 3D" class="card-media-img" loading="lazy" />
             </div>
-            <span class="badge">Curso</span>
-            <h3>Impresión 3D Aplicada a la Educación</h3>
-            <p>Diseño y fabricación aditiva de piezas técnicas y material didáctico para laboratorios.</p>
-            <p class="role-card-action"><a href="views/catalogo.php" class="link">Ver catálogo &rarr;</a></p>
+            <span class="badge"><?= __t('label_course') ?></span>
+            <h3><?= __t('fallback_c2_title') ?></h3>
+            <p><?= __t('fallback_c2_desc') ?></p>
+            <p class="role-card-action"><a href="views/catalogo.php" class="link"><?= __t('btn_view_catalog') ?> &rarr;</a></p>
           </article>
 
           <article class="content-card motion-card">
             <div class="card-media-wrapper">
               <img src="assets/images/tech_conference.jpg" alt="Auditoría de Código" class="card-media-img" loading="lazy" />
             </div>
-            <span class="badge">Servicio</span>
-            <h3>Asesoría y Auditoría de Código Seguro</h3>
-            <p>Revisión experta de proyectos, validaciones criptográficas y cumplimiento de estándares.</p>
-            <p class="role-card-action"><a href="views/catalogo.php" class="link">Ver catálogo &rarr;</a></p>
+            <span class="badge"><?= __t('label_service') ?></span>
+            <h3><?= __t('fallback_c3_title') ?></h3>
+            <p><?= __t('fallback_c3_desc') ?></p>
+            <p class="role-card-action"><a href="views/catalogo.php" class="link"><?= __t('btn_view_catalog') ?> &rarr;</a></p>
           </article>
         <?php endif; ?>
       </div>
@@ -240,13 +240,13 @@ include 'includes/header.php';
           </div>
           <div>
             <div class="news-meta">
-              <span class="badge badge-brand-soft">Institucional</span>
-              <time datetime="2026-09-10">10 Septiembre 2026</time>
+              <span class="badge badge-brand-soft"><?= __t('news_tag_institutional') ?></span>
+              <time datetime="2026-09-10"><?= __t('news_date_1') ?></time>
             </div>
-            <h3>Classia incorpora Autenticación en Dos Pasos y Cédula Uruguaya Protegida</h3>
-            <p>Conforme a las directrices de la Ley N° 18.331 de Protección de Datos Personales, reforzamos la seguridad de todas las cuentas con TOTP y validación oficial de identidad.</p>
+            <h3><?= __t('news_title_1') ?></h3>
+            <p><?= __t('news_desc_1') ?></p>
           </div>
-          <a href="views/institucional.php" class="link u-text-xs u-font-semibold">Leer comunicado &rarr;</a>
+          <a href="views/institucional.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_1') ?></a>
         </article>
 
         <article class="home-news-card">
@@ -255,13 +255,13 @@ include 'includes/header.php';
           </div>
           <div>
             <div class="news-meta">
-              <span class="badge badge-brand-soft">Innovación EdTech</span>
-              <time datetime="2026-09-04">4 Septiembre 2026</time>
+              <span class="badge badge-brand-soft"><?= __t('news_tag_edtech') ?></span>
+              <time datetime="2026-09-04"><?= __t('news_date_2') ?></time>
             </div>
-            <h3>Integración de GitHub y Google OAuth para la Comunidad Técnica</h3>
-            <p>Estudiantes y docentes ya pueden acceder rápidamente a sus aulas virtuales utilizando sus credenciales institucionales o perfiles de GitHub y Google.</p>
+            <h3><?= __t('news_title_2') ?></h3>
+            <p><?= __t('news_desc_2') ?></p>
           </div>
-          <a href="views/login.php" class="link u-text-xs u-font-semibold">Probar inicio rápido &rarr;</a>
+          <a href="views/login.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_2') ?></a>
         </article>
 
         <article class="home-news-card">
@@ -270,13 +270,13 @@ include 'includes/header.php';
           </div>
           <div>
             <div class="news-meta">
-              <span class="badge badge-brand-soft">Académico</span>
-              <time datetime="2026-08-28">28 Agosto 2026</time>
+              <span class="badge badge-brand-soft"><?= __t('news_tag_academic') ?></span>
+              <time datetime="2026-08-28"><?= __t('news_date_3') ?></time>
             </div>
-            <h3>Nueva Convocatoria para Docentes y Creadores de Contenido 2026</h3>
-            <p>Si eres docente o profesional del área informática y técnica, postúlate para publicar tus propios cursos y ofrecer servicios personalizados en la plataforma.</p>
+            <h3><?= __t('news_title_3') ?></h3>
+            <p><?= __t('news_desc_3') ?></p>
           </div>
-          <a href="views/solicitar-docente.php" class="link u-text-xs u-font-semibold">Postularse como docente &rarr;</a>
+          <a href="views/solicitar-docente.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_3') ?></a>
         </article>
       </div>
     </section>
@@ -299,15 +299,15 @@ include 'includes/header.php';
               <span class="event-tag event-tag--own"><?= __t('event_own') ?></span>
               <span class="u-inline-flex-center u-gap-xs">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                22 Septiembre, 2026 &middot; 18:30 UYT
+                <?= __t('event_date_1') ?>
               </span>
             </div>
-            <h3>Webinar: Buenas Prácticas en el Desarrollo de Sistemas Seguros y Web 2FA</h3>
-            <p>Taller online interactivo dictado por el equipo docente de Classia. Conceptos esenciales de criptografía, tokens y defensas ante ciberataques.</p>
+            <h3><?= __t('event_title_1') ?></h3>
+            <p><?= __t('event_desc_1') ?></p>
           </div>
           <div class="event-footer-strip">
-            <span class="u-text-xs u-font-bold u-text-success">Cupos Abiertos &middot; Gratuito</span>
-            <a href="views/contacto.php" class="btn btn-sm">Inscribirse</a>
+            <span class="u-text-xs u-font-bold u-text-success"><?= __t('event_status_1') ?></span>
+            <a href="views/contacto.php" class="btn btn-sm"><?= __t('event_btn_1') ?></a>
           </div>
         </article>
 
@@ -320,15 +320,15 @@ include 'includes/header.php';
               <span class="event-tag event-tag--sector"><?= __t('event_sector') ?></span>
               <span class="u-inline-flex-center u-gap-xs">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                03 Octubre, 2026 &middot; Híbrido
+                <?= __t('event_date_2') ?>
               </span>
             </div>
-            <h3>Simposio Latinoamericano de EdTech y Fabricación Digital 3D</h3>
-            <p>Encuentro de profesionales, docentes y empresas tecnológicas explorando el futuro de los laboratorios de prototipado y las aulas virtuales.</p>
+            <h3><?= __t('event_title_2') ?></h3>
+            <p><?= __t('event_desc_2') ?></p>
           </div>
           <div class="event-footer-strip">
-            <span class="u-text-xs u-text-muted">Conferencias & Paneles</span>
-            <a href="views/contacto.php" class="btn btn-sm btn-ghost">Más información</a>
+            <span class="u-text-xs u-text-muted"><?= __t('event_status_2') ?></span>
+            <a href="views/contacto.php" class="btn btn-sm btn-ghost"><?= __t('event_btn_2') ?></a>
           </div>
         </article>
 
@@ -341,15 +341,15 @@ include 'includes/header.php';
               <span class="event-tag event-tag--national"><?= __t('event_national') ?></span>
               <span class="u-inline-flex-center u-gap-xs">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                Montevideo, Uruguay
+                <?= __t('event_date_3') ?>
               </span>
             </div>
-            <h3>Jornadas Nacionales de Informática, Ciencia de Datos e Innovación</h3>
-            <p>Evento académico y profesional de alcance nacional organizado con instituciones educativas para promover el talento técnico local.</p>
+            <h3><?= __t('event_title_3') ?></h3>
+            <p><?= __t('event_desc_3') ?></p>
           </div>
           <div class="event-footer-strip">
-            <span class="u-text-xs u-text-muted">Sede Central &middot; Presencial</span>
-            <a href="views/contacto.php" class="btn btn-sm btn-ghost">Ver detalles</a>
+            <span class="u-text-xs u-text-muted"><?= __t('event_status_3') ?></span>
+            <a href="views/contacto.php" class="btn btn-sm btn-ghost"><?= __t('event_btn_3') ?></a>
           </div>
         </article>
       </div>
@@ -374,14 +374,14 @@ include 'includes/header.php';
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </div>
             <p class="testimonial-quote">
-              "Classia me permitió capacitarme a mi ritmo en desarrollo web y seguridad. La plataforma es limpia, sin distracciones y con contenidos muy prácticos."
+              <?= __t('testimonial_quote_1') ?>
             </p>
           </div>
           <div class="testimonial-author">
-            <img src="assets/images/default-avatar.svg" alt="Avatar de Mateo R." class="testimonial-avatar" />
+            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" />
             <div>
-              <p class="testimonial-name">Mateo Rodríguez</p>
-              <p class="testimonial-role">Estudiante de Informática</p>
+              <p class="testimonial-name"><?= __t('testimonial_name_1') ?></p>
+              <p class="testimonial-role"><?= __t('testimonial_role_1') ?></p>
             </div>
           </div>
         </div>
@@ -396,14 +396,14 @@ include 'includes/header.php';
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </div>
             <p class="testimonial-quote">
-              "Como docente, el panel de control de Classia es sumamente intuitivo para publicar propuestas y recibir solicitudes de alumnos con total transparencia."
+              <?= __t('testimonial_quote_2') ?>
             </p>
           </div>
           <div class="testimonial-author">
-            <img src="assets/images/default-avatar.svg" alt="Avatar de Prof. Laura S." class="testimonial-avatar" />
+            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" />
             <div>
-              <p class="testimonial-name">Prof. Laura Silva</p>
-              <p class="testimonial-role">Docente de Redes y Seguridad</p>
+              <p class="testimonial-name"><?= __t('testimonial_name_2') ?></p>
+              <p class="testimonial-role"><?= __t('testimonial_role_2') ?></p>
             </div>
           </div>
         </div>
@@ -418,14 +418,14 @@ include 'includes/header.php';
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             </div>
             <p class="testimonial-quote">
-              "Contratamos el servicio de prototipado 3D para proyectos educativos y la experiencia de pago y entrega fue impecable y segura."
+              <?= __t('testimonial_quote_3') ?>
             </p>
           </div>
           <div class="testimonial-author">
-            <img src="assets/images/default-avatar.svg" alt="Avatar de Gabriel B." class="testimonial-avatar" />
+            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" />
             <div>
-              <p class="testimonial-name">Gabriel Benítez</p>
-              <p class="testimonial-role">Coordinador de Laboratorio</p>
+              <p class="testimonial-name"><?= __t('testimonial_name_3') ?></p>
+              <p class="testimonial-role"><?= __t('testimonial_role_3') ?></p>
             </div>
           </div>
         </div>
@@ -442,7 +442,7 @@ include 'includes/header.php';
               <rect x="3" y="3" width="18" height="18" rx="3"/>
               <path d="M12 8v4l3 3"/>
             </svg>
-            <span>INSTITUTO TÉCNICO NACIONAL</span>
+            <span><?= __t('trusted_org_1') ?></span>
           </div>
 
           <div class="trusted-badge">
@@ -450,7 +450,7 @@ include 'includes/header.php';
               <circle cx="12" cy="12" r="9"/>
               <path d="M12 7v5l3 2"/>
             </svg>
-            <span>TECH URUGUAY LAB</span>
+            <span><?= __t('trusted_org_2') ?></span>
           </div>
 
           <div class="trusted-badge">
@@ -460,21 +460,21 @@ include 'includes/header.php';
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
-            <span>RED DOCENTES LATAM</span>
+            <span><?= __t('trusted_org_3') ?></span>
           </div>
 
           <div class="trusted-badge">
             <svg class="trusted-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
-            <span>CIBERSEGURIDAD UY</span>
+            <span><?= __t('trusted_org_4') ?></span>
           </div>
 
           <div class="trusted-badge">
             <svg class="trusted-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
-            <span>ANITECH S.A.</span>
+            <span><?= __t('trusted_org_5') ?></span>
           </div>
 
         </div>
