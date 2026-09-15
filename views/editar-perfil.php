@@ -40,7 +40,7 @@ include '../includes/header.php';
           <input 
             type="text" 
             id="cedula_display" 
-            value="<?= !empty($userData['cedula_identidad']) ? htmlspecialchars(formatear_ci($userData['cedula_identidad'])) : 'No registrada' ?>" 
+            value="<?= !empty($userData['cedula_identidad']) ? htmlspecialchars(enmascarar_ci($userData['cedula_identidad'])) : 'No registrada' ?>" 
             readonly 
             disabled 
             class="input-disabled-state"

@@ -50,11 +50,11 @@ try {
         exit;
     }
 
-    $secret = $user_2fa['dos_factores_secreto'];
+    $secret = TOTP::desencriptarSecreto($user_2fa['dos_factores_secreto'] ?? '');
     $backup_codes_json = $user_2fa['dos_factores_backup_codes'] ?? '[]';
     $es_valido = false;
 
-    if (preg_match('/^[0-9]{6}$/', $codigo)) {
+    if (!empty($secret) && preg_match('/^[0-9]{6}$/', $codigo)) {
         $es_valido = TOTP::verificarCodigo($secret, $codigo);
     }
 

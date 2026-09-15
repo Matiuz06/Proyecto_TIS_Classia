@@ -11,6 +11,74 @@ class TOTP
     private const BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
     /**
+     * Clave criptográfica para proteger secretos en reposo (AES-256-GCM).
+     */
+    private static function obtenerClaveCifrado(): string
+    {
+        $key = getenv('APP_KEY') ?: getenv('CI_SECRET_KEY') ?: 'classia_ci_data_protection_key_2026_anitech_uy';
+        if (str_starts_with($key, 'base64:')) {
+            $decoded = base64_decode(substr($key, 7), true);
+            if ($decoded !== false) {
+                $key = $decoded;
+            }
+        }
+        return hash('sha256', $key, true);
+    }
+
+    /**
+     * Cifra el secreto TOTP con AES-256-GCM antes de persistir en base de datos.
+     */
+    public static function encriptarSecreto(?string $secreto): ?string
+    {
+        if ($secreto === null || trim($secreto) === '') {
+            return null;
+        }
+        $secreto = trim($secreto);
+        $key = self::obtenerClaveCifrado();
+        $iv = random_bytes(12);
+        $tag = '';
+        $ciphertext = openssl_encrypt($secreto, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag, '', 16);
+
+        if ($ciphertext === false) {
+            throw new RuntimeException('Error al cifrar secreto 2FA.');
+        }
+
+        return 'enc_v1:' . base64_encode($iv) . ':' . base64_encode($tag) . ':' . base64_encode($ciphertext);
+    }
+
+    /**
+     * Desencripta un secreto TOTP cifrado con AES-256-GCM (soporta fallback a plano).
+     */
+    public static function desencriptarSecreto(?string $payload): ?string
+    {
+        if ($payload === null || trim($payload) === '') {
+            return null;
+        }
+        $payload = trim($payload);
+        if (!str_starts_with($payload, 'enc_v1:')) {
+            return $payload; // Soporte retrocompatible para secretos previos
+        }
+
+        $partes = explode(':', $payload);
+        if (count($partes) !== 4) {
+            return null;
+        }
+
+        $iv = base64_decode($partes[1], true);
+        $tag = base64_decode($partes[2], true);
+        $ciphertext = base64_decode($partes[3], true);
+
+        if ($iv === false || $tag === false || $ciphertext === false) {
+            return null;
+        }
+
+        $key = self::obtenerClaveCifrado();
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+        return ($plaintext !== false) ? $plaintext : null;
+    }
+
+    /**
      * Genera un secreto aleatorio en Base32 (16 bytes = 26-32 caracteres Base32).
      */
     public static function generarSecreto(int $length = 16): string

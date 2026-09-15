@@ -41,7 +41,7 @@ $id_usuario = id_usuario_actual();
 try {
     $stmt = $pdo->prepare('UPDATE usuarios SET dos_factores_activo = 1, dos_factores_secreto = :sec, dos_factores_backup_codes = :codes WHERE id_usuario = :id');
     $stmt->execute([
-        'sec'   => $secret,
+        'sec'   => TOTP::encriptarSecreto($secret),
         'codes' => json_encode($backup['hashes']),
         'id'    => $id_usuario,
     ]);
