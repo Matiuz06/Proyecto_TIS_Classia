@@ -104,21 +104,24 @@ curl_setopt_array($ch_user, [
     CURLOPT_HTTPHEADER     => [
         'Authorization: Bearer ' . $access_token,
         'User-Agent: Classia-App',
-        'Accept: application/json',
+        'Accept: application/vnd.github.v3+json, application/json',
     ],
     CURLOPT_TIMEOUT        => 10,
+    CURLOPT_SSL_VERIFYPEER => false,
 ]);
 $user_resp = curl_exec($ch_user);
 curl_close($ch_user);
 
-$gh_user = json_decode($user_resp, true);
+$gh_user = json_decode((string) $user_resp, true);
 $github_id = isset($gh_user['id']) ? (string) $gh_user['id'] : null;
 
 if (!$github_id) {
+    error_log('GitHub OAuth: respuesta de usuario inválida: ' . (string) $user_resp);
     github_oauth_error('No se pudo obtener la información de perfil de GitHub.');
 }
 
-$email = $gh_user['email'] ?? null;
+$login_gh = $gh_user['login'] ?? 'usuario_' . $github_id;
+$email = !empty($gh_user['email']) ? $gh_user['email'] : null;
 
 if (!$email) {
     $ch_emails = curl_init('https://api.github.com/user/emails');
@@ -127,29 +130,56 @@ if (!$email) {
         CURLOPT_HTTPHEADER     => [
             'Authorization: Bearer ' . $access_token,
             'User-Agent: Classia-App',
-            'Accept: application/json',
+            'Accept: application/vnd.github.v3+json, application/json',
         ],
         CURLOPT_TIMEOUT        => 10,
+        CURLOPT_SSL_VERIFYPEER => false,
     ]);
     $emails_resp = curl_exec($ch_emails);
     curl_close($ch_emails);
 
-    $emails_data = json_decode($emails_resp, true);
+    $emails_data = json_decode((string) $emails_resp, true);
     if (is_array($emails_data)) {
+        // 1. Primario y verificado
         foreach ($emails_data as $e) {
-            if (!empty($e['primary']) && !empty($e['verified'])) {
+            if (!empty($e['email']) && !empty($e['primary']) && !empty($e['verified'])) {
                 $email = $e['email'];
                 break;
             }
         }
-        if (!$email && !empty($emails_data[0]['email'])) {
-            $email = $emails_data[0]['email'];
+        // 2. Cualquier correo verificado
+        if (!$email) {
+            foreach ($emails_data as $e) {
+                if (!empty($e['email']) && !empty($e['verified'])) {
+                    $email = $e['email'];
+                    break;
+                }
+            }
+        }
+        // 3. Cualquier correo primario
+        if (!$email) {
+            foreach ($emails_data as $e) {
+                if (!empty($e['email']) && !empty($e['primary'])) {
+                    $email = $e['email'];
+                    break;
+                }
+            }
+        }
+        // 4. Cualquier correo disponible en la lista
+        if (!$email) {
+            foreach ($emails_data as $e) {
+                if (!empty($e['email'])) {
+                    $email = $e['email'];
+                    break;
+                }
+            }
         }
     }
 }
 
+// 5. Fallback infalible si el usuario tiene todos sus correos 100% privados en GitHub
 if (!$email) {
-    github_oauth_error('Tu cuenta de GitHub no tiene un correo electrónico accesible o verificado.');
+    $email = $login_gh . '@users.noreply.github.com';
 }
 
 $email = strtolower(trim($email));
@@ -158,7 +188,6 @@ $partes_nombre = explode(' ', $nombre_completo, 2);
 $nombre   = $partes_nombre[0];
 $apellido = $partes_nombre[1] ?? 'GitHub';
 $foto_perfil = $gh_user['avatar_url'] ?? null;
-$login_gh = $gh_user['login'] ?? 'usuario';
 
 try {
     $stmt = $pdo->prepare('SELECT * FROM usuarios WHERE github_id = :github_id LIMIT 1');

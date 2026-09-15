@@ -74,11 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errores)) {
         $ci_limpia = limpiar_ci($cedula);
-        $stmt = $pdo->prepare("SELECT id_usuario FROM usuarios WHERE email = :email OR nombre_usuario = :nombre_usuario OR cedula_identidad = :ci");
+        $ci_hash = hash_ci($ci_limpia);
+        $stmt = $pdo->prepare("SELECT id_usuario FROM usuarios WHERE email = :email OR nombre_usuario = :nombre_usuario OR cedula_hash = :ci_hash OR cedula_identidad = :ci_plain");
         $stmt->execute([
             'email' => $correo,
             'nombre_usuario' => $usuario,
-            'ci' => $ci_limpia
+            'ci_hash' => $ci_hash,
+            'ci_plain' => $ci_limpia,
         ]);
         if ($stmt->fetch()) {
             $errores[] = "El correo electrónico, nombre de usuario o Cédula de Identidad ya se encuentran registrados.";
@@ -90,14 +92,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id_rol_cliente = 1;
         $token_verificacion = bin2hex(random_bytes(32));
         $config_correo = cargar_configuracion_correo();
-        $ci_guardar = limpiar_ci($cedula);
+        $ci_cifrada = encriptar_ci($cedula);
+        $ci_hash = hash_ci($cedula);
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, apellido, cedula_identidad, nombre_usuario, genero, email, password_hash, id_rol, email_verificado, email_verificacion_token, email_verificacion_expira) VALUES (:nombre, :apellido, :cedula, :nombre_usuario, :genero, :email, :password_hash, :id_rol, 0, :token, DATE_ADD(NOW(), INTERVAL 24 HOUR))");
+            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, apellido, cedula_identidad, cedula_hash, nombre_usuario, genero, email, password_hash, id_rol, email_verificado, email_verificacion_token, email_verificacion_expira) VALUES (:nombre, :apellido, :cedula, :cedula_hash, :nombre_usuario, :genero, :email, :password_hash, :id_rol, 0, :token, DATE_ADD(NOW(), INTERVAL 24 HOUR))");
             $stmt->execute([
                 'nombre' => $nombre,
                 'apellido' => $apellido,
-                'cedula' => $ci_guardar,
+                'cedula' => $ci_cifrada,
+                'cedula_hash' => $ci_hash,
                 'nombre_usuario' => $usuario,
                 'genero' => $genero,
                 'email' => $correo,
