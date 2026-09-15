@@ -3811,7 +3811,7 @@ img.user-nav-avatar {
   width: min(100% - 2rem, 620px);
   margin: var(--space-6) auto;
   text-align: center;
-
+  margin: 0 2rem;
 }
 
 .two-factor-setup-steps {
