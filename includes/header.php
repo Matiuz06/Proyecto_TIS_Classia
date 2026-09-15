@@ -119,7 +119,7 @@ function enlace_idioma(string $lang): string {
               </a>
 
               <?php if (es_estudiante()): ?>
-                <a href="<?= $misSolicitudesHref ?>" role="menuitem" class="user-dropdown-item">Mis solicitudes de servicios</a>
+                <a href="<?= $misSolicitudesHref ?>" role="menuitem" class="user-dropdown-item"><?= __t('nav_mis_solicitudes', 'Mis solicitudes de servicios') ?></a>
                 <a href="<?= $solicitarDocenteHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'solicitar-docente' ? ' active' : '' ?>">
                   <?= __t('nav_solicitar_docente') ?>
                 </a>
@@ -128,19 +128,23 @@ function enlace_idioma(string $lang): string {
                   <?= __t('nav_panel_docente') ?>
                 </a>
                 <a href="<?= ($cssPrefix === '.') ? 'views/crear-publicacion.php' : 'crear-publicacion.php' ?>" role="menuitem" class="user-dropdown-item">
-                  Crear publicación
+                  <?= __t('nav_crear_publicacion', 'Crear publicación') ?>
                 </a>
-                <a href="<?= $solicitudesProveedorHref ?>" role="menuitem" class="user-dropdown-item">Solicitudes de servicios</a>
-                <a href="<?= $perfilProfesionalHref ?>" role="menuitem" class="user-dropdown-item">Perfil profesional</a>
+                <a href="<?= $solicitudesProveedorHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_solicitudes_servicios', 'Solicitudes de servicios') ?>
+                </a>
+                <a href="<?= $perfilProfesionalHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_perfil_profesional', 'Perfil profesional') ?>
+                </a>
               <?php elseif (es_admin()): ?>
                 <a href="<?= $panelAdminHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'panel-administrador' ? ' active' : '' ?>">
                   <?= __t('nav_panel_admin') ?>
                 </a>
                 <a href="<?= ($cssPrefix === '.') ? 'views/solicitudes-docente.php' : 'solicitudes-docente.php' ?>" role="menuitem" class="user-dropdown-item">
-                  Solicitudes docentes
+                  <?= __t('nav_solicitudes_docentes', 'Solicitudes docentes') ?>
                 </a>
                 <a href="<?= $panelProveedorHref ?>" role="menuitem" class="user-dropdown-item">
-                  Panel proveedor
+                  <?= __t('nav_panel_proveedor', 'Panel proveedor') ?>
                 </a>
               <?php endif; ?>
 

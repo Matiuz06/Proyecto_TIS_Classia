@@ -96,7 +96,7 @@ include '../includes/header.php';
           </p>
           <form action="../php/auth/activar_2fa.php" method="POST">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>" />
-            <div class="form-group u-max-w-280 u-mb-lg">
+            <div class="form-group u-max-w-280 u-mb-lg card-two-factor ">
               <label for="codigo_confirmacion"><strong>Código de 6 dígitos:</strong></label>
               <input type="text" id="codigo_confirmacion" name="codigo_confirmacion" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="123456" required autofocus class="input-otp" />
             </div>

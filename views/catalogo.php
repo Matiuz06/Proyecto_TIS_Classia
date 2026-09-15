@@ -83,10 +83,10 @@ $puedeAgregar = esta_autenticado();
             <fieldset class="filter-category-fieldset">
               <legend>Disciplina / Orientación</legend>
               <select name="categoria" id="filtro-categoria" class="filter-category-select">
-                <option value="0">Todas las disciplinas</option>
+                <option value="0"><?= __t('cat_all_disciplines', 'Todas las disciplinas') ?></option>
                 <?php foreach ($categorias as $cat): ?>
                   <option value="<?= (int) $cat['id_categoria'] ?>" <?= ($categoria_filtro === (int)$cat['id_categoria']) ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($cat['nombre_categoria']) ?>
+                    <?= htmlspecialchars(__t_db($cat['nombre_categoria'])) ?>
                   </option>
                 <?php endforeach; ?>
               </select>
@@ -122,7 +122,7 @@ $puedeAgregar = esta_autenticado();
                     <div>
                       <h3 id="recomendacion-<?= (int) $recomendacion['id_publicacion'] ?>"><?= htmlspecialchars($recomendacion['titulo']) ?></h3>
                       <p><?= htmlspecialchars($recomendacion['descripcion']) ?></p>
-                      <p><strong><?= htmlspecialchars($recomendacion['nombre_categoria']) ?></strong> · $<?= number_format($recomendacion['precio'], 2, ',', '.') ?></p>
+                      <p><strong><?= htmlspecialchars(__t_db($recomendacion['nombre_categoria'])) ?></strong> · $<?= number_format($recomendacion['precio'], 2, ',', '.') ?></p>
                       <p class="catalog-actions">
                         <a class="btn" href="<?= $esCurso ? 'curso.php' : 'servicio-detalle.php' ?>?id=<?= (int) $recomendacion['id_publicacion'] ?>">
                           <?= $esCurso ? 'Ver curso' : 'Ver servicio' ?>
@@ -169,8 +169,8 @@ $puedeAgregar = esta_autenticado();
                         <p><?= htmlspecialchars($curso['descripcion']) ?></p>
                         <dl>
                           <div>
-                            <dt>Categoría</dt>
-                            <dd><?= htmlspecialchars($curso['nombre_categoria']) ?></dd>
+                            <dt><?= __t('label_category', 'Categoría') ?></dt>
+                            <dd><?= htmlspecialchars(__t_db($curso['nombre_categoria'])) ?></dd>
                           </div>
                           <div>
                             <dt>Docente</dt>
@@ -227,8 +227,8 @@ $puedeAgregar = esta_autenticado();
                         <p><?= htmlspecialchars($serv['descripcion']) ?></p>
                         <dl>
                           <div>
-                            <dt>Categoría</dt>
-                            <dd><?= htmlspecialchars($serv['nombre_categoria']) ?></dd>
+                            <dt><?= __t('label_category', 'Categoría') ?></dt>
+                            <dd><?= htmlspecialchars(__t_db($serv['nombre_categoria'])) ?></dd>
                           </div>
                           <div>
                             <dt>Proveedor</dt>

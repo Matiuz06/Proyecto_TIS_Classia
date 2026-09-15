@@ -19,7 +19,7 @@ if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $tok
     exit;
 }
 
-$id_usuario = (int) $_SESSION['usuario_id'];
+$id_usuario = id_usuario_actual();
 $contrasena = $_POST['contrasena_confirmar'] ?? '';
 
 if ($contrasena === '') {

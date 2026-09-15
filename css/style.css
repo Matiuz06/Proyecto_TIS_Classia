@@ -256,7 +256,7 @@ nav ol {
   justify-content: flex-end;
 }
 
-.site-nav > a {
+.site-nav>a {
   display: inline-flex;
   align-items: center;
   min-height: 2.25rem;
@@ -271,17 +271,17 @@ nav ol {
   transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
-.site-nav > a:focus-visible {
+.site-nav>a:focus-visible {
   outline: 3px solid rgb(21, 113, 86);
 }
 
-.site-nav > a:hover {
+.site-nav>a:hover {
   color: var(--color-brand-primary);
   background: var(--color-bg-soft);
   text-decoration: none;
 }
 
-.site-nav > a[aria-current="page"] {
+.site-nav>a[aria-current="page"] {
   color: var(--color-brand-primary);
   font-weight: 700;
   background: var(--color-brand-primary-soft, #e6f7f2);
@@ -3807,25 +3807,34 @@ img.user-nav-avatar {
   margin-bottom: 1.5rem;
 }
 
+.card-two-factor {
+  width: min(100% - 2rem, 620px);
+  margin: var(--space-6) auto;
+  text-align: center;
+
+}
+
 .two-factor-setup-steps {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  text-align: center;
 }
 
 .setup-step-box {
   background: var(--color-surface);
-  padding: 1.25rem;
+  padding: 1.5rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
+  text-align: center;
 }
 
 .two-factor-qr-wrapper {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   margin-block: 1rem;
 }
 

@@ -33,13 +33,13 @@ include 'includes/header.php';
             </a>
           <?php else: ?>
             <a href="views/usuario.php" class="btn btn-ghost btn-lg">
-              Ir a mi cuenta &rarr;
+              <?= __t('hero_btn_account') ?> &rarr;
             </a>
           <?php endif; ?>
         </div>
         <?php if (!$isAuth): ?>
           <p class="home-hero-login-hint">
-            ¿Ya tenés cuenta? <a href="views/login.php" class="link u-font-semibold">Iniciar sesión &rarr;</a>
+            <?= __t('hero_login_prompt') ?> <a href="views/login.php" class="link u-font-semibold"><?= __t('nav_iniciar_sesion') ?> &rarr;</a>
           </p>
         <?php endif; ?>
       </div>

@@ -36,7 +36,7 @@ if (!TOTP::verificarCodigo($secret, $codigo)) {
     exit;
 }
 
-$id_usuario = (int) $_SESSION['usuario_id'];
+$id_usuario = id_usuario_actual();
 
 try {
     $stmt = $pdo->prepare('UPDATE usuarios SET dos_factores_activo = 1, dos_factores_secreto = :sec, dos_factores_backup_codes = :codes WHERE id_usuario = :id');

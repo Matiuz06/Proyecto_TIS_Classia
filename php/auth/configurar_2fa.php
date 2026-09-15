@@ -13,7 +13,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$id_usuario = (int) $_SESSION['usuario_id'];
+$id_usuario = id_usuario_actual();
 
 try {
     $stmt = $pdo->prepare('SELECT email, dos_factores_activo, dos_factores_secreto FROM usuarios WHERE id_usuario = :id LIMIT 1');
