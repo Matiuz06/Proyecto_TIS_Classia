@@ -1528,6 +1528,8 @@ th {
   font-size: var(--text-base);
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .btn-google:hover {
@@ -1535,6 +1537,39 @@ th {
   border-color: var(--color-border-strong);
   color: var(--color-text);
   text-decoration: none;
+}
+
+.btn-github {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 2.55rem;
+  padding: 0.68rem 1rem;
+  color: #ffffff !important;
+  background: #24292e;
+  border: 1px solid #24292e;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-github:hover {
+  background: #181b1d;
+  border-color: #181b1d;
+  color: #ffffff !important;
+  text-decoration: none;
+}
+
+.btn-google svg,
+.btn-github svg {
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .onboarding-page {

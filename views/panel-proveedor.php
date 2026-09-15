@@ -28,6 +28,16 @@ $perfil_profesional = obtener_perfil_profesional($pdo, $uid);
 $solicitudes_todas = obtener_solicitudes_proveedor($pdo, $uid);
 $solicitudes_recientes = array_slice($solicitudes_todas, 0, 5);
 
+$stmt_pubs = $pdo->prepare(
+    "SELECT p.*, c.nombre_categoria 
+     FROM publicaciones p 
+     JOIN categorias c ON p.id_categoria = c.id_categoria 
+     WHERE p.id_usuario = :id_usuario 
+     ORDER BY p.fecha_creacion DESC"
+);
+$stmt_pubs->execute(['id_usuario' => $uid]);
+$publicaciones_proveedor = $stmt_pubs->fetchAll();
+
 $activas = (int) proveedor_escalar(
     $pdo,
     "SELECT COUNT(*) FROM publicaciones WHERE id_usuario = :u AND estado = 'Activo'",
@@ -180,7 +190,7 @@ include '../includes/header.php';
             <ul>
                 <li><a href="crear-publicacion.php">Publicar un curso o servicio</a></li>
                 <li><a href="#publicaciones">Gestionar publicaciones</a></li>
-                <?php if (es_docente()): ?>
+                <?php if (es_docente() || es_admin()): ?>
                     <li><a href="solicitudes-servicios.php">Ver solicitudes</a></li>
                     <li><a href="editar-perfil-profesional.php">Editar perfil profesional</a></li>
                 <?php endif; ?>
@@ -317,10 +327,10 @@ include '../includes/header.php';
                         <?php if (!empty($sol['fecha_hora_propuesta'])): ?><div><dt>Fecha propuesta</dt><dd><?= htmlspecialchars($sol['fecha_hora_propuesta']) ?></dd></div><?php endif; ?>
                     </dl>
                     <?php if (!empty($sol['descripcion'])): ?><p><?= htmlspecialchars(mb_strimwidth($sol['descripcion'], 0, 220, '…')) ?></p><?php endif; ?>
-                    <?php if (es_docente()): ?><a href="solicitud-servicio-detalle.php?id=<?= (int)$sol['id_solicitud'] ?>">Ver y responder</a><?php endif; ?>
+                    <?php if (es_docente() || es_admin()): ?><a href="solicitud-servicio-detalle.php?id=<?= (int)$sol['id_solicitud'] ?>">Ver y responder</a><?php endif; ?>
                 </article>
             <?php endforeach; ?>
-            <?php if (es_docente()): ?><p><a href="solicitudes-servicios.php">Ver todas las solicitudes</a></p><?php endif; ?>
+            <?php if (es_docente() || es_admin()): ?><p><a href="solicitudes-servicios.php">Ver todas las solicitudes</a></p><?php endif; ?>
         <?php endif; ?>
     </section>
 
@@ -346,7 +356,7 @@ include '../includes/header.php';
         <header><h2 id="titulo-habilidades">Habilidades y especialidades</h2><p>Información profesional que ayuda a los usuarios a conocer tu experiencia.</p></header>
         <?php if (!empty($perfil_profesional['habilidades'])): ?><p><strong>Habilidades:</strong> <?= nl2br(htmlspecialchars($perfil_profesional['habilidades'])) ?></p><?php else: ?><p class="muted">Todavía no cargaste habilidades.</p><?php endif; ?>
         <?php if (!empty($perfil_profesional['especialidades'])): ?><p><strong>Especialidades:</strong> <?= nl2br(htmlspecialchars($perfil_profesional['especialidades'])) ?></p><?php endif; ?>
-        <?php if (es_docente()): ?><a href="editar-perfil-profesional.php">Editar habilidades</a><?php endif; ?>
+        <?php if (es_docente() || es_admin()): ?><a href="editar-perfil-profesional.php">Editar habilidades</a><?php endif; ?>
     </section>
 
     <section id="perfil" aria-labelledby="titulo-perfil-profesional">
@@ -366,7 +376,7 @@ include '../includes/header.php';
                 <div><dt>Visibilidad</dt><dd><?= htmlspecialchars($perfil_profesional['visibilidad'] ?? 'Registrados') ?></dd></div>
             </dl>
         <?php endif; ?>
-        <?php if (es_docente()): ?><a href="perfil-profesional.php?id=<?= $uid ?>">Ver perfil público</a> <a href="editar-perfil-profesional.php">Editar información</a><?php endif; ?>
+        <?php if (es_docente() || es_admin()): ?><a href="perfil-profesional.php?id=<?= $uid ?>">Ver perfil público</a> <a href="editar-perfil-profesional.php">Editar información</a><?php endif; ?>
     </section>
 
     <section id="valoraciones" aria-labelledby="titulo-valoraciones">
@@ -394,7 +404,7 @@ include '../includes/header.php';
         <br>
         <nav aria-label="Configuración del proveedor">
             <ul>
-                <?php if (es_docente()): ?>
+                <?php if (es_docente() || es_admin()): ?>
                     <li><a href="editar-perfil-profesional.php">Datos profesionales</a></li>
                     <li><a href="solicitudes-servicios.php">Gestión de solicitudes</a></li>
                 <?php endif; ?>

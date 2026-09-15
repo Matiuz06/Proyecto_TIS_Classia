@@ -1,7 +1,6 @@
 <?php
 
 return [
-    /* ── Navigation ─────────────────────────────────────────────────────── */
     'nav_inicio'            => 'Home',
     'nav_catalogo'          => 'Catalog',
     'nav_carrito'           => 'Cart',
@@ -14,20 +13,17 @@ return [
     'nav_panel_admin'       => 'Admin Panel',
     'nav_solicitar_docente' => 'Apply to teach',
 
-    /* ── Hero ────────────────────────────────────────────────────────────── */
     'hero_badge'            => 'Learning & Professional Services Platform',
     'hero_title'            => 'Advance your skills with cutting-edge education',
     'hero_subtitle'         => 'Explore practical courses, hire mentorship from verified instructors, and earn recognized certifications.',
     'hero_btn_explore'      => 'Explore Catalog',
     'hero_btn_start'        => 'Go to my account',
 
-    /* ── Stats ───────────────────────────────────────────────────────────── */
     'stat_courses'          => 'Courses & Services',
     'stat_students'         => 'Active Learners',
     'stat_instructors'      => 'Verified Instructors',
     'stat_satisfaction'     => 'Guaranteed Satisfaction',
 
-    /* ── Home sections ───────────────────────────────────────────────────── */
     'sec_categories'        => 'Browse by Category',
     'sec_categories_sub'    => 'Find the specialty that best fits your career goals.',
     'sec_view_all'          => 'View all →',
@@ -42,7 +38,6 @@ return [
     'sec_trusted_by'        => 'Institutions & Companies that Trust Us',
     'sec_tech_stack'        => 'Technologies & Standards Powering Classia',
 
-    /* ── Buttons / common actions ────────────────────────────────────────── */
     'btn_view_details'      => 'View details',
     'btn_view_course'       => 'View course',
     'btn_view_service'      => 'View service',
@@ -58,7 +53,6 @@ return [
     'btn_register'          => 'Register',
     'btn_more_info'         => 'More info',
 
-    /* ── Data labels ─────────────────────────────────────────────────────── */
     'price_free'            => 'Free',
     'hours'                 => 'hours',
     'level'                 => 'Level',
@@ -74,7 +68,6 @@ return [
     'label_online'          => 'Online',
     'label_conferences'     => 'Conferences & Panels',
 
-    /* ── Catalog ─────────────────────────────────────────────────────────── */
     'catalog_title'         => 'Catalog',
     'catalog_heading'       => 'Courses & educational services',
     'catalog_sub'           => 'Find the course or service that fits you best.',
@@ -90,7 +83,6 @@ return [
     'catalog_empty_sub'     => 'Try different keywords or remove filters.',
     'catalog_login_hint'    => 'Sign in',
 
-    /* ── Contact ─────────────────────────────────────────────────────────── */
     'contact_title'         => 'Contact',
     'contact_heading'       => 'Contact',
     'contact_sub'           => 'Have questions, suggestions, or want to work with us? We\'re here to help.',
@@ -109,7 +101,6 @@ return [
     'contact_message_ph'    => 'Write your inquiry here…',
     'contact_note'          => 'By submitting this form you agree to our privacy policy.',
 
-    /* ── Login ───────────────────────────────────────────────────────────── */
     'login_title'           => 'Sign in',
     'login_heading'         => 'Sign in',
     'login_sub'             => 'Use your email and password to continue.',
@@ -124,7 +115,6 @@ return [
     'login_intro_title'     => 'Welcome back',
     'login_intro_sub'       => 'Access your courses, requests, publications, and management tools from your Classia account.',
 
-    /* ── Register ────────────────────────────────────────────────────────── */
     'register_title'        => 'Create account',
     'register_heading'      => 'Create account',
     'register_sub'          => 'Fill in your details to get started.',
@@ -139,7 +129,6 @@ return [
     'register_intro_title'  => 'Join Classia',
     'register_intro_sub'    => 'Create your account and access hundreds of verified courses and educational services.',
 
-    /* ── Footer ──────────────────────────────────────────────────────────── */
     'footer_about'          => 'Classia is an educational and specialized services platform developed by AniTech. We connect students, instructors, institutions, and professionals to learn, collaborate, and access training opportunities in a secure, modern, community-driven environment.',
     'footer_institutional'  => 'Company',
     'footer_about_us'       => 'About us',

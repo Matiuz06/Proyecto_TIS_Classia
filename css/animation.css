@@ -49,12 +49,16 @@ button {
 .btn:hover,
 .btn:focus-visible,
 button:hover,
-button:focus-visible {
+button:focus-visible,
+.btn-google:hover,
+.btn-github:hover {
   transform: scale(1.02);
 }
 
 .btn:active,
-button:active {
+button:active,
+.btn-google:active,
+.btn-github:active {
   transform: translateY(0);
   transition: all 150ms ease-in-out;
 }

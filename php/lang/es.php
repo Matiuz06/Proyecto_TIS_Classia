@@ -1,7 +1,6 @@
 <?php
 
 return [
-    /* ── Navegación ─────────────────────────────────────────────────────── */
     'nav_inicio'            => 'Inicio',
     'nav_catalogo'          => 'Catálogo',
     'nav_carrito'           => 'Carrito',
@@ -14,20 +13,17 @@ return [
     'nav_panel_admin'       => 'Panel administrador',
     'nav_solicitar_docente' => 'Solicitar ser docente',
 
-    /* ── Hero ────────────────────────────────────────────────────────────── */
     'hero_badge'            => 'Plataforma de Aprendizaje & Servicios',
     'hero_title'            => 'Impulsa tus habilidades con formación de vanguardia',
     'hero_subtitle'         => 'Explorar cursos prácticos, contratar asesorías con docentes verificados y obtener certificados con validez académica.',
     'hero_btn_explore'      => 'Explorar catálogo',
     'hero_btn_start'        => 'Ir a mi cuenta',
 
-    /* ── Estadísticas ────────────────────────────────────────────────────── */
     'stat_courses'          => 'Cursos y Servicios',
     'stat_students'         => 'Estudiantes Activos',
     'stat_instructors'      => 'Docentes Verificados',
     'stat_satisfaction'     => 'Satisfacción Garantizada',
 
-    /* ── Secciones home ──────────────────────────────────────────────────── */
     'sec_categories'        => 'Explorar por Categoría',
     'sec_categories_sub'    => 'Encontrar la especialidad que mejor se adapta a tus metas profesionales.',
     'sec_view_all'          => 'Ver todos →',
@@ -42,7 +38,6 @@ return [
     'sec_trusted_by'        => 'Instituciones y Organizaciones que Confían en Nosotros',
     'sec_tech_stack'        => 'Tecnologías y Estándares que Respaldan Nuestra Plataforma',
 
-    /* ── Botones / acciones comunes ──────────────────────────────────────── */
     'btn_view_details'      => 'Ver detalles',
     'btn_view_course'       => 'Ver curso',
     'btn_view_service'      => 'Ver servicio',
@@ -58,7 +53,6 @@ return [
     'btn_register'          => 'Inscribirme',
     'btn_more_info'         => 'Más información',
 
-    /* ── Etiquetas de datos ──────────────────────────────────────────────── */
     'price_free'            => 'Gratuito',
     'hours'                 => 'horas',
     'level'                 => 'Nivel',
@@ -74,7 +68,6 @@ return [
     'label_online'          => 'Online',
     'label_conferences'     => 'Conferencias & Paneles',
 
-    /* ── Catálogo ────────────────────────────────────────────────────────── */
     'catalog_title'         => 'Catálogo',
     'catalog_heading'       => 'Cursos y servicios educativos',
     'catalog_sub'           => 'Encontrá el curso o servicio que mejor se adapta a vos.',
@@ -90,7 +83,6 @@ return [
     'catalog_empty_sub'     => 'Intentá con otros términos o eliminá los filtros.',
     'catalog_login_hint'    => 'Inicia sesión',
 
-    /* ── Contacto ────────────────────────────────────────────────────────── */
     'contact_title'         => 'Contacto',
     'contact_heading'       => 'Contacto',
     'contact_sub'           => '¿Tenés preguntas, sugerencias o querés trabajar con nosotros? Estamos para ayudarte.',
@@ -109,7 +101,6 @@ return [
     'contact_message_ph'    => 'Escribí tu consulta aquí…',
     'contact_note'          => 'Al enviar este formulario aceptás nuestra política de privacidad.',
 
-    /* ── Login ───────────────────────────────────────────────────────────── */
     'login_title'           => 'Iniciar sesión',
     'login_heading'         => 'Iniciar sesión',
     'login_sub'             => 'Usá tu correo y contraseña para continuar.',
@@ -124,7 +115,6 @@ return [
     'login_intro_title'     => 'Bienvenido de vuelta',
     'login_intro_sub'       => 'Accedé a tus cursos, solicitudes, publicaciones y herramientas de gestión desde una cuenta Classia.',
 
-    /* ── Registro ────────────────────────────────────────────────────────── */
     'register_title'        => 'Crear cuenta',
     'register_heading'      => 'Crear cuenta',
     'register_sub'          => 'Completá tus datos para comenzar.',
@@ -139,7 +129,6 @@ return [
     'register_intro_title'  => 'Únete a Classia',
     'register_intro_sub'    => 'Creá tu cuenta y accedé a cientos de cursos y servicios educativos verificados.',
 
-    /* ── Footer ──────────────────────────────────────────────────────────── */
     'footer_about'          => 'Classia es una plataforma educativa y de contratación de servicios especializados desarrollada por AniTech. Conectamos estudiantes, docentes, instituciones y profesionales para aprender, colaborar y acceder a oportunidades formativas con una experiencia segura, moderna y centrada en la comunidad.',
     'footer_institutional'  => 'Institucional',
     'footer_about_us'       => 'Nosotros',

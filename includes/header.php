@@ -26,7 +26,7 @@ $panelProveedorHref   = ($cssPrefix === '.') ? 'views/panel-proveedor.php' : 'pa
 $panelAdminHref       = ($cssPrefix === '.') ? 'views/panel-administrador.php' : 'panel-administrador.php';
 $misSolicitudesHref = ($cssPrefix === '.') ? 'views/mis-solicitudes-servicios.php' : 'mis-solicitudes-servicios.php';
 $solicitudesProveedorHref = ($cssPrefix === '.') ? 'views/solicitudes-servicios.php' : 'solicitudes-servicios.php';
-$perfilProfesionalHref = ($cssPrefix === '.') ? 'views/editar-perfil-profesional.php' : 'editar-perfil-profesional.php';
+$perfilProfesionalHref = ($cssPrefix === '.') ? 'views/perfil-profesional.php' : 'perfil-profesional.php';
 
 $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
