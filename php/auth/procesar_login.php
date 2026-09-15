@@ -1,9 +1,11 @@
 <?php
 
 require_once __DIR__ . "/sesion.php";
+require_once __DIR__ . "/../utils/recaptcha.php";
 
 const LOGIN_URL = "../../views/login.php";
 const LOGIN_OK_URL = "../../views/usuario.php";
+const VERIFY_2FA_URL = "../../views/verificar-2fa.php";
 
 function volver_login(string $mensaje, string $email = ""): void
 {
@@ -22,9 +24,16 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 iniciar_sesion();
+
 $token_csrf = $_POST['csrf_token'] ?? '';
 if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_csrf)) {
     volver_login("La sesión del formulario expiró. Recargá la página e intentá nuevamente.");
+}
+
+$recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
+$res_recaptcha = verificar_recaptcha($recaptcha_response);
+if (!$res_recaptcha['exito']) {
+    volver_login($res_recaptcha['mensaje'], $_POST['email'] ?? '');
 }
 
 $email = strtolower(trim($_POST["email"] ?? ""));
@@ -55,7 +64,9 @@ try {
             id_rol,
             foto_perfil,
             email_verificado,
-            onboarding_step
+            onboarding_step,
+            dos_factores_activo,
+            dos_factores_secreto
          FROM usuarios
          WHERE email = :email
          LIMIT 1"
@@ -87,6 +98,19 @@ if (
 
 if (isset($usuario['email_verificado']) && !(int) $usuario['email_verificado']) {
     volver_login('Confirmá tu correo electrónico antes de iniciar sesión.', $email);
+}
+
+if (!empty($usuario['dos_factores_activo'])) {
+    $_SESSION['2fa_pending'] = [
+        'id_usuario'  => (int) $usuario['id_usuario'],
+        'nombre'      => $usuario['nombre'] . (!empty($usuario['apellido']) ? ' ' . $usuario['apellido'] : ''),
+        'email'       => $usuario['email'],
+        'id_rol'      => (int) $usuario['id_rol'],
+        'foto_perfil' => $usuario['foto_perfil'] ?? null,
+        'tiempo'      => time(),
+    ];
+    header("Location: " . VERIFY_2FA_URL);
+    exit;
 }
 
 establecer_usuario_sesion(

@@ -5,9 +5,23 @@ require_once __DIR__ . '/../../config/database.php';
 
 function obtener_perfil_profesional(PDO $pdo, int $id_usuario): ?array
 {
-    $stmt = $pdo->prepare("SELECT pp.*, u.nombre, u.apellido, u.email, u.foto_perfil, u.fecha_registro FROM usuarios u LEFT JOIN perfiles_profesionales pp ON pp.id_usuario=u.id_usuario WHERE u.id_usuario=:id AND u.id_rol = 2");
-    $stmt->execute(['id'=>$id_usuario]);
-    return $stmt->fetch() ?: null;
+    $stmt = $pdo->prepare(
+        "SELECT pp.*, u.id_usuario, u.nombre, u.apellido, u.email, u.foto_perfil, u.fecha_registro, u.id_rol, r.nombre_rol 
+         FROM usuarios u 
+         LEFT JOIN roles r ON r.id_rol = u.id_rol 
+         LEFT JOIN perfiles_profesionales pp ON pp.id_usuario = u.id_usuario 
+         WHERE u.id_usuario = :id"
+    );
+    $stmt->execute(['id' => $id_usuario]);
+    $res = $stmt->fetch();
+    return $res ?: null;
+}
+
+function obtener_primer_docente_id(PDO $pdo): int
+{
+    $stmt = $pdo->query("SELECT id_usuario FROM usuarios WHERE id_rol IN (2, 3) ORDER BY id_rol DESC, id_usuario ASC LIMIT 1");
+    $id = $stmt->fetchColumn();
+    return $id ? (int)$id : 0;
 }
 
 function guardar_perfil_profesional(PDO $pdo, int $id_usuario, array $data): void

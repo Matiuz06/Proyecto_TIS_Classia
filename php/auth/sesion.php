@@ -94,6 +94,20 @@ function usuario_actual(): ?array
         : null;
 }
 
+function id_usuario_actual(): int
+{
+    if (isset($_SESSION['usuario']['id_usuario'])) {
+        return (int) $_SESSION['usuario']['id_usuario'];
+    }
+    if (isset($_SESSION['id_usuario'])) {
+        return (int) $_SESSION['id_usuario'];
+    }
+    if (isset($_SESSION['usuario_id'])) {
+        return (int) $_SESSION['usuario_id'];
+    }
+    return 0;
+}
+
 function requerir_autenticacion(string $login_url): void
 {
     if (esta_autenticado()) {
