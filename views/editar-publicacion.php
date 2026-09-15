@@ -6,7 +6,7 @@ require_once '../php/publicaciones/editar_publicacion.php';
 $title='Editar publicación'; $description='Modificación de cursos o servicios en Classia.'; $cssPrefix='..'; $jsPrefix='..'; $bodyClass='auth-page'; $activePage='cuenta';
 include '../includes/header.php';
 ?>
-<main class="auth-shell">
+<main class="auth-shell provider-form-shell">
   <section class="auth-intro"><h1>Modificá tu publicación</h1><p>Actualizá la propuesta sin perder su historial, contrataciones ni contenido asociado.</p></section>
   <section class="auth-card provider-editor">
     <h2>Editar propuesta</h2>
@@ -36,7 +36,9 @@ include '../includes/header.php';
         <?php $cts=$_POST['tipo_servicio'] ?? ($publicacion['tipo_servicio'] ?? ''); ?><label>Plantilla de servicio<select name="tipo_servicio" <?= $publicacion['tipo']!=='Servicio'?'disabled':'' ?>><option value="">Sin plantilla / contratación directa</option><?php foreach($plantillas_servicios as $clave=>$plantilla): ?><option value="<?= htmlspecialchars($clave) ?>" <?= $cts===$clave?'selected':'' ?>><?= htmlspecialchars($plantilla['nombre']) ?></option><?php endforeach; ?></select></label>
         <label>Imagen<?php if(!empty($publicacion['imagen'])): ?><img src="../<?= htmlspecialchars($publicacion['imagen']) ?>" class="pub-preview-img" alt="Imagen actual"><span><input type="checkbox" name="eliminar_imagen" value="1"> Quitar imagen actual</span><?php endif; ?><input type="file" name="imagen" accept="image/jpeg,image/png,image/webp,image/gif"></label>
       </div></details>
-      <button type="submit">Actualizar cambios</button>
+      <div class="form-actions">
+        <button class="btn btn-primary-action" type="submit">Actualizar cambios</button>
+      </div>
     </form>
     <?php endif; ?>
     <p class="auth-links"><a href="panel-proveedor.php">Volver al panel del proveedor</a></p>

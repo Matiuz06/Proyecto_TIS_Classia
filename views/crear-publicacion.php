@@ -9,7 +9,7 @@ $description='Publicación de nuevos cursos o servicios en Classia.';
 $cssPrefix='..'; $jsPrefix='..'; $bodyClass='auth-page'; $activePage='cuenta';
 include '../includes/header.php';
 ?>
-<main class="auth-shell">
+<main class="auth-shell provider-form-shell">
   <section class="auth-intro" aria-labelledby="intro-crear">
     <h1 id="intro-crear">Publicá un curso o servicio</h1>
     <p>Creá y compartí tus propuestas formativas o servicios profesionales con la comunidad de Classia.</p>
@@ -40,7 +40,9 @@ include '../includes/header.php';
         <label>Plantilla de servicio<select name="tipo_servicio"><option value="">Sin plantilla / contratación directa</option><?php foreach($plantillas_servicios as $clave=>$plantilla): ?><option value="<?= htmlspecialchars($clave) ?>" <?= ($_POST['tipo_servicio']??'')===$clave?'selected':'' ?>><?= htmlspecialchars($plantilla['nombre']) ?></option><?php endforeach; ?></select></label>
         <label>Imagen de portada<input type="file" name="imagen" accept="image/jpeg,image/png,image/webp,image/gif"><small>JPG, PNG, WEBP o GIF. Máximo 5MB.</small></label>
       </div></details>
-      <button type="submit">Guardar publicación</button>
+      <div class="form-actions">
+        <button class="btn btn-primary-action" type="submit">Guardar publicación</button>
+      </div>
     </form>
     <p class="auth-links"><a href="panel-proveedor.php">Volver al panel del proveedor</a></p>
   </section>
