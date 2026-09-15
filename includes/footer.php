@@ -1,5 +1,6 @@
 <?php
 $cssPrefix = $cssPrefix ?? '..';
+$jsPrefix  = $jsPrefix  ?? '..';
 
 $contactoHref      = ($cssPrefix === '.') ? 'views/contacto.php' : 'contacto.php';
 $primerosPasosHref = ($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php';

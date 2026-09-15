@@ -495,3 +495,18 @@ body.catalog-page>main {
   transition: transform var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
     opacity var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
 }
+
+/* ── Onboarding active step ── */
+.onboarding-step--active {
+  animation: fade-slide-up var(--dur-medium, 250ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+/* ── Carrito badge pulse ── */
+.nav-cart-badge {
+  animation: pulse-badge 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pulse-badge {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
