@@ -12,7 +12,7 @@ $id_usuario = (int) $_SESSION['usuario']['id_usuario'];
 $pasos_totales = 9;
 $errores_onboarding = [];
 
-$stmt = $pdo->prepare('SELECT nombre, apellido, email_verificado, cedula_identidad, fecha_nacimiento, onboarding_step, onboarding_data FROM usuarios WHERE id_usuario = :id LIMIT 1');
+$stmt = $pdo->prepare('SELECT nombre, apellido, email_verificado, cedula_identidad, onboarding_step, onboarding_data FROM usuarios WHERE id_usuario = :id LIMIT 1');
 $stmt->execute(['id' => $id_usuario]);
 $usuario_onboarding = $stmt->fetch() ?: [];
 if ((int) ($usuario_onboarding['email_verificado'] ?? 0) !== 1) {
