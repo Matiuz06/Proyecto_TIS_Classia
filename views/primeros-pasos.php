@@ -59,6 +59,37 @@ include '../includes/header.php';
 
         <div class="form-grid form-grid--2col onboarding-grid-mt">
           <div class="form-group">
+            <label for="fecha_nacimiento">Fecha de nacimiento <span class="required-mark">*</span></label>
+            <input
+              type="date"
+              id="fecha_nacimiento"
+              name="fecha_nacimiento"
+              required
+              min="<?= date('Y-m-d', strtotime('-120 years')) ?>"
+              max="<?= date('Y-m-d', strtotime('-13 years')) ?>"
+              value="<?= htmlspecialchars($datos_onboarding['fecha_nacimiento'] ?? $usuario_onboarding['fecha_nacimiento'] ?? '') ?>"
+            />
+            <small class="form-hint form-hint-block"><em>Debés tener al menos 13 años.</em></small>
+          </div>
+
+          <?php if (empty($usuario_onboarding['cedula_identidad'])): ?>
+          <div class="form-group">
+            <label for="cedula_identidad">Cédula de Identidad <span class="form-hint">(opcional)</span></label>
+            <input
+              type="text"
+              id="cedula_identidad"
+              name="cedula_identidad"
+              pattern="[0-9.\-\s]{6,12}"
+              placeholder="Ej: 1.234.567-8"
+              value="<?= htmlspecialchars($datos_onboarding['cedula_identidad'] ?? '') ?>"
+            />
+            <small class="form-hint form-hint-block">🔒 <em>Solo podrás ingresarla una vez. No se podrá modificar después.</em></small>
+          </div>
+          <?php endif; ?>
+        </div>
+
+        <div class="form-grid form-grid--2col onboarding-grid-mt">
+          <div class="form-group">
             <label for="profesion">Profesión u ocupación</label>
             <select id="profesion" name="profesion" required>
               <option value="">Seleccioná una opción</option>

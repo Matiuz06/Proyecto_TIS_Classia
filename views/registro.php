@@ -69,6 +69,21 @@ include '../includes/header.php';
         </p>
 
         <p>
+          <label for="fecha_nacimiento">Fecha de nacimiento</label>
+          <input
+            type="date"
+            id="fecha_nacimiento"
+            name="fecha_nacimiento"
+            required
+            min="<?php echo date('Y-m-d', strtotime('-120 years')); ?>"
+            max="<?php echo date('Y-m-d', strtotime('-13 years')); ?>"
+            value="<?php echo htmlspecialchars($_POST['fecha_nacimiento'] ?? ''); ?>" />
+          <small class="form-hint form-hint-block">
+            <em>Debés tener al menos 13 años para registrarte en Classia.</em>
+          </small>
+        </p>
+
+        <p>
           <label for="cedula_identidad">Cédula de Identidad</label>
           <input
             type="text"

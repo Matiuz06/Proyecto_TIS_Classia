@@ -36,11 +36,7 @@ requerir_onboarding_completo($onboardingHref);
 $cartItems = array_unique(array_filter($_SESSION['carrito_publicaciones'] ?? []));
 $cartCount = count($cartItems);
 
-function enlace_idioma(string $lang): string {
-    $params = $_GET;
-    $params['lang'] = $lang;
-    return '?' . http_build_query($params);
-}
+
 ?>
 <!doctype html>
 <html lang="<?= htmlspecialchars($current_lang) ?>">
@@ -75,11 +71,6 @@ function enlace_idioma(string $lang): string {
           <?php endif; ?>
         </a>
 
-        <div class="lang-selector-nav" aria-label="Seleccionar idioma">
-          <a href="<?= enlace_idioma('es') ?>" class="lang-btn <?= $current_lang === 'es' ? 'is-active' : '' ?>" title="Español">ES</a>
-          <span class="lang-divider">|</span>
-          <a href="<?= enlace_idioma('en') ?>" class="lang-btn <?= $current_lang === 'en' ? 'is-active' : '' ?>" title="English">EN</a>
-        </div>
 
         <?php if (!$isAuth): ?>
           <div class="user-nav-dropdown">

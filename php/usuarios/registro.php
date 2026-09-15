@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre = trim($_POST['nombre'] ?? '');
     $apellido = trim($_POST['apellido'] ?? '');
     $cedula = trim($_POST['cedula_identidad'] ?? '');
+    $fecha_nacimiento = trim($_POST['fecha_nacimiento'] ?? '');
     $correo = strtolower(trim($_POST['correo'] ?? ''));
     $usuario = trim($_POST['usuario'] ?? '');
     $genero = trim($_POST['genero'] ?? 'sin-especificar');
@@ -44,8 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = $res_recaptcha['mensaje'];
     }
 
-    if (empty($nombre) || empty($apellido) || empty($cedula) || empty($usuario) || empty($correo) || empty($contrasena) || empty($confirmar_contrasena)) {
+    if (empty($nombre) || empty($apellido) || empty($fecha_nacimiento) || empty($cedula) || empty($usuario) || empty($correo) || empty($contrasena) || empty($confirmar_contrasena)) {
         $errores[] = "Todos los campos son obligatorios.";
+    }
+
+    if (!empty($fecha_nacimiento)) {
+        $fn = DateTime::createFromFormat('Y-m-d', $fecha_nacimiento);
+        $hoy = new DateTime();
+        $min_fecha = (new DateTime())->modify('-120 years');
+        $max_fecha = (new DateTime())->modify('-13 years');
+
+        if (!$fn || $fn->format('Y-m-d') !== $fecha_nacimiento) {
+            $errores[] = "La fecha de nacimiento ingresada no es válida.";
+        } elseif ($fn < $min_fecha || $fn > $max_fecha) {
+            $errores[] = "Debés tener entre 13 y 120 años para registrarte en Classia.";
+        }
     }
 
     if (!empty($cedula)) {
@@ -96,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ci_hash = hash_ci($cedula);
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, apellido, cedula_identidad, cedula_hash, nombre_usuario, genero, email, password_hash, id_rol, email_verificado, email_verificacion_token, email_verificacion_expira) VALUES (:nombre, :apellido, :cedula, :cedula_hash, :nombre_usuario, :genero, :email, :password_hash, :id_rol, 0, :token, DATE_ADD(NOW(), INTERVAL 24 HOUR))");
+            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, apellido, cedula_identidad, cedula_hash, nombre_usuario, genero, fecha_nacimiento, email, password_hash, id_rol, email_verificado, email_verificacion_token, email_verificacion_expira) VALUES (:nombre, :apellido, :cedula, :cedula_hash, :nombre_usuario, :genero, :fecha_nacimiento, :email, :password_hash, :id_rol, 0, :token, DATE_ADD(NOW(), INTERVAL 24 HOUR))");
             $stmt->execute([
                 'nombre' => $nombre,
                 'apellido' => $apellido,
@@ -104,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'cedula_hash' => $ci_hash,
                 'nombre_usuario' => $usuario,
                 'genero' => $genero,
+                'fecha_nacimiento' => $fecha_nacimiento,
                 'email' => $correo,
                 'password_hash' => $hash,
                 'id_rol' => $id_rol_cliente,
