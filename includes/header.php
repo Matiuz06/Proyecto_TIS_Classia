@@ -4,10 +4,14 @@ iniciar_sesion();
 
 require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../php/auth/guardia_onboarding.php';
+require_once __DIR__ . '/../php/utils/i18n.php';
+
+$current_lang = inicializar_i18n();
 
 $title       = $title       ?? 'Classia';
 $description = $description ?? 'Classia conecta clientes, proveedores y administradores en una plataforma educativa clara y organizada.';
 $cssPrefix   = $cssPrefix   ?? '..';
+$jsPrefix    = $jsPrefix    ?? '..';
 $activePage  = $activePage  ?? '';
 
 $indexHref    = ($cssPrefix === '.') ? 'index.php'           : '../index.php';
@@ -28,9 +32,18 @@ $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
 $onboardingHref = ($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php';
 requerir_onboarding_completo($onboardingHref);
+
+$cartItems = array_unique(array_filter($_SESSION['carrito_publicaciones'] ?? []));
+$cartCount = count($cartItems);
+
+function enlace_idioma(string $lang): string {
+    $params = $_GET;
+    $params['lang'] = $lang;
+    return '?' . http_build_query($params);
+}
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= htmlspecialchars($current_lang) ?>">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -47,23 +60,41 @@ requerir_onboarding_completo($onboardingHref);
         <img src="<?= $cssPrefix ?>/assets/images/logo-classia.png" alt="Classia" />
       </a>
       <nav class="site-nav" aria-label="Navegación principal">
-        <a href="<?= $indexHref ?>"<?= $activePage === 'inicio' ? ' aria-current="page"' : '' ?>>Inicio</a>
-        <a href="<?= $catalogoHref ?>"<?= $activePage === 'catalogo' ? ' aria-current="page"' : '' ?>>Catálogo</a>
-        <?php if ($isAuth): ?>
-          <a href="<?= $carritoHref ?>"<?= $activePage === 'carrito' ? ' aria-current="page"' : '' ?>>Carrito</a>
-        <?php endif; ?>
+        <a href="<?= $indexHref ?>"<?= $activePage === 'inicio' ? ' aria-current="page"' : '' ?>><?= __t('nav_inicio') ?></a>
+        <a href="<?= $catalogoHref ?>"<?= $activePage === 'catalogo' ? ' aria-current="page"' : '' ?>><?= __t('nav_catalogo') ?></a>
+        
+        <a href="<?= $carritoHref ?>" class="nav-cart-btn<?= $activePage === 'carrito' ? ' active' : '' ?>" aria-label="<?= __t('nav_carrito') ?> (<?= $cartCount ?> items)">
+          <svg class="nav-cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span class="nav-cart-text"><?= __t('nav_carrito') ?></span>
+          <?php if ($cartCount > 0): ?>
+            <span class="nav-cart-badge" id="cart-item-count"><?= $cartCount ?></span>
+          <?php endif; ?>
+        </a>
+
+        <div class="lang-selector-nav" aria-label="Seleccionar idioma">
+          <a href="<?= enlace_idioma('es') ?>" class="lang-btn <?= $current_lang === 'es' ? 'is-active' : '' ?>" title="Español">ES</a>
+          <span class="lang-divider">|</span>
+          <a href="<?= enlace_idioma('en') ?>" class="lang-btn <?= $current_lang === 'en' ? 'is-active' : '' ?>" title="English">EN</a>
+        </div>
 
         <?php if (!$isAuth): ?>
           <div class="user-nav-dropdown">
             <a href="<?= $loginHref ?>" class="user-nav-trigger" title="Acceder a tu cuenta">
-              <span class="user-nav-name">Cuenta</span>
+              <span class="user-nav-name"><?= __t('nav_cuenta') ?></span>
               <img src="<?= $cssPrefix ?>/assets/images/default-avatar.svg" alt="Cuenta" class="user-nav-avatar" />
               <span class="user-nav-caret" aria-hidden="true">&#9662;</span>
             </a>
 
             <div class="user-dropdown-menu" role="menu" aria-label="Opciones de acceso">
               <a href="<?= $loginHref ?>" role="menuitem" class="user-dropdown-item<?= in_array($activePage, ['login', 'cuenta'], true) ? ' active' : '' ?>">
-                Iniciar sesión
+                <?= __t('nav_iniciar_sesion') ?>
+              </a>
+              <a href="<?= $registroHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'registro' ? ' active' : '' ?>">
+                <?= __t('nav_registrarse') ?>
               </a>
             </div>
           </div>
@@ -84,17 +115,17 @@ requerir_onboarding_completo($onboardingHref);
 
             <div class="user-dropdown-menu" role="menu" aria-label="Opciones de usuario">
               <a href="<?= $cuentaHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'cuenta' ? ' active' : '' ?>">
-                Mi cuenta
+                <?= __t('nav_mi_cuenta') ?>
               </a>
 
               <?php if (es_estudiante()): ?>
                 <a href="<?= $misSolicitudesHref ?>" role="menuitem" class="user-dropdown-item">Mis solicitudes de servicios</a>
                 <a href="<?= $solicitarDocenteHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'solicitar-docente' ? ' active' : '' ?>">
-                  Solicitar ser docente
+                  <?= __t('nav_solicitar_docente') ?>
                 </a>
               <?php elseif (es_docente()): ?>
                 <a href="<?= $panelProveedorHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'panel-proveedor' ? ' active' : '' ?>">
-                  Panel proveedor
+                  <?= __t('nav_panel_docente') ?>
                 </a>
                 <a href="<?= ($cssPrefix === '.') ? 'views/crear-publicacion.php' : 'crear-publicacion.php' ?>" role="menuitem" class="user-dropdown-item">
                   Crear publicación
@@ -103,7 +134,7 @@ requerir_onboarding_completo($onboardingHref);
                 <a href="<?= $perfilProfesionalHref ?>" role="menuitem" class="user-dropdown-item">Perfil profesional</a>
               <?php elseif (es_admin()): ?>
                 <a href="<?= $panelAdminHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'panel-administrador' ? ' active' : '' ?>">
-                  Panel administrador
+                  <?= __t('nav_panel_admin') ?>
                 </a>
                 <a href="<?= ($cssPrefix === '.') ? 'views/solicitudes-docente.php' : 'solicitudes-docente.php' ?>" role="menuitem" class="user-dropdown-item">
                   Solicitudes docentes
@@ -115,7 +146,7 @@ requerir_onboarding_completo($onboardingHref);
 
               <div class="user-dropdown-divider" role="separator"></div>
               <a href="<?= $logoutHref ?>" role="menuitem" class="user-dropdown-item user-dropdown-item--logout">
-                Cerrar sesión
+                <?= __t('nav_cerrar_sesion') ?>
               </a>
             </div>
           </div>
