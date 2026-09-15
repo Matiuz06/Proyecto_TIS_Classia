@@ -4,12 +4,18 @@ $rol_actual = 'Usuario';
 $cursos_contratados = [];
 $servicios_contratados = [];
 require_once '../php/usuarios/perfil.php';
+require_once '../php/utils/cedula_uy.php';
 
 $title      = 'Perfil de usuario';
 $cssPrefix  = '..';
 $jsPrefix    = '..';
 
 $activePage = 'cuenta';
+
+if (isset($_GET['2fa_desactivado'])) {
+    $mensaje_exito = 'La autenticación en dos pasos ha sido desactivada.';
+}
+
 include '../includes/header.php';
 ?>
 
@@ -92,7 +98,7 @@ include '../includes/header.php';
     </section>
 
     <nav class="profile-tabs" aria-label="Secciones de la cuenta">
-      <button type="button">Perfil</button>
+      <button type="button" class="active">Perfil</button>
       <button type="button">Mis Cursos Comprados</button>
       <button type="button">Mis Servicios Contratados</button>
       <button type="button">Certificados</button>
@@ -108,6 +114,10 @@ include '../includes/header.php';
       <p>
         <label for="apellido-cuenta">Apellido:</label><br />
         <input type="text" id="apellido-cuenta" value="<?php echo htmlspecialchars($userData['apellido'] ?? ''); ?>" readonly disabled />
+      </p>
+      <p>
+        <label for="ci-cuenta">Cédula de Identidad Uruguaya:</label><br />
+        <input type="text" id="ci-cuenta" value="<?php echo !empty($userData['cedula_identidad']) ? htmlspecialchars(enmascarar_ci($userData['cedula_identidad'])) : 'No especificada'; ?>" readonly disabled />
       </p>
       <p>
         <label for="email-cuenta">Email:</label><br />
@@ -127,8 +137,27 @@ include '../includes/header.php';
       </p>
 
       <div class="account-security-card">
-        <h3>Seguridad de la cuenta</h3>
-        <p>Podés cambiar tu clave actual o restablecerla en caso de olvido.</p>
+        <h3>Seguridad y Autenticación</h3>
+        <p class="text-muted">Protegé tu cuenta administrando tu contraseña y la autenticación en dos pasos.</p>
+        
+        <div class="security-status-bar">
+          <div>
+            <strong>Autenticación en Dos Pasos (2FA / TOTP):</strong><br />
+            <span class="u-text-base">
+              <?php if (!empty($userData['dos_factores_activo'])): ?>
+                <span class="badge badge-success-soft">Activado ✅</span> (Google / Microsoft Authenticator / Authy)
+              <?php else: ?>
+                <span class="badge badge-warning-soft">Desactivado ⚠️</span>
+              <?php endif; ?>
+            </span>
+          </div>
+          <div>
+            <a href="configurar-2fa.php" class="btn <?= !empty($userData['dos_factores_activo']) ? 'btn-ghost' : '' ?>">
+              <?= !empty($userData['dos_factores_activo']) ? 'Administrar 2FA' : 'Activar 2FA' ?>
+            </a>
+          </div>
+        </div>
+
         <div class="account-security-actions">
           <a href="cambiar-contrasena.php" class="btn">Cambiar contraseña</a>
           <a href="restablecer-contrasena.php" class="btn btn-ghost">Restablecer contraseña</a>

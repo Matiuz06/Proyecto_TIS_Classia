@@ -1,5 +1,6 @@
 <?php
 require_once '../php/usuarios/perfil.php';
+require_once '../php/utils/cedula_uy.php';
 
 $title     = 'Modificar datos personales';
 $cssPrefix = '..';
@@ -10,7 +11,7 @@ include '../includes/header.php';
 ?>
 
   <main class="product-detail-container motion-entry">
-    <div class="card-container payment-card">
+    <div class="card-container payment-card card-narrow-650">
       <span class="brand-mark">Classia</span>
       <h1>Modificar Datos Personales</h1>
       <p class="text-muted">Actualizá tu información de contacto y datos básicos.</p>
@@ -32,6 +33,21 @@ include '../includes/header.php';
         <div class="form-group">
           <label for="apellido"><strong>Apellido:</strong></label>
           <input type="text" id="apellido" name="apellido" value="<?= htmlspecialchars($userData['apellido'] ?? '') ?>" />
+        </div>
+
+        <div class="form-group">
+          <label for="cedula_display"><strong>Cédula de Identidad Uruguaya:</strong></label>
+          <input 
+            type="text" 
+            id="cedula_display" 
+            value="<?= !empty($userData['cedula_identidad']) ? htmlspecialchars(formatear_ci($userData['cedula_identidad'])) : 'No registrada' ?>" 
+            readonly 
+            disabled 
+            class="input-disabled-state"
+          />
+          <small class="form-hint form-hint-block">
+            🔒 <em>La Cédula de Identidad no puede ser modificada tras el registro por motivos de verificación institucional y seguridad.</em>
+          </small>
         </div>
 
         <div class="form-group">
