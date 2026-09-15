@@ -19,21 +19,7 @@
 }
 
 .site-nav a {
-  transition: all 250ms ease;
-}
-
-.site-nav a:hover,
-.site-nav a[aria-current="page"] {
-  transform: translateY(2px);
-}
-
-.site-nav a[aria-current="page"] {
-  transition: all 250ms ease;
-}
-
-.site-nav a[aria-current="page"]:hover {
-  transform: translateY(2px);
-  transform: scale(1.04);
+  transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease;
 }
 
 .btn,

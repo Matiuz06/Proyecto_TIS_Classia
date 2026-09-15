@@ -179,7 +179,7 @@ include '../includes/header.php';
 
                     <div class="provider-hero-actions" style="margin-top: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
                         <?php if ($es_propio || es_admin()): ?>
-                            <a href="editar-perfil-profesional.php" class="btn btn-primary-action">✏️ Editar mi perfil</a>
+                            <a href="editar-perfil-profesional.php" class="btn btn-primary-action">Editar mi perfil</a>
                             <a href="panel-proveedor.php" class="btn">Panel del proveedor</a>
                         <?php endif; ?>
                         
