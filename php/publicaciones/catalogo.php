@@ -42,8 +42,13 @@ $sql = "SELECT p.*, c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS 
 $params = [];
 
 if ($busqueda !== '') {
-    $sql .= " AND (p.titulo LIKE :busqueda OR p.descripcion LIKE :busqueda OR c.nombre_categoria LIKE :busqueda OR u.nombre LIKE :busqueda OR u.apellido LIKE :busqueda)";
-    $params['busqueda'] = '%' . $busqueda . '%';
+    $sql .= " AND (p.titulo LIKE :b_titulo OR p.descripcion LIKE :b_desc OR c.nombre_categoria LIKE :b_cat OR u.nombre LIKE :b_nom OR u.apellido LIKE :b_ape)";
+    $term = '%' . $busqueda . '%';
+    $params['b_titulo'] = $term;
+    $params['b_desc']   = $term;
+    $params['b_cat']    = $term;
+    $params['b_nom']    = $term;
+    $params['b_ape']    = $term;
 }
 
 if ($tipo_filtro === 'curso') {
@@ -71,87 +76,89 @@ try {
 $cursos = array_filter($publicaciones, fn($p) => $p['tipo'] === 'Curso');
 $servicios = array_filter($publicaciones, fn($p) => $p['tipo'] === 'Servicio');
 
-function puntaje_recomendacion(array $publicacion, array $preferencias): int
-{
-    if (empty($preferencias)) {
-        return 0;
-    }
+if (!function_exists('puntaje_recomendacion')) {
+    function puntaje_recomendacion(array $publicacion, array $preferencias): int
+    {
+        if (empty($preferencias)) {
+            return 0;
+        }
 
-    $puntaje = 0;
-    $categorias_preferidas = $preferencias['categorias'] ?? [];
-    $categorias_preferidas = is_array($categorias_preferidas) ? $categorias_preferidas : [$categorias_preferidas];
-    $mapa_categorias = [
-        'programacion' => ['programación', 'desarrollo'],
-        'robotica-automatizacion' => ['robótica', 'automatización', 'electrónica'],
-        'diseno-impresion-3d' => ['3d', 'diseño e impresión'],
-        'mentorias' => ['mentorías', 'capacitación'],
-        'diseno' => ['diseño', 'ux', 'interfaz'],
-        'educacion' => ['educación', 'didáctica'],
-        'gestion' => ['gestión', 'proyectos'],
-        'formacion-institucional' => ['gestión', 'proyectos'],
-        'proyectos-educativos' => ['proyectos', 'educación'],
-    ];
-    $nombre_categoria = function_exists('mb_strtolower')
-        ? mb_strtolower($publicacion['nombre_categoria'] ?? '')
-        : strtolower($publicacion['nombre_categoria'] ?? '');
+        $puntaje = 0;
+        $categorias_preferidas = $preferencias['categorias'] ?? [];
+        $categorias_preferidas = is_array($categorias_preferidas) ? $categorias_preferidas : [$categorias_preferidas];
+        $mapa_categorias = [
+            'programacion' => ['programación', 'desarrollo'],
+            'robotica-automatizacion' => ['robótica', 'automatización', 'electrónica'],
+            'diseno-impresion-3d' => ['3d', 'diseño e impresión'],
+            'mentorias' => ['mentorías', 'capacitación'],
+            'diseno' => ['diseño', 'ux', 'interfaz'],
+            'educacion' => ['educación', 'didáctica'],
+            'gestion' => ['gestión', 'proyectos'],
+            'formacion-institucional' => ['gestión', 'proyectos'],
+            'proyectos-educativos' => ['proyectos', 'educación'],
+        ];
+        $nombre_categoria = function_exists('mb_strtolower')
+            ? mb_strtolower($publicacion['nombre_categoria'] ?? '')
+            : strtolower($publicacion['nombre_categoria'] ?? '');
 
-    foreach ($categorias_preferidas as $categoria) {
-        foreach ($mapa_categorias[$categoria] ?? [] as $termino) {
-            if (strpos($nombre_categoria, $termino) !== false) {
-                $puntaje += 10;
-                break;
+        foreach ($categorias_preferidas as $categoria) {
+            foreach ($mapa_categorias[$categoria] ?? [] as $termino) {
+                if (strpos($nombre_categoria, $termino) !== false) {
+                    $puntaje += 10;
+                    break;
+                }
             }
         }
-    }
 
-    $usos = $preferencias['uso_plataforma'] ?? [];
-    $usos = is_array($usos) ? $usos : [$usos];
-    if ($publicacion['tipo'] === 'Curso' && in_array('explorar-servicios', $usos, true)) {
-        $puntaje += 2;
-    }
-    if ($publicacion['tipo'] === 'Servicio' && in_array('contratar-servicios', $usos, true)) {
-        $puntaje += 2;
-    }
-    if (in_array('publicar-servicios', $usos, true) && $publicacion['tipo'] === 'Servicio') {
-        $puntaje += 1;
-    }
+        $usos = $preferencias['uso_plataforma'] ?? [];
+        $usos = is_array($usos) ? $usos : [$usos];
+        if ($publicacion['tipo'] === 'Curso' && in_array('explorar-servicios', $usos, true)) {
+            $puntaje += 2;
+        }
+        if ($publicacion['tipo'] === 'Servicio' && in_array('contratar-servicios', $usos, true)) {
+            $puntaje += 2;
+        }
+        if (in_array('publicar-servicios', $usos, true) && $publicacion['tipo'] === 'Servicio') {
+            $puntaje += 1;
+        }
 
-    $presupuesto = $preferencias['presupuesto'] ?? '';
-    $precio = (float) ($publicacion['precio'] ?? 0);
-    $rangos_presupuesto = [
-        'gratuito' => $precio <= 0,
-        'menos-de-1000' => $precio < 1000,
-        'entre-1000-y-3000' => $precio >= 1000 && $precio <= 3000,
-        'entre-3000-y-10000' => $precio > 3000 && $precio <= 10000,
-        'mas-de-10000' => $precio > 10000,
-    ];
-    if (!empty($rangos_presupuesto[$presupuesto]) && $rangos_presupuesto[$presupuesto]) {
-        $puntaje += 4;
-    }
+        $presupuesto = $preferencias['presupuesto'] ?? '';
+        $precio = (float) ($publicacion['precio'] ?? 0);
+        $rangos_presupuesto = [
+            'gratuito' => $precio <= 0,
+            'menos-de-1000' => $precio < 1000,
+            'entre-1000-y-3000' => $precio >= 1000 && $precio <= 3000,
+            'entre-3000-y-10000' => $precio > 3000 && $precio <= 10000,
+            'mas-de-10000' => $precio > 10000,
+        ];
+        if (!empty($rangos_presupuesto[$presupuesto]) && $rangos_presupuesto[$presupuesto]) {
+            $puntaje += 4;
+        }
 
-    $modalidades = $preferencias['modalidades'] ?? [];
-    $modalidades = is_array($modalidades) ? $modalidades : [$modalidades];
-    if (!empty($publicacion['modalidad']) && in_array($publicacion['modalidad'], $modalidades, true)) {
-        $puntaje += 5;
-    }
+        $modalidades = $preferencias['modalidades'] ?? [];
+        $modalidades = is_array($modalidades) ? $modalidades : [$modalidades];
+        if (!empty($publicacion['modalidad']) && in_array($publicacion['modalidad'], $modalidades, true)) {
+            $puntaje += 5;
+        }
 
-    $nivel_preferido = $preferencias['nivel_experiencia'] ?? '';
-    if ($nivel_preferido !== '' && $publicacion['nivel_experiencia'] === $nivel_preferido) {
-        $puntaje += 5;
-    }
+        $nivel_preferido = $preferencias['nivel_experiencia'] ?? '';
+        if ($nivel_preferido !== '' && $publicacion['nivel_experiencia'] === $nivel_preferido) {
+            $puntaje += 5;
+        }
 
-    $duracion_preferida = $preferencias['duracion_preferida'] ?? '';
-    $duracion = (int) ($publicacion['duracion_horas'] ?? 0);
-    $coincide_duracion = [
-        'menos-de-10-horas' => $duracion > 0 && $duracion < 10,
-        'entre-10-y-20-horas' => $duracion >= 10 && $duracion <= 20,
-        'mas-de-20-horas' => $duracion > 20,
-    ];
-    if (!empty($coincide_duracion[$duracion_preferida]) && $coincide_duracion[$duracion_preferida]) {
-        $puntaje += 4;
-    }
+        $duracion_preferida = $preferencias['duracion_preferida'] ?? '';
+        $duracion = (int) ($publicacion['duracion_horas'] ?? 0);
+        $coincide_duracion = [
+            'menos-de-10-horas' => $duracion > 0 && $duracion < 10,
+            'entre-10-y-20-horas' => $duracion >= 10 && $duracion <= 20,
+            'mas-de-20-horas' => $duracion > 20,
+        ];
+        if (!empty($coincide_duracion[$duracion_preferida]) && $coincide_duracion[$duracion_preferida]) {
+            $puntaje += 4;
+        }
 
-    return $puntaje;
+        return $puntaje;
+    }
 }
 
 $recomendaciones = [];

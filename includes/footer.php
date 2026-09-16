@@ -1,5 +1,6 @@
 <?php
 $cssPrefix = $cssPrefix ?? '..';
+$jsPrefix  = $jsPrefix  ?? '..';
 
 $contactoHref      = ($cssPrefix === '.') ? 'views/contacto.php' : 'contacto.php';
 $primerosPasosHref = ($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php';
@@ -20,40 +21,38 @@ $accesibilidadHref = ($cssPrefix === '.') ? 'views/politica-accesibilidad.php' :
       <div class="site-footer__about">
         <h3 class="site-footer__brand-title">Classia</h3>
         <p class="site-footer__brand-desc">
-          Classia es una plataforma educativa y de contratación de servicios especializados desarrollada por AniTech.
-          Conectamos estudiantes, docentes, instituciones y profesionales para aprender, colaborar y acceder a
-          oportunidades formativas con una experiencia segura, moderna y centrada en la comunidad.
+          <?= __t('footer_about') ?>
         </p>
       </div>
 
       <div>
-        <h4 class="site-footer__section-title">Institucional</h4>
+        <h4 class="site-footer__section-title"><?= __t('footer_institutional') ?></h4>
         <ul class="site-footer__list">
-          <li><a href="<?= $institucionalHref ?>">Nosotros</a></li>
-          <li><a href="<?= $primerosPasosHref ?>">Primeros pasos</a></li>
-          <li><a href="<?= $contactoHref ?>">Contacto</a></li>
-          <li><a href="<?= $reglamentoHref ?>">Reglamento</a></li>
+          <li><a href="<?= $institucionalHref ?>"><?= __t('footer_about_us') ?></a></li>
+          <li><a href="<?= $primerosPasosHref ?>"><?= __t('footer_first_steps') ?></a></li>
+          <li><a href="<?= $contactoHref ?>"><?= __t('footer_contact') ?></a></li>
+          <li><a href="<?= $reglamentoHref ?>"><?= __t('footer_rules') ?></a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="site-footer__section-title">Políticas</h4>
+        <h4 class="site-footer__section-title"><?= __t('footer_policies') ?></h4>
         <ul class="site-footer__list">
-          <li><a href="<?= $privacidadHref ?>">Política de privacidad</a></li>
-          <li><a href="<?= $terminosHref ?>">Términos de servicio</a></li>
-          <li><a href="<?= $divulgHref ?>">Divulgación responsable</a></li>
-          <li><a href="<?= $seguridadHref ?>">Política de seguridad</a></li>
-          <li><a href="<?= $calidadHref ?>">Política de calidad</a></li>
-          <li><a href="<?= $cookiesHref ?>">Política de cookies</a></li>
-          <li><a href="<?= $accesibilidadHref ?>">Política de accesibilidad</a></li>
+          <li><a href="<?= $privacidadHref ?>"><?= __t('footer_privacy') ?></a></li>
+          <li><a href="<?= $terminosHref ?>"><?= __t('footer_terms') ?></a></li>
+          <li><a href="<?= $divulgHref ?>"><?= __t('footer_disclosure') ?></a></li>
+          <li><a href="<?= $seguridadHref ?>"><?= __t('footer_security') ?></a></li>
+          <li><a href="<?= $calidadHref ?>"><?= __t('footer_quality') ?></a></li>
+          <li><a href="<?= $cookiesHref ?>"><?= __t('footer_cookies') ?></a></li>
+          <li><a href="<?= $accesibilidadHref ?>"><?= __t('footer_accessibility') ?></a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="site-footer__section-title">Ayuda</h4>
+        <h4 class="site-footer__section-title"><?= __t('footer_help') ?></h4>
         <ul class="site-footer__list">
-          <li><a href="<?= $faqHref ?>">Preguntas frecuentes</a></li>
-          <li><a href="<?= $reglamentoHref ?>">Reglas de uso</a></li>
+          <li><a href="<?= $faqHref ?>"><?= __t('footer_faq') ?></a></li>
+          <li><a href="<?= $reglamentoHref ?>"><?= __t('footer_usage_rules') ?></a></li>
         </ul>
       </div>
 
@@ -61,9 +60,9 @@ $accesibilidadHref = ($cssPrefix === '.') ? 'views/politica-accesibilidad.php' :
 
     <div class="site-footer__bottom">
       <p class="site-footer__powered">
-        Desarrollado por <a href="<?= $contactoHref ?>" class="site-footer__powered-link">AniTech S.A.</a>
+        <?= __t('footer_developed_by') ?> <a href="<?= $contactoHref ?>" class="site-footer__powered-link">AniTech S.A.</a>
       </p>
-      <p>&copy; <?= date('Y') ?> Classia &middot; AniTech S.A. Todos los derechos reservados.</p>
+      <p>&copy; <?= date('Y') ?> Classia &middot; AniTech S.A. <?= __t('footer_rights') ?></p>
     </div>
   </footer>
 </body>

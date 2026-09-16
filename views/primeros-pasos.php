@@ -37,7 +37,7 @@ include '../includes/header.php';
         <div class="alert alert-danger"><ul><?php foreach ($errores_onboarding as $error): ?><li><?= htmlspecialchars($error) ?></li><?php endforeach; ?></ul></div>
       <?php endif; ?>
 
-      <fieldset class="onboarding-step<?= clase_paso(1, $paso_actual) ?>"<?= atributo_paso(1, $paso_actual) ?><?= $paso_actual === 1 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(1, $paso_actual) ?>"<?= atributo_paso(1, $paso_actual) ?><?= $paso_actual === 1 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">1</span> Datos personales y profesionales
         </legend>
@@ -57,7 +57,38 @@ include '../includes/header.php';
           </div>
         </div>
 
-        <div class="form-grid form-grid--2col" style="margin-top: var(--space-4);">
+        <div class="form-grid form-grid--2col onboarding-grid-mt">
+          <div class="form-group">
+            <label for="fecha_nacimiento">Fecha de nacimiento <span class="required-mark">*</span></label>
+            <input
+              type="date"
+              id="fecha_nacimiento"
+              name="fecha_nacimiento"
+              required
+              min="<?= date('Y-m-d', strtotime('-120 years')) ?>"
+              max="<?= date('Y-m-d', strtotime('-13 years')) ?>"
+              value="<?= htmlspecialchars($datos_onboarding['fecha_nacimiento'] ?? $usuario_onboarding['fecha_nacimiento'] ?? '') ?>"
+            />
+            <small class="form-hint form-hint-block"><em>Debés tener al menos 13 años.</em></small>
+          </div>
+
+          <?php if (empty($usuario_onboarding['cedula_identidad'])): ?>
+          <div class="form-group">
+            <label for="cedula_identidad">Cédula de Identidad <span class="form-hint">(opcional)</span></label>
+            <input
+              type="text"
+              id="cedula_identidad"
+              name="cedula_identidad"
+              pattern="[0-9.\-\s]{6,12}"
+              placeholder="Ej: 1.234.567-8"
+              value="<?= htmlspecialchars($datos_onboarding['cedula_identidad'] ?? '') ?>"
+            />
+            <small class="form-hint form-hint-block">🔒 <em>Solo podrás ingresarla una vez. No se podrá modificar después.</em></small>
+          </div>
+          <?php endif; ?>
+        </div>
+
+        <div class="form-grid form-grid--2col onboarding-grid-mt">
           <div class="form-group">
             <label for="profesion">Profesión u ocupación</label>
             <select id="profesion" name="profesion" required>
@@ -83,7 +114,7 @@ include '../includes/header.php';
           </div>
         </div>
 
-        <div class="form-grid form-grid--3col" style="margin-top: var(--space-4);">
+        <div class="form-grid form-grid--3col onboarding-grid-mt">
           <div class="form-group">
             <label for="institucion">Institución, empresa o emprendimiento</label>
             <input type="text" id="institucion" name="institucion" autocomplete="organization" placeholder="Opcional" />
@@ -102,7 +133,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step<?= clase_paso(2, $paso_actual) ?>"<?= atributo_paso(2, $paso_actual) ?><?= $paso_actual === 2 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(2, $paso_actual) ?>"<?= atributo_paso(2, $paso_actual) ?><?= $paso_actual === 2 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">2</span> ¿Cómo pensás utilizar la plataforma?
         </legend>
@@ -146,7 +177,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step<?= clase_paso(3, $paso_actual) ?>"<?= atributo_paso(3, $paso_actual) ?><?= $paso_actual === 3 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(3, $paso_actual) ?>"<?= atributo_paso(3, $paso_actual) ?><?= $paso_actual === 3 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">3</span> Categorías de interés
         </legend>
@@ -207,7 +238,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step<?= clase_paso(4, $paso_actual) ?>"<?= atributo_paso(4, $paso_actual) ?><?= $paso_actual === 4 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(4, $paso_actual) ?>"<?= atributo_paso(4, $paso_actual) ?><?= $paso_actual === 4 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">4</span> Modalidades preferidas
         </legend>
@@ -241,7 +272,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step<?= clase_paso(5, $paso_actual) ?>"<?= atributo_paso(5, $paso_actual) ?><?= $paso_actual === 5 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(5, $paso_actual) ?>"<?= atributo_paso(5, $paso_actual) ?><?= $paso_actual === 5 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">5</span> Nivel de experiencia
         </legend>
@@ -270,13 +301,13 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step<?= clase_paso(6, $paso_actual) ?>"<?= atributo_paso(6, $paso_actual) ?><?= $paso_actual === 6 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(6, $paso_actual) ?>"<?= atributo_paso(6, $paso_actual) ?><?= $paso_actual === 6 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">6</span> Preferencias de contratación
         </legend>
         <p class="step-desc">Indicá tus preferencias de presupuesto y formato.</p>
 
-        <div class="form-grid form-grid--2col" style="margin-bottom: var(--space-4);">
+        <div class="form-grid form-grid--2col onboarding-grid-mb">
           <div class="form-group">
             <label for="presupuesto">Presupuesto habitual</label>
             <select id="presupuesto" name="presupuesto">
@@ -323,7 +354,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step<?= clase_paso(7, $paso_actual) ?>"<?= atributo_paso(7, $paso_actual) ?><?= $paso_actual === 7 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(7, $paso_actual) ?>"<?= atributo_paso(7, $paso_actual) ?><?= $paso_actual === 7 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">7</span> Comunicación y notificaciones
         </legend>
@@ -359,7 +390,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step<?= clase_paso(8, $paso_actual) ?>"<?= atributo_paso(8, $paso_actual) ?><?= $paso_actual === 8 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(8, $paso_actual) ?>"<?= atributo_paso(8, $paso_actual) ?><?= $paso_actual === 8 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">8</span> Perfil como proveedor
         </legend>
@@ -367,14 +398,14 @@ include '../includes/header.php';
           Completa esta sección si también pensás publicar y comercializar servicios.
         </p>
 
-        <div class="options-grid" style="margin-bottom: var(--space-4);">
+        <div class="options-grid onboarding-grid-mb">
           <label class="option-card" for="quiere-publicar">
             <input type="checkbox" id="quiere-publicar" name="quiere_publicar" value="si" />
             <span class="option-text">Quiero publicar servicios en Classia</span>
           </label>
         </div>
 
-        <div class="form-grid form-grid--2col" style="margin-bottom: var(--space-4);">
+        <div class="form-grid form-grid--2col onboarding-grid-mb">
           <div class="form-group">
             <label for="tipo-proveedor">Tipo de proveedor</label>
             <select id="tipo-proveedor" name="tipo_proveedor">
@@ -401,7 +432,7 @@ include '../includes/header.php';
         </div>
       </fieldset>
 
-      <fieldset class="onboarding-step<?= clase_paso(9, $paso_actual) ?>"<?= atributo_paso(9, $paso_actual) ?><?= $paso_actual === 9 ? '' : ' hidden style="display:none!important"' ?>>
+      <fieldset class="onboarding-step<?= clase_paso(9, $paso_actual) ?>"<?= atributo_paso(9, $paso_actual) ?><?= $paso_actual === 9 ? '' : ' hidden' ?>>
         <legend class="onboarding-legend">
           <span class="step-num">9</span> Privacidad y personalización
         </legend>
@@ -410,7 +441,7 @@ include '../includes/header.php';
           relacionadas.
         </p>
 
-        <div class="form-grid" style="gap: var(--space-3);">
+        <div class="form-grid onboarding-grid-gap-3">
           <label class="option-card" for="acepta-personalizacion">
             <input type="checkbox" id="acepta-personalizacion" name="acepta_personalizacion" value="si" required />
             <span class="option-text">
@@ -422,8 +453,7 @@ include '../includes/header.php';
           <label class="option-card" for="acepta-privacidad">
             <input type="checkbox" id="acepta-privacidad" name="acepta_privacidad" value="si" required />
             <span class="option-text">
-              Confirmo que leí y acepto la <a href="politica-privacidad.php"
-                style="color: var(--color-brand-primary); font-weight: 600;">política de privacidad</a> y el tratamiento
+              Confirmo que leí y acepto la <a href="politica-privacidad.php" class="link-primary-bold">política de privacidad</a> y el tratamiento
               de mis datos personales.
             </span>
           </label>

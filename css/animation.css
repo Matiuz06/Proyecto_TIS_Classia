@@ -19,21 +19,7 @@
 }
 
 .site-nav a {
-  transition: all 250ms ease;
-}
-
-.site-nav a:hover,
-.site-nav a[aria-current="page"] {
-  transform: translateY(2px);
-}
-
-.site-nav a[aria-current="page"] {
-  transition: all 250ms ease;
-}
-
-.site-nav a[aria-current="page"]:hover {
-  transform: translateY(2px);
-  transform: scale(1.04);
+  transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease;
 }
 
 .btn,
@@ -49,12 +35,16 @@ button {
 .btn:hover,
 .btn:focus-visible,
 button:hover,
-button:focus-visible {
+button:focus-visible,
+.btn-google:hover,
+.btn-github:hover {
   transform: scale(1.02);
 }
 
 .btn:active,
-button:active {
+button:active,
+.btn-google:active,
+.btn-github:active {
   transform: translateY(0);
   transition: all 150ms ease-in-out;
 }
@@ -494,4 +484,19 @@ body.catalog-page>main {
 .pub-actions-link {
   transition: transform var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
     opacity var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+/* ── Onboarding active step ── */
+.onboarding-step--active {
+  animation: fade-slide-up var(--dur-medium, 250ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+/* ── Carrito badge pulse ── */
+.nav-cart-badge {
+  animation: pulse-badge 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pulse-badge {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
