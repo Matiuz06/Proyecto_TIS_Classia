@@ -5,6 +5,7 @@ $title = $curso ? htmlspecialchars($curso['titulo']) : 'Curso no encontrado';
 $description = $curso ? htmlspecialchars(mb_strimwidth($curso['descripcion'], 0, 150, '...')) : 'Detalle del curso en Classia.';
 $cssPrefix = '..';
 $jsPrefix = '..';
+$bodyClass = 'course-page';
 $activePage = 'catalogo';
 
 $clases_planas = [];
@@ -43,8 +44,31 @@ include '../includes/header.php';
       <p><a href="catalogo.php?tipo=curso" class="btn">Explorar catálogo de cursos</a></p>
     </section>
   <?php elseif ($puede_ver_recursos): ?>
+    <?php if (!$item_actual): ?>
+      <section class="course-page-hero" aria-labelledby="course-page-title">
+        <div class="course-page-hero__body">
+          <span class="badge badge-course"><?= htmlspecialchars($curso['nombre_categoria']) ?></span>
+          <h1 id="course-page-title"><?= htmlspecialchars($curso['titulo']) ?></h1>
+          <p class="course-page-teacher">Curso de <a href="proveedor.php?id=<?= (int)$curso['autor_id'] ?>"><?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?></a></p>
+          <p class="course-page-description"><?= htmlspecialchars(mb_strimwidth($curso['descripcion'], 0, 180, '...')) ?></p>
+          <dl class="course-page-summary-grid" aria-label="Resumen del curso">
+            <div><dt>Módulos</dt><dd><?= count($contenido_curso) ?></dd></div>
+            <div><dt>Clases</dt><dd><?= count($clases_planas) ?></dd></div>
+            <div><dt>Modalidad</dt><dd><?= htmlspecialchars($curso['modalidad'] ?: 'A definir') ?></dd></div>
+            <div><dt>Duración</dt><dd><?= !empty($curso['duracion_horas']) ? ((int)$curso['duracion_horas'] . ' h') : 'A definir' ?></dd></div>
+          </dl>
+        </div>
+        <figure class="course-page-cover">
+          <?php if (!empty($curso['imagen'])): ?>
+            <img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>">
+          <?php else: ?>
+            <div class="course-page-cover__placeholder">Classia</div>
+          <?php endif; ?>
+        </figure>
+      </section>
+    <?php endif; ?>
     <button class="btn course-mobile-toggle" type="button" data-course-sidebar-toggle aria-controls="course-sidebar" aria-expanded="false">☰ Contenido del curso</button>
-    <div class="course-shell">
+    <div class="course-shell<?= !$item_actual ? ' course-shell--overview' : '' ?>">
       <aside class="course-sidebar" id="course-sidebar" data-course-sidebar aria-label="Contenido del curso">
         <div class="course-sidebar-title">Contenido del curso</div>
         <a class="course-sidebar-general<?= $item_actual ? '' : ' is-active' ?>" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>" <?= $item_actual ? '' : 'aria-current="page"' ?>>
@@ -78,23 +102,9 @@ include '../includes/header.php';
 
       <article class="course-content" aria-live="polite">
         <?php if (!$item_actual): ?>
-          <header class="course-content-header">
-            <span class="badge badge-course"><?= htmlspecialchars($curso['nombre_categoria']) ?></span>
-            <h1><?= htmlspecialchars($curso['titulo']) ?></h1>
-            <p>Curso de <?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?></p>
-          </header>
-          <?php if (!empty($curso['imagen'])): ?>
-            <img class="course-hero-image" src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>">
-          <?php endif; ?>
           <section class="course-overview">
             <h2>Información del curso</h2>
             <p><?= nl2br(htmlspecialchars($curso['descripcion'])) ?></p>
-            <dl class="course-facts">
-              <div><dt>Módulos</dt><dd><?= count($contenido_curso) ?></dd></div>
-              <div><dt>Clases</dt><dd><?= count($clases_planas) ?></dd></div>
-              <?php if (!empty($curso['modalidad'])): ?><div><dt>Modalidad</dt><dd><?= htmlspecialchars($curso['modalidad']) ?></dd></div><?php endif; ?>
-              <?php if (!empty($curso['duracion_horas'])): ?><div><dt>Duración</dt><dd><?= (int)$curso['duracion_horas'] ?> h</dd></div><?php endif; ?>
-            </dl>
           </section>
           <?php if (!empty($clases_planas)): ?>
             <nav class="course-lesson-nav" aria-label="Navegación de clases">
