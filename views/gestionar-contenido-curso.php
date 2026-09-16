@@ -33,10 +33,11 @@ $title = 'Contenido del curso';
 $description = 'Gestión de módulos, clases y recursos.';
 $cssPrefix = '..';
 $jsPrefix = '..';
+$bodyClass = 'course-builder-page';
 $activePage = 'panel-proveedor';
 include '../includes/header.php';
 ?>
-<main class="provider-editor course-editor">
+<main class="provider-editor course-editor course-builder">
   <header class="section-heading course-editor-heading">
     <div>
       <p class="course-eyebrow">Constructor de curso</p>
@@ -63,8 +64,10 @@ include '../includes/header.php';
       <a class="btn" href="panel-proveedor.php">Volver al panel</a>
     </nav>
 
+    <button class="btn btn-secondary course-structure-toggle" type="button" data-course-sidebar-toggle aria-expanded="false">Contenido del curso</button>
+
     <div class="course-editor-shell">
-      <aside class="course-editor-sidebar" aria-label="Estructura del curso">
+      <aside class="course-editor-sidebar" data-course-sidebar aria-label="Estructura del curso">
         <div class="course-sidebar-title">Estructura</div>
         <?php if (empty($contenido)): ?>
           <p class="course-empty-note">Este curso todavía no tiene módulos.</p>
@@ -91,6 +94,15 @@ include '../includes/header.php';
       </aside>
 
       <section class="course-editor-main" aria-label="Edicion del contenido">
+        <?php if (empty($contenido)): ?>
+          <div class="course-empty-state course-empty-state-hero">
+            <span class="course-empty-icon" aria-hidden="true">+</span>
+            <h2>Este curso todavía no tiene módulos.</h2>
+            <p>Empezá creando el primer módulo para organizar las clases y materiales que verá el alumno.</p>
+            <button class="btn btn-primary-action" type="button" data-dialog-open="dialog-agregar-modulo">+ Agregar primer módulo</button>
+          </div>
+        <?php endif; ?>
+
         <?php foreach ($contenido as $modulo): ?>
           <article class="course-editor-module" id="modulo-<?= (int)$modulo['id_modulo'] ?>">
             <header class="course-editor-module-header">
@@ -104,6 +116,12 @@ include '../includes/header.php';
                   <form method="POST"><?php campo_base_curso($id_publicacion); ?><input type="hidden" name="accion" value="<?= $accion ?>"><input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>"><button class="btn btn-sm" type="submit"><?= $texto ?></button></form>
                 <?php endforeach; ?>
                 <button class="btn btn-sm" type="button" data-dialog-open="dialog-editar-modulo-<?= (int)$modulo['id_modulo'] ?>">Editar</button>
+                <form method="POST" onsubmit="return confirm('¿Eliminar este módulo? También se eliminarán sus clases y recursos.');">
+                  <?php campo_base_curso($id_publicacion); ?>
+                  <input type="hidden" name="accion" value="eliminar_modulo">
+                  <input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>">
+                  <button class="btn-status btn-status-delete" type="submit">Eliminar</button>
+                </form>
               </div>
             </header>
 
@@ -125,15 +143,26 @@ include '../includes/header.php';
                         <form method="POST"><?php campo_base_curso($id_publicacion); ?><input type="hidden" name="accion" value="<?= $accion ?>"><input type="hidden" name="id_unidad" value="<?= (int)$unidad['id_unidad'] ?>"><button class="btn btn-sm" type="submit"><?= $texto ?></button></form>
                       <?php endforeach; ?>
                       <button class="btn btn-sm" type="button" data-dialog-open="dialog-editar-clase-<?= (int)$unidad['id_unidad'] ?>">Editar</button>
+                      <form method="POST" onsubmit="return confirm('¿Eliminar esta clase? También se eliminarán sus recursos asociados.');">
+                        <?php campo_base_curso($id_publicacion); ?>
+                        <input type="hidden" name="accion" value="eliminar_unidad">
+                        <input type="hidden" name="id_unidad" value="<?= (int)$unidad['id_unidad'] ?>">
+                        <button class="btn-status btn-status-delete" type="submit">Eliminar</button>
+                      </form>
                     </div>
                   </header>
 
                   <section class="course-resource-editor" aria-label="Recursos de la clase">
-                    <h4>Recursos</h4>
+                    <div class="course-resource-editor__header">
+                      <h4>Recursos</h4>
+                      <?php if (!empty($unidad['recursos'])): ?>
+                        <button class="btn btn-sm course-add-resource-btn" type="button" data-dialog-open="dialog-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">+ Agregar recurso</button>
+                      <?php endif; ?>
+                    </div>
                     <?php if (empty($unidad['recursos'])): ?>
                       <div class="course-empty-state course-empty-state-small">
                         <p>Esta clase todavía no tiene recursos.</p>
-                        <a class="btn btn-sm" href="#agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">Agregar recurso</a>
+                        <button class="btn btn-sm" type="button" data-dialog-open="dialog-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">+ Agregar recurso</button>
                       </div>
                     <?php else: ?>
                       <ul class="course-resource-list course-resource-list-editor">
@@ -149,13 +178,23 @@ include '../includes/header.php';
                                 <?php if ($r['archivo']): ?><a href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$r['id_recurso'] ?>">Descargar</a><?php endif; ?>
                               </div>
                             </div>
-                            <div class="course-actions course-actions-stack">
+                            <div class="course-actions course-resource-controls">
                               <?php foreach (['subir_recurso' => 'Subir', 'bajar_recurso' => 'Bajar'] as $accion => $texto): ?>
                                 <form method="POST"><?php campo_base_curso($id_publicacion); ?><input type="hidden" name="accion" value="<?= $accion ?>"><input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>"><button class="btn btn-sm" type="submit"><?= $texto ?></button></form>
                               <?php endforeach; ?>
+                              <button class="btn btn-sm" type="button" data-dialog-open="dialog-editar-recurso-<?= (int)$r['id_recurso'] ?>">Editar</button>
+                              <form method="POST" class="inline-form" onsubmit="return confirm('¿Eliminar este recurso?');">
+                                <?php campo_base_curso($id_publicacion); ?>
+                                <input type="hidden" name="accion" value="eliminar_recurso">
+                                <input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>">
+                                <button class="btn-status btn-status-delete" type="submit">Eliminar</button>
+                              </form>
                             </div>
-                            <details class="course-editor-panel course-resource-edit">
-                              <summary>Editar recurso</summary>
+                            <dialog class="course-dialog" id="dialog-editar-recurso-<?= (int)$r['id_recurso'] ?>" aria-labelledby="titulo-editar-recurso-<?= (int)$r['id_recurso'] ?>">
+                              <div class="course-dialog-header">
+                                <h2 id="titulo-editar-recurso-<?= (int)$r['id_recurso'] ?>">Editar recurso</h2>
+                                <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">×</button>
+                              </div>
                               <form method="POST" enctype="multipart/form-data" class="form-grid compact-form">
                                 <?php campo_base_curso($id_publicacion); ?>
                                 <input type="hidden" name="accion" value="editar_recurso">
@@ -167,22 +206,22 @@ include '../includes/header.php';
                                 <label>Reemplazar archivo<input type="file" name="archivo_recurso"></label>
                                 <label>Orden<input type="number" min="1" name="orden" value="<?= (int)$r['orden'] ?>"></label>
                                 <label class="form-grid-full">Descripción<textarea name="descripcion_recurso" rows="2"><?= htmlspecialchars($r['descripcion'] ?? '') ?></textarea></label>
-                                <button class="btn" type="submit">Guardar recurso</button>
+                                <div class="course-dialog-actions form-grid-full">
+                                  <button class="btn btn-secondary" type="button" data-dialog-close>Cancelar</button>
+                                  <button class="btn btn-primary-action" type="submit">Guardar recurso</button>
+                                </div>
                               </form>
-                            </details>
-                            <form method="POST" class="inline-form" onsubmit="return confirm('¿Eliminar este recurso?');">
-                              <?php campo_base_curso($id_publicacion); ?>
-                              <input type="hidden" name="accion" value="eliminar_recurso">
-                              <input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>">
-                              <button class="link-danger" type="submit">Eliminar</button>
-                            </form>
+                            </dialog>
                           </li>
                         <?php endforeach; ?>
                       </ul>
                     <?php endif; ?>
 
-                    <details class="course-editor-panel" id="agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">
-                      <summary>Agregar recurso</summary>
+                    <dialog class="course-dialog" id="dialog-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>" aria-labelledby="titulo-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">
+                      <div class="course-dialog-header">
+                        <h2 id="titulo-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">Agregar recurso</h2>
+                        <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">×</button>
+                      </div>
                       <form method="POST" enctype="multipart/form-data" class="form-grid compact-form">
                         <?php campo_base_curso($id_publicacion); ?>
                         <input type="hidden" name="accion" value="agregar_recurso">
@@ -193,29 +232,20 @@ include '../includes/header.php';
                         <label>Archivo<input type="file" name="archivo_recurso"></label>
                         <label>Orden<input type="number" min="1" name="orden" value="<?= count($unidad['recursos']) + 1 ?>"></label>
                         <label class="form-grid-full">Descripción<textarea name="descripcion_recurso" rows="2"></textarea></label>
-                        <button class="btn" type="submit">Agregar recurso</button>
+                        <div class="course-dialog-actions form-grid-full">
+                          <button class="btn btn-secondary" type="button" data-dialog-close>Cancelar</button>
+                          <button class="btn btn-primary-action" type="submit">Agregar recurso</button>
+                        </div>
                       </form>
-                    </details>
+                    </dialog>
                   </section>
 
-                  <form method="POST" class="course-delete-form" onsubmit="return confirm('¿Eliminar esta clase? También se eliminarán sus recursos asociados.');">
-                    <?php campo_base_curso($id_publicacion); ?>
-                    <input type="hidden" name="accion" value="eliminar_unidad">
-                    <input type="hidden" name="id_unidad" value="<?= (int)$unidad['id_unidad'] ?>">
-                    <button class="btn-status btn-status-delete" type="submit">Eliminar clase</button>
-                  </form>
                 </article>
               <?php endforeach; ?>
             </div>
 
             <button class="btn course-add-class-btn" type="button" data-dialog-open="dialog-agregar-clase-<?= (int)$modulo['id_modulo'] ?>">+ Agregar clase</button>
 
-            <form method="POST" class="course-delete-form" onsubmit="return confirm('¿Eliminar este módulo? También se eliminarán sus clases y recursos.');">
-              <?php campo_base_curso($id_publicacion); ?>
-              <input type="hidden" name="accion" value="eliminar_modulo">
-              <input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>">
-              <button class="btn-status btn-status-delete" type="submit">Eliminar módulo</button>
-            </form>
           </article>
 
           <dialog class="course-dialog" id="dialog-editar-modulo-<?= (int)$modulo['id_modulo'] ?>" aria-labelledby="titulo-editar-modulo-<?= (int)$modulo['id_modulo'] ?>">
@@ -301,4 +331,5 @@ include '../includes/header.php';
     </dialog>
   <?php endif; ?>
 </main>
+<script src="<?= $jsPrefix ?>/js/script.js" defer></script>
 <?php include '../includes/footer.php'; ?>
