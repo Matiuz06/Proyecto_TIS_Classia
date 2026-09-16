@@ -12,6 +12,7 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 $publicaciones_recientes = [];
+$categorias_home = [];
 
 try {
     $stmt_recientes = $pdo->prepare(
@@ -22,11 +23,21 @@ try {
          JOIN usuarios u ON p.id_usuario = u.id_usuario
          WHERE p.estado = 'Activo'
          ORDER BY p.fecha_creacion DESC
-         LIMIT 3"
+         LIMIT 4"
     );
     $stmt_recientes->execute();
     $publicaciones_recientes = $stmt_recientes->fetchAll();
+
+    $stmt_categorias = $pdo->prepare(
+        "SELECT nombre_categoria
+         FROM categorias
+         ORDER BY nombre_categoria ASC
+         LIMIT 12"
+    );
+    $stmt_categorias->execute();
+    $categorias_home = $stmt_categorias->fetchAll();
 } catch (PDOException $e) {
     error_log("Error al consultar publicaciones recientes en home: " . $e->getMessage());
     $publicaciones_recientes = [];
+    $categorias_home = [];
 }
