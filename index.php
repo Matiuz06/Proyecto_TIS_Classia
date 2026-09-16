@@ -13,10 +13,6 @@ include 'includes/header.php';
   <main>
     <section class="home-hero-centered motion-entry" aria-labelledby="hero-heading">
       <div class="home-hero-content">
-        <span class="home-badge-tag">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-          <?= __t('hero_badge') ?>
-        </span>
         <h1 id="hero-heading" class="home-hero-title">
           <?= __t('hero_title') ?>
         </h1>
@@ -45,25 +41,6 @@ include 'includes/header.php';
       </div>
     </section>
 
-    <div class="home-stats-strip">
-      <div class="stat-card-mini">
-        <span class="stat-card-number">45+</span>
-        <span class="stat-card-label"><?= __t('stat_courses') ?></span>
-      </div>
-      <div class="stat-card-mini">
-        <span class="stat-card-number">1.2K+</span>
-        <span class="stat-card-label"><?= __t('stat_students') ?></span>
-      </div>
-      <div class="stat-card-mini">
-        <span class="stat-card-number">100%</span>
-        <span class="stat-card-label"><?= __t('stat_instructors') ?></span>
-      </div>
-      <div class="stat-card-mini">
-        <span class="stat-card-number">4.9 / 5</span>
-        <span class="stat-card-label"><?= __t('stat_satisfaction') ?></span>
-      </div>
-    </div>
-
     <section class="home-section" aria-labelledby="categorias-heading">
       <div class="home-section-header">
         <div>
@@ -73,6 +50,25 @@ include 'includes/header.php';
         <a href="views/catalogo.php" class="link u-font-semibold u-text-xs"><?= __t('sec_view_all') ?></a>
       </div>
 
+      <?php if (!empty($categorias_home)): ?>
+        <nav class="home-category-bar" aria-label="Categorías destacadas">
+          <?php foreach ($categorias_home as $categoria): ?>
+            <?php $nombre_categoria = (string)$categoria['nombre_categoria']; ?>
+            <a href="views/catalogo.php?categoria=<?= rawurlencode($nombre_categoria) ?>" class="home-category-item">
+              <span aria-hidden="true"></span>
+              <?= htmlspecialchars(__t_db($nombre_categoria), ENT_QUOTES, 'UTF-8') ?>
+            </a>
+          <?php endforeach; ?>
+        </nav>
+      <?php else: ?>
+        <nav class="home-category-bar" aria-label="Categorías destacadas">
+          <a href="views/catalogo.php" class="home-category-item">
+            <span aria-hidden="true"></span>
+            <?= __t('sec_view_all') ?>
+          </a>
+        </nav>
+      <?php endif; ?>
+      <?php if (false): ?>
       <div class="home-carousel-container">
         <div class="home-carousel-track" id="categories-carousel" tabindex="0" role="region" aria-label="Carrusel de categorías">
           <a href="views/catalogo.php?categoria=Programacion" class="home-category-card">
@@ -124,6 +120,7 @@ include 'includes/header.php';
           </a>
         </div>
       </div>
+      <?php endif; ?>
     </section>
 
     <section class="home-section" aria-labelledby="recientes-heading">
@@ -135,7 +132,7 @@ include 'includes/header.php';
         <a href="views/catalogo.php" class="link u-font-semibold u-text-xs"><?= __t('btn_view_catalog') ?> &rarr;</a>
       </div>
 
-      <div class="grid grid-3">
+      <div class="home-course-grid">
         <?php if (!empty($publicaciones_recientes)): ?>
           <?php 
             $default_covers = [
@@ -150,7 +147,7 @@ include 'includes/header.php';
               $cover_src = !empty($pub['imagen']) ? $pub['imagen'] : ($default_covers[$idx % count($default_covers)]);
               $idx++;
             ?>
-            <article class="content-card motion-card content-card--column">
+            <article class="content-card motion-card content-card--column home-course-card">
               <div>
                 <div class="card-media-wrapper">
                   <img src="<?= htmlspecialchars($cover_src) ?>" alt="<?= htmlspecialchars($pub['titulo']) ?>" class="card-media-img" loading="lazy" />
@@ -177,7 +174,7 @@ include 'includes/header.php';
                 </div>
               </div>
 
-              <div class="u-mt-md">
+              <div class="home-card-action-row">
                 <?php if ($pub['tipo'] === 'Curso'): ?>
                   <a href="views/curso.php?id=<?= (int)$pub['id_publicacion'] ?>" class="btn btn-full btn-card-action">
                     <?= __t('btn_view_details') ?>
@@ -192,7 +189,7 @@ include 'includes/header.php';
           <?php endforeach; ?>
         <?php else: ?>
 
-          <article class="content-card motion-card">
+          <article class="content-card motion-card home-course-card">
             <div class="card-media-wrapper">
               <img src="assets/images/cybersecurity_lab.jpg" alt="Seguridad Web" class="card-media-img" loading="lazy" />
             </div>
@@ -202,7 +199,7 @@ include 'includes/header.php';
             <p class="role-card-action"><a href="views/catalogo.php" class="link"><?= __t('btn_view_catalog') ?> &rarr;</a></p>
           </article>
 
-          <article class="content-card motion-card">
+          <article class="content-card motion-card home-course-card">
             <div class="card-media-wrapper">
               <img src="assets/images/printing3d_lab.jpg" alt="Impresión 3D" class="card-media-img" loading="lazy" />
             </div>
@@ -212,7 +209,7 @@ include 'includes/header.php';
             <p class="role-card-action"><a href="views/catalogo.php" class="link"><?= __t('btn_view_catalog') ?> &rarr;</a></p>
           </article>
 
-          <article class="content-card motion-card">
+          <article class="content-card motion-card home-course-card">
             <div class="card-media-wrapper">
               <img src="assets/images/tech_conference.jpg" alt="Auditoría de Código" class="card-media-img" loading="lazy" />
             </div>
@@ -223,6 +220,15 @@ include 'includes/header.php';
           </article>
         <?php endif; ?>
       </div>
+    </section>
+
+    <section class="home-section home-provider-cta" aria-labelledby="proveedores-heading">
+      <div>
+        <p class="section-title-tag-sm">Docentes y proveedores</p>
+        <h2 id="proveedores-heading">Enseñá o brindá servicios desde Classia</h2>
+        <p>Publicá cursos, mentorías o servicios educativos y tecnológicos en el mismo entorno donde los estudiantes descubren nuevas oportunidades.</p>
+      </div>
+      <a href="views/solicitar-docente.php" class="btn">Postularme como docente</a>
     </section>
 
     <section class="home-section" aria-labelledby="noticias-heading">
@@ -366,7 +372,7 @@ include 'includes/header.php';
       <div class="home-testimonials-grid">
         <div class="testimonial-card">
           <div>
-            <div class="rating-stars" aria-label="5 de 5 estrellas">
+            <div class="rating-stars" hidden aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -388,7 +394,7 @@ include 'includes/header.php';
 
         <div class="testimonial-card">
           <div>
-            <div class="rating-stars" aria-label="5 de 5 estrellas">
+            <div class="rating-stars" hidden aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -410,7 +416,7 @@ include 'includes/header.php';
 
         <div class="testimonial-card">
           <div>
-            <div class="rating-stars" aria-label="5 de 5 estrellas">
+            <div class="rating-stars" hidden aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -481,7 +487,7 @@ include 'includes/header.php';
       </div>
     </section>
 
-    <section class="home-section u-mb-3xl" aria-labelledby="tech-heading">
+    <section class="home-section" aria-labelledby="tech-heading">
       <div class="home-tech-strip">
         <p class="trusted-label"><?= __t('sec_tech_stack') ?></p>
         <div class="home-tech-grid">
@@ -529,6 +535,7 @@ include 'includes/header.php';
         </div>
       </div>
     </section>
+
   </main>
 
 <?php
