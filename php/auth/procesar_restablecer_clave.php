@@ -38,8 +38,9 @@ if ($token_reset !== '') {
     }
 
     try {
+        $token_hash = hash('sha256', $token_reset);
         $stmt = $pdo->prepare('SELECT id_usuario FROM usuarios WHERE password_reset_token = :token AND password_reset_expira > NOW() LIMIT 1');
-        $stmt->execute(['token' => $token_reset]);
+        $stmt->execute(['token' => $token_hash]);
         $usuario = $stmt->fetch();
 
         if (!$usuario) {
@@ -85,11 +86,12 @@ try {
 
     if ($usuario) {
         $token_generado = bin2hex(random_bytes(32));
+        $token_hash = hash('sha256', $token_generado);
         $expira = date('Y-m-d H:i:s', time() + 3600);
 
         $stmt_up = $pdo->prepare('UPDATE usuarios SET password_reset_token = :token, password_reset_expira = :expira WHERE id_usuario = :id');
         $stmt_up->execute([
-            'token' => $token_generado,
+            'token' => $token_hash,
             'expira' => $expira,
             'id' => (int) $usuario['id_usuario'],
         ]);

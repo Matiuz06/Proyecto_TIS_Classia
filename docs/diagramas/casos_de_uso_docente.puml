@@ -1,0 +1,64 @@
+@startuml casos_de_uso_docente
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 12
+skinparam defaultFontColor #2D3748
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    ArrowColor #3182CE
+    BorderColor #2B6CB0
+    HeaderBackgroundColor #EBF8FF
+}
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+}
+skinparam sequence {
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+    ParticipantBorderColor #2B6CB0
+    ParticipantBackgroundColor #EBF8FF
+    LifeLineBorderColor #4A5568
+    LifeLineBackgroundColor #EDF2F7
+    ArrowColor #2B6CB0
+}
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+}
+
+title Casos de Uso: Perfil Docente / Proveedor — Classia
+
+left to right direction
+actor "Docente / Proveedor" as Docente
+
+rectangle "Módulos de Docente" {
+  usecase "Crear Publicación (Curso/Servicio)" as UC1
+  usecase "Editar Información de Oferta" as UC2
+  usecase "Gestionar Estados (Pausar/Activar)" as UC3
+  usecase "Estructurar Módulos y Unidades" as UC4
+  usecase "Subir Archivos y Enlaces (Supabase)" as UC5
+  usecase "Revisar y Cotizar Solicitudes" as UC6
+  usecase "Chatear con Clientes en Solicitudes" as UC7
+  usecase "Gestionar Perfil Profesional" as UC8
+  usecase "Consultar Ingresos y Valoraciones" as UC9
+}
+
+Docente --> UC1
+Docente --> UC2
+Docente --> UC3
+Docente --> UC4
+Docente --> UC5
+Docente --> UC6
+Docente --> UC7
+Docente --> UC8
+Docente --> UC9
+@enduml

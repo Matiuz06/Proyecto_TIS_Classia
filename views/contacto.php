@@ -15,11 +15,8 @@ include '../includes/header.php';
 
     <header>
       <p>AniTech S.A.</p>
-      <h1>Contacto</h1>
-      <p>
-        ¿Tenés alguna consulta, sugerencia o necesitás asistencia con la plataforma?
-        Estamos disponibles para ayudarte.
-      </p>
+      <h1><?= __t('contact_heading') ?></h1>
+      <p><?= __t('contact_sub') ?></p>
     </header>
 
     <div class="contact-layout">
@@ -28,7 +25,7 @@ include '../includes/header.php';
       <section class="contact-cards" aria-label="Canales de contacto">
 
         <article class="contact-card">
-          <h2 class="contact-card__title">Dirección</h2>
+          <h2 class="contact-card__title"><?= __t('contact_address') ?></h2>
           <p class="contact-card__body">
             Florencio Sánchez 389<br>
             Salto, Uruguay
@@ -36,21 +33,21 @@ include '../includes/header.php';
         </article>
 
         <article class="contact-card">
-          <h2 class="contact-card__title">Teléfono</h2>
+          <h2 class="contact-card__title"><?= __t('contact_phone') ?></h2>
           <p class="contact-card__body">
             <a href="tel:+59847333530">+598 4733 3530</a>
           </p>
         </article>
 
         <article class="contact-card">
-          <h2 class="contact-card__title">Correo general</h2>
+          <h2 class="contact-card__title"><?= __t('contact_email') ?></h2>
           <p class="contact-card__body">
             <a href="mailto:anitechsa2026@gmail.com">anitechsa2026@gmail.com</a>
           </p>
         </article>
 
         <article class="contact-card">
-          <h2 class="contact-card__title">Privacidad de datos</h2>
+          <h2 class="contact-card__title"><?= __t('contact_privacy') ?></h2>
           <p class="contact-card__body">
             Para consultas sobre el manejo de tus datos personales (Ley 18.331):<br>
             <a href="mailto:privacidad@classia.uy">privacidad@classia.uy</a>
@@ -58,7 +55,7 @@ include '../includes/header.php';
         </article>
 
         <article class="contact-card">
-          <h2 class="contact-card__title">Seguridad</h2>
+          <h2 class="contact-card__title"><?= __t('contact_security') ?></h2>
           <p class="contact-card__body">
             Para reportar vulnerabilidades de forma responsable:<br>
             <a href="mailto:seguridad@anitech.com">seguridad@anitech.com</a>
@@ -69,10 +66,8 @@ include '../includes/header.php';
 
       <!-- Formulario -->
       <section class="contact-form-wrap" aria-label="Formulario de contacto">
-        <h2 class="contact-form-wrap__title">Envianos un mensaje</h2>
-        <p class="contact-form-wrap__subtitle">
-          Respondemos consultas generales en un plazo de <strong>2 días hábiles</strong>.
-        </p>
+        <h2 class="contact-form-wrap__title"><?= __t('contact_form_title') ?></h2>
+        <p class="contact-form-wrap__subtitle"><?= __t('contact_form_sub') ?></p>
 
         <form
           class="contact-form"

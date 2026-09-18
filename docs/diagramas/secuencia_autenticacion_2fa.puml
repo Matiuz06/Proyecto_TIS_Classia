@@ -1,0 +1,84 @@
+@startuml secuencia_autenticacion_2fa
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 12
+skinparam defaultFontColor #2D3748
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    ArrowColor #3182CE
+    BorderColor #2B6CB0
+    HeaderBackgroundColor #EBF8FF
+}
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+}
+skinparam sequence {
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+    ParticipantBorderColor #2B6CB0
+    ParticipantBackgroundColor #EBF8FF
+    LifeLineBorderColor #4A5568
+    LifeLineBackgroundColor #EDF2F7
+    ArrowColor #2B6CB0
+}
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+}
+
+title Diagrama de Secuencia: Inicio de Sesión y Verificación 2FA
+
+autonumber
+actor "Usuario" as User
+boundary "Vista: login.php" as ViewLogin
+boundary "Vista: verificar-2fa.php" as View2FA
+control "php/auth/procesar_login.php" as C_Login
+control "php/auth/totp_helper.php" as C_TOTP
+entity "Base de Datos (MySQL)" as DB
+
+User -> ViewLogin: Ingresa email y contraseña
+ViewLogin -> C_Login: POST (email, password)
+activate C_Login
+
+C_Login -> DB: SELECT * FROM usuarios WHERE email = :email
+DB --> C_Login: Registro de usuario
+
+alt Credenciales inválidas
+  C_Login --> ViewLogin: Redirige con error ("Credenciales incorrectas")
+  ViewLogin --> User: Muestra banner de error
+else Credenciales válidas
+  C_Login -> C_Login: password_verify(password, hash)
+  
+  alt 2FA está deshabilitado
+    C_Login -> C_Login: session_regenerate_id() & inicializar sesión
+    C_Login --> ViewLogin: Redirige a catálogo / panel
+    ViewLogin --> User: Acceso concedido
+  else 2FA activo
+    C_Login -> C_Login: Guardar 2FA_PENDING en sesión
+    C_Login --> View2FA: Redirige a verificación 2FA
+    deactivate C_Login
+    
+    User -> View2FA: Ingresa código 6 dígitos
+    View2FA -> C_TOTP: POST verificar código TOTP
+    activate C_TOTP
+    C_TOTP -> C_TOTP: Validar TOTP(secreto, codigo)
+    
+    alt Código correcto
+      C_TOTP -> C_TOTP: session_regenerate_id() & autenticar
+      C_TOTP --> User: Redirige al panel correspondiente
+    else Código incorrecto
+      C_TOTP --> View2FA: Retorna error de token inválido
+      deactivate C_TOTP
+    end
+  end
+end
+@enduml
