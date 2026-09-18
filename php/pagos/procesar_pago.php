@@ -105,13 +105,12 @@ try {
         'id_contratacion'  => $id_contratacion,
     ]);
 
-    $stmt_tipo = $pdo->prepare("SELECT COUNT(*) FROM detalles_contratacion dc JOIN publicaciones p ON p.id_publicacion=dc.id_publicacion WHERE dc.id_contratacion=:id AND p.tipo='Servicio'");
-    $stmt_tipo->execute(['id'=>$id_contratacion]);
-    $tieneServicio=((int)$stmt_tipo->fetchColumn())>0;
-    $nuevoEstado=$tieneServicio?'En Proceso':'Completada';
-    $stmt_up_con=$pdo->prepare("UPDATE contrataciones SET estado=:estado WHERE id_contratacion=:id");
-    $stmt_up_con->execute(['estado'=>$nuevoEstado,'id'=>$id_contratacion]);
-    if($tieneServicio){$stmt_sol=$pdo->prepare("UPDATE solicitudes SET estado='En Proceso' WHERE id_contratacion=:id AND estado='Aceptada'");$stmt_sol->execute(['id'=>$id_contratacion]);}
+    $stmt_up_con = $pdo->prepare("UPDATE contrataciones SET estado = 'En Proceso' WHERE id_contratacion = :id");
+    $stmt_up_con->execute(['id' => $id_contratacion]);
+    if ($tieneServicio) {
+        $stmt_sol = $pdo->prepare("UPDATE solicitudes SET estado = 'En Proceso' WHERE id_contratacion = :id AND estado = 'Aceptada'");
+        $stmt_sol->execute(['id' => $id_contratacion]);
+    }
 
     $pdo->commit();
 
