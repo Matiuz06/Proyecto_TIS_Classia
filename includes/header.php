@@ -45,8 +45,8 @@ $cartCount = count($cartItems);
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="<?= htmlspecialchars($description) ?>" />
   <title><?= htmlspecialchars($title) ?></title>
-  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/animation.css" />
-  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/style.css" />
+  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/animation.css?v=<?= filemtime(__DIR__ . '/../css/animation.css') ?>" />
+  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/style.css?v=<?= filemtime(__DIR__ . '/../css/style.css') ?>" />
   <link rel="icon" type="image/png" href="<?= $cssPrefix ?>/assets/images/favicon.png" />
 </head>
 <body<?= ($bodyClass ?? '') ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?>>
@@ -59,6 +59,7 @@ $cartCount = count($cartItems);
         <a href="<?= $indexHref ?>"<?= $activePage === 'inicio' ? ' aria-current="page"' : '' ?>><?= __t('nav_inicio') ?></a>
         <a href="<?= $catalogoHref ?>"<?= $activePage === 'catalogo' ? ' aria-current="page"' : '' ?>><?= __t('nav_catalogo') ?></a>
         
+        <?php if ($isAuth): ?>
         <a href="<?= $carritoHref ?>" class="nav-cart-btn<?= $activePage === 'carrito' ? ' active' : '' ?>" aria-label="<?= __t('nav_carrito') ?> (<?= $cartCount ?> items)">
           <svg class="nav-cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="9" cy="21" r="1"></circle>
@@ -70,6 +71,7 @@ $cartCount = count($cartItems);
             <span class="nav-cart-badge" id="cart-item-count"><?= $cartCount ?></span>
           <?php endif; ?>
         </a>
+        <?php endif; ?>
 
 
         <?php if (!$isAuth): ?>

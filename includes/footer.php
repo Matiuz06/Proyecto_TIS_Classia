@@ -65,5 +65,6 @@ $accesibilidadHref = ($cssPrefix === '.') ? 'views/politica-accesibilidad.php' :
       <p>&copy; <?= date('Y') ?> Classia &middot; AniTech S.A. <?= __t('footer_rights') ?></p>
     </div>
   </footer>
+  <script src="<?= $jsPrefix ?>/js/script.js?v=<?= filemtime(__DIR__ . '/../js/script.js') ?>" defer></script>
 </body>
 </html>
