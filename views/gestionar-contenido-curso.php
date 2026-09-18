@@ -200,12 +200,40 @@ include '../includes/header.php';
                                 <input type="hidden" name="accion" value="editar_recurso">
                                 <input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>">
                                 <input type="hidden" name="id_unidad" value="<?= (int)$unidad['id_unidad'] ?>">
-                                <label>Título<input name="titulo_recurso" value="<?= htmlspecialchars($r['titulo']) ?>" required maxlength="180"></label>
-                                <label>Tipo<select name="tipo_recurso"><?php foreach (tipos_recurso_curso() as $tipoR): ?><option value="<?= $tipoR ?>" <?= $r['tipo'] === $tipoR ? 'selected' : '' ?>><?= $tipoR ?></option><?php endforeach; ?></select></label>
-                                <label>URL<input type="url" name="url_recurso" value="<?= htmlspecialchars($r['url'] ?? '') ?>" placeholder="https://..."></label>
-                                <label>Reemplazar archivo<input type="file" name="archivo_recurso"></label>
-                                <label>Orden<input type="number" min="1" name="orden" value="<?= (int)$r['orden'] ?>"></label>
-                                <label class="form-grid-full">Descripción<textarea name="descripcion_recurso" rows="2"><?= htmlspecialchars($r['descripcion'] ?? '') ?></textarea></label>
+                                <label class="form-grid-full">Tipo de recurso
+                                  <select name="tipo_recurso" data-resource-type-select>
+                                    <?php foreach (tipos_recurso_curso() as $tipoR): ?>
+                                      <option value="<?= $tipoR ?>" <?= $r['tipo'] === $tipoR ? 'selected' : '' ?>>
+                                        <?= match($tipoR) {
+                                          'Archivo' => 'Archivo (Documentos, PDFs, ZIPs)',
+                                          'Foro' => 'Foro (Debate y consultas)',
+                                          'Entrega de Tareas' => 'Entrega de Tareas (Consigna y TP)',
+                                          'Video' => 'Video (YouTube o subido)',
+                                          'PDF' => 'PDF',
+                                          'Imagen' => 'Imagen',
+                                          'Enlace' => 'Enlace externo',
+                                          default => $tipoR
+                                        } ?>
+                                      </option>
+                                    <?php endforeach; ?>
+                                  </select>
+                                </label>
+                                <p class="course-type-hint form-grid-full" data-resource-hint></p>
+                                <label class="form-grid-full">Título / Nombre
+                                  <input name="titulo_recurso" value="<?= htmlspecialchars($r['titulo']) ?>" required maxlength="180">
+                                </label>
+                                <label data-field-container="url">URL o Enlace
+                                  <input type="url" name="url_recurso" value="<?= htmlspecialchars($r['url'] ?? '') ?>" placeholder="https://...">
+                                </label>
+                                <label data-field-container="archivo">Reemplazar archivo
+                                  <input type="file" name="archivo_recurso">
+                                </label>
+                                <label data-field-container="orden">Orden
+                                  <input type="number" min="1" name="orden" value="<?= (int)$r['orden'] ?>">
+                                </label>
+                                <label class="form-grid-full" data-field-container="descripcion">Consigna / Descripción
+                                  <textarea name="descripcion_recurso" rows="3"><?= htmlspecialchars($r['descripcion'] ?? '') ?></textarea>
+                                </label>
                                 <div class="course-dialog-actions form-grid-full">
                                   <button class="btn btn-secondary" type="button" data-dialog-close>Cancelar</button>
                                   <button class="btn btn-primary-action" type="submit">Guardar recurso</button>
@@ -219,19 +247,47 @@ include '../includes/header.php';
 
                     <dialog class="course-dialog" id="dialog-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>" aria-labelledby="titulo-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">
                       <div class="course-dialog-header">
-                        <h2 id="titulo-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">Agregar recurso</h2>
+                        <h2 id="titulo-agregar-recurso-<?= (int)$unidad['id_unidad'] ?>">Agregar recurso o actividad</h2>
                         <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">×</button>
                       </div>
                       <form method="POST" enctype="multipart/form-data" class="form-grid compact-form">
                         <?php campo_base_curso($id_publicacion); ?>
                         <input type="hidden" name="accion" value="agregar_recurso">
                         <input type="hidden" name="id_unidad" value="<?= (int)$unidad['id_unidad'] ?>">
-                        <label>Título<input name="titulo_recurso" required maxlength="180"></label>
-                        <label>Tipo<select name="tipo_recurso"><?php foreach (tipos_recurso_curso() as $tipoR): ?><option value="<?= $tipoR ?>"><?= $tipoR ?></option><?php endforeach; ?></select></label>
-                        <label>URL<input type="url" name="url_recurso" placeholder="https://..."></label>
-                        <label>Archivo<input type="file" name="archivo_recurso"></label>
-                        <label>Orden<input type="number" min="1" name="orden" value="<?= count($unidad['recursos']) + 1 ?>"></label>
-                        <label class="form-grid-full">Descripción<textarea name="descripcion_recurso" rows="2"></textarea></label>
+                        <label class="form-grid-full">Tipo de recurso
+                          <select name="tipo_recurso" data-resource-type-select>
+                            <?php foreach (tipos_recurso_curso() as $tipoR): ?>
+                              <option value="<?= $tipoR ?>">
+                                <?= match($tipoR) {
+                                  'Archivo' => 'Archivo (Documentos, PDFs, ZIPs)',
+                                  'Foro' => 'Foro (Debate y consultas)',
+                                  'Entrega de Tareas' => 'Entrega de Tareas (Consigna y TP)',
+                                  'Video' => 'Video (YouTube o subido)',
+                                  'PDF' => 'PDF',
+                                  'Imagen' => 'Imagen',
+                                  'Enlace' => 'Enlace externo',
+                                  default => $tipoR
+                                } ?>
+                              </option>
+                            <?php endforeach; ?>
+                          </select>
+                        </label>
+                        <p class="course-type-hint form-grid-full" data-resource-hint></p>
+                        <label class="form-grid-full">Título / Nombre
+                          <input name="titulo_recurso" placeholder="Ej: Guía de ejercicios / Consigna TP 1" required maxlength="180">
+                        </label>
+                        <label data-field-container="url">URL o Enlace
+                          <input type="url" name="url_recurso" placeholder="https://...">
+                        </label>
+                        <label data-field-container="archivo">Archivo adjunto
+                          <input type="file" name="archivo_recurso">
+                        </label>
+                        <label data-field-container="orden">Orden
+                          <input type="number" min="1" name="orden" value="<?= count($unidad['recursos']) + 1 ?>">
+                        </label>
+                        <label class="form-grid-full" data-field-container="descripcion">Consigna / Descripción
+                          <textarea name="descripcion_recurso" rows="3" placeholder="Detallá la descripción, consigna o pautas para los estudiantes..."></textarea>
+                        </label>
                         <div class="course-dialog-actions form-grid-full">
                           <button class="btn btn-secondary" type="button" data-dialog-close>Cancelar</button>
                           <button class="btn btn-primary-action" type="submit">Agregar recurso</button>
