@@ -100,11 +100,29 @@ include '../includes/header.php';
               <ol class="course-lesson-list">
                 <?php foreach ($modulo['unidades'] as $unidad): ?>
                   <?php $activa = $item_actual && (int)$item_actual['unidad']['id_unidad'] === (int)$unidad['id_unidad']; ?>
-                  <li>
+                  <li class="course-lesson-item<?= $activa ? ' is-active' : '' ?>">
                     <a class="course-lesson-link<?= $activa ? ' is-active' : '' ?>" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$unidad['id_unidad'] ?>" <?= $activa ? 'aria-current="page"' : '' ?>>
-                      <span><?= (int)$modulo['orden'] ?>.<?= (int)$unidad['orden'] ?></span>
-                      <?= htmlspecialchars($unidad['titulo']) ?>
+                      <span class="course-lesson-code"><?= (int)$modulo['orden'] ?>.<?= (int)$unidad['orden'] ?></span>
+                      <span class="course-lesson-title"><?= htmlspecialchars($unidad['titulo']) ?></span>
                     </a>
+                    <?php if (!empty($unidad['recursos'])): ?>
+                      <ul class="course-subresource-list" aria-label="Recursos de <?= htmlspecialchars($unidad['titulo']) ?>">
+                        <?php foreach ($unidad['recursos'] as $idxR => $rec): ?>
+                          <?php 
+                            $subCodigo = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($idxR + 1);
+                            $emoji = icono_emoji_recurso($rec['tipo']);
+                            $hrefRec = $activa ? ('#recurso-' . (int)$rec['id_recurso']) : ('curso.php?id=' . (int)$curso['id_publicacion'] . '&unidad=' . (int)$unidad['id_unidad'] . '#recurso-' . (int)$rec['id_recurso']);
+                          ?>
+                          <li class="course-subresource-item">
+                            <a class="course-subresource-link" href="<?= $hrefRec ?>" title="<?= htmlspecialchars($rec['titulo']) ?> (<?= htmlspecialchars($rec['tipo']) ?>)">
+                              <span class="course-subresource-code"><?= $subCodigo ?></span>
+                              <span class="course-subresource-icon" aria-hidden="true"><?= $emoji ?></span>
+                              <span class="course-subresource-text"><?= htmlspecialchars($rec['titulo']) ?></span>
+                            </a>
+                          </li>
+                        <?php endforeach; ?>
+                      </ul>
+                    <?php endif; ?>
                   </li>
                 <?php endforeach; ?>
               </ol>
@@ -133,15 +151,24 @@ include '../includes/header.php';
             <span class="course-kicker"><?= htmlspecialchars($curso['titulo']) ?></span>
             <p><?= (int)$modulo['orden'] ?>. <?= htmlspecialchars($modulo['titulo']) ?></p>
             <h1><?= htmlspecialchars($unidad['titulo']) ?></h1>
+
           </header>
           <section class="course-lesson-body">
             <?php 
               $videos_clase = array_filter($unidad['recursos'] ?? [], fn($r) => $r['tipo'] === 'Video');
             ?>
             <?php if (!empty($videos_clase)): ?>
-              <?php foreach ($videos_clase as $vid): ?>
-                <?php $ytEmbed = !empty($vid['url']) ? obtener_youtube_embed_url($vid['url']) : null; ?>
-                <div class="course-video-wrapper u-mb-md">
+              <?php foreach ($videos_clase as $idxV => $vid): ?>
+                <?php 
+                  $posRecurso = array_search($vid['id_recurso'], array_column($unidad['recursos'], 'id_recurso'));
+                  $codVid = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($posRecurso !== false ? $posRecurso + 1 : $idxV + 1);
+                  $ytEmbed = !empty($vid['url']) ? obtener_youtube_embed_url($vid['url']) : null; 
+                ?>
+                <div class="course-video-wrapper u-mb-md" id="recurso-<?= (int)$vid['id_recurso'] ?>">
+                  <div class="course-video-header u-mb-xs">
+                    <span class="course-resource-code"><?= $codVid ?></span>
+                    <strong>🎥 <?= htmlspecialchars($vid['titulo']) ?></strong>
+                  </div>
                   <?php if ($ytEmbed): ?>
                     <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-md);background:#000;box-shadow:var(--shadow-sm);">
                       <iframe src="<?= htmlspecialchars($ytEmbed) ?>" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
@@ -173,12 +200,19 @@ include '../includes/header.php';
               <div class="course-empty-state"><p>Esta clase todavía no tiene recursos.</p></div>
             <?php else: ?>
               <ul class="course-resource-list">
-                <?php foreach ($unidad['recursos'] as $recurso): ?>
-                  <li class="course-resource course-resource--<?= strtolower(str_replace(' ', '-', $recurso['tipo'])) ?>">
-                    <span class="course-resource-icon" aria-hidden="true"><?= htmlspecialchars(icono_recurso_curso($recurso['tipo'])) ?></span>
+                <?php foreach ($unidad['recursos'] as $idxRec => $recurso): ?>
+                  <?php 
+                    $codRec = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($idxRec + 1);
+                    $emoji = icono_emoji_recurso($recurso['tipo']);
+                  ?>
+                  <li class="course-resource course-resource--<?= strtolower(str_replace(' ', '-', $recurso['tipo'])) ?>" id="recurso-<?= (int)$recurso['id_recurso'] ?>">
+                    <span class="course-resource-icon" aria-hidden="true"><?= $emoji ?></span>
                     <div>
-                      <strong><?= htmlspecialchars($recurso['titulo']) ?></strong>
-                      <span class="course-resource-tag"><?= htmlspecialchars($recurso['tipo']) ?></span>
+                      <div class="course-resource-title-row">
+                        <span class="course-resource-code"><?= $codRec ?></span>
+                        <strong><?= htmlspecialchars($recurso['titulo']) ?></strong>
+                        <span class="course-resource-tag"><?= htmlspecialchars($recurso['tipo']) ?></span>
+                      </div>
                       <?php if (!empty($recurso['descripcion'])): ?><p><?= nl2br(htmlspecialchars($recurso['descripcion'])) ?></p><?php endif; ?>
                       <div class="course-resource-actions">
                         <?php if (!empty($recurso['url']) && $recurso['tipo'] !== 'Foro'): ?>
@@ -186,18 +220,37 @@ include '../includes/header.php';
                             <?= match($recurso['tipo']) {
                               'Entrega de Tareas' => '🔗 Ver consigna externa',
                               'Video' => '🎥 Ver video',
-                              default => 'Abrir enlace'
+                              default => '🔗 Abrir enlace'
                             } ?>
                           </a>
                         <?php endif; ?>
                         <?php if (!empty($recurso['archivo'])): ?>
-                          <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>">
-                            <?= match($recurso['tipo']) {
-                              'Entrega de Tareas' => '📥 Descargar consigna',
-                              'Video' => '🎥 Descargar video',
-                              default => 'Descargar archivo'
-                            } ?>
-                          </a>
+                          <?php $esVisualizable = recurso_es_visualizable_nativamente($recurso['tipo'], $recurso['archivo']); ?>
+                          <?php if ($esVisualizable): ?>
+                            <button class="btn btn-sm btn-primary-action" type="button" data-dialog-open="dialog-doc-<?= (int)$recurso['id_recurso'] ?>">
+                              <?= match($recurso['tipo']) {
+                                'PDF' => 'Leer documento PDF',
+                                'Imagen' => 'Ver imagen',
+                                'Entrega de Tareas' => 'Ver consigna',
+                                default => 'Leer documento'
+                              } ?>
+                            </button>
+                            <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=descargar">
+                              <?= match($recurso['tipo']) {
+                                'Entrega de Tareas' => '📥 Descargar consigna',
+                                'Video' => '🎥 Descargar video',
+                                default => '📥 Descargar'
+                              } ?>
+                            </a>
+                          <?php else: ?>
+                            <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=descargar">
+                              <?= match($recurso['tipo']) {
+                                'Entrega de Tareas' => '📥 Descargar consigna',
+                                'Video' => '🎥 Descargar video',
+                                default => '📥 Descargar archivo'
+                              } ?>
+                            </a>
+                          <?php endif; ?>
                         <?php endif; ?>
                         <?php if ($recurso['tipo'] === 'Foro'): ?>
                           <?php $msgs = $mensajes_foro[$recurso['id_recurso']] ?? []; ?>
@@ -228,7 +281,7 @@ include '../includes/header.php';
                       <dialog class="course-dialog" id="dialog-foro-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-foro-<?= (int)$recurso['id_recurso'] ?>">
                         <div class="course-dialog-header">
                           <h2 id="titulo-dialog-foro-<?= (int)$recurso['id_recurso'] ?>">💬 Foro de debate: <?= htmlspecialchars($recurso['titulo']) ?></h2>
-                          <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">×</button>
+                          <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
                         </div>
                         <div class="course-dialog-body">
                           <?php if (!empty($recurso['descripcion'])): ?>
@@ -280,12 +333,38 @@ include '../includes/header.php';
                       </dialog>
                     <?php endif; ?>
 
+                    <?php if (!empty($recurso['archivo']) && recurso_es_visualizable_nativamente($recurso['tipo'], $recurso['archivo'])): ?>
+                      <dialog class="course-dialog course-dialog--doc-viewer" id="dialog-doc-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-doc-<?= (int)$recurso['id_recurso'] ?>">
+                        <div class="course-dialog-header">
+                          <h2 id="titulo-dialog-doc-<?= (int)$recurso['id_recurso'] ?>">📄 <?= htmlspecialchars($recurso['titulo']) ?></h2>
+                          <div class="course-dialog-header-actions">
+                            <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=inline" target="_blank" rel="noopener" title="Abrir en pestaña completa">⛶ Pantalla completa</a>
+                            <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=descargar" title="Descargar archivo">📥 Descargar</a>
+                            <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
+                          </div>
+                        </div>
+                        <div class="course-dialog-body course-dialog-body--viewer">
+                          <?php if (!empty($recurso['descripcion'])): ?>
+                            <p class="course-doc-viewer__desc"><?= nl2br(htmlspecialchars($recurso['descripcion'])) ?></p>
+                          <?php endif; ?>
+                          <div class="course-doc-viewer__frame-wrap">
+                            <iframe 
+                              src="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=inline" 
+                              class="course-doc-viewer__frame" 
+                              title="<?= htmlspecialchars($recurso['titulo']) ?>"
+                              loading="lazy">
+                            </iframe>
+                          </div>
+                        </div>
+                      </dialog>
+                    <?php endif; ?>
+
                     <?php if ($recurso['tipo'] === 'Entrega de Tareas'): ?>
                       <?php $entrega = $mis_entregas[$recurso['id_recurso']] ?? null; ?>
                       <dialog class="course-dialog" id="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
                         <div class="course-dialog-header">
                           <h2 id="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">Entrega de tarea: <?= htmlspecialchars($recurso['titulo']) ?></h2>
-                          <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">×</button>
+                          <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
                         </div>
                         <div class="course-dialog-body">
                           <?php if (!empty($recurso['descripcion'])): ?>
@@ -299,7 +378,13 @@ include '../includes/header.php';
                             <div class="alert alert-success u-mb-md">
                               <p><strong>Estado:</strong> Entregada el <?= date('d/m/Y H:i', strtotime($entrega['fecha_entrega'])) ?> hs.</p>
                               <?php if (!empty($entrega['archivo_entrega'])): ?>
-                                <p class="u-mt-xs"><a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=entrega&id=<?= (int)$entrega['id_entrega'] ?>">📥 Descargar mi archivo entregado</a></p>
+                                <?php $entregaVisualizable = recurso_es_visualizable_nativamente('Archivo', $entrega['archivo_entrega']); ?>
+                                <div class="u-mt-xs" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+                                  <?php if ($entregaVisualizable): ?>
+                                    <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=entrega&id=<?= (int)$entrega['id_entrega'] ?>&modo=inline" target="_blank" rel="noopener">👁️ Ver mi archivo entregado</a>
+                                  <?php endif; ?>
+                                  <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=entrega&id=<?= (int)$entrega['id_entrega'] ?>&modo=descargar">📥 Descargar mi archivo entregado</a>
+                                </div>
                               <?php endif; ?>
                               <?php if (!empty($entrega['comentario_entrega'])): ?>
                                 <p class="u-mt-xs"><strong>Tus notas:</strong> <?= nl2br(htmlspecialchars($entrega['comentario_entrega'])) ?></p>

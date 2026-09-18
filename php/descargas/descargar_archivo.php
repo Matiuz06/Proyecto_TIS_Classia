@@ -41,6 +41,8 @@ if ($tipo === 'recurso' && $id > 0) {
     }
 }
 
+$modo = $_GET['modo'] ?? 'descargar';
+
 if (!$ruta) {
     http_response_code(404);
     exit('Archivo no disponible.');
@@ -63,9 +65,12 @@ $mime = (new finfo(FILEINFO_MIME_TYPE))->file($abs) ?: 'application/octet-stream
 $ext = pathinfo($abs, PATHINFO_EXTENSION);
 $seguro = preg_replace('/[^A-Za-z0-9._-]+/u','_', $nombreDescarga) ?: 'archivo';
 if ($ext) $seguro .= '.' . $ext;
+
+$disposition = ($modo === 'inline') ? 'inline' : 'attachment';
+
 header('Content-Type: '.$mime);
 header('Content-Length: '.filesize($abs));
-header('Content-Disposition: attachment; filename="'.$seguro.'"');
+header('Content-Disposition: ' . $disposition . '; filename="'.$seguro.'"');
 header('X-Content-Type-Options: nosniff');
 readfile($abs);
 exit;

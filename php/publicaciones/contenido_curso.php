@@ -75,6 +75,19 @@ function icono_recurso_curso(string $tipo): string
     ][$tipo] ?? 'REC';
 }
 
+function icono_emoji_recurso(string $tipo): string
+{
+    return match($tipo) {
+        'Video'             => '🎥',
+        'PDF'               => '📄',
+        'Entrega de Tareas' => '📝',
+        'Foro'              => '💬',
+        'Imagen'            => '🖼️',
+        'Enlace'            => '🔗',
+        default             => '📥'
+    };
+}
+
 function recurso_archivo_permite_tipo(string $tipo, string $nombre): bool
 {
     $ext = strtolower(pathinfo($nombre, PATHINFO_EXTENSION));
@@ -85,6 +98,18 @@ function recurso_archivo_permite_tipo(string $tipo, string $nombre): bool
         return in_array($ext, ['pdf', 'zip', 'rar', '7z', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'webm', 'stl', 'obj', '3mf'], true);
     }
     return true;
+}
+
+function recurso_es_visualizable_nativamente(string $tipo, ?string $archivo = null): bool
+{
+    if ($tipo === 'PDF' || $tipo === 'Imagen') {
+        return true;
+    }
+    if ($archivo) {
+        $ext = strtolower(pathinfo($archivo, PATHINFO_EXTENSION));
+        return in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'txt'], true);
+    }
+    return false;
 }
 
 function intercambiar_orden(PDO $pdo, string $tabla, string $id_col, int $id, string $scope_col, int $scope_id, string $direccion): bool
@@ -204,6 +229,20 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
                     $archivo = $nuevo;
                 }
             }
+            // Exclusión mutua: si se sube un nuevo archivo se anula la URL; si se especifica URL y no se sube archivo, se elimina el archivo previo
+            if ($nuevo !== null) {
+                $url = null;
+            } elseif ($url !== null && $tipo !== 'Foro' && $tipo !== 'Entrega de Tareas') {
+                if (!empty($actual['archivo'])) {
+                    if (str_starts_with($actual['archivo'], 'supabase:')) {
+                        supabase_eliminar_archivo(substr($actual['archivo'], 9));
+                    } else {
+                        eliminar_archivo_guardado($actual['archivo']);
+                    }
+                }
+                $archivo = null;
+            }
+
             if ($tipo === 'Enlace') {
                 $archivo = null;
                 if (!$url) return ['ok' => false, 'mensaje' => 'Indicá una URL http/https válida para el enlace.'];
