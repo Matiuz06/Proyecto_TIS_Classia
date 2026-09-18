@@ -1,18 +1,3 @@
-# Diagrama de Clases — Classia · Segunda Entrega (Sprint 3)
-
-## Arquitectura de Clases y Servicios
-El diagrama de clases modela la arquitectura de entidades, controladores y servicios auxiliares en PHP 8.
-
----
-
-## Diagrama de Clases (PlantUML / draw.io)
-
-![Diagrama de Clases](diagramas/diagrama_de_clases_classia.png)
-
-*Versión vectorial:* [diagrama_de_clases_classia.svg](diagramas/diagrama_de_clases_classia.svg) | *Código fuente:* [diagrama_de_clases_classia.puml](diagramas/diagrama_de_clases_classia.puml)
-
-### Código Fuente PlantUML
-```plantuml
 @startuml diagrama_de_clases_classia
 !theme plain
 
@@ -195,5 +180,3 @@ Publicacion ..> UploadHelper : usa
 CursoRecurso ..> SupabaseStorageService : almacena
 Usuario ..> AuthHelper : gestiona
 @enduml
-
-```

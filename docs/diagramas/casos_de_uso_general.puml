@@ -1,12 +1,3 @@
-# Diagramas de Casos de Uso — Classia · Segunda Entrega (Sprint 3)
-
-## 1. Diagrama General del Sistema
-
-![Casos de Uso General](diagramas/casos_de_uso_general.png)
-
-*Versión vectorial:* [casos_de_uso_general.svg](diagramas/casos_de_uso_general.svg) | *Código fuente:* [casos_de_uso_general.puml](diagramas/casos_de_uso_general.puml)
-
-```plantuml
 @startuml casos_de_uso_general
 !theme plain
 
@@ -89,21 +80,3 @@ Admin --|> Visitante
 Admin --> UC_Adm
 Admin --> UC_ApprDoc
 @enduml
-
-```
-
----
-
-## 2. Casos de Uso por Rol
-
-### A. Perfil Estudiante / Cliente
-![Casos de Uso Estudiante](diagramas/casos_de_uso_estudiante.png)
-*Versión vectorial:* [casos_de_uso_estudiante.svg](diagramas/casos_de_uso_estudiante.svg)
-
-### B. Perfil Docente / Proveedor
-![Casos de Uso Docente](diagramas/casos_de_uso_docente.png)
-*Versión vectorial:* [casos_de_uso_docente.svg](diagramas/casos_de_uso_docente.svg)
-
-### C. Perfil Administrador
-![Casos de Uso Administrador](diagramas/casos_de_uso_admin.png)
-*Versión vectorial:* [casos_de_uso_admin.svg](diagramas/casos_de_uso_admin.svg)

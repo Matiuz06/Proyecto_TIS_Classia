@@ -1,0 +1,77 @@
+@startuml secuencia_solicitud_servicio
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 12
+skinparam defaultFontColor #2D3748
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    ArrowColor #3182CE
+    BorderColor #2B6CB0
+    HeaderBackgroundColor #EBF8FF
+}
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+}
+skinparam sequence {
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+    ParticipantBorderColor #2B6CB0
+    ParticipantBackgroundColor #EBF8FF
+    LifeLineBorderColor #4A5568
+    LifeLineBackgroundColor #EDF2F7
+    ArrowColor #2B6CB0
+}
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+}
+
+title Diagrama de Secuencia: Solicitud de Servicio a Medida y Chat
+
+autonumber
+actor "Estudiante / Cliente" as Cliente
+actor "Docente / Proveedor" as Docente
+boundary "views/form-solicitar-servicio.php" as ViewForm
+boundary "views/solicitud-servicio-detalle.php" as ViewChat
+control "php/solicitudes/crear_solicitud.php" as C_Sol
+control "php/solicitudes/mensajes_solicitud.php" as C_Msg
+entity "Base de Datos (MySQL)" as DB
+
+Cliente -> ViewForm: Completa formulario de requerimiento (título, descripción, presupuesto, adjunto)
+ViewForm -> C_Sol: POST /crear_solicitud.php
+activate C_Sol
+C_Sol -> DB: INSERT INTO solicitudes (estado='Pendiente', ...)
+DB --> C_Sol: id_solicitud
+C_Sol --> ViewForm: Redirige a "Mis Solicitudes" con confirmación
+deactivate C_Sol
+
+Docente -> ViewChat: Accede al detalle de la solicitud recibida
+Docente -> DB: Consulta datos de solicitud y mensajes
+DB --> ViewChat: Carga historial de conversación
+
+Docente -> ViewChat: Escribe contraoferta / mensaje de aclaración
+ViewChat -> C_Msg: POST enviar mensaje
+activate C_Msg
+C_Msg -> DB: INSERT INTO solicitud_mensajes (...)
+C_Msg -> DB: UPDATE solicitudes SET estado='Contraoferta'
+DB --> C_Msg: OK
+C_Msg --> ViewChat: Actualiza hilo de chat en tiempo real
+deactivate C_Msg
+
+Cliente -> ViewChat: Lee propuesta y acepta términos
+ViewChat -> C_Sol: POST aceptar solicitud
+activate C_Sol
+C_Sol -> DB: UPDATE solicitudes SET estado='Aceptada'
+C_Sol -> DB: INSERT INTO contrataciones (...)
+deactivate C_Sol
+ViewChat --> Cliente: Redirige a pasarela de pago para formalizar
+@enduml
