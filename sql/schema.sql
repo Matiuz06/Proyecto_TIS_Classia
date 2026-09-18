@@ -223,6 +223,31 @@ CREATE TABLE IF NOT EXISTS curso_recursos (
     INDEX idx_curso_recursos_unidad_orden (id_unidad,orden)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Tabla para entregas de tareas del aula virtual
+CREATE TABLE IF NOT EXISTS curso_entregas (
+    id_entrega INT AUTO_INCREMENT PRIMARY KEY,
+    id_recurso INT NOT NULL,
+    id_usuario INT NOT NULL,
+    archivo VARCHAR(255) NULL,
+    comentario TEXT NULL,
+    fecha_entrega DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_curso_entregas_recurso FOREIGN KEY (id_recurso) REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_curso_entregas_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_entregas_recurso_usuario (id_recurso, id_usuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla para mensajes de foros del aula virtual
+CREATE TABLE IF NOT EXISTS curso_foro_mensajes (
+    id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
+    id_recurso INT NOT NULL,
+    id_usuario INT NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_mensaje DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_foro_mensajes_recurso FOREIGN KEY (id_recurso) REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_foro_mensajes_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_foro_mensajes_recurso_fecha (id_recurso, fecha_mensaje)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS solicitud_mensajes (
     id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
     id_solicitud INT NOT NULL,
