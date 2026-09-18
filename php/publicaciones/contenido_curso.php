@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/file_upload_helper.php';
+require_once __DIR__ . '/../utils/supabase_storage.php';
 
 function obtener_curso_del_docente(PDO $pdo, int $id_publicacion, int $id_usuario, bool $admin = false): ?array
 {
@@ -46,14 +47,32 @@ function url_recurso_valida(?string $url): bool
     return is_array($p) && isset($p['scheme']) && in_array(strtolower($p['scheme']), ['http', 'https'], true);
 }
 
+function obtener_youtube_embed_url(?string $url): ?string
+{
+    if (!$url) return null;
+    $url = trim($url);
+    if (preg_match('#(?:youtube\.com/(?:watch\?v=|embed/|v/|shorts/)|youtu\.be/)([a-zA-Z0-9_-]{11})#i', $url, $matches)) {
+        return 'https://www.youtube-nocookie.com/embed/' . $matches[1] . '?rel=0&modestbranding=1';
+    }
+    return null;
+}
+
 function tipos_recurso_curso(): array
 {
-    return ['Archivo', 'PDF', 'Imagen', 'Video', 'Enlace'];
+    return ['Archivo', 'Foro', 'Entrega de Tareas', 'Video', 'PDF', 'Imagen', 'Enlace'];
 }
 
 function icono_recurso_curso(string $tipo): string
 {
-    return ['PDF' => 'PDF', 'Imagen' => 'IMG', 'Video' => 'VID', 'Enlace' => 'URL', 'Archivo' => 'DOC'][$tipo] ?? 'REC';
+    return [
+        'Archivo'           => 'DOC',
+        'Foro'              => 'FORO',
+        'Entrega de Tareas' => 'TAREA',
+        'Video'             => 'VID',
+        'PDF'               => 'PDF',
+        'Imagen'            => 'IMG',
+        'Enlace'            => 'URL',
+    ][$tipo] ?? 'REC';
 }
 
 function recurso_archivo_permite_tipo(string $tipo, string $nombre): bool
@@ -62,7 +81,10 @@ function recurso_archivo_permite_tipo(string $tipo, string $nombre): bool
     if ($tipo === 'PDF') return $ext === 'pdf';
     if ($tipo === 'Imagen') return in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true);
     if ($tipo === 'Video') return in_array($ext, ['mp4', 'webm'], true);
-    return $tipo === 'Archivo';
+    if (in_array($tipo, ['Archivo', 'Foro', 'Entrega de Tareas'], true)) {
+        return in_array($ext, ['pdf', 'zip', 'rar', '7z', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'webm', 'stl', 'obj', '3mf'], true);
+    }
+    return true;
 }
 
 function intercambiar_orden(PDO $pdo, string $tabla, string $id_col, int $id, string $scope_col, int $scope_id, string $direccion): bool
@@ -158,19 +180,49 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
             $archivo = $actual['archivo'] ?? null;
             $nuevo = null;
             if ($tipo !== 'Enlace' && isset($files['archivo_recurso']) && ($files['archivo_recurso']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
-                if (!recurso_archivo_permite_tipo($tipo, (string)($files['archivo_recurso']['name'] ?? ''))) {
-                    return ['ok' => false, 'mensaje' => 'El archivo no coincide con el tipo de recurso seleccionado.'];
+                if (supabase_esta_activo()) {
+                    $val = supabase_validar_archivo_subido($files['archivo_recurso'], $tipo, 50);
+                    if (!$val['ok']) {
+                        return ['ok' => false, 'mensaje' => $val['error']];
+                    }
+                    $ext = $val['ext'];
+                    $mime = $val['mime'];
+                    $remotePath = 'cursos/' . $id_publicacion . '/' . bin2hex(random_bytes(8)) . '_' . time() . '.' . $ext;
+                    $subida = supabase_subir_archivo($files['archivo_recurso']['tmp_name'], $remotePath, $mime);
+                    if (!$subida['ok']) {
+                        return ['ok' => false, 'mensaje' => 'Error al subir a la nube (Supabase): ' . $subida['error']];
+                    }
+                    $nuevo = 'supabase:' . $remotePath;
+                    $archivo = $nuevo;
+                } else {
+                    if (!recurso_archivo_permite_tipo($tipo, (string)($files['archivo_recurso']['name'] ?? ''))) {
+                        return ['ok' => false, 'mensaje' => 'El archivo no coincide con el tipo de recurso seleccionado.'];
+                    }
+                    $res = guardar_archivo_subido($files['archivo_recurso'], 'cursos', 50);
+                    if (!$res['ok']) return ['ok' => false, 'mensaje' => $res['error']];
+                    $nuevo = $res['ruta'];
+                    $archivo = $nuevo;
                 }
-                $res = guardar_archivo_subido($files['archivo_recurso'], 'cursos', 50);
-                if (!$res['ok']) return ['ok' => false, 'mensaje' => $res['error']];
-                $nuevo = $res['ruta'];
-                $archivo = $nuevo;
             }
             if ($tipo === 'Enlace') {
                 $archivo = null;
-                if (!$url) return ['ok' => false, 'mensaje' => 'Indicá una URL http/https.'];
+                if (!$url) return ['ok' => false, 'mensaje' => 'Indicá una URL http/https válida para el enlace.'];
             }
-            if ($tipo !== 'Enlace' && !$archivo && !$url) return ['ok' => false, 'mensaje' => 'Subí un archivo o indicá una URL.'];
+            if ($tipo === 'Video' && !$url && !$archivo) {
+                return ['ok' => false, 'mensaje' => 'Indicá el enlace del video (YouTube/Vimeo) o subí un archivo de video.'];
+            }
+            if ($tipo === 'Archivo' && !$archivo && !$url) {
+                return ['ok' => false, 'mensaje' => 'Subí un archivo o indicá un enlace al material.'];
+            }
+            if (in_array($tipo, ['Foro', 'Entrega de Tareas'], true)) {
+                $desc = trim($post['descripcion_recurso'] ?? '');
+                if (!$desc && !$url && !$archivo) {
+                    return ['ok' => false, 'mensaje' => 'Indicá una consigna o descripción para ' . strtolower($tipo) . '.'];
+                }
+            }
+            if (!in_array($tipo, ['Enlace', 'Foro', 'Entrega de Tareas'], true) && !$archivo && !$url) {
+                return ['ok' => false, 'mensaje' => 'Subí un archivo o indicá una URL.'];
+            }
 
             $data = ['u' => $unidad, 't' => trim($post['titulo_recurso'] ?? '') ?: 'Recurso', 'tipo' => $tipo, 'url' => $url, 'a' => $archivo, 'd' => trim($post['descripcion_recurso'] ?? '') ?: null, 'o' => max(1, (int)($post['orden'] ?? 1))];
             if ($a === 'agregar_recurso') {
@@ -180,8 +232,20 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
                 $data['r'] = $rid;
                 $q = $pdo->prepare("UPDATE curso_recursos SET id_unidad=:u,titulo=:t,tipo=:tipo,url=:url,archivo=:a,descripcion=:d,orden=:o WHERE id_recurso=:r");
                 $q->execute($data);
-                if ($nuevo && !empty($actual['archivo']) && $actual['archivo'] !== $nuevo) eliminar_archivo_guardado($actual['archivo']);
-                if ($tipo === 'Enlace' && !empty($actual['archivo'])) eliminar_archivo_guardado($actual['archivo']);
+                if ($nuevo && !empty($actual['archivo']) && $actual['archivo'] !== $nuevo) {
+                    if (str_starts_with($actual['archivo'], 'supabase:')) {
+                        supabase_eliminar_archivo(substr($actual['archivo'], 9));
+                    } else {
+                        eliminar_archivo_guardado($actual['archivo']);
+                    }
+                }
+                if ($tipo === 'Enlace' && !empty($actual['archivo'])) {
+                    if (str_starts_with($actual['archivo'], 'supabase:')) {
+                        supabase_eliminar_archivo(substr($actual['archivo'], 9));
+                    } else {
+                        eliminar_archivo_guardado($actual['archivo']);
+                    }
+                }
             }
         } elseif ($a === 'eliminar_recurso') {
             $q = $pdo->prepare("SELECT r.archivo FROM curso_recursos r JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE r.id_recurso=:r AND m.id_publicacion=:p");
@@ -189,7 +253,13 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
             $ruta = $q->fetchColumn();
             $d = $pdo->prepare("DELETE r FROM curso_recursos r JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE r.id_recurso=:r AND m.id_publicacion=:p");
             $d->execute(['r' => (int)$post['id_recurso'], 'p' => $id_publicacion]);
-            if ($ruta) eliminar_archivo_guardado($ruta);
+            if ($ruta) {
+                if (str_starts_with($ruta, 'supabase:')) {
+                    supabase_eliminar_archivo(substr($ruta, 9));
+                } else {
+                    eliminar_archivo_guardado($ruta);
+                }
+            }
         } elseif (in_array($a, ['subir_recurso', 'bajar_recurso'], true)) {
             $q = $pdo->prepare("SELECT r.id_unidad FROM curso_recursos r JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE r.id_recurso=:r AND m.id_publicacion=:p");
             $q->execute(['r' => (int)$post['id_recurso'], 'p' => $id_publicacion]);

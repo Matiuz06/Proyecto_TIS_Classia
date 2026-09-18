@@ -1,42 +1,18 @@
 # php/auth/
 
-Backend de autenticación, autorización y ciclo de vida de la sesión.
+Backend de autenticación, autorización y ciclo de vida de la sesión (Sprint 3 — Segunda Entrega).
 
 ## Archivos y responsabilidades
 
 | Archivo | Responsabilidad |
 |---|---|
-| `sesion.php` | Inicia sesiones, configura cookies, regenera el ID al autenticar, expone helpers de usuario y destruye sesiones. |
-| `procesar_login.php` | Valida POST, CSRF, correo, contraseña y correo confirmado; redirige según rol. |
-| `login.php` | Backend alternativo de login/onboarding utilizado por algunos flujos heredados. |
-| `registro.php` | Está en `php/usuarios/`; procesa alta, hash, verificación de correo y sesión pendiente. |
-| `inicio_oauth_google.php` | Genera el estado CSRF y redirige a Google OAuth 2.0. |
-| `callback_oauth_google.php` | Valida el estado, consulta OpenID UserInfo, crea o localiza el usuario y guarda su foto. |
-| `procesar_restablecer_clave.php` | Solicita enlaces neutros de recuperación y consume tokens de un solo uso con expiración. |
-| `guardia_onboarding.php` | Impide que estudiantes incompletos accedan al resto de la aplicación; permite políticas legales. |
-| `roles.php` | Centraliza constantes y comprobaciones de rol. |
-| `password_policy.php` | Reutiliza las reglas de complejidad de contraseña. |
-| `logout.php` | Vacía la sesión, invalida la cookie y redirige al inicio. |
-
-## Controles implementados
-
-- Tokens CSRF generados con `random_bytes()` y comparados con `hash_equals()`.
-- `password_hash()` y `password_verify()` para credenciales; nunca se guarda la contraseña original.
-- `session_regenerate_id(true)` después del login para evitar fijación de sesión.
-- Cookie `HttpOnly`, `SameSite=Lax` y `Secure` cuando la conexión usa HTTPS.
-- Cookie de navegador fuera de entornos locales; en `localhost`, `127.0.0.1` y `::1` se permite una duración de desarrollo de 30 días.
-- OAuth Google protegido con parámetro `state`; la imagen externa se conserva como URL HTTPS.
-- Mensaje neutro en recuperación para no revelar si un correo existe.
-
-`$_SESSION["usuario"]` contiene únicamente `id_usuario`, `nombre`, `email`, `id_rol` y, cuando existe, `foto_perfil`.
-
-## Límites actuales
-
-Google es autenticación federada, no autenticación en dos pasos. Todavía no existe un desafío OTP por correo o celular posterior al primer factor.
-
-Ejemplo de protección:
-
-```php
-require_once __DIR__ . '/../auth/sesion.php';
-requerir_autenticacion('../../views/login.php');
-```
+| `sesion.php` | Inicia sesiones, configura cookies seguras (HttpOnly, SameSite), regenera ID al autenticar y expone helpers de control de rol. |
+| `procesar_login.php` | Valida POST, CSRF, correo, hash bcrypt (`password_verify`) y bifurca al flujo de 2FA si está activo. |
+| `totp_helper.php` | Implementación nativa de TOTP (RFC 6238 / Google Authenticator) y generación de códigos QR de enrolamiento. |
+| `verificar_2fa.php` | Validación del código de 6 dígitos durante el login o consumo de código de respaldo único. |
+| `configurar_2fa.php` | Activación, verificación y generación de códigos de backup de dos factores. |
+| `inicio_oauth_google.php` / `callback_oauth_google.php` | Flujo OAuth 2.0 con Google. |
+| `inicio_oauth_github.php` / `callback_oauth_github.php` | Flujo OAuth 2.0 con GitHub. |
+| `procesar_restablecer_clave.php` | Recuperación de contraseñas mediante tokens seguros con expiración. |
+| `roles.php` | Constantes y comprobaciones de permisos por rol (`Estudiante`, `Docente`, `Administrador`). |
+| `logout.php` | Cierre seguro de sesión e invalidación de cookies de autenticación. |

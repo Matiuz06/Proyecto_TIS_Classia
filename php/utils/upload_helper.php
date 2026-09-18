@@ -16,7 +16,17 @@ function guardar_imagen_subida(array $archivo, string $subcarpeta, int $max_mega
         return ['ok' => false, 'error' => 'No se seleccionó ningún archivo.'];
     }
     if ($archivo['error'] !== UPLOAD_ERR_OK) {
-        return ['ok' => false, 'error' => 'Error al subir el archivo (código ' . $archivo['error'] . ').'];
+        $msg = match ((int)$archivo['error']) {
+            UPLOAD_ERR_INI_SIZE   => "La imagen supera el tamaño máximo permitido por el servidor (máx. {$max_megabytes}MB).",
+            UPLOAD_ERR_FORM_SIZE  => "La imagen supera el tamaño máximo permitido por el formulario.",
+            UPLOAD_ERR_PARTIAL    => "La imagen se subió parcialmente. Intentalo de nuevo.",
+            UPLOAD_ERR_NO_FILE    => "No se seleccionó ninguna imagen.",
+            UPLOAD_ERR_NO_TMP_DIR => "Falta la carpeta temporal en el servidor.",
+            UPLOAD_ERR_CANT_WRITE => "Error al guardar la imagen en el servidor.",
+            UPLOAD_ERR_EXTENSION  => "Subida interrumpida por una extensión del servidor.",
+            default               => "Error al subir la imagen (código {$archivo['error']}).",
+        };
+        return ['ok' => false, 'error' => $msg];
     }
     if (($archivo['size'] ?? 0) > $max_megabytes * 1024 * 1024) {
         return ['ok' => false, 'error' => "El tamaño de la imagen no puede superar los {$max_megabytes}MB."];
@@ -38,8 +48,12 @@ function guardar_imagen_subida(array $archivo, string $subcarpeta, int $max_mega
 
     $base = __DIR__ . '/../../assets/uploads';
     $destino = $base . DIRECTORY_SEPARATOR . $subcarpeta;
-    if (!is_dir($destino) && !mkdir($destino, 0755, true) && !is_dir($destino)) {
-        return ['ok' => false, 'error' => 'No se pudo crear el directorio de destino.'];
+    if (!is_dir($destino)) {
+        @mkdir($destino, 0777, true);
+        @chmod($destino, 0777);
+    }
+    if (!is_writable($destino)) {
+        @chmod($destino, 0777);
     }
     if (!is_writable($destino)) {
         return ['ok' => false, 'error' => 'El directorio de destino no tiene permisos de escritura.'];
