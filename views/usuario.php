@@ -179,7 +179,7 @@ include '../includes/header.php';
             <li class="account-item">
               <strong><?php echo htmlspecialchars($curso['titulo']); ?></strong>
               — Estado: <em><?php echo htmlspecialchars($curso['estado']); ?></em>
-              [<a href="curso.php?id=<?php echo (int)$curso['id_publicacion']; ?>">Continuar curso</a>]
+              [<a href="curso.php?id=<?php echo (int)$curso['id_publicacion']; ?>"><?php echo $curso['estado'] === 'Completada' ? 'Ver curso' : 'Continuar curso'; ?></a>]
 
               <?php if (!empty($curso['id_valoracion'])): ?>
                 <div class="account-item-rating">

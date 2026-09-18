@@ -79,11 +79,13 @@ include '../includes/header.php';
               type="text"
               id="cedula_identidad"
               name="cedula_identidad"
-              pattern="[0-9.\-\s]{6,12}"
-              placeholder="Ej: 1.234.567-8"
+              inputmode="numeric"
+              maxlength="8"
+              pattern="[0-9]{7,8}"
+              placeholder="Ej: 12345678 (7 u 8 dígitos)"
               value="<?= htmlspecialchars($datos_onboarding['cedula_identidad'] ?? '') ?>"
             />
-            <small class="form-hint form-hint-block">🔒 <em>Solo podrás ingresarla una vez. No se podrá modificar después.</em></small>
+            <small class="form-hint form-hint-block">🔒 <em>Ingresa los 7 u 8 dígitos de tu cédula uruguaya (sin puntos ni guión). Solo podrás ingresarla una vez.</em></small>
           </div>
           <?php endif; ?>
         </div>
@@ -471,34 +473,7 @@ include '../includes/header.php';
     </form>
   </main>
 
-<script>
-  const datosOnboarding = <?= json_encode($datos_onboarding, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-  Object.entries(datosOnboarding).forEach(([clave, valor]) => {
-    const controles = document.querySelectorAll(`[name="${clave}"], [name="${clave}[]"]`);
-    controles.forEach((control) => {
-      if (control.type === 'checkbox' || control.type === 'radio') {
-        control.checked = Array.isArray(valor) ? valor.includes(control.value) : valor === control.value;
-      } else {
-        control.value = valor;
-      }
-    });
-  });
-
-  const profesion = document.getElementById('profesion');
-  const otraProfesion = document.getElementById('otra-profesion');
-
-  const actualizarOtraProfesion = () => {
-    const habilitada = profesion.value === 'otro';
-    otraProfesion.disabled = !habilitada;
-    otraProfesion.required = habilitada;
-
-    if (!habilitada) {
-      otraProfesion.value = '';
-    }
-  };
-
-  profesion.addEventListener('change', actualizarOtraProfesion);
-  actualizarOtraProfesion();
-</script>
+  <script id="onboarding-data" type="application/json"><?= json_encode($datos_onboarding, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+  <script src="<?= $jsPrefix ?>/js/script.js" defer></script>
 
 <?php include '../includes/footer.php'; ?>

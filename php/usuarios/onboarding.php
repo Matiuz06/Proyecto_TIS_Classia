@@ -10,7 +10,8 @@ header('Pragma: no-cache');
 
 $id_usuario = (int) $_SESSION['usuario']['id_usuario'];
 $pasos_totales = 9;
-$errores_onboarding = [];
+$errores_onboarding = $_SESSION['errores_onboarding'] ?? [];
+unset($_SESSION['errores_onboarding']);
 
 $stmt = $pdo->prepare('SELECT nombre, apellido, email_verificado, cedula_identidad, fecha_nacimiento, onboarding_step, onboarding_data FROM usuarios WHERE id_usuario = :id LIMIT 1');
 $stmt->execute(['id' => $id_usuario]);
@@ -31,15 +32,25 @@ if ($paso_guardado > $pasos_totales) {
 $paso_actual = min($pasos_totales, max(1, (int) ($usuario_onboarding['onboarding_step'] ?? 1)));
 $datos_onboarding = json_decode($usuario_onboarding['onboarding_data'] ?? '{}', true);
 $datos_onboarding = is_array($datos_onboarding) ? $datos_onboarding : [];
+if (!empty($_SESSION['datos_onboarding_form'])) {
+    $datos_onboarding = array_merge($datos_onboarding, $_SESSION['datos_onboarding_form']);
+    unset($_SESSION['datos_onboarding_form']);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'] ?? '')) {
-        $errores_onboarding[] = 'La sesión del formulario expiró. Recargá la página.';
+        $errores_onboarding[] = 'La sesión del formulario expiró. Recarga la página.';
     }
 
     $paso_enviado = (int) ($_POST['paso'] ?? $paso_actual);
     if ($paso_enviado !== $paso_actual) {
-        $errores_onboarding[] = 'El paso enviado ya no está disponible. Recargá la página.';
+        $errores_onboarding[] = 'El paso enviado ya no está disponible. Recarga la página.';
+    }
+
+    if ($errores_onboarding) {
+        $_SESSION['errores_onboarding'] = $errores_onboarding;
+        header('Location: ../../views/primeros-pasos.php');
+        exit;
     }
 
     if (!$errores_onboarding) {
@@ -85,16 +96,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif (!$fn_obj || $fn_obj->format('Y-m-d') !== $fn_raw) {
                 $errores_onboarding[] = 'La fecha de nacimiento ingresada no es válida.';
             } elseif ($fn_obj < $min_fecha || $fn_obj > $max_fecha) {
-                $errores_onboarding[] = 'Debés tener entre 13 y 120 años para completar tu perfil.';
+                $errores_onboarding[] = 'Debes tener entre 13 y 120 años para completar tu perfil.';
             }
 
             // --- Cédula de Identidad (solo si el usuario no tiene una) ---
             $tiene_cedula = !empty($usuario_onboarding['cedula_identidad']);
             if (!$tiene_cedula) {
-                $cedula_input = trim($_POST['cedula_identidad'] ?? '');
+                $cedula_input = preg_replace('/\D/', '', trim($_POST['cedula_identidad'] ?? ''));
                 if (!empty($cedula_input)) {
-                    if (!validar_cedula_uruguaya($cedula_input)) {
-                        $errores_onboarding[] = 'La Cédula de Identidad ingresada no es válida.';
+                    if (strlen($cedula_input) < 7 || strlen($cedula_input) > 8 || !validar_cedula_uruguaya($cedula_input)) {
+                        $errores_onboarding[] = 'La Cédula de Identidad ingresada debe tener 7 u 8 dígitos y ser válida.';
                     } else {
                         // Verificar duplicado
                         $ci_limpia = limpiar_ci($cedula_input);
@@ -124,7 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($errores_onboarding) {
-            // Volver a mostrar el formulario con errores
+            $_SESSION['errores_onboarding'] = $errores_onboarding;
+            $_SESSION['datos_onboarding_form'] = $datos_onboarding;
             header('Location: ../../views/primeros-pasos.php');
             exit;
         }

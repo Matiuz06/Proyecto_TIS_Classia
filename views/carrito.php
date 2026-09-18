@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../php/contrataciones/carrito.php';
+requerir_autenticacion('login.php');
 
 $mensaje_error = $mensaje_error ?? '';
 $items = $items ?? [];

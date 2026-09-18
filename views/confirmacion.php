@@ -35,7 +35,6 @@ include '../includes/header.php';
         <p><strong>Total:</strong> $<?php echo number_format((float) $contratacion['monto_total'], 2, ',', '.'); ?></p>
         <p><a href="catalogo.php" class="btn">Volver al catálogo</a></p>
         <p><a href="usuario.php">Ver mi perfil</a></p>
-        <p><a href="catalogo.php">Volver al catalogo</a></p>
       <?php endif; ?>
     </main>
 

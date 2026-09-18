@@ -8,7 +8,9 @@ $jsPrefix    = '..';
 
 $activePage  = 'catalogo';
 include '../includes/header.php';
-$puedeAgregar = es_estudiante();
+$curr = usuario_actual();
+$es_propietario = $curr && (int)$curr['id_usuario'] === (int)($servicio['id_usuario'] ?? 0);
+$puedeAgregar = esta_autenticado() && (es_estudiante() || es_docente()) && !$es_propietario;
 ?>
 
   <main class="product-detail-container motion-entry">
@@ -146,13 +148,21 @@ $puedeAgregar = es_estudiante();
               <?php if (!empty($servicio['disponibilidad'])): ?><li>✓ Disponibilidad: <?= htmlspecialchars($servicio['disponibilidad']) ?></li><?php endif; ?>
             </ul>
 
-            <?php if (!empty($plantilla_servicio)): ?>
+            <?php if ($es_propietario): ?>
+              <div class="purchase-owner-actions">
+                <p class="badge badge-service u-mb-sm">Eres el autor de este servicio</p>
+                <a class="btn product-card-pricing__btn" href="editar-publicacion.php?id=<?= (int)$servicio['id_publicacion'] ?>">Editar servicio</a>
+              </div>
+            <?php elseif (es_admin()): ?>
+              <div class="purchase-admin-actions">
+                <p class="badge u-mb-sm">Modo Administrador</p>
+                <a class="btn btn-secondary product-card-pricing__btn" href="editar-publicacion.php?id=<?= (int)$servicio['id_publicacion'] ?>">Editar servicio</a>
+              </div>
+            <?php elseif (!empty($plantilla_servicio)): ?>
               <?php if ($puedeAgregar): ?>
                 <a href="form-solicitar-servicio.php?id=<?= (int)$servicio['id_publicacion'] ?>" class="btn product-card-pricing__btn">Solicitar propuesta personalizada</a>
               <?php elseif (!esta_autenticado()): ?>
                 <div class="purchase-auth-actions"><a class="btn product-card-pricing__btn" href="login.php">Inicia sesión</a><a href="registro.php">Regístrate</a></div>
-              <?php else: ?>
-                <p class="text-muted">Las solicitudes de servicios se realizan desde una cuenta de estudiante.</p>
               <?php endif; ?>
               <div class="custom-request-box"><p>Este servicio utiliza la plantilla: <strong><?= htmlspecialchars($plantilla_servicio['nombre']) ?></strong>.</p></div>
             <?php else: ?>

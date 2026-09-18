@@ -184,7 +184,7 @@ include '../includes/header.php';
     <header class="provider-dashboard__header">
         <h1>Panel del proveedor</h1>
         <p>Gestiona tus cursos, servicios, solicitudes, estudiantes y datos profesionales desde un único lugar.</p>
-        <p>Sesión iniciada como <strong><?= htmlspecialchars(trim(($usuario['nombre'] ?? '') . ' ' . ($usuario['apellido'] ?? ''))) ?></strong></p>
+        <p><span>Sesión iniciada como:</span> <strong><?= htmlspecialchars(trim(($usuario['nombre'] ?? '') . ' ' . ($usuario['apellido'] ?? ''))) ?></strong></p>
 
         <nav aria-label="Acciones rápidas del proveedor">
             <ul>
