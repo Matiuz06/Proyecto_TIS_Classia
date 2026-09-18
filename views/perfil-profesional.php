@@ -322,7 +322,7 @@ include '../includes/header.php';
         <?php endif; ?>
 
         <p class="back-link-container" style="margin-top: 2rem;">
-            <a href="catalogo.php" class="link">← Volver al catálogo general</a>
+            <a href="usuario.php" class="link">← Volver al perfil general</a>
         </p>
     <?php endif; ?>
 </main>
