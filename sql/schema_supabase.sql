@@ -292,6 +292,31 @@ CREATE TABLE IF NOT EXISTS solicitud_mensajes (
 );
 CREATE INDEX IF NOT EXISTS idx_solicitud_mensajes_fecha ON solicitud_mensajes (id_solicitud, fecha_mensaje);
 
+-- Índices de optimización para consultas frecuentes
+CREATE INDEX IF NOT EXISTS idx_pub_usuario ON publicaciones (id_usuario);
+CREATE INDEX IF NOT EXISTS idx_pub_categoria ON publicaciones (id_categoria);
+CREATE INDEX IF NOT EXISTS idx_pub_estado_tipo ON publicaciones (estado, tipo);
+CREATE INDEX IF NOT EXISTS idx_pub_fecha ON publicaciones (fecha_creacion);
+
+CREATE INDEX IF NOT EXISTS idx_sol_usuario ON solicitudes (id_usuario);
+CREATE INDEX IF NOT EXISTS idx_sol_publicacion ON solicitudes (id_publicacion);
+CREATE INDEX IF NOT EXISTS idx_sol_estado ON solicitudes (estado);
+CREATE INDEX IF NOT EXISTS idx_sol_contratacion ON solicitudes (id_contratacion);
+
+CREATE INDEX IF NOT EXISTS idx_cont_usuario ON contrataciones (id_usuario);
+CREATE INDEX IF NOT EXISTS idx_cont_estado ON contrataciones (estado);
+CREATE INDEX IF NOT EXISTS idx_cont_fecha ON contrataciones (fecha_contratacion);
+
+CREATE INDEX IF NOT EXISTS idx_det_contratacion ON detalles_contratacion (id_contratacion);
+CREATE INDEX IF NOT EXISTS idx_det_publicacion ON detalles_contratacion (id_publicacion);
+
+CREATE INDEX IF NOT EXISTS idx_pagos_contratacion ON pagos (id_contratacion);
+CREATE INDEX IF NOT EXISTS idx_pagos_estado ON pagos (estado_pago);
+
+CREATE INDEX IF NOT EXISTS idx_val_publicacion ON valoraciones (id_publicacion);
+CREATE INDEX IF NOT EXISTS idx_val_usuario ON valoraciones (id_usuario);
+CREATE INDEX IF NOT EXISTS idx_val_contratacion ON valoraciones (id_contratacion);
+
 -- ============================================================================
 -- INSERCIÓN DE DATOS SEMILLA INICIALES
 -- ============================================================================

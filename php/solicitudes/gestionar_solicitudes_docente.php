@@ -31,7 +31,6 @@ function obtener_solicitudes_docente_pendientes(?PDO $pdo_param = null): array
 {
     global $pdo;
     $db = $pdo_param ?? $pdo;
-    asegurar_tabla_solicitudes_docente($db);
 
     try {
         $sql = "SELECT sd.id_solicitud_docente, sd.estado, sd.motivo, sd.fecha_solicitud,
