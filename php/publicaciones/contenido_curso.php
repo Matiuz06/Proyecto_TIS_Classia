@@ -19,21 +19,58 @@ function obtener_curso_del_docente(PDO $pdo, int $id_publicacion, int $id_usuari
 
 function obtener_contenido_curso(PDO $pdo, int $id_publicacion): array
 {
-    $s = $pdo->prepare("SELECT * FROM curso_modulos WHERE id_publicacion=:id ORDER BY orden,id_modulo");
+    // 1. Obtener los modulos del curso
+    $s = $pdo->prepare("SELECT * FROM curso_modulos WHERE id_publicacion = :id ORDER BY orden, id_modulo");
     $s->execute(['id' => $id_publicacion]);
     $mods = $s->fetchAll();
 
+    if (empty($mods)) {
+        return [];
+    }
+
+    // 2. Obtener todas las unidades de los modulos del curso en una sola consulta
+    $s_unidades = $pdo->prepare("
+        SELECT u.* 
+        FROM curso_unidades u 
+        JOIN curso_modulos m ON m.id_modulo = u.id_modulo 
+        WHERE m.id_publicacion = :id 
+        ORDER BY u.orden, u.id_unidad
+    ");
+    $s_unidades->execute(['id' => $id_publicacion]);
+    $todas_unidades = $s_unidades->fetchAll();
+
+    // 3. Obtener todos los recursos de las unidades en una sola consulta
+    $s_recursos = $pdo->prepare("
+        SELECT r.* 
+        FROM curso_recursos r 
+        JOIN curso_unidades u ON u.id_unidad = r.id_unidad 
+        JOIN curso_modulos m ON m.id_modulo = u.id_modulo 
+        WHERE m.id_publicacion = :id 
+        ORDER BY r.orden, r.id_recurso
+    ");
+    $s_recursos->execute(['id' => $id_publicacion]);
+    $todos_recursos = $s_recursos->fetchAll();
+
+    // 4. Agrupar recursos por unidad
+    $recursos_por_unidad = [];
+    foreach ($todos_recursos as $rec) {
+        $id_u = (int) $rec['id_unidad'];
+        $recursos_por_unidad[$id_u][] = $rec;
+    }
+
+    // 5. Agrupar unidades por modulo y asociar recursos
+    $unidades_por_modulo = [];
+    foreach ($todas_unidades as $uni) {
+        $id_u = (int) $uni['id_unidad'];
+        $id_m = (int) $uni['id_modulo'];
+        $uni['recursos'] = $recursos_por_unidad[$id_u] ?? [];
+        $unidades_por_modulo[$id_m][] = $uni;
+    }
+
+    // 6. Asociar unidades a cada modulo
     foreach ($mods as &$m) {
-        $u = $pdo->prepare("SELECT * FROM curso_unidades WHERE id_modulo=:id ORDER BY orden,id_unidad");
-        $u->execute(['id' => $m['id_modulo']]);
-        $uns = $u->fetchAll();
-        foreach ($uns as &$un) {
-            $r = $pdo->prepare("SELECT * FROM curso_recursos WHERE id_unidad=:id ORDER BY orden,id_recurso");
-            $r->execute(['id' => $un['id_unidad']]);
-            $un['recursos'] = $r->fetchAll();
-        }
-        unset($un);
-        $m['unidades'] = $uns;
+        $id_m = (int) $m['id_modulo'];
+        $m['unidades'] = $unidades_por_modulo[$id_m] ?? [];
     }
     unset($m);
 

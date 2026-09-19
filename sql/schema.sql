@@ -83,7 +83,11 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     id_usuario INT NOT NULL,
     id_categoria INT NOT NULL,
     CONSTRAINT fk_publicaciones_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_publicaciones_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT fk_publicaciones_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_pub_usuario (id_usuario),
+    INDEX idx_pub_categoria (id_categoria),
+    INDEX idx_pub_estado_tipo (estado, tipo),
+    INDEX idx_pub_fecha (fecha_creacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS solicitudes (
@@ -102,7 +106,11 @@ CREATE TABLE IF NOT EXISTS solicitudes (
     id_publicacion INT NULL,
     id_contratacion INT NULL,
     CONSTRAINT fk_solicitudes_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_solicitudes_publicaciones FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT fk_solicitudes_publicaciones FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_sol_usuario (id_usuario),
+    INDEX idx_sol_publicacion (id_publicacion),
+    INDEX idx_sol_estado (estado),
+    INDEX idx_sol_contratacion (id_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS solicitudes_docente (
@@ -127,7 +135,10 @@ CREATE TABLE IF NOT EXISTS contrataciones (
     id_usuario INT NOT NULL,
     CONSTRAINT fk_contrataciones_usuarios
         FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_cont_usuario (id_usuario),
+    INDEX idx_cont_estado (estado),
+    INDEX idx_cont_fecha (fecha_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS detalles_contratacion (
@@ -142,7 +153,9 @@ CREATE TABLE IF NOT EXISTS detalles_contratacion (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_detalles_publicaciones
         FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
-        ON DELETE RESTRICT ON UPDATE CASCADE
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_det_contratacion (id_contratacion),
+    INDEX idx_det_publicacion (id_publicacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS pagos (
@@ -155,7 +168,9 @@ CREATE TABLE IF NOT EXISTS pagos (
     id_contratacion INT NOT NULL,
     CONSTRAINT fk_pagos_contrataciones
         FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_pagos_contratacion (id_contratacion),
+    INDEX idx_pagos_estado (estado_pago)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS valoraciones (
@@ -176,7 +191,10 @@ CREATE TABLE IF NOT EXISTS valoraciones (
         FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT uq_valoraciones_contratacion_usuario
-        UNIQUE (id_contratacion, id_usuario)
+        UNIQUE (id_contratacion, id_usuario),
+    INDEX idx_val_publicacion (id_publicacion),
+    INDEX idx_val_usuario (id_usuario),
+    INDEX idx_val_contratacion (id_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
