@@ -225,7 +225,7 @@ include 'includes/header.php';
     <section class="home-section home-provider-cta" aria-labelledby="proveedores-heading">
       <div>
         <p class="section-title-tag-sm">Docentes y proveedores</p>
-        <h2 id="proveedores-heading">Enseñá o brindá servicios desde Classia</h2>
+        <h2 id="proveedores-heading">Enseña o brinda servicios desde Classia</h2>
         <p>Publicá cursos, mentorías o servicios educativos y tecnológicos en el mismo entorno donde los estudiantes descubren nuevas oportunidades.</p>
       </div>
       <a href="views/solicitar-docente.php" class="btn">Postularme como docente</a>

@@ -225,8 +225,12 @@ include '../includes/header.php';
                                 <label data-field-container="url">URL o Enlace
                                   <input type="url" name="url_recurso" value="<?= htmlspecialchars($r['url'] ?? '') ?>" placeholder="https://...">
                                 </label>
-                                <label data-field-container="archivo">Reemplazar archivo
-                                  <input type="file" name="archivo_recurso">
+                                <label data-field-container="archivo">
+                                  <span><?= !empty($r['archivo']) ? 'Reemplazar archivo' : 'Archivo adjunto' ?></span>
+                                  <div class="course-file-input-wrapper">
+                                    <input type="file" name="archivo_recurso">
+                                    <button type="button" class="btn btn-sm btn-outline course-clear-file-btn" data-clear-file-btn hidden title="Quitar archivo seleccionado">✕ Quitar</button>
+                                  </div>
                                 </label>
                                 <label data-field-container="orden">Orden
                                   <input type="number" min="1" name="orden" value="<?= (int)$r['orden'] ?>">
@@ -279,8 +283,12 @@ include '../includes/header.php';
                         <label data-field-container="url">URL o Enlace
                           <input type="url" name="url_recurso" placeholder="https://...">
                         </label>
-                        <label data-field-container="archivo">Archivo adjunto
-                          <input type="file" name="archivo_recurso">
+                        <label data-field-container="archivo">
+                          <span>Archivo adjunto</span>
+                          <div class="course-file-input-wrapper">
+                            <input type="file" name="archivo_recurso">
+                            <button type="button" class="btn btn-sm btn-outline course-clear-file-btn" data-clear-file-btn hidden title="Quitar archivo seleccionado">✕ Quitar</button>
+                          </div>
                         </label>
                         <label data-field-container="orden">Orden
                           <input type="number" min="1" name="orden" value="<?= count($unidad['recursos']) + 1 ?>">

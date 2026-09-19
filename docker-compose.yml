@@ -8,9 +8,12 @@ services:
       - "8080:80"
     volumes:
       - .:/var/www/html
+    env_file:
+      - path: .env
+        required: false
     environment:
-      DB_HOST: db
-      DB_PORT: 3306
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-3306}
       DB_NAME: ${DB_NAME:-classia_db}
       DB_USER: ${DB_USER:-classia_user}
       DB_PASSWORD: ${DB_PASSWORD:-1234}

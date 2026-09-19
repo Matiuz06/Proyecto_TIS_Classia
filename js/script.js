@@ -39,6 +39,15 @@ document.addEventListener("DOMContentLoaded", () => {
       lastDialogTrigger = openTrigger;
       document.body.classList.add("course-dialog-open");
       if (!dialog.open) dialog.showModal();
+
+      const typeSelect = dialog.querySelector('select[name="tipo_recurso"]');
+      if (typeSelect) {
+        syncResourceFields(typeSelect);
+      } else {
+        const resourceForm = dialog.querySelector("form");
+        if (resourceForm) updateResourceMutualExclusivity(resourceForm);
+      }
+
       dialog.querySelector("input, textarea, select")?.focus();
 
       return;
@@ -49,6 +58,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (closeTrigger) {
       event.preventDefault();
       closeTrigger.closest("dialog")?.close();
+    }
+
+    const clearFileTrigger = event.target.closest("[data-clear-file-btn]");
+    if (clearFileTrigger) {
+      event.preventDefault();
+      const form = clearFileTrigger.closest("form");
+      if (form) {
+        const fileInput = form.querySelector('input[name="archivo_recurso"]');
+        if (fileInput) fileInput.value = "";
+        updateResourceMutualExclusivity(form);
+        fileInput?.focus();
+      }
     }
   });
 
@@ -61,13 +82,92 @@ document.addEventListener("DOMContentLoaded", () => {
   }, true);
 
   const HINTS_RECURSOS = {
-    "Archivo": "Subí un documento, plantilla o archivo complementario para la clase.",
-    "Foro": "Espacio de intercambio: detallá el tema o consigna de debate para los estudiantes.",
-    "Entrega de Tareas": "Actividad práctica: especificá las consignas, pautas de evaluación y fecha de entrega.",
-    "Video": "Pegá un enlace de YouTube / Vimeo o subí un video explicativo (.mp4, .webm).",
+    "Archivo": "Sube un documento, plantilla o archivo complementario para la clase.",
+    "Foro": "Espacio de intercambio: detalla el tema o consigna de debate para los estudiantes.",
+    "Entrega de Tareas": "Actividad práctica: especifica las consignas, pautas de evaluación y fecha de entrega.",
+    "Video": "Pega un enlace de YouTube / Vimeo o subí un video explicativo (.mp4, .webm).",
     "PDF": "Documento de lectura o guía de estudio en formato PDF.",
     "Imagen": "Infografía, diagrama o imagen ilustrativa para la clase.",
     "Enlace": "Enlace externo o recurso web de interés para los alumnos."
+  };
+
+  const updateResourceMutualExclusivity = (form) => {
+    if (!form) return;
+    const tipoSelect = form.querySelector('select[name="tipo_recurso"]');
+    const tipo = tipoSelect ? tipoSelect.value : "";
+    const urlLabel = form.querySelector('[data-field-container="url"]');
+    const fileLabel = form.querySelector('[data-field-container="archivo"]');
+    const urlInput = urlLabel ? urlLabel.querySelector('input[name="url_recurso"]') : null;
+    const fileInput = fileLabel ? fileLabel.querySelector('input[name="archivo_recurso"]') : null;
+    const clearFileBtn = form.querySelector('[data-clear-file-btn]');
+
+    if (!urlInput || !fileInput) return;
+
+    if (tipo === "Enlace") {
+      fileInput.disabled = true;
+      fileInput.value = "";
+      if (fileLabel) {
+        fileLabel.hidden = true;
+        fileLabel.classList.remove("is-disabled");
+        fileLabel.removeAttribute("title");
+      }
+      urlInput.disabled = false;
+      if (urlLabel) {
+        urlLabel.hidden = false;
+        urlLabel.classList.remove("is-disabled");
+        urlLabel.removeAttribute("title");
+      }
+      if (clearFileBtn) clearFileBtn.hidden = true;
+      return;
+    }
+
+    if (fileLabel) fileLabel.hidden = false;
+    if (urlLabel) urlLabel.hidden = false;
+
+    const hasUrl = urlInput.value.trim().length > 0;
+    const hasFile = fileInput.files && fileInput.files.length > 0;
+
+    if (clearFileBtn) {
+      clearFileBtn.hidden = !hasFile;
+    }
+
+    if (hasUrl) {
+      fileInput.disabled = true;
+      fileInput.value = "";
+      if (clearFileBtn) clearFileBtn.hidden = true;
+      if (fileLabel) {
+        fileLabel.classList.add("is-disabled");
+        fileLabel.title = "Deshabilitado porque se ingresó un enlace";
+      }
+      urlInput.disabled = false;
+      if (urlLabel) {
+        urlLabel.classList.remove("is-disabled");
+        urlLabel.removeAttribute("title");
+      }
+    } else if (hasFile) {
+      urlInput.disabled = true;
+      urlInput.value = "";
+      if (urlLabel) {
+        urlLabel.classList.add("is-disabled");
+        urlLabel.title = "Deshabilitado porque se seleccionó un archivo adjunto";
+      }
+      fileInput.disabled = false;
+      if (fileLabel) {
+        fileLabel.classList.remove("is-disabled");
+        fileLabel.removeAttribute("title");
+      }
+    } else {
+      urlInput.disabled = false;
+      fileInput.disabled = false;
+      if (urlLabel) {
+        urlLabel.classList.remove("is-disabled");
+        urlLabel.removeAttribute("title");
+      }
+      if (fileLabel) {
+        fileLabel.classList.remove("is-disabled");
+        fileLabel.removeAttribute("title");
+      }
+    }
   };
 
   const syncResourceFields = (select) => {
@@ -76,7 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const tipo = select.value;
     const urlLabel = form.querySelector('[data-field-container="url"]');
-    const fileLabel = form.querySelector('[data-field-container="archivo"]');
     const descLabel = form.querySelector('[data-field-container="descripcion"]');
     const hintElem = form.querySelector("[data-resource-hint]");
 
@@ -90,7 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const isTask = tipo === "Entrega de Tareas";
 
     if (urlLabel) {
-      urlLabel.hidden = false;
       const urlInput = urlLabel.querySelector("input");
       if (urlInput) {
         if (isVideo) {
@@ -101,10 +199,6 @@ document.addEventListener("DOMContentLoaded", () => {
           urlInput.placeholder = "https://... (opcional)";
         }
       }
-    }
-
-    if (fileLabel) {
-      fileLabel.hidden = isLink;
     }
 
     if (descLabel) {
@@ -119,13 +213,37 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     }
+
+    updateResourceMutualExclusivity(form);
   };
 
   document.querySelectorAll('.course-builder-page select[name="tipo_recurso"]').forEach(syncResourceFields);
 
   document.addEventListener("change", (event) => {
     const resourceType = event.target.closest('.course-builder-page select[name="tipo_recurso"]');
-    if (resourceType) syncResourceFields(resourceType);
+    if (resourceType) {
+      syncResourceFields(resourceType);
+      return;
+    }
+
+    const fileInput = event.target.closest('.course-builder-page input[name="archivo_recurso"]');
+    if (fileInput) {
+      updateResourceMutualExclusivity(fileInput.closest("form"));
+      return;
+    }
+
+    const urlInput = event.target.closest('.course-builder-page input[name="url_recurso"]');
+    if (urlInput) {
+      updateResourceMutualExclusivity(urlInput.closest("form"));
+      return;
+    }
+  });
+
+  document.addEventListener("input", (event) => {
+    const urlInput = event.target.closest('.course-builder-page input[name="url_recurso"]');
+    if (urlInput) {
+      updateResourceMutualExclusivity(urlInput.closest("form"));
+    }
   });
 
   const onboardingForm = document.querySelector(".onboarding-page form");

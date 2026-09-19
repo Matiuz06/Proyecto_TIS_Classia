@@ -19,20 +19,6 @@ if (isset($_GET['2fa_desactivado'])) {
 include '../includes/header.php';
 ?>
 
-  <?php if (es_admin()): ?>
-    <div id="panel-admin" class="alert alert-info role-banner">
-      <strong>Modo Administrador Activo:</strong>
-      <a href="panel-administrador.php" class="banner-link">Ir al Panel de Administración</a> |
-      <a href="catalogo.php">Gestionar Catálogo</a>
-    </div>
-  <?php elseif (es_docente()): ?>
-    <div id="panel-docente" class="alert alert-info role-banner">
-      <strong>Modo Docente/Proveedor Activo:</strong>
-      <a href="panel-proveedor.php" class="banner-link">Ir a mi Panel de Proveedor</a> |
-      <a href="crear-publicacion.php">Publicar nuevo contenido</a>
-    </div>
-  <?php endif; ?>
-
   <main class="motion-entry">
     <?php if (!empty($mensaje_acceso)): ?>
       <div class="alert alert-danger" role="alert">
