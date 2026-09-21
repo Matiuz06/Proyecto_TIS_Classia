@@ -224,7 +224,7 @@ docker exec classia_web php scripts/migrate_provider_features.php
 
 ---
 
-## 🔐 Seguridad y cumplimiento normativo
+## Seguridad y cumplimiento normativo
 
 El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SECURITY.md):
 
@@ -241,7 +241,7 @@ El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SEC
 
 ## 📌 Estado actual del proyecto
 
-### ✅ Completado — Tercera Entrega
+### ✅ Completado — Segunda Entrega
 
 - [x] **Arquitectura PHP modular** con más de 50 vistas, includes reutilizables y backend organizado por dominio.
 - [x] **Base de datos relacional** en `sql/schema.sql` (MySQL) y `sql/schema_supabase.sql` (PostgreSQL), con 12+ tablas, 3FN e integridad referencial completa.
