@@ -167,6 +167,8 @@ include '../includes/header.php';
                 <?php if (es_docente() || es_admin()): ?>
                     <li><a href="solicitudes-servicios.php">Ver solicitudes</a></li>
                     <li><a href="editar-perfil-profesional.php">Editar perfil profesional</a></li>
+                    <li><a href="eventos.php">Proponer o ver eventos</a></li>
+                    <li><a href="noticias.php">Proponer o ver noticias</a></li>
                 <?php endif; ?>
             </ul>
         </nav>
