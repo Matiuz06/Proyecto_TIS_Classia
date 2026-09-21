@@ -107,15 +107,23 @@ try {
 
     $stmt_up_con = $pdo->prepare("UPDATE contrataciones SET estado = 'En Proceso' WHERE id_contratacion = :id");
     $stmt_up_con->execute(['id' => $id_contratacion]);
-    if ($tieneServicio) {
-        $stmt_sol = $pdo->prepare("UPDATE solicitudes SET estado = 'En Proceso' WHERE id_contratacion = :id AND estado = 'Aceptada'");
-        $stmt_sol->execute(['id' => $id_contratacion]);
-    }
+
+    // Actualizar solicitudes asociadas si las hubiere
+    $stmt_sol = $pdo->prepare("UPDATE solicitudes SET estado = 'En Proceso' WHERE id_contratacion = :id AND estado = 'Aceptada'");
+    $stmt_sol->execute(['id' => $id_contratacion]);
 
     $pdo->commit();
 
     // Limpiar carrito tras pago exitoso
     unset($_SESSION['carrito_publicaciones']);
+
+    // Enviar comprobante de pago por correo automáticamente
+    require_once __DIR__ . '/comprobante_pago.php';
+    try {
+        enviar_comprobante_email($pdo, $id_contratacion, $email);
+    } catch (Exception $e) {
+        error_log("No se pudo enviar el correo del comprobante: " . $e->getMessage());
+    }
 
     header("Location: ../../views/confirmacion.php?id_contratacion=$id_contratacion");
     exit;

@@ -57,14 +57,24 @@ include '../includes/header.php';
 
           <a
             class="content-card role-card-link motion-card"
-            href="solicitudes-docente.php">
-            <span class="badge role-card-meta">Supervisión</span>
-            <h3>Solicitudes Docentes</h3>
+            href="eventos.php">
+            <span class="badge role-card-meta">Comunidad</span>
+            <h3>Eventos &amp; Webinars</h3>
             <p class="role-card-text">
-              Evalúa y aprueba o rechaza solicitudes de usuarios que desean ser
-              docentes en la plataforma.
+              Supervisa, crea, aprueba o rechaza eventos propuestos por docentes y la institución.
             </p>
-            <span class="role-card-action">Administrar</span>
+            <span class="role-card-action">Gestionar Eventos</span>
+          </a>
+
+          <a
+            class="content-card role-card-link motion-card"
+            href="noticias.php">
+            <span class="badge role-card-meta">Prensa</span>
+            <h3>Noticias &amp; Novedades</h3>
+            <p class="role-card-text">
+              Publica y modera artículos, comunicados institucionales y noticias académicas.
+            </p>
+            <span class="role-card-action">Gestionar Noticias</span>
           </a>
         </div>
       </section>

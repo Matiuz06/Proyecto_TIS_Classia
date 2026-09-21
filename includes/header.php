@@ -27,6 +27,8 @@ $panelAdminHref       = ($cssPrefix === '.') ? 'views/panel-administrador.php' :
 $misSolicitudesHref = ($cssPrefix === '.') ? 'views/mis-solicitudes-servicios.php' : 'mis-solicitudes-servicios.php';
 $solicitudesProveedorHref = ($cssPrefix === '.') ? 'views/solicitudes-servicios.php' : 'solicitudes-servicios.php';
 $perfilProfesionalHref = ($cssPrefix === '.') ? 'views/perfil-profesional.php' : 'perfil-profesional.php';
+$eventosHref  = ($cssPrefix === '.') ? 'views/eventos.php'   : 'eventos.php';
+$noticiasHref = ($cssPrefix === '.') ? 'views/noticias.php'  : 'noticias.php';
 
 $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
@@ -58,6 +60,8 @@ $cartCount = count($cartItems);
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="<?= $indexHref ?>"<?= $activePage === 'inicio' ? ' aria-current="page"' : '' ?>><?= __t('nav_inicio') ?></a>
         <a href="<?= $catalogoHref ?>"<?= $activePage === 'catalogo' ? ' aria-current="page"' : '' ?>><?= __t('nav_catalogo') ?></a>
+        <a href="<?= $eventosHref ?>"<?= $activePage === 'eventos' ? ' aria-current="page"' : '' ?>><?= __t('nav_eventos', 'Eventos') ?></a>
+        <a href="<?= $noticiasHref ?>"<?= $activePage === 'noticias' ? ' aria-current="page"' : '' ?>><?= __t('nav_noticias', 'Noticias') ?></a>
         
         <?php if ($isAuth): ?>
         <a href="<?= $carritoHref ?>" class="nav-cart-btn<?= $activePage === 'carrito' ? ' active' : '' ?>" aria-label="<?= __t('nav_carrito') ?> (<?= $cartCount ?> items)">
@@ -123,6 +127,12 @@ $cartCount = count($cartItems);
                 <a href="<?= ($cssPrefix === '.') ? 'views/crear-publicacion.php' : 'crear-publicacion.php' ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_crear_publicacion', 'Crear publicación') ?>
                 </a>
+                <a href="<?= $eventosHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_docente_eventos', 'Proponer / Ver Eventos') ?>
+                </a>
+                <a href="<?= $noticiasHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_docente_noticias', 'Proponer / Ver Noticias') ?>
+                </a>
                 <a href="<?= $solicitudesProveedorHref ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_solicitudes_servicios', 'Solicitudes de servicios') ?>
                 </a>
@@ -135,6 +145,12 @@ $cartCount = count($cartItems);
                 </a>
                 <a href="<?= ($cssPrefix === '.') ? 'views/solicitudes-docente.php' : 'solicitudes-docente.php' ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_solicitudes_docentes', 'Solicitudes docentes') ?>
+                </a>
+                <a href="<?= $eventosHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_admin_eventos', 'Gestión de Eventos') ?>
+                </a>
+                <a href="<?= $noticiasHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_admin_noticias', 'Gestión de Noticias') ?>
                 </a>
                 <a href="<?= $panelProveedorHref ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_panel_proveedor', 'Panel proveedor') ?>

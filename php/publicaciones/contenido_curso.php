@@ -84,14 +84,32 @@ function url_recurso_valida(?string $url): bool
     return is_array($p) && isset($p['scheme']) && in_array(strtolower($p['scheme']), ['http', 'https'], true);
 }
 
-function obtener_youtube_embed_url(?string $url): ?string
+function obtener_video_embed_url(?string $url): ?string
 {
     if (!$url) return null;
     $url = trim($url);
+    // YouTube
     if (preg_match('#(?:youtube\.com/(?:watch\?v=|embed/|v/|shorts/)|youtu\.be/)([a-zA-Z0-9_-]{11})#i', $url, $matches)) {
         return 'https://www.youtube-nocookie.com/embed/' . $matches[1] . '?rel=0&modestbranding=1';
     }
+    // Vimeo
+    if (preg_match('#(?:vimeo\.com/(?:video/)?|player\.vimeo\.com/video/)([0-9]+)#i', $url, $matches)) {
+        return 'https://player.vimeo.com/video/' . $matches[1];
+    }
+    // Dailymotion
+    if (preg_match('#(?:dailymotion\.com/(?:video/|embed/video/)|dai\.ly/)([a-zA-Z0-9]+)#i', $url, $matches)) {
+        return 'https://www.dailymotion.com/embed/video/' . $matches[1];
+    }
+    // Loom
+    if (preg_match('#(?:loom\.com/share/|loom\.com/embed/)([a-zA-Z0-9]+)#i', $url, $matches)) {
+        return 'https://www.loom.com/embed/' . $matches[1];
+    }
     return null;
+}
+
+function obtener_youtube_embed_url(?string $url): ?string
+{
+    return obtener_video_embed_url($url);
 }
 
 function tipos_recurso_curso(): array
@@ -208,10 +226,10 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
         } elseif ($a === 'editar_unidad') {
             $t = trim($post['titulo'] ?? '');
             if ($t === '') return ['ok' => false, 'mensaje' => 'La clase necesita un título.'];
-            $q = $pdo->prepare("UPDATE curso_unidades u JOIN curso_modulos m ON m.id_modulo=u.id_modulo SET u.titulo=:t,u.descripcion=:d,u.orden=:o WHERE u.id_unidad=:u AND m.id_publicacion=:p");
+            $q = $pdo->prepare("UPDATE curso_unidades SET titulo=:t, descripcion=:d, orden=:o WHERE id_unidad=:u AND id_modulo IN (SELECT id_modulo FROM curso_modulos WHERE id_publicacion=:p)");
             $q->execute(['t' => $t, 'd' => trim($post['descripcion'] ?? '') ?: null, 'o' => max(1, (int)($post['orden'] ?? 1)), 'u' => (int)$post['id_unidad'], 'p' => $id_publicacion]);
         } elseif ($a === 'eliminar_unidad') {
-            $q = $pdo->prepare("DELETE u FROM curso_unidades u JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE u.id_unidad=:u AND m.id_publicacion=:p");
+            $q = $pdo->prepare("DELETE FROM curso_unidades WHERE id_unidad=:u AND id_modulo IN (SELECT id_modulo FROM curso_modulos WHERE id_publicacion=:p)");
             $q->execute(['u' => (int)$post['id_unidad'], 'p' => $id_publicacion]);
         } elseif (in_array($a, ['subir_unidad', 'bajar_unidad'], true)) {
             $q = $pdo->prepare("SELECT u.id_modulo FROM curso_unidades u JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE u.id_unidad=:u AND m.id_publicacion=:p");
@@ -327,7 +345,7 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
             $q = $pdo->prepare("SELECT r.archivo FROM curso_recursos r JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE r.id_recurso=:r AND m.id_publicacion=:p");
             $q->execute(['r' => (int)$post['id_recurso'], 'p' => $id_publicacion]);
             $ruta = $q->fetchColumn();
-            $d = $pdo->prepare("DELETE r FROM curso_recursos r JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE r.id_recurso=:r AND m.id_publicacion=:p");
+            $d = $pdo->prepare("DELETE FROM curso_recursos WHERE id_recurso=:r AND id_unidad IN (SELECT u.id_unidad FROM curso_unidades u JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE m.id_publicacion=:p)");
             $d->execute(['r' => (int)$post['id_recurso'], 'p' => $id_publicacion]);
             if ($ruta) {
                 if (str_starts_with($ruta, 'supabase:')) {

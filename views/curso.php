@@ -165,21 +165,32 @@ include '../includes/header.php';
                   $ytEmbed = !empty($vid['url']) ? obtener_youtube_embed_url($vid['url']) : null; 
                 ?>
                 <div class="course-video-wrapper u-mb-md" id="recurso-<?= (int)$vid['id_recurso'] ?>">
-                  <div class="course-video-header u-mb-xs">
-                    <span class="course-resource-code"><?= $codVid ?></span>
-                    <strong>🎥 <?= htmlspecialchars($vid['titulo']) ?></strong>
+                  <div class="course-video-header u-mb-xs" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                      <span class="course-resource-code"><?= $codVid ?></span>
+                      <strong>🎥 <?= htmlspecialchars($vid['titulo']) ?></strong>
+                    </div>
+                    <?php if (!empty($vid['url'])): ?>
+                      <a href="<?= htmlspecialchars($vid['url']) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
+                        🔗 Abrir en pestaña nueva ↗
+                      </a>
+                    <?php elseif (!empty($vid['archivo'])): ?>
+                      <a href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$vid['id_recurso'] ?>&modo=inline" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
+                        🔗 Abrir en pestaña nueva ↗
+                      </a>
+                    <?php endif; ?>
                   </div>
-                  <?php if ($ytEmbed): ?>
-                    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-md);background:#000;box-shadow:var(--shadow-sm);">
-                      <iframe src="<?= htmlspecialchars($ytEmbed) ?>" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
+                  <?php if ($embedUrl = obtener_video_embed_url($vid['url'] ?? '')): ?>
+                    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-lg);background:#000;box-shadow:var(--shadow-md);">
+                      <iframe src="<?= htmlspecialchars($embedUrl) ?>" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
                     </div>
                   <?php elseif (!empty($vid['archivo'])): ?>
-                    <video controls style="width:100%;border-radius:var(--radius-md);max-height:480px;background:#000;box-shadow:var(--shadow-sm);">
+                    <video controls style="width:100%;border-radius:var(--radius-lg);max-height:640px;background:#000;box-shadow:var(--shadow-md);display:block;">
                       <source src="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$vid['id_recurso'] ?>">
                       Tu navegador no soporta la reproducción directa de video.
                     </video>
                   <?php elseif (!empty($vid['url'])): ?>
-                    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-md);background:#000;box-shadow:var(--shadow-sm);">
+                    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-lg);background:#000;box-shadow:var(--shadow-md);">
                       <iframe src="<?= htmlspecialchars($vid['url']) ?>" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
                     </div>
                   <?php endif; ?>

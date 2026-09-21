@@ -164,8 +164,12 @@ include '../includes/header.php';
           <?php foreach ($cursos_contratados as $curso): ?>
             <li class="account-item">
               <strong><?php echo htmlspecialchars($curso['titulo']); ?></strong>
-              — Estado: <em><?php echo htmlspecialchars($curso['estado']); ?></em>
-              [<a href="curso.php?id=<?php echo (int)$curso['id_publicacion']; ?>"><?php echo $curso['estado'] === 'Completada' ? 'Ver curso' : 'Continuar curso'; ?></a>]
+              — Estado: <em><?php echo $curso['estado'] === 'Pendiente' ? 'Pendiente de pago' : htmlspecialchars($curso['estado']); ?></em>
+              <?php if ($curso['estado'] === 'Pendiente'): ?>
+                [<a href="pasarela-pago.php?id_contratacion=<?php echo (int)$curso['id_contratacion']; ?>" class="link u-font-bold u-text-brand-primary">Completar pago →</a>]
+              <?php else: ?>
+                [<a href="curso.php?id=<?php echo (int)$curso['id_publicacion']; ?>"><?php echo $curso['estado'] === 'Completada' ? 'Ver curso' : 'Continuar curso'; ?></a>]
+              <?php endif; ?>
 
               <?php if (!empty($curso['id_valoracion'])): ?>
                 <div class="account-item-rating">

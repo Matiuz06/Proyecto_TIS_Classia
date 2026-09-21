@@ -366,8 +366,64 @@ INSERT INTO publicaciones (id_publicacion, titulo, descripcion, precio, tipo, ti
 (10, 'Consultoría en Implementación de Metodologías Ágiles', 'Asesoría para equipos de desarrollo en adopción de Scrum y Kanban.', 30000.00, 'Servicio', 'formacion_institucional', 'Activo', '2026-03-01 13:00:00+00', 5, 10)
 ON CONFLICT (id_publicacion) DO NOTHING;
 
+-- ----------------------------------------------------------------------------
+-- 17. TABLA: noticias
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS noticias (
+    id_noticia SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    subtitulo VARCHAR(255) NULL,
+    cuerpo TEXT NOT NULL,
+    imagen VARCHAR(255) NULL,
+    categoria VARCHAR(100) DEFAULT 'Institucional',
+    autor VARCHAR(100) DEFAULT 'Equipo AniTech',
+    id_usuario INT REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+    fecha_publicacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    orden INT DEFAULT 0,
+    estado VARCHAR(50) DEFAULT 'Publicada'
+);
+
+-- ----------------------------------------------------------------------------
+-- 18. TABLA: eventos
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS eventos (
+    id_evento SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT NOT NULL,
+    tipo VARCHAR(100) DEFAULT 'Webinar',
+    modalidad VARCHAR(50) DEFAULT 'Online',
+    fecha_evento TIMESTAMPTZ NOT NULL,
+    ubicacion_enlace VARCHAR(255) NULL,
+    cupos INT DEFAULT 0,
+    imagen VARCHAR(255) NULL,
+    id_usuario INT REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+    estado VARCHAR(50) DEFAULT 'Abierto'
+);
+
+CREATE INDEX IF NOT EXISTS idx_noticias_estado ON noticias (estado);
+CREATE INDEX IF NOT EXISTS idx_noticias_fecha ON noticias (fecha_publicacion);
+CREATE INDEX IF NOT EXISTS idx_noticias_usuario ON noticias (id_usuario);
+CREATE INDEX IF NOT EXISTS idx_eventos_estado ON eventos (estado);
+CREATE INDEX IF NOT EXISTS idx_eventos_fecha ON eventos (fecha_evento);
+CREATE INDEX IF NOT EXISTS idx_eventos_usuario ON eventos (id_usuario);
+
+INSERT INTO noticias (id_noticia, titulo, subtitulo, cuerpo, imagen, categoria, autor, fecha_publicacion, orden, estado) VALUES
+(1, 'Lanzamiento de Classia 2.0 y Nuevos Entornos de Aprendizaje', 'Una plataforma renovada para fortalecer la educación técnica y el intercambio profesional.', 'Nos complace presentar Classia 2.0, una evolución integral diseñada para conectar a estudiantes, docentes y entusiastas de la tecnología. Con módulos de cursos estructurados, visor de documentos integrado y un sistema ágil de solicitud de servicios personalizados, la plataforma refuerza el compromiso de democratizar el acceso a la educación tecnológica de calidad.', 'assets/images/cybersecurity_lab.jpg', 'Institucional', 'Equipo AniTech', '2026-09-01 10:00:00+00', 1, 'Publicada'),
+(2, 'Taller de Ciberseguridad y Auditoría Web en CeRP del Suroeste', 'Capacitación práctica en buenas prácticas OWASP y defensas activas en servidores.', 'Se llevó a cabo con gran concurrencia el taller presencial de ciberseguridad aplicada en el Laboratorio del CeRP del Suroeste. Durante la jornada se abordaron técnicas de auditoría de vulnerabilidades, protección contra inyecciones SQL y mitigación de ataques CSRF en arquitecturas modernas.', 'assets/images/network_security_center.jpg', 'Ciberseguridad', 'Gonzalo Martínez', '2026-09-08 14:30:00+00', 2, 'Publicada'),
+(3, 'Nueva Convocatoria para Docentes y Creadores de Contenido TI', 'Sumate a la red de instructores y compartí tus cursos y servicios especializados.', 'Abrimos la convocatoria para docentes, profesionales independientes y técnicos que deseen publicar sus propios cursos y ofrecer servicios de consultoría o fabricación técnica dentro del ecosistema Classia.', 'assets/images/cloud_server_facility.jpg', 'Académico', 'Carlos Admin', '2026-09-15 09:15:00+00', 3, 'Publicada')
+ON CONFLICT (id_noticia) DO NOTHING;
+
+INSERT INTO eventos (id_evento, titulo, descripcion, tipo, modalidad, fecha_evento, ubicacion_enlace, cupos, imagen, estado) VALUES
+(1, 'Webinar: Seguridad en el Desarrollo Web Moderno (OWASP Top 10)', 'Aprende a identificar y mitigar las vulnerabilidades más críticas en aplicaciones web: inyecciones, CSRF, autenticación rota y configuraciones de seguridad esenciales.', 'Webinar', 'Online', '2026-10-15 19:00:00+00', 'https://meet.google.com/classia-security', 120, 'assets/images/cybersecurity_lab.jpg', 'Abierto'),
+(2, 'Taller Práctico: Diseño y Fabricación Digital con Impresión 3D', 'Jornada intensiva para aprender calibración de impresoras FDM, modelado en Fusion 360 y optimización de parámetros de laminado con PLA y PETG.', 'Taller', 'Presencial', '2026-10-22 14:30:00+00', 'Laboratorio CeRP del Suroeste (Colonia)', 30, 'assets/images/network_security_center.jpg', 'Abierto'),
+(3, 'Mesa Redonda: Desafíos de la Educación Técnica y el Software Libre', 'Intercambio abierto entre docentes y estudiantes sobre la adopción de herramientas libres y metodologías activas en la formación tecnológica.', 'Conferencia', 'Híbrido', '2026-11-05 18:00:00+00', 'Salón de Actos CeRP & Transmisión en Vivo', 80, 'assets/images/cloud_server_facility.jpg', 'Abierto')
+ON CONFLICT (id_evento) DO NOTHING;
+
 -- Sincronizar secuencias serial con los registros insertados
 SELECT setval(pg_get_serial_sequence('roles', 'id_rol'), coalesce(max(id_rol), 1)) FROM roles;
 SELECT setval(pg_get_serial_sequence('categorias', 'id_categoria'), coalesce(max(id_categoria), 1)) FROM categorias;
 SELECT setval(pg_get_serial_sequence('usuarios', 'id_usuario'), coalesce(max(id_usuario), 1)) FROM usuarios;
 SELECT setval(pg_get_serial_sequence('publicaciones', 'id_publicacion'), coalesce(max(id_publicacion), 1)) FROM publicaciones;
+SELECT setval(pg_get_serial_sequence('noticias', 'id_noticia'), coalesce(max(id_noticia), 1)) FROM noticias;
+SELECT setval(pg_get_serial_sequence('eventos', 'id_evento'), coalesce(max(id_evento), 1)) FROM eventos;
+
