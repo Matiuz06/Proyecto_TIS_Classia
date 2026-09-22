@@ -8154,3 +8154,272 @@ body.course-builder-page.course-dialog-open {
   color: #9b2c2c;
   border-color: #fc8181;
 }
+
+/* CSS DEl DROPDOWN PANEL ADMIN (MATEUS) */
+
+.admin-panel {
+  width: min(100% - 2rem, 1100px);
+  margin: 0 auto;
+}
+
+.admin-panel-header {
+  padding: 2rem 0 1.25rem;
+}
+
+.admin-panel-kicker {
+  margin: 0 0 0.4rem;
+  color: var(--color-brand-primary, #157156);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.admin-panel-header h1 {
+  margin: 0 0 0.75rem;
+  color: var(--color-heading, #1a202c);
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.admin-panel-header > p:last-child {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--color-text-muted, #718096);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+
+/* Tarjeta principal */
+
+.admin-panel-section {
+  padding: 1.5rem;
+  background: var(--color-surface-elevated, #ffffff);
+  border: 1px solid var(--color-border, #cbd5e0);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-panel-section h2 {
+  margin: 0 0 1.25rem;
+  color: var(--color-heading, #1a202c);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+
+/* Dropdown de los apartados */
+
+.admin-panel-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.admin-panel-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+
+  background: var(--color-surface-elevated, #ffffff);
+  color: var(--color-text, #2d3748);
+
+  border: 1px solid var(--color-border, #cbd5e0);
+  border-radius: var(--radius-sm, 6px);
+
+  font-size: 0.88rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.admin-panel-trigger:hover {
+  background-color: var(--color-brand-primary-soft, #ebf8ff);
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+}
+
+.admin-panel-trigger:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.admin-panel-caret {
+  font-size: 0.65rem;
+  opacity: 0.65;
+}
+
+
+/* Menú del selector */
+
+.admin-panel-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+
+  width: 220px;
+  padding: 0.35rem 0;
+
+  background: var(--color-surface-elevated, #ffffff);
+  border: 1px solid var(--color-border, #cbd5e0);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-md);
+
+  z-index: 20;
+}
+
+.admin-panel-dropdown:hover .admin-panel-menu,
+.admin-panel-dropdown:focus-within .admin-panel-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Opciones */
+
+.admin-panel-item {
+  display: block;
+  width: 100%;
+
+  padding: 0.6rem 0.9rem;
+
+  background: transparent;
+  color: var(--color-text, #2d3748);
+
+  border: 0;
+
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.4;
+
+  text-align: left;
+  text-decoration: none;
+
+  box-sizing: border-box;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.admin-panel-item:hover,
+.admin-panel-item:focus {
+  background-color: var(--color-brand-accent-soft, #e6f4f1);
+  color: var(--color-brand-primary, #157156);
+}
+
+.admin-panel-item.active {
+  background-color: var(--color-brand-primary-soft, #ebf8ff);
+  color: var(--color-brand-primary, #157156);
+  font-weight: 700;
+}
+
+/*PANEL GRAL DEL ADMIN*/
+
+.admin-panel-general {
+  margin-top: 1.5rem;
+}
+
+.admin-panel-general-header {
+  margin-bottom: 1.25rem;
+}
+
+.admin-panel-general-header h3 {
+  margin: 0 0 0.5rem;
+  color: var(--color-heading, #1a202c);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.admin-panel-general-header p:last-child {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--color-text-muted, #718096);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+
+/* DIVS DE ESTADÍSTICAS*/
+
+.admin-panel-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.admin-panel-stat {
+  padding: 1.25rem;
+
+  background: var(--color-surface-elevated, #ffffff);
+  border: 1px solid var(--color-border, #cbd5e0);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-panel-stat-label {
+  display: block;
+  margin-bottom: 0.6rem;
+
+  color: var(--color-text-muted, #718096);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.admin-panel-stat-value {
+  display: block;
+  margin-bottom: 0.35rem;
+
+  color: var(--color-brand-primary, #157156);
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.admin-panel-stat-description {
+  color: var(--color-text-muted, #718096);
+  font-size: 0.75rem;
+}
+
+
+/*INFO GRAL*/
+
+.admin-panel-general-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-panel-info-card {
+  padding: 1.25rem;
+
+  background: var(--color-bg-soft, #f7fafc);
+  border: 1px solid var(--color-border, #cbd5e0);
+  border-radius: var(--radius-md, 8px);
+}
+
+.admin-panel-info-card h4 {
+  margin: 0 0 0.5rem;
+
+  color: var(--color-heading, #1a202c);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.admin-panel-info-card p {
+  margin: 0;
+
+  color: var(--color-text-muted, #718096);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
