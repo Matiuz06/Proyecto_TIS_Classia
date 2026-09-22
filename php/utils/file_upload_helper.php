@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Gestiona archivos privados subidos y resuelve rutas internas permitidas.
+ */
+
 function ruta_absoluta_archivo_guardado(?string $ruta): ?string
 {
     if (!$ruta) return null;
@@ -23,22 +27,45 @@ function guardar_archivo_subido(array $archivo, string $subcarpeta, int $max_meg
 {
     if (!isset($archivo['error']) || is_array($archivo['error'])) return ['ok'=>false,'error'=>'Parámetros de archivo no válidos.'];
     if ($archivo['error'] === UPLOAD_ERR_NO_FILE) return ['ok'=>false,'error'=>'No se seleccionó ningún archivo.'];
-    if ($archivo['error'] !== UPLOAD_ERR_OK) return ['ok'=>false,'error'=>'Error al subir el archivo.'];
+    if ($archivo['error'] !== UPLOAD_ERR_OK) {
+        $msg = match ((int)$archivo['error']) {
+            UPLOAD_ERR_INI_SIZE   => "El archivo supera el tamaño máximo permitido por el servidor (máx. {$max_megabytes}MB).",
+            UPLOAD_ERR_FORM_SIZE  => "El archivo supera el tamaño máximo permitido por el formulario.",
+            UPLOAD_ERR_PARTIAL    => "El archivo se subió solo parcialmente. Intentalo de nuevo.",
+            UPLOAD_ERR_NO_TMP_DIR => "Falta la carpeta temporal en el servidor.",
+            UPLOAD_ERR_CANT_WRITE => "Error al guardar el archivo en el servidor.",
+            UPLOAD_ERR_EXTENSION  => "Subida interrumpida por una extensión del servidor.",
+            default               => "Error al subir el archivo (código {$archivo['error']}).",
+        };
+        return ['ok'=>false,'error'=>$msg];
+    }
     if (($archivo['size'] ?? 0) > $max_megabytes * 1024 * 1024) return ['ok'=>false,'error'=>"El archivo supera el máximo de {$max_megabytes}MB."];
     if (empty($archivo['tmp_name']) || !is_uploaded_file($archivo['tmp_name'])) return ['ok'=>false,'error'=>'El archivo temporal no es válido.'];
 
     $nombreOriginal = (string)($archivo['name'] ?? '');
     $extensionOriginal = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
-    $extPermitidas = ['pdf','zip','doc','docx','txt','jpg','jpeg','png','webp','gif','mp4','webm','stl','obj','3mf'];
+    $extPermitidas = ['pdf','zip','rar','7z','doc','docx','ppt','pptx','pps','ppsx','xls','xlsx','odt','ods','odp','txt','csv','jpg','jpeg','png','webp','gif','mp4','webm','stl','obj','3mf'];
     if (!in_array($extensionOriginal, $extPermitidas, true)) return ['ok'=>false,'error'=>'La extensión del archivo no está permitida.'];
 
     $mimePermitidos = [
         'application/pdf'=>['pdf'],
         'application/zip'=>['zip'],
         'application/x-zip-compressed'=>['zip'],
+        'application/x-rar-compressed'=>['rar'],
+        'application/vnd.rar'=>['rar'],
+        'application/x-7z-compressed'=>['7z'],
         'application/msword'=>['doc'],
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'=>['docx'],
-        'text/plain'=>['txt'],
+        'application/vnd.ms-powerpoint'=>['ppt', 'pps'],
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation'=>['pptx'],
+        'application/vnd.openxmlformats-officedocument.presentationml.slideshow'=>['ppsx'],
+        'application/vnd.ms-excel'=>['xls'],
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'=>['xlsx'],
+        'application/vnd.oasis.opendocument.text'=>['odt'],
+        'application/vnd.oasis.opendocument.spreadsheet'=>['ods'],
+        'application/vnd.oasis.opendocument.presentation'=>['odp'],
+        'text/plain'=>['txt', 'csv'],
+        'text/csv'=>['csv'],
         'image/jpeg'=>['jpg','jpeg'],
         'image/png'=>['png'],
         'image/webp'=>['webp'],

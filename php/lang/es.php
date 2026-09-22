@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Define los textos de interfaz en español para el sistema de internacionalización.
+ */
+
 return [
     'nav_inicio'            => 'Inicio',
     'nav_catalogo'          => 'Catálogo',
@@ -18,6 +22,12 @@ return [
     'nav_perfil_profesional' => 'Perfil profesional',
     'nav_solicitudes_docentes' => 'Solicitudes docentes',
     'nav_panel_proveedor'   => 'Panel proveedor',
+    'nav_eventos'           => 'Eventos',
+    'nav_noticias'          => 'Noticias',
+    'nav_docente_eventos'   => 'Proponer / Ver Eventos',
+    'nav_docente_noticias'  => 'Proponer / Ver Noticias',
+    'nav_admin_eventos'     => 'Gestión de Eventos',
+    'nav_admin_noticias'    => 'Gestión de Noticias',
 
     'hero_badge'            => 'Plataforma de Aprendizaje & Servicios',
     'hero_title'            => 'Impulsa tus habilidades con formación de vanguardia',

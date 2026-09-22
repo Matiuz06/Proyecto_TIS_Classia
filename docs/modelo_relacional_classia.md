@@ -1,184 +1,251 @@
-# Modelo Relacional y Diccionario de Datos — Classia · Segunda Entrega
+# Modelo Relacional — Classia · Segunda Entrega (Sprint 3)
 
-## Resumen del Documento
-Este documento especifica la **transformación del MER al Modelo Relacional Físico** para la base de datos de **Classia** (MariaDB/MySQL). Incluye la definición de tablas, claves primarias, claves foráneas, restricciones de integridad, resolución de relaciones N:M, diccionario de datos, roles del sistema y verificación de normalización (3FN).
+## Especificación del Esquema Físico
+Este documento detalla el **Modelo Relacional Lógico y Físico** correspondiente a la base de datos MariaDB / MySQL de la plataforma **Classia**.
 
-> **Última actualización:** Segunda entrega funcional y técnica (Sprint 2)  
-> **Coherencia validada contra:** [`sql/schema.sql`](../sql/schema.sql)  
-> **Convención de nombres:** `snake_case` para tablas y columnas, conforme al DDL físico.
-
----
-
-## Esquema de Tablas Físicas
-
-### 1. `roles`
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_rol` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `nombre_rol` | `VARCHAR(50)` | `NOT NULL UNIQUE` |
-| `descripcion` | `VARCHAR(255)` | `NULL` |
-
-**Datos semilla:**
-| `id_rol` | `nombre_rol` | `descripcion` |
-|:---:|:---|:---|
-| 1 | `Cliente/Estudiante` | Usuario consumidor de cursos y servicios |
-| 2 | `Docente/Proveedor` | Usuario creador y prestador de servicios educativos |
-| 3 | `Administrador` | Superusuario del sistema |
+> **Última actualización:** Segunda Entrega (Sprint 3)  
+> **Script físico asociado:** [`sql/schema.sql`](../sql/schema.sql)
 
 ---
 
-### 2. `usuarios`
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_usuario` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `nombre` | `VARCHAR(100)` | `NOT NULL` |
-| `apellido` | `VARCHAR(100)` | `NOT NULL` |
-| `email` | `VARCHAR(150)` | `NOT NULL UNIQUE` |
-| `password_hash` | `VARCHAR(255)` | `NOT NULL` |
-| `telefono` | `VARCHAR(30)` | `NULL` |
-| `fecha_registro` | `DATETIME` | `NOT NULL DEFAULT CURRENT_TIMESTAMP` |
-| `id_rol` | `INT` | `NOT NULL` · `FK → roles(id_rol)` ON DELETE RESTRICT |
+## Diagrama del Modelo Relacional (PlantUML / draw.io)
 
----
+![Diagrama Modelo Relacional](diagramas/modelo_relacional_classia.png)
 
-### 3. `categorias`
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_categoria` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `nombre_categoria` | `VARCHAR(100)` | `NOT NULL UNIQUE` |
-| `descripcion` | `TEXT` | `NULL` |
+*Versión vectorial:* [modelo_relacional_classia.svg](diagramas/modelo_relacional_classia.svg) | *Código fuente:* [modelo_relacional_classia.puml](diagramas/modelo_relacional_classia.puml)
 
-**10 categorías semilla:** Programación y Desarrollo, Robótica y Automatización, Diseño e Impresión 3D, Mentorías y Capacitación, Inteligencia Artificial y Datos, Electrónica y Microcontroladores, Ciberseguridad y Redes, Diseño Web y UX/UI, Idiomas y Comunicación Técnica, Gestión de Proyectos Tecnológicos.
+### Código Fuente PlantUML
+```plantuml
+@startuml modelo_relacional_classia
+!theme plain
 
----
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 12
+skinparam defaultFontColor #2D3748
 
-### 4. `publicaciones`
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_publicacion` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `titulo` | `VARCHAR(200)` | `NOT NULL` |
-| `descripcion` | `TEXT` | `NOT NULL` |
-| `precio` | `DECIMAL(10,2)` | `NOT NULL` |
-| `tipo` | `ENUM('Curso','Servicio')` | `NOT NULL` |
-| `estado` | `ENUM('Activo','Inactivo','Pausado')` | `NOT NULL DEFAULT 'Activo'` |
-| `fecha_creacion` | `DATETIME` | `NOT NULL DEFAULT CURRENT_TIMESTAMP` |
-| `id_usuario` | `INT` | `NOT NULL` · `FK → usuarios(id_usuario)` ON DELETE CASCADE |
-| `id_categoria` | `INT` | `NOT NULL` · `FK → categorias(id_categoria)` ON DELETE RESTRICT |
+skinparam class {
+    BackgroundColor #FFFFFF
+    ArrowColor #3182CE
+    BorderColor #2B6CB0
+    HeaderBackgroundColor #EBF8FF
+}
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+}
+skinparam sequence {
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+    ParticipantBorderColor #2B6CB0
+    ParticipantBackgroundColor #EBF8FF
+    LifeLineBorderColor #4A5568
+    LifeLineBackgroundColor #EDF2F7
+    ArrowColor #2B6CB0
+}
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+}
 
----
+title Modelo Relacional Físico — Classia (MariaDB / MySQL)
 
-### 5. `solicitudes`
-Implementa el flujo de **solicitud personalizada de servicios educativos** (solicitud docente), accesible mediante `views/form-solicitar-servicio.php` y `views/solicitud-impresion-3d.php`. La lógica backend (`php/solicitudes/`) está planificada para la siguiente entrega.
+class "roles" as roles {
+  + **id_rol** : INT [PK, AI]
+  --
+  nombre_rol : VARCHAR(50) [UQ, NN]
+  descripcion : VARCHAR(255)
+}
 
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_solicitud` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `titulo` | `VARCHAR(200)` | `NOT NULL` |
-| `descripcion` | `TEXT` | `NOT NULL` |
-| `estado` | `ENUM('Pendiente','Aceptada','Rechazada','Cancelada')` | `NOT NULL DEFAULT 'Pendiente'` |
-| `fecha_solicitud` | `DATETIME` | `NOT NULL DEFAULT CURRENT_TIMESTAMP` |
-| `id_usuario` | `INT` | `NOT NULL` · `FK → usuarios(id_usuario)` ON DELETE CASCADE |
-| `id_publicacion` | `INT` | `NULL` · `FK → publicaciones(id_publicacion)` ON DELETE SET NULL |
+class "usuarios" as usuarios {
+  + **id_usuario** : INT [PK, AI]
+  --
+  nombre : VARCHAR(100) [NN]
+  apellido : VARCHAR(100) [NN]
+  email : VARCHAR(150) [UQ, NN]
+  password_hash : VARCHAR(255) [NN]
+  telefono : VARCHAR(30)
+  fecha_registro : DATETIME [NN]
+  # **id_rol** : INT [FK, NN]
+  foto_perfil : VARCHAR(255)
+  dos_factores_activo : TINYINT(1) [NN]
+  activo : TINYINT(1) [NN]
+}
 
----
+class "perfiles_profesionales" as perfiles {
+  + **id_perfil** : INT [PK, AI]
+  --
+  # **id_usuario** : INT [FK, UQ, NN]
+  titulo_profesional : VARCHAR(180)
+  presentacion : TEXT
+  experiencia : TEXT
+  formacion : TEXT
+  habilidades : TEXT
+  especialidades : TEXT
+  ubicacion : VARCHAR(150)
+  modalidad_trabajo : VARCHAR(150)
+}
 
-### 6. `contrataciones`
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_contratacion` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `fecha_contratacion` | `DATETIME` | `NOT NULL DEFAULT CURRENT_TIMESTAMP` |
-| `monto_total` | `DECIMAL(10,2)` | `NOT NULL` |
-| `estado` | `ENUM('Pendiente','En Proceso','Completada','Cancelada')` | `NOT NULL DEFAULT 'Pendiente'` |
-| `id_usuario` | `INT` | `NOT NULL` · `FK → usuarios(id_usuario)` ON DELETE CASCADE |
+class "categorias" as categorias {
+  + **id_categoria** : INT [PK, AI]
+  --
+  nombre_categoria : VARCHAR(100) [UQ, NN]
+  descripcion : TEXT
+  # **creada_por** : INT [FK, NULL]
+}
 
----
+class "publicaciones" as publicaciones {
+  + **id_publicacion** : INT [PK, AI]
+  --
+  titulo : VARCHAR(200) [NN]
+  descripcion : TEXT [NN]
+  precio : DECIMAL(10,2) [NN]
+  tipo : ENUM('Curso', 'Servicio') [NN]
+  modalidad : VARCHAR(30)
+  duracion_horas : SMALLINT
+  cupos : INT
+  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado') [NN]
+  imagen : VARCHAR(255)
+  # **id_usuario** : INT [FK, NN]
+  # **id_categoria** : INT [FK, NN]
+}
 
-### 7. `detalles_contratacion` *(tabla intermedia que resuelve relación N:M)*
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_detalle` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `cantidad` | `INT` | `NOT NULL DEFAULT 1` |
-| `precio_unitario` | `DECIMAL(10,2)` | `NOT NULL` |
-| `subtotal` | `DECIMAL(10,2)` | `NOT NULL` |
-| `id_contratacion` | `INT` | `NOT NULL` · `FK → contrataciones(id_contratacion)` ON DELETE CASCADE |
-| `id_publicacion` | `INT` | `NOT NULL` · `FK → publicaciones(id_publicacion)` ON DELETE RESTRICT |
+class "curso_modulos" as modulos {
+  + **id_modulo** : INT [PK, AI]
+  --
+  # **id_publicacion** : INT [FK, NN]
+  titulo : VARCHAR(180) [NN]
+  descripcion : TEXT
+  orden : INT [NN]
+}
 
----
+class "curso_unidades" as unidades {
+  + **id_unidad** : INT [PK, AI]
+  --
+  # **id_modulo** : INT [FK, NN]
+  titulo : VARCHAR(180) [NN]
+  descripcion : TEXT
+  orden : INT [NN]
+}
 
-### 8. `pagos`
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_pago` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `monto` | `DECIMAL(10,2)` | `NOT NULL` |
-| `metodo_pago` | `ENUM('Tarjeta','Transferencia','MercadoPago','Efectivo')` | `NOT NULL` |
-| `estado_pago` | `ENUM('Pendiente','Aprobado','Rechazado')` | `NOT NULL DEFAULT 'Pendiente'` |
-| `fecha_pago` | `DATETIME` | `NOT NULL DEFAULT CURRENT_TIMESTAMP` |
-| `transaccion_ref` | `VARCHAR(100)` | `NULL` |
-| `id_contratacion` | `INT` | `NOT NULL` · `FK → contrataciones(id_contratacion)` ON DELETE CASCADE |
+class "curso_recursos" as recursos {
+  + **id_recurso** : INT [PK, AI]
+  --
+  # **id_unidad** : INT [FK, NN]
+  titulo : VARCHAR(180) [NN]
+  tipo : ENUM('Archivo', 'PDF', 'Imagen', 'Video', 'Enlace') [NN]
+  url : VARCHAR(500)
+  archivo : VARCHAR(255)
+  orden : INT [NN]
+}
 
----
+class "solicitudes" as solicitudes {
+  + **id_solicitud** : INT [PK, AI]
+  --
+  titulo : VARCHAR(200) [NN]
+  descripcion : TEXT [NN]
+  estado : ENUM('Pendiente', 'Aceptada', 'Rechazada', 'Contraoferta', 'En Proceso', 'Realizada', 'Cancelada') [NN]
+  precio_propuesto : DECIMAL(10,2)
+  # **id_usuario** : INT [FK, NN]
+  # **id_publicacion** : INT [FK, NULL]
+}
 
-### 9. `valoraciones`
-| Columna | Tipo | Restricciones |
-|:---|:---|:---|
-| `id_valoracion` | `INT AUTO_INCREMENT` | `PRIMARY KEY` |
-| `puntuacion` | `INT` | `NOT NULL CHECK (puntuacion BETWEEN 1 AND 5)` |
-| `comentario` | `TEXT` | `NULL` |
-| `fecha_valoracion` | `DATETIME` | `NOT NULL DEFAULT CURRENT_TIMESTAMP` |
-| `id_usuario` | `INT` | `NOT NULL` · `FK → usuarios(id_usuario)` ON DELETE CASCADE |
-| `id_publicacion` | `INT` | `NOT NULL` · `FK → publicaciones(id_publicacion)` ON DELETE CASCADE |
-| `id_contratacion` | `INT` | `NULL` · `FK → contrataciones(id_contratacion)` ON DELETE SET NULL |
+class "solicitud_mensajes" as mensajes {
+  + **id_mensaje** : INT [PK, AI]
+  --
+  # **id_solicitud** : INT [FK, NN]
+  # **id_usuario** : INT [FK, NN]
+  mensaje : TEXT [NN]
+  fecha_mensaje : DATETIME [NN]
+}
 
----
+class "contrataciones" as contrataciones {
+  + **id_contratacion** : INT [PK, AI]
+  --
+  fecha_contratacion : DATETIME [NN]
+  monto_total : DECIMAL(10,2) [NN]
+  estado : ENUM('Pendiente', 'En Proceso', 'Completada', 'Cancelada') [NN]
+  # **id_usuario** : INT [FK, NN]
+}
 
-## Resolución de Relaciones N:M
+class "detalles_contratacion" as detalles {
+  + **id_detalle** : INT [PK, AI]
+  --
+  cantidad : INT [NN]
+  precio_unitario : DECIMAL(10,2) [NN]
+  subtotal : DECIMAL(10,2) [NN]
+  # **id_contratacion** : INT [FK, NN]
+  # **id_publicacion** : INT [FK, NN]
+}
 
-La relación entre **`contrataciones`** y **`publicaciones`** es de tipo **Muchos a Muchos (N:M)**, ya que una contratación puede incluir múltiples publicaciones y una publicación puede estar presente en múltiples contrataciones.
+class "pagos" as pagos {
+  + **id_pago** : INT [PK, AI]
+  --
+  monto : DECIMAL(10,2) [NN]
+  metodo_pago : ENUM('Tarjeta', 'Transferencia', 'MercadoPago', 'Efectivo') [NN]
+  estado_pago : ENUM('Pendiente', 'Aprobado', 'Rechazado') [NN]
+  transaccion_ref : VARCHAR(100)
+  # **id_contratacion** : INT [FK, NN]
+}
 
-**Solución implementada:** Tabla intermedia **`detalles_contratacion`** que descompone la relación N:M en dos relaciones 1:N:
-1. `contrataciones` (1) → (N) `detalles_contratacion`
-2. `publicaciones` (1) → (N) `detalles_contratacion`
+class "valoraciones" as valoraciones {
+  + **id_valoracion** : INT [PK, AI]
+  --
+  puntuacion : INT [NN]
+  comentario : TEXT
+  # **id_usuario** : INT [FK, NN]
+  # **id_publicacion** : INT [FK, NN]
+  # **id_contratacion** : INT [FK, NULL]
+}
 
----
+roles "1" <-- "0..*" usuarios : id_rol
+usuarios "1" <-- "0..1" perfiles : id_usuario
+usuarios "1" <-- "0..*" categorias : creada_por
+usuarios "1" <-- "0..*" publicaciones : id_usuario
+categorias "1" <-- "0..*" publicaciones : id_categoria
 
-## Roles y Permisos del Sistema
+publicaciones "1" <-- "0..*" modulos : id_publicacion
+modulos "1" <-- "0..*" unidades : id_modulo
+unidades "1" <-- "0..*" recursos : id_unidad
 
-El sistema implementa **Control de Acceso Basado en Roles (RBAC)** mediante la tabla `roles` y el campo `id_rol` en `usuarios`.
+usuarios "1" <-- "0..*" solicitudes : id_usuario
+publicaciones "0..1" <-- "0..*" solicitudes : id_publicacion
+solicitudes "1" <-- "0..*" mensajes : id_solicitud
+usuarios "1" <-- "0..*" mensajes : id_usuario
 
-| Rol | `id_rol` | Permisos principales |
-|:---|:---:|:---|
-| **Cliente / Estudiante** | 1 | Explorar catálogo, contratar servicios, enviar solicitudes, emitir valoraciones |
-| **Docente / Proveedor** | 2 | Crear/editar/gestionar publicaciones, ver solicitudes recibidas, consultar contrataciones |
-| **Administrador** | 3 | Gestión global de usuarios, moderación de publicaciones, administración de categorías |
+usuarios "1" <-- "0..*" contrataciones : id_usuario
+contrataciones "1" <-- "1..*" detalles : id_contratacion
+publicaciones "1" <-- "0..*" detalles : id_publicacion
+contrataciones "1" <-- "0..*" pagos : id_contratacion
 
-La sesión PHP almacena `id_rol` para control de acceso en vistas y controladores:
+usuarios "1" <-- "0..*" valoraciones : id_usuario
+publicaciones "1" <-- "0..*" valoraciones : id_publicacion
+contrataciones "0..1" <-- "0..*" valoraciones : id_contratacion
+@enduml
 
-```php
-// php/auth/session.php
-$_SESSION["usuario"] = [
-    "id_usuario" => $id,
-    "nombre"     => $nombre,
-    "email"      => $email,
-    "id_rol"     => $id_rol, // 1=Cliente, 2=Docente, 3=Admin
-];
 ```
 
 ---
 
-## Verificación de Normalización (Tercera Forma Normal — 3FN)
+## Tablas y Claves Foráneas
 
-1. **1FN:** Todos los atributos contienen valores atómicos. Cada tabla posee una clave primaria bien definida. Los valores multi-estado se expresan como `ENUM`.
-2. **2FN:** Todos los atributos no clave dependen funcionalmente de la totalidad de la clave primaria.
-3. **3FN:** No existen dependencias transitivas entre atributos no clave. Todos los campos no clave dependen directamente únicamente de la clave primaria.
-
----
-
-## Archivo SQL Físico
-
-El script DDL listo para ejecución en MySQL/MariaDB se encuentra en:
-👉 [`sql/schema.sql`](../sql/schema.sql)
-
-Para importarlo:
-```bash
-mysql -u root -p classia_db < sql/schema.sql
-```
+1. `roles` (**id_rol** [PK])
+2. `usuarios` (**id_usuario** [PK], `id_rol` [FK -> roles])
+3. `perfiles_profesionales` (**id_perfil** [PK], `id_usuario` [FK UNIQUE -> usuarios])
+4. `categorias` (**id_categoria** [PK], `creada_por` [FK -> usuarios])
+5. `publicaciones` (**id_publicacion** [PK], `id_usuario` [FK -> usuarios], `id_categoria` [FK -> categorias])
+6. `curso_modulos` (**id_modulo** [PK], `id_publicacion` [FK -> publicaciones])
+7. `curso_unidades` (**id_unidad** [PK], `id_modulo` [FK -> curso_modulos])
+8. `curso_recursos` (**id_recurso** [PK], `id_unidad` [FK -> curso_unidades])
+9. `solicitudes` (**id_solicitud** [PK], `id_usuario` [FK -> usuarios], `id_publicacion` [FK -> publicaciones])
+10. `solicitud_mensajes` (**id_mensaje** [PK], `id_solicitud` [FK -> solicitudes], `id_usuario` [FK -> usuarios])
+11. `solicitudes_docente` (**id_solicitud_docente** [PK], `id_usuario` [FK -> usuarios])
+12. `contrataciones` (**id_contratacion** [PK], `id_usuario` [FK -> usuarios])
+13. `detalles_contratacion` (**id_detalle** [PK], `id_contratacion` [FK -> contrataciones], `id_publicacion` [FK -> publicaciones])
+14. `pagos` (**id_pago** [PK], `id_contratacion` [FK -> contrataciones])
+15. `valoraciones` (**id_valoracion** [PK], `id_usuario` [FK -> usuarios], `id_publicacion` [FK -> publicaciones], `id_contratacion` [FK -> contrataciones])

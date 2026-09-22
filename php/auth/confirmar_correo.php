@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Activa cuentas pendientes mediante token de verificación de correo.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 
 $token = trim($_GET['token'] ?? '');

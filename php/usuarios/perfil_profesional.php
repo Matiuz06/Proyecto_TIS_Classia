@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Carga el perfil profesional público de un docente o proveedor.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 

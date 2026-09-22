@@ -27,6 +27,8 @@ $panelAdminHref       = ($cssPrefix === '.') ? 'views/panel-administrador.php' :
 $misSolicitudesHref = ($cssPrefix === '.') ? 'views/mis-solicitudes-servicios.php' : 'mis-solicitudes-servicios.php';
 $solicitudesProveedorHref = ($cssPrefix === '.') ? 'views/solicitudes-servicios.php' : 'solicitudes-servicios.php';
 $perfilProfesionalHref = ($cssPrefix === '.') ? 'views/perfil-profesional.php' : 'perfil-profesional.php';
+$eventosHref  = ($cssPrefix === '.') ? 'views/eventos.php'   : 'eventos.php';
+$noticiasHref = ($cssPrefix === '.') ? 'views/noticias.php'  : 'noticias.php';
 
 $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
@@ -45,8 +47,8 @@ $cartCount = count($cartItems);
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="<?= htmlspecialchars($description) ?>" />
   <title><?= htmlspecialchars($title) ?></title>
-  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/animation.css" />
-  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/style.css" />
+  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/animation.css?v=<?= filemtime(__DIR__ . '/../css/animation.css') ?>" />
+  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/style.css?v=<?= filemtime(__DIR__ . '/../css/style.css') ?>" />
   <link rel="icon" type="image/png" href="<?= $cssPrefix ?>/assets/images/favicon.png" />
 </head>
 <body<?= ($bodyClass ?? '') ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?>>
@@ -58,7 +60,10 @@ $cartCount = count($cartItems);
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="<?= $indexHref ?>"<?= $activePage === 'inicio' ? ' aria-current="page"' : '' ?>><?= __t('nav_inicio') ?></a>
         <a href="<?= $catalogoHref ?>"<?= $activePage === 'catalogo' ? ' aria-current="page"' : '' ?>><?= __t('nav_catalogo') ?></a>
+        <a href="<?= $eventosHref ?>"<?= $activePage === 'eventos' ? ' aria-current="page"' : '' ?>><?= __t('nav_eventos', 'Eventos') ?></a>
+        <a href="<?= $noticiasHref ?>"<?= $activePage === 'noticias' ? ' aria-current="page"' : '' ?>><?= __t('nav_noticias', 'Noticias') ?></a>
         
+        <?php if ($isAuth): ?>
         <a href="<?= $carritoHref ?>" class="nav-cart-btn<?= $activePage === 'carrito' ? ' active' : '' ?>" aria-label="<?= __t('nav_carrito') ?> (<?= $cartCount ?> items)">
           <svg class="nav-cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="9" cy="21" r="1"></circle>
@@ -70,6 +75,7 @@ $cartCount = count($cartItems);
             <span class="nav-cart-badge" id="cart-item-count"><?= $cartCount ?></span>
           <?php endif; ?>
         </a>
+        <?php endif; ?>
 
 
         <?php if (!$isAuth): ?>
@@ -121,6 +127,12 @@ $cartCount = count($cartItems);
                 <a href="<?= ($cssPrefix === '.') ? 'views/crear-publicacion.php' : 'crear-publicacion.php' ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_crear_publicacion', 'Crear publicación') ?>
                 </a>
+                <a href="<?= $eventosHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_docente_eventos', 'Proponer / Ver Eventos') ?>
+                </a>
+                <a href="<?= $noticiasHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_docente_noticias', 'Proponer / Ver Noticias') ?>
+                </a>
                 <a href="<?= $solicitudesProveedorHref ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_solicitudes_servicios', 'Solicitudes de servicios') ?>
                 </a>
@@ -128,16 +140,28 @@ $cartCount = count($cartItems);
                   <?= __t('nav_perfil_profesional', 'Perfil profesional') ?>
                 </a>
               <?php elseif (es_admin()): ?>
-                <a href="<?= $panelAdminHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'panel-administrador' ? ' active' : '' ?>">
-                  <?= __t('nav_panel_admin') ?>
+                <a href="<?= $panelAdminHref ?>"
+                role="menuitem"
+                class="user-dropdown-item<?= $activePage === 'panel-administrador' ? ' active' : '' ?>">
+                <?= __t('nav_panel_admin') ?>
                 </a>
-                <a href="<?= ($cssPrefix === '.') ? 'views/solicitudes-docente.php' : 'solicitudes-docente.php' ?>" role="menuitem" class="user-dropdown-item">
+
+                <a href="<?= ($cssPrefix === '.') ? 'views/solicitudes-docente.php' : 'solicitudes-docente.php' ?>"
+                  role="menuitem"
+                  class="user-dropdown-item<?= $activePage === 'solicitudes-docente' ? ' active' : '' ?>">
                   <?= __t('nav_solicitudes_docentes', 'Solicitudes docentes') ?>
+                </a>
+                <a href="<?= $eventosHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_admin_eventos', 'Gestión de Eventos') ?>
+                </a>
+                <a href="<?= $noticiasHref ?>" role="menuitem" class="user-dropdown-item">
+                  <?= __t('nav_admin_noticias', 'Gestión de Noticias') ?>
                 </a>
                 <a href="<?= $panelProveedorHref ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_panel_proveedor', 'Panel proveedor') ?>
                 </a>
-              <?php endif; ?>
+
+                <?php endif; ?>
 
               <div class="user-dropdown-divider" role="separator"></div>
               <a href="<?= $logoutHref ?>" role="menuitem" class="user-dropdown-item user-dropdown-item--logout">

@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * Responsabilidad: Valida y normaliza cédulas uruguayas para datos de usuario.
+ */
+
+/**
  * Utilidades de validación, cifrado y enmascaramiento de Cédula de Identidad Uruguaya.
  * Cumplimiento con Ley N° 18.331 de Protección de Datos Personales.
  */

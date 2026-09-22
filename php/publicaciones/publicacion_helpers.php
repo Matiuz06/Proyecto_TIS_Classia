@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Agrupa validaciones y utilidades compartidas para publicaciones.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../solicitudes/plantillas_servicio.php';
 
@@ -12,16 +16,19 @@ function resolver_categoria_publicacion(PDO $pdo, int $id_usuario, int $id_categ
 {
     $nueva_categoria = trim($nueva_categoria);
     if ($nueva_categoria !== '') {
-        if (mb_strlen($nueva_categoria) > 100) {
-            return ['ok'=>false,'error'=>'La nueva categoría no puede superar 100 caracteres.','id'=>0];
+        if ($id_categoria > 0) {
+            return ['ok' => false, 'error' => 'Para crear una nueva categoría, no debes tener seleccionada una categoría existente.', 'id' => 0];
         }
-        $stmt=$pdo->prepare("SELECT id_categoria FROM categorias WHERE LOWER(nombre_categoria)=LOWER(:n) LIMIT 1");
-        $stmt->execute(['n'=>$nueva_categoria]);
-        $existente=$stmt->fetchColumn();
-        if ($existente) return ['ok'=>true,'error'=>'','id'=>(int)$existente];
-        $stmt=$pdo->prepare("INSERT INTO categorias (nombre_categoria,descripcion,creada_por) VALUES (:n,:d,:u)");
-        $stmt->execute(['n'=>$nueva_categoria,'d'=>trim($descripcion_categoria) ?: null,'u'=>$id_usuario]);
-        return ['ok'=>true,'error'=>'','id'=>(int)$pdo->lastInsertId()];
+        if (mb_strlen($nueva_categoria) > 100) {
+            return ['ok' => false, 'error' => 'La nueva categoría no puede superar 100 caracteres.', 'id' => 0];
+        }
+        $stmt = $pdo->prepare("SELECT id_categoria FROM categorias WHERE LOWER(nombre_categoria)=LOWER(:n) LIMIT 1");
+        $stmt->execute(['n' => $nueva_categoria]);
+        $existente = $stmt->fetchColumn();
+        if ($existente) return ['ok' => true, 'error' => '', 'id' => (int)$existente];
+        $stmt = $pdo->prepare("INSERT INTO categorias (nombre_categoria,descripcion,creada_por) VALUES (:n,:d,:u)");
+        $stmt->execute(['n' => $nueva_categoria, 'd' => trim($descripcion_categoria) ?: null, 'u' => $id_usuario]);
+        return ['ok' => true, 'error' => '', 'id' => (int)$pdo->lastInsertId()];
     }
     if ($id_categoria <= 0) return ['ok'=>false,'error'=>'Seleccioná una categoría o creá una nueva.','id'=>0];
     $stmt=$pdo->prepare("SELECT id_categoria FROM categorias WHERE id_categoria=:id");

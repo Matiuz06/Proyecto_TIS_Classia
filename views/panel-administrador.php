@@ -8,16 +8,67 @@ $description = 'Panel de supervisión y gestión integral de la plataforma Class
 $cssPrefix   = '..';
 $jsPrefix    = '..';
 $activePage  = 'panel-administrador';
+
 include '../includes/header.php';
 ?>
 
-    <main>
-      <header>
-        <p>Plataforma educativa</p>
-        <h1>Panel de Administración y Control</h1>
+<main class="admin-panel">
+
+  <header class="admin-panel-header">
+    <p class="admin-panel-kicker">Plataforma educativa</p>
+
+    <h1>Panel de administración y control</h1>
+
+    <p>
+      Espacio centralizado para supervisar usuarios, gestionar solicitudes docentes,
+      revisar publicaciones y coordinar la actividad global de Classia.
+    </p>
+  </header>
+
+
+  <section class="admin-panel-section" aria-labelledby="apartados-admin">
+
+    <h2 id="apartados-admin">Apartados del panel</h2>
+
+    <div class="admin-panel-dropdown">
+
+      <button type="button" class="admin-panel-trigger">
+        <span>Seleccionar apartado</span>
+        <span class="admin-panel-caret">▾</span>
+      </button>
+
+      <div class="admin-panel-menu">
+
+        <a href="#" class="admin-panel-item">
+          Usuarios
+        </a>
+
+        <a href="#" class="admin-panel-item">
+          Solicitudes docentes
+        </a>
+
+        <a href="#" class="admin-panel-item">
+          Publicaciones
+        </a>
+
+        <a href="#" class="admin-panel-item">
+          Actividad
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div class="admin-panel-general">
+
+      <div class="admin-panel-general-header">
+
+        <h3>Estado de la plataforma</h3>
+
         <p>
-          Espacio centralizado para supervisar usuarios, gestionar solicitudes docentes,
-          revisar publicaciones y coordinar la actividad global de Classia.
+          Consulta rápida de los principales elementos que requieren
+          supervisión dentro de Classia.
         </p>
         <p class="action-row">
           <a class="btn" href="catalogo.php">Explorar catálogo</a>
@@ -57,17 +108,33 @@ include '../includes/header.php';
 
           <a
             class="content-card role-card-link motion-card"
-            href="solicitudes-docente.php">
-            <span class="badge role-card-meta">Supervisión</span>
-            <h3>Solicitudes Docentes</h3>
+            href="eventos.php">
+            <span class="badge role-card-meta">Comunidad</span>
+            <h3>Eventos &amp; Webinars</h3>
             <p class="role-card-text">
-              Evalúa y aprueba o rechaza solicitudes de usuarios que desean ser
-              docentes en la plataforma.
+              Supervisa, crea, aprueba o rechaza eventos propuestos por docentes y la institución.
             </p>
-            <span class="role-card-action">Administrar</span>
+            <span class="role-card-action">Gestionar Eventos</span>
+          </a>
+
+          <a
+            class="content-card role-card-link motion-card"
+            href="noticias.php">
+            <span class="badge role-card-meta">Prensa</span>
+            <h3>Noticias &amp; Novedades</h3>
+            <p class="role-card-text">
+              Publica y modera artículos, comunicados institucionales y noticias académicas.
+            </p>
+            <span class="role-card-action">Gestionar Noticias</span>
           </a>
         </div>
-      </section>
-    </main>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
 
 <?php include '../includes/footer.php'; ?>

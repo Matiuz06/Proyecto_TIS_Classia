@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Redirige usuarios según estado de autenticación y onboarding.
+ */
+
 require_once __DIR__ . '/sesion.php';
 
 function requerir_onboarding_completo(string $url_onboarding): void

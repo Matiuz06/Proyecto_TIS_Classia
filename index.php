@@ -13,10 +13,6 @@ include 'includes/header.php';
   <main>
     <section class="home-hero-centered motion-entry" aria-labelledby="hero-heading">
       <div class="home-hero-content">
-        <span class="home-badge-tag">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-          <?= __t('hero_badge') ?>
-        </span>
         <h1 id="hero-heading" class="home-hero-title">
           <?= __t('hero_title') ?>
         </h1>
@@ -45,25 +41,6 @@ include 'includes/header.php';
       </div>
     </section>
 
-    <div class="home-stats-strip">
-      <div class="stat-card-mini">
-        <span class="stat-card-number">45+</span>
-        <span class="stat-card-label"><?= __t('stat_courses') ?></span>
-      </div>
-      <div class="stat-card-mini">
-        <span class="stat-card-number">1.2K+</span>
-        <span class="stat-card-label"><?= __t('stat_students') ?></span>
-      </div>
-      <div class="stat-card-mini">
-        <span class="stat-card-number">100%</span>
-        <span class="stat-card-label"><?= __t('stat_instructors') ?></span>
-      </div>
-      <div class="stat-card-mini">
-        <span class="stat-card-number">4.9 / 5</span>
-        <span class="stat-card-label"><?= __t('stat_satisfaction') ?></span>
-      </div>
-    </div>
-
     <section class="home-section" aria-labelledby="categorias-heading">
       <div class="home-section-header">
         <div>
@@ -73,6 +50,25 @@ include 'includes/header.php';
         <a href="views/catalogo.php" class="link u-font-semibold u-text-xs"><?= __t('sec_view_all') ?></a>
       </div>
 
+      <?php if (!empty($categorias_home)): ?>
+        <nav class="home-category-bar" aria-label="Categorías destacadas">
+          <?php foreach ($categorias_home as $categoria): ?>
+            <?php $nombre_categoria = (string)$categoria['nombre_categoria']; ?>
+            <a href="views/catalogo.php?categoria=<?= rawurlencode($nombre_categoria) ?>" class="home-category-item">
+              <span aria-hidden="true"></span>
+              <?= htmlspecialchars(__t_db($nombre_categoria), ENT_QUOTES, 'UTF-8') ?>
+            </a>
+          <?php endforeach; ?>
+        </nav>
+      <?php else: ?>
+        <nav class="home-category-bar" aria-label="Categorías destacadas">
+          <a href="views/catalogo.php" class="home-category-item">
+            <span aria-hidden="true"></span>
+            <?= __t('sec_view_all') ?>
+          </a>
+        </nav>
+      <?php endif; ?>
+      <?php if (false): ?>
       <div class="home-carousel-container">
         <div class="home-carousel-track" id="categories-carousel" tabindex="0" role="region" aria-label="Carrusel de categorías">
           <a href="views/catalogo.php?categoria=Programacion" class="home-category-card">
@@ -124,6 +120,7 @@ include 'includes/header.php';
           </a>
         </div>
       </div>
+      <?php endif; ?>
     </section>
 
     <section class="home-section" aria-labelledby="recientes-heading">
@@ -135,7 +132,7 @@ include 'includes/header.php';
         <a href="views/catalogo.php" class="link u-font-semibold u-text-xs"><?= __t('btn_view_catalog') ?> &rarr;</a>
       </div>
 
-      <div class="grid grid-3">
+      <div class="home-course-grid">
         <?php if (!empty($publicaciones_recientes)): ?>
           <?php 
             $default_covers = [
@@ -150,7 +147,7 @@ include 'includes/header.php';
               $cover_src = !empty($pub['imagen']) ? $pub['imagen'] : ($default_covers[$idx % count($default_covers)]);
               $idx++;
             ?>
-            <article class="content-card motion-card content-card--column">
+            <article class="content-card motion-card content-card--column home-course-card">
               <div>
                 <div class="card-media-wrapper">
                   <img src="<?= htmlspecialchars($cover_src) ?>" alt="<?= htmlspecialchars($pub['titulo']) ?>" class="card-media-img" loading="lazy" />
@@ -177,7 +174,7 @@ include 'includes/header.php';
                 </div>
               </div>
 
-              <div class="u-mt-md">
+              <div class="home-card-action-row">
                 <?php if ($pub['tipo'] === 'Curso'): ?>
                   <a href="views/curso.php?id=<?= (int)$pub['id_publicacion'] ?>" class="btn btn-full btn-card-action">
                     <?= __t('btn_view_details') ?>
@@ -192,7 +189,7 @@ include 'includes/header.php';
           <?php endforeach; ?>
         <?php else: ?>
 
-          <article class="content-card motion-card">
+          <article class="content-card motion-card home-course-card">
             <div class="card-media-wrapper">
               <img src="assets/images/cybersecurity_lab.jpg" alt="Seguridad Web" class="card-media-img" loading="lazy" />
             </div>
@@ -202,7 +199,7 @@ include 'includes/header.php';
             <p class="role-card-action"><a href="views/catalogo.php" class="link"><?= __t('btn_view_catalog') ?> &rarr;</a></p>
           </article>
 
-          <article class="content-card motion-card">
+          <article class="content-card motion-card home-course-card">
             <div class="card-media-wrapper">
               <img src="assets/images/printing3d_lab.jpg" alt="Impresión 3D" class="card-media-img" loading="lazy" />
             </div>
@@ -212,7 +209,7 @@ include 'includes/header.php';
             <p class="role-card-action"><a href="views/catalogo.php" class="link"><?= __t('btn_view_catalog') ?> &rarr;</a></p>
           </article>
 
-          <article class="content-card motion-card">
+          <article class="content-card motion-card home-course-card">
             <div class="card-media-wrapper">
               <img src="assets/images/tech_conference.jpg" alt="Auditoría de Código" class="card-media-img" loading="lazy" />
             </div>
@@ -225,59 +222,48 @@ include 'includes/header.php';
       </div>
     </section>
 
+    <section class="home-section home-provider-cta" aria-labelledby="proveedores-heading">
+      <div>
+        <p class="section-title-tag-sm">Docentes y proveedores</p>
+        <h2 id="proveedores-heading">Enseña o brinda servicios desde Classia</h2>
+        <p>Publicá cursos, mentorías o servicios educativos y tecnológicos en el mismo entorno donde los estudiantes descubren nuevas oportunidades.</p>
+      </div>
+      <a href="views/solicitar-docente.php" class="btn">Postularme como docente</a>
+    </section>
+
     <section class="home-section" aria-labelledby="noticias-heading">
       <div class="home-section-header">
         <div>
           <h2 id="noticias-heading"><?= __t('sec_news') ?></h2>
           <p><?= __t('sec_news_sub') ?></p>
         </div>
+        <a href="views/noticias.php" class="btn btn-sm">Ver todas las noticias →</a>
       </div>
 
       <div class="home-news-grid">
-        <article class="home-news-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/cybersecurity_lab.jpg" alt="Ciberseguridad y 2FA" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="news-meta">
-              <span class="badge badge-brand-soft"><?= __t('news_tag_institutional') ?></span>
-              <time datetime="2026-09-10"><?= __t('news_date_1') ?></time>
-            </div>
-            <h3><?= __t('news_title_1') ?></h3>
-            <p><?= __t('news_desc_1') ?></p>
-          </div>
-          <a href="views/institucional.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_1') ?></a>
-        </article>
-
-        <article class="home-news-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/hero_education.jpg" alt="Integración OAuth" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="news-meta">
-              <span class="badge badge-brand-soft"><?= __t('news_tag_edtech') ?></span>
-              <time datetime="2026-09-04"><?= __t('news_date_2') ?></time>
-            </div>
-            <h3><?= __t('news_title_2') ?></h3>
-            <p><?= __t('news_desc_2') ?></p>
-          </div>
-          <a href="views/login.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_2') ?></a>
-        </article>
-
-        <article class="home-news-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/tech_conference.jpg" alt="Convocatoria Docente" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="news-meta">
-              <span class="badge badge-brand-soft"><?= __t('news_tag_academic') ?></span>
-              <time datetime="2026-08-28"><?= __t('news_date_3') ?></time>
-            </div>
-            <h3><?= __t('news_title_3') ?></h3>
-            <p><?= __t('news_desc_3') ?></p>
-          </div>
-          <a href="views/solicitar-docente.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_3') ?></a>
-        </article>
+        <?php if (!empty($noticias_home)): ?>
+          <?php foreach ($noticias_home as $noticia): ?>
+            <?php 
+              $imgN = !empty($noticia['imagen']) ? htmlspecialchars($noticia['imagen']) : 'assets/images/cybersecurity_lab.jpg';
+            ?>
+            <article class="home-news-card">
+              <div class="card-media-wrapper">
+                <img src="<?= $imgN ?>" alt="<?= htmlspecialchars($noticia['titulo']) ?>" class="card-media-img" loading="lazy" />
+              </div>
+              <div>
+                <div class="news-meta">
+                  <span class="badge badge-brand-soft"><?= htmlspecialchars($noticia['categoria']) ?></span>
+                  <time datetime="<?= date('Y-m-d', strtotime($noticia['fecha_publicacion'])) ?>"><?= date('d/m/Y', strtotime($noticia['fecha_publicacion'])) ?></time>
+                </div>
+                <h3><?= htmlspecialchars($noticia['titulo']) ?></h3>
+                <p><?= htmlspecialchars($noticia['subtitulo'] ?: substr(strip_tags($noticia['cuerpo']), 0, 110) . '...') ?></p>
+              </div>
+              <a href="views/noticia-detalle.php?id=<?= (int)$noticia['id_noticia'] ?>" class="link u-text-xs u-font-semibold">Leer noticia completa →</a>
+            </article>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="text-muted">No hay noticias publicadas actualmente.</p>
+        <?php endif; ?>
       </div>
     </section>
 
@@ -287,71 +273,40 @@ include 'includes/header.php';
           <h2 id="eventos-heading"><?= __t('sec_events') ?></h2>
           <p><?= __t('sec_events_sub') ?></p>
         </div>
+        <a href="views/eventos.php" class="btn btn-sm">Ver agenda de eventos →</a>
       </div>
 
       <div class="home-events-grid">
-        <article class="home-event-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/event_webinar.jpg" alt="Webinar de Seguridad" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="event-meta">
-              <span class="event-tag event-tag--own"><?= __t('event_own') ?></span>
-              <span class="u-inline-flex-center u-gap-xs">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <?= __t('event_date_1') ?>
-              </span>
-            </div>
-            <h3><?= __t('event_title_1') ?></h3>
-            <p><?= __t('event_desc_1') ?></p>
-          </div>
-          <div class="event-footer-strip">
-            <span class="u-text-xs u-font-bold u-text-success"><?= __t('event_status_1') ?></span>
-            <a href="views/contacto.php" class="btn btn-sm"><?= __t('event_btn_1') ?></a>
-          </div>
-        </article>
-
-        <article class="home-event-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/event_symposium.jpg" alt="Simposio EdTech y Fabricación 3D" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="event-meta">
-              <span class="event-tag event-tag--sector"><?= __t('event_sector') ?></span>
-              <span class="u-inline-flex-center u-gap-xs">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <?= __t('event_date_2') ?>
-              </span>
-            </div>
-            <h3><?= __t('event_title_2') ?></h3>
-            <p><?= __t('event_desc_2') ?></p>
-          </div>
-          <div class="event-footer-strip">
-            <span class="u-text-xs u-text-muted"><?= __t('event_status_2') ?></span>
-            <a href="views/contacto.php" class="btn btn-sm btn-ghost"><?= __t('event_btn_2') ?></a>
-          </div>
-        </article>
-
-        <article class="home-event-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/event_national.jpg" alt="Jornadas Nacionales de Informática" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="event-meta">
-              <span class="event-tag event-tag--national"><?= __t('event_national') ?></span>
-              <span class="u-inline-flex-center u-gap-xs">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <?= __t('event_date_3') ?>
-              </span>
-            </div>
-            <h3><?= __t('event_title_3') ?></h3>
-            <p><?= __t('event_desc_3') ?></p>
-          </div>
-          <div class="event-footer-strip">
-            <span class="u-text-xs u-text-muted"><?= __t('event_status_3') ?></span>
-            <a href="views/contacto.php" class="btn btn-sm btn-ghost"><?= __t('event_btn_3') ?></a>
-          </div>
-        </article>
+        <?php if (!empty($eventos_home)): ?>
+          <?php foreach ($eventos_home as $evento): ?>
+            <?php 
+              $imgE = !empty($evento['imagen']) ? htmlspecialchars($evento['imagen']) : 'assets/images/event_webinar.jpg';
+              $fechaE = strtotime($evento['fecha_evento']);
+            ?>
+            <article class="home-event-card">
+              <div class="card-media-wrapper">
+                <img src="<?= $imgE ?>" alt="<?= htmlspecialchars($evento['titulo']) ?>" class="card-media-img" loading="lazy" />
+              </div>
+              <div>
+                <div class="event-meta">
+                  <span class="event-tag event-tag--own"><?= htmlspecialchars($evento['tipo']) ?></span>
+                  <span class="u-inline-flex-center u-gap-xs">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <?= date('d/m/Y H:i', $fechaE) ?> hs
+                  </span>
+                </div>
+                <h3><?= htmlspecialchars($evento['titulo']) ?></h3>
+                <p><?= htmlspecialchars(substr($evento['descripcion'], 0, 110) . '...') ?></p>
+              </div>
+              <div class="event-footer-strip">
+                <span class="u-text-xs u-font-bold u-text-success"><?= htmlspecialchars($evento['modalidad']) ?></span>
+                <a href="views/evento-detalle.php?id=<?= (int)$evento['id_evento'] ?>" class="btn btn-sm">Ver evento →</a>
+              </div>
+            </article>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="text-muted">No hay eventos programados actualmente.</p>
+        <?php endif; ?>
       </div>
     </section>
 
@@ -366,7 +321,7 @@ include 'includes/header.php';
       <div class="home-testimonials-grid">
         <div class="testimonial-card">
           <div>
-            <div class="rating-stars" aria-label="5 de 5 estrellas">
+            <div class="rating-stars" hidden aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -388,7 +343,7 @@ include 'includes/header.php';
 
         <div class="testimonial-card">
           <div>
-            <div class="rating-stars" aria-label="5 de 5 estrellas">
+            <div class="rating-stars" hidden aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -410,7 +365,7 @@ include 'includes/header.php';
 
         <div class="testimonial-card">
           <div>
-            <div class="rating-stars" aria-label="5 de 5 estrellas">
+            <div class="rating-stars" hidden aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -481,7 +436,7 @@ include 'includes/header.php';
       </div>
     </section>
 
-    <section class="home-section u-mb-3xl" aria-labelledby="tech-heading">
+    <section class="home-section" aria-labelledby="tech-heading">
       <div class="home-tech-strip">
         <p class="trusted-label"><?= __t('sec_tech_stack') ?></p>
         <div class="home-tech-grid">
@@ -529,6 +484,7 @@ include 'includes/header.php';
         </div>
       </div>
     </section>
+
   </main>
 
 <?php

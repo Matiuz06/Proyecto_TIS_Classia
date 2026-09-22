@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * Responsabilidad: Valida tokens de Google reCAPTCHA antes de aceptar formularios sensibles.
+ */
+
+/**
  * Utilidades para verificación de Google reCAPTCHA v2 / v3
  */
 

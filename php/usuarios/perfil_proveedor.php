@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Consulta estadísticas públicas del proveedor y sus publicaciones activas.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 
 $id_proveedor = isset($_GET['id']) ? (int) $_GET['id'] : 0;

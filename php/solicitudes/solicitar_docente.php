@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Registra solicitudes para obtener rol docente/proveedor.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 
 function asegurar_tabla_solicitudes_docente(PDO $db): void
@@ -29,7 +33,6 @@ function tiene_solicitud_docente_pendiente(int $id_usuario, ?PDO $pdo_param = nu
 {
     global $pdo;
     $db = $pdo_param ?? $pdo;
-    asegurar_tabla_solicitudes_docente($db);
 
     try {
         $stmt = $db->prepare(
@@ -49,7 +52,6 @@ function crear_solicitud_docente(int $id_usuario, string $motivo, string $token_
 {
     global $pdo;
     $db = $pdo_param ?? $pdo;
-    asegurar_tabla_solicitudes_docente($db);
 
     if (empty($csrf_session) || !hash_equals($csrf_session, $token_recibido)) {
         return [

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Inicia el flujo OAuth con GitHub mediante redirección autorizada.
+ */
+
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 

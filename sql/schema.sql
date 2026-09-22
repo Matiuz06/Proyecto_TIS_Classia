@@ -5,11 +5,19 @@ CREATE DATABASE IF NOT EXISTS classia_db
 USE classia_db;
 
 
+-- =========================================================
+-- Permisos locales de desarrollo
+-- Usuario con privilegios acotados al esquema de Classia
+-- =========================================================
 CREATE USER IF NOT EXISTS 'classia_user'@'localhost' IDENTIFIED BY 'CONTRASENA_LOCAL';
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, INDEX ON classia_db.* TO 'classia_user'@'localhost';
 FLUSH PRIVILEGES;
 
 
+-- =========================================================
+-- Identidad, roles y perfiles base
+-- Usuarios contiene autenticación, onboarding y recuperación
+-- =========================================================
 CREATE TABLE IF NOT EXISTS roles (
     id_rol INT AUTO_INCREMENT PRIMARY KEY,
     nombre_rol VARCHAR(50) NOT NULL UNIQUE,
@@ -53,6 +61,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Catálogo de cursos y servicios
+-- Publicaciones pertenecen a usuarios proveedores y categorías
+-- =========================================================
 CREATE TABLE IF NOT EXISTS categorias (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nombre_categoria VARCHAR(100) NOT NULL UNIQUE,
@@ -83,9 +95,17 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     id_usuario INT NOT NULL,
     id_categoria INT NOT NULL,
     CONSTRAINT fk_publicaciones_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_publicaciones_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT fk_publicaciones_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_pub_usuario (id_usuario),
+    INDEX idx_pub_categoria (id_categoria),
+    INDEX idx_pub_estado_tipo (estado, tipo),
+    INDEX idx_pub_fecha (fecha_creacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Solicitudes, contrataciones y pagos
+-- Vinculan pedidos personalizados, órdenes y comprobantes
+-- =========================================================
 CREATE TABLE IF NOT EXISTS solicitudes (
     id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(200) NOT NULL,
@@ -102,9 +122,17 @@ CREATE TABLE IF NOT EXISTS solicitudes (
     id_publicacion INT NULL,
     id_contratacion INT NULL,
     CONSTRAINT fk_solicitudes_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_solicitudes_publicaciones FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT fk_solicitudes_publicaciones FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_sol_usuario (id_usuario),
+    INDEX idx_sol_publicacion (id_publicacion),
+    INDEX idx_sol_estado (estado),
+    INDEX idx_sol_contratacion (id_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Solicitudes de rol docente
+-- Registra postulaciones y revisión administrativa de proveedores
+-- =========================================================
 CREATE TABLE IF NOT EXISTS solicitudes_docente (
     id_solicitud_docente INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -127,7 +155,10 @@ CREATE TABLE IF NOT EXISTS contrataciones (
     id_usuario INT NOT NULL,
     CONSTRAINT fk_contrataciones_usuarios
         FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_cont_usuario (id_usuario),
+    INDEX idx_cont_estado (estado),
+    INDEX idx_cont_fecha (fecha_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS detalles_contratacion (
@@ -142,7 +173,9 @@ CREATE TABLE IF NOT EXISTS detalles_contratacion (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_detalles_publicaciones
         FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
-        ON DELETE RESTRICT ON UPDATE CASCADE
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_det_contratacion (id_contratacion),
+    INDEX idx_det_publicacion (id_publicacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS pagos (
@@ -155,9 +188,15 @@ CREATE TABLE IF NOT EXISTS pagos (
     id_contratacion INT NOT NULL,
     CONSTRAINT fk_pagos_contrataciones
         FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_pagos_contratacion (id_contratacion),
+    INDEX idx_pagos_estado (estado_pago)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Valoraciones y perfil profesional
+-- Relacionan reputación pública con usuarios y contrataciones
+-- =========================================================
 CREATE TABLE IF NOT EXISTS valoraciones (
     id_valoracion INT AUTO_INCREMENT PRIMARY KEY,
     puntuacion INT NOT NULL CHECK (puntuacion BETWEEN 1 AND 5),
@@ -176,11 +215,18 @@ CREATE TABLE IF NOT EXISTS valoraciones (
         FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT uq_valoraciones_contratacion_usuario
-        UNIQUE (id_contratacion, id_usuario)
+        UNIQUE (id_contratacion, id_usuario),
+    INDEX idx_val_publicacion (id_publicacion),
+    INDEX idx_val_usuario (id_usuario),
+    INDEX idx_val_contratacion (id_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
+-- =========================================================
+-- Perfiles profesionales
+-- Datos públicos ampliados para docentes y proveedores
+-- =========================================================
 CREATE TABLE IF NOT EXISTS perfiles_profesionales (
     id_perfil INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL UNIQUE,
@@ -202,6 +248,10 @@ CREATE TABLE IF NOT EXISTS perfiles_profesionales (
     CONSTRAINT fk_perfiles_profesionales_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Contenido de cursos
+-- Módulos, unidades, recursos, entregas y participación
+-- =========================================================
 CREATE TABLE IF NOT EXISTS curso_modulos (
     id_modulo INT AUTO_INCREMENT PRIMARY KEY,
     id_publicacion INT NOT NULL,
@@ -226,7 +276,7 @@ CREATE TABLE IF NOT EXISTS curso_recursos (
     id_recurso INT AUTO_INCREMENT PRIMARY KEY,
     id_unidad INT NOT NULL,
     titulo VARCHAR(180) NOT NULL,
-    tipo ENUM('Archivo','PDF','Imagen','Video','Enlace') NOT NULL,
+    tipo ENUM('Archivo','Foro','Entrega de Tareas','Video','PDF','Imagen','Enlace') NOT NULL,
     url VARCHAR(500) NULL,
     archivo VARCHAR(255) NULL,
     descripcion TEXT NULL,
@@ -234,6 +284,31 @@ CREATE TABLE IF NOT EXISTS curso_recursos (
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_curso_recursos_unidad FOREIGN KEY (id_unidad) REFERENCES curso_unidades(id_unidad) ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_curso_recursos_unidad_orden (id_unidad,orden)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_entregas (
+    id_entrega INT AUTO_INCREMENT PRIMARY KEY,
+    id_recurso INT NOT NULL,
+    id_usuario INT NOT NULL,
+    archivo_entrega VARCHAR(500) NULL,
+    comentario_entrega TEXT NULL,
+    estado ENUM('Entregada', 'Calificada') NOT NULL DEFAULT 'Entregada',
+    calificacion DECIMAL(4,2) NULL,
+    fecha_entrega DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_curso_entregas_recurso FOREIGN KEY (id_recurso) REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_curso_entregas_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uk_recurso_usuario (id_recurso, id_usuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_foro_mensajes (
+    id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
+    id_recurso INT NOT NULL,
+    id_usuario INT NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_mensaje DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_curso_foro_recurso FOREIGN KEY (id_recurso) REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_curso_foro_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_foro_recurso_fecha (id_recurso, fecha_mensaje)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS solicitud_mensajes (
@@ -245,6 +320,40 @@ CREATE TABLE IF NOT EXISTS solicitud_mensajes (
     CONSTRAINT fk_solicitud_mensajes_solicitud FOREIGN KEY (id_solicitud) REFERENCES solicitudes(id_solicitud) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_solicitud_mensajes_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_solicitud_mensajes_fecha (id_solicitud,fecha_mensaje)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS noticias (
+    id_noticia INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    subtitulo VARCHAR(255) NULL,
+    cuerpo TEXT NOT NULL,
+    imagen VARCHAR(255) NULL,
+    categoria VARCHAR(100) DEFAULT 'Institucional',
+    autor VARCHAR(100) DEFAULT 'Equipo AniTech',
+    id_usuario INT NULL,
+    fecha_publicacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    orden INT DEFAULT 0,
+    estado VARCHAR(50) DEFAULT 'Publicada',
+    CONSTRAINT fk_noticias_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_noticias_estado (estado),
+    INDEX idx_noticias_fecha (fecha_publicacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS eventos (
+    id_evento INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT NOT NULL,
+    tipo VARCHAR(100) DEFAULT 'Webinar',
+    modalidad VARCHAR(50) DEFAULT 'Online',
+    fecha_evento DATETIME NOT NULL,
+    ubicacion_enlace VARCHAR(255) NULL,
+    cupos INT DEFAULT 0,
+    imagen VARCHAR(255) NULL,
+    id_usuario INT NULL,
+    estado VARCHAR(50) DEFAULT 'Abierto',
+    CONSTRAINT fk_eventos_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_eventos_estado (estado),
+    INDEX idx_eventos_fecha (fecha_evento)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE solicitudes
@@ -356,3 +465,86 @@ INSERT IGNORE INTO valoraciones (id_valoracion, puntuacion, comentario, fecha_va
 UPDATE publicaciones SET tipo_servicio='impresion_3d' WHERE id_publicacion=2 AND tipo='Servicio' AND tipo_servicio IS NULL;
 UPDATE publicaciones SET tipo_servicio='mentoria' WHERE id_publicacion=4 AND tipo='Servicio' AND tipo_servicio IS NULL;
 UPDATE publicaciones SET tipo_servicio='formacion_institucional' WHERE id_publicacion=10 AND tipo='Servicio' AND tipo_servicio IS NULL;
+
+
+INSERT IGNORE INTO solicitudes_docente (id_solicitud_docente, id_usuario, estado, motivo, fecha_solicitud, fecha_respuesta) VALUES
+(1, 6, 'Aprobada', 'Poseo 4 años de experiencia como desarrollador backend y deseo dictar cursos de Laravel y API REST.', '2026-02-15 09:00:00', '2026-02-16 14:30:00'),
+(2, 7, 'Pendiente', 'Especialista en robótica educativa con proyectos Arduino en nivel secundario y terciario.', '2026-02-18 10:20:00', NULL),
+(3, 8, 'Rechazada', 'Interés en dictar cursos básicos sin adjuntar certificaciones ni experiencia comprobable.', '2026-02-20 11:45:00', '2026-02-21 16:00:00'),
+(4, 9, 'Aprobada', 'Diseñadora UX/UI con certificación Figma y experiencia liderando proyectos digitales.', '2026-02-22 15:10:00', '2026-02-23 10:00:00'),
+(5, 10, 'Pendiente', 'Ingeniero electrónico con trayectoria en diseño de hardware libre y microcontroladores ESP32.', '2026-02-25 12:00:00', NULL),
+(6, 6, 'Aprobada', 'Actualización de solicitud para habilitación de servicios de consultoría técnica.', '2026-03-01 08:30:00', '2026-03-02 09:15:00'),
+(7, 7, 'Pendiente', 'Postulación para dictado de talleres de modelado paramétrico e impresión 3D.', '2026-03-03 14:00:00', NULL),
+(8, 8, 'Pendiente', 'Especialista en seguridad informática enfocado en auditorías web OWASP.', '2026-03-05 16:20:00', NULL),
+(9, 9, 'Aprobada', 'Docente de inglés técnico con experiencia en capacitación a equipos de ingeniería.', '2026-03-07 10:10:00', '2026-03-08 11:30:00'),
+(10, 10, 'Pendiente', 'Scrum Master certificado buscando impartir mentorías de agilidad y gestión de software.', '2026-03-09 17:40:00', NULL);
+
+INSERT IGNORE INTO perfiles_profesionales (id_perfil, id_usuario, titulo_profesional, presentacion, experiencia, formacion, certificaciones, habilidades, especialidades, idiomas, ubicacion, modalidad_trabajo, portfolio_url, linkedin_url, tiempo_respuesta, visibilidad) VALUES
+(1, 1, 'Administrador de Plataforma y DevOps', 'Coordinador técnico de la infraestructura y seguridad en Classia.', '8 años en administración de sistemas Linux, bases de datos MariaDB y orquestación con Docker.', 'Licenciado en Sistemas de Información', 'LPIC-2, AWS Certified Solutions Architect', 'Linux, Docker, MySQL, Ciberseguridad, PHP', 'Infraestructura educativa y DevOps', 'Español (Nativo), Inglés (Avanzado)', 'Montevideo, Uruguay', 'Remoto / Híbrido', 'https://github.com/classia-admin', 'https://linkedin.com/in/carlos-admin-classia', 'Menos de 2 horas', 'Registrados'),
+(2, 2, 'Desarrolladora Web Full Stack & Docente TI', 'Apasionada por la enseñanza de tecnologías web modernas y arquitecturas de software limpias.', '6 años como docente y desarrolladora backend en entornos LAMP y stacks modernos.', 'Ingeniería en Computación (UdelaR)', 'Zend Certified PHP Engineer, Scrum Master', 'PHP 8, MySQL, JavaScript, HTML5, CSS3, Docker', 'Desarrollo Backend, Arquitectura MVC, REST APIs', 'Español, Inglés B2', 'Salto, Uruguay', 'Virtual / Remoto', 'https://github.com/maria-docente', 'https://linkedin.com/in/maria-docente', 'Menos de 4 horas', 'Registrados'),
+(3, 3, 'Especialista en Hardware, IoT y Robótica', 'Instructor de robótica aplicada y circuitos electrónicos para proyectos de automatización.', '5 años capacitando a estudiantes en electrónica digital, sensores y microcontroladores.', 'Tecnólogo en Mecatrónica', 'Certificación Arduino Oficial, IPC-A-610', 'Arduino, ESP32, KiCad, Impresión 3D, C/C++', 'Sistemas Embebidos e Internet de las Cosas', 'Español, Portugués', 'Paysandú, Uruguay', 'Presencial / Híbrida', 'https://portfolio.robertogomez.tech', 'https://linkedin.com/in/roberto-gomez-iot', 'Menos de 6 horas', 'Registrados'),
+(4, 4, 'Diseñadora UX/UI & Desarrolladora Frontend', 'Diseño de experiencias centradas en el usuario con foco en accesibilidad e interacción moderna.', '4 años creando prototipos de alta fidelidad y guiando cursos prácticos de diseño visual.', 'Diseño Gráfico Digital y Multimedia', 'NN/g UX Master, Interaction Design Foundation', 'Figma, Design Systems, CSS Grid, React, Wireframing', 'Interfaces Educativas y Accesibilidad Web', 'Español, Inglés', 'Montevideo, Uruguay', 'Remoto', 'https://dribbble.com/luciafernandez-ux', 'https://linkedin.com/in/lucia-fernandez-ux', 'Menos de 3 horas', 'Registrados'),
+(5, 5, 'Científico de Datos & Consultor de Ciberseguridad', 'Docente e investigador en análisis de datos, modelos de IA y auditorías de vulnerabilidades.', '7 años en consultoría de seguridad informática y entrenamiento de modelos predictivos.', 'Máster en Ciencia de Datos y Seguridad Informática', 'CompTIA Security+, Certified Ethical Hacker (CEH)', 'Python, Pandas, Scikit-Learn, Pentesting, OWASP', 'Data Science, Machine Learning y Pentesting Web', 'Español, Inglés C1', 'Colonia, Uruguay', 'Virtual / Remoto', 'https://gonzalomartinez.dev', 'https://linkedin.com/in/gonzalo-martinez-sec', 'Menos de 5 horas', 'Registrados'),
+(6, 6, 'Estudiante Avanzado & Desarrollador Junior', 'Interesado en participar en proyectos colaborativos y reforzar conocimientos en frontend.', '2 años de prácticas formativas y proyectos open-source.', 'Estudiante de Profesorado de Informática (CeRP)', 'Curso Frontend Developer', 'HTML, CSS, JavaScript, Git', 'Maquetación Web y Control de Versiones', 'Español', 'Salto, Uruguay', 'Híbrida', 'https://github.com/juanperez-dev', 'https://linkedin.com/in/juan-perez-student', 'Menos de 24 horas', 'Registrados'),
+(7, 7, 'Diseñadora 3D & Prototipista Técnica', 'Apasionada por la fabricación digital, impresión 3D y diseño de productos personalizados.', '3 años operando impresoras FDM y diseñando piezas en Blender y Fusion 360.', 'Técnica en Fabricación Digital', 'Certificado Autodesk Fusion 360', 'Fusion 360, Blender, Cura, PrusaSlicer, PLA/PETG', 'Modelado 3D para Prototipos Didácticos', 'Español, Portugués', 'Rivera, Uruguay', 'Presencial', 'https://anasilva3d.artstation.com', 'https://linkedin.com/in/ana-silva-3d', 'Menos de 12 horas', 'Registrados'),
+(8, 8, 'Técnico en Redes y Soporte Informático', 'Especialista en cableado estructurado, configuración de routers y seguridad de red local.', '3 años en soporte informático corporativo y mantenimiento de servidores.', 'Técnico en Redes y Telecomunicaciones', 'Cisco CCNA 1 y 2', 'TCP/IP, Routing, Switching, Linux Server, Hardening', 'Infraestructura de Redes y Diagnóstico', 'Español, Inglés Técnico', 'Salto, Uruguay', 'Presencial / Remoto', 'https://diegolopez.net/soporte', 'https://linkedin.com/in/diego-lopez-redes', 'Menos de 8 horas', 'Registrados'),
+(9, 9, 'Traductora Técnica & Diseñadora Visual', 'Especialista en traducción inglés-español de contenidos tecnológicos y localización de software.', '4 años trabajando con comunidades de software libre y redacción de especificaciones.', 'Traductorado Técnico-Científico en Inglés', 'Cambridge C2 Proficiency, Technical Writing Certification', 'Technical English, Redacción de APIs, Markdown, Git', 'Documentación de Software y Localización', 'Español, Inglés Nativo', 'Montevideo, Uruguay', 'Remoto', 'https://sofiarodriguez-translations.com', 'https://linkedin.com/in/sofia-rodriguez-tr', 'Menos de 4 horas', 'Registrados'),
+(10, 10, 'Agile Coach & Gestor de Proyectos de Software', 'Facilitador de dinámicas de equipo, Scrum, Kanban y mejora continua en proyectos IT.', '5 años acompañando startups y equipos universitarios en metodologías ágiles.', 'Licenciado en Administración y Gestión Tecnológica', 'PSM I (Professional Scrum Master), PMI-ACP', 'Scrum, Kanban, Jira, Trello, Métricas Ágiles, Retrospectivas', 'Transformación Ágil y Coordinación de Equipos', 'Español, Inglés B2', 'Maldonado, Uruguay', 'Remoto / Híbrido', 'https://martinbenitez-agile.com', 'https://linkedin.com/in/martin-benitez-scrum', 'Menos de 6 horas', 'Registrados');
+
+INSERT IGNORE INTO curso_modulos (id_modulo, id_publicacion, titulo, descripcion, orden) VALUES
+(1, 1, 'Módulo 1: Fundamentos de PHP Moderno', 'Sintaxis básica, estructuras de control, funciones y manejo de tipos estrictos en PHP 8.', 1),
+(2, 1, 'Módulo 2: Programación Orientada a Objetos y PDO', 'Clases, interfaces, herencia, conexión a bases de datos y sentencias preparadas contra inyecciones SQL.', 2),
+(3, 1, 'Módulo 3: Arquitectura MVC y Seguridad Web', 'Separación de vistas, lógica de negocio, sesiones seguras, CSRF y hash de contraseñas.', 3),
+(4, 3, 'Módulo 1: Introducción a la Electrónica y Arduino', 'Conceptos de voltaje, corriente, ley de Ohm y estructura del microcontrolador ATmega328P.', 1),
+(5, 3, 'Módulo 2: Sensores, Actuadores y Comunicación Serie', 'Lectura de sensores analógicos/digitales, control de servomotores y pantallas LCD.', 2),
+(6, 5, 'Módulo 1: Fundamentos de Python y Estructuras de Datos', 'Variables, listas, tuplas, diccionarios y funciones lambda en Python 3.', 1),
+(7, 5, 'Módulo 2: Manipulación y Visualización con NumPy y Pandas', 'DataFrames, limpieza de valores nulos, agregaciones y gráficos interactivos con Matplotlib/Seaborn.', 2),
+(8, 6, 'Módulo 1: Fundamentos de Circuitos y Simulación', 'Diseño de diagramas esquemáticos con KiCad y simulación de circuitos analógicos.', 1),
+(9, 8, 'Módulo 1: Fundamentos de UX y Arquitectura de la Información', 'Research con usuarios, mapas de empatía, user journeys y card sorting.', 1),
+(10, 8, 'Módulo 2: Prototipado y Design Systems en Figma', 'Componentes reutilizables, auto-layout, variantes e interacciones animadas.', 2);
+
+INSERT IGNORE INTO curso_unidades (id_unidad, id_modulo, titulo, descripcion, orden) VALUES
+(1, 1, 'Unidad 1.1: Instalación del Entorno y Sintaxis Básica', 'Configuración de PHP 8, Apache y variables de entorno.', 1),
+(2, 1, 'Unidad 1.2: Estructuras de Control y Arreglos Asociativos', 'Uso de bucles foreach, match, funciones de array y validaciones.', 2),
+(3, 2, 'Unidad 2.1: Conexión Segura con PDO y Manejo de Errores', 'Instanciación de PDO, opciones de atributos y captura de PDOException.', 1),
+(4, 2, 'Unidad 2.2: Consultas Preparadas (CRUD Completo)', 'Operaciones de alta, baja, modificación y consulta utilizando marcadores de posición.', 2),
+(5, 3, 'Unidad 3.1: Control de Sesiones y Protección contra CSRF', 'session_start seguro, tokens anti-CSRF y expiración por inactividad.', 1),
+(6, 4, 'Unidad 1.1: Componentes Básicos y Entorno IDE', 'Instalación de Arduino IDE, placas compatibles y primer sketch Blink.', 1),
+(7, 5, 'Unidad 2.1: Sensores Ultrasónicos y Servomotores', 'Medición de distancia con HC-SR04 y control de servomotores SG90.', 1),
+(8, 6, 'Unidad 1.1: Sintaxis de Python y Tipos de Datos', 'Variables, tipos primitivos, listas y comprensiones.', 1),
+(9, 7, 'Unidad 2.1: Carga y Análisis de Datasets con Pandas', 'Lectura de archivos CSV, filtros booleanos y cálculo de estadísticas descriptivas.', 1),
+(10, 10, 'Unidad 2.1: Creación de Componentes y Variantes en Figma', 'Estructuración de botones, inputs y tarjetas con diseño responsive en Figma.', 1);
+
+INSERT IGNORE INTO curso_recursos (id_recurso, id_unidad, titulo, tipo, url, archivo, descripcion, orden, fecha_creacion) VALUES
+(1, 1, 'Guía de Instalación de PHP 8 y Docker', 'PDF', NULL, 'assets/uploads/cursos/guia_php_docker.pdf', 'Documento paso a paso para levantar el entorno local de desarrollo.', 1, '2026-02-21 10:30:00'),
+(2, 1, 'Repositorio de Ejemplos Básicos en GitHub', 'Enlace', 'https://github.com/classia-demo/php-fundamentos', NULL, 'Código fuente de los ejemplos vistos en la clase inaugural.', 2, '2026-02-21 11:00:00'),
+(3, 2, 'Cheat Sheet: Funciones de Arreglos en PHP', 'PDF', NULL, 'assets/uploads/cursos/cheatsheet_arrays_php.pdf', 'Resumen imprimible de funciones útiles como array_map y array_filter.', 1, '2026-02-21 11:45:00'),
+(4, 3, 'Diagrama de Arquitectura de Conexión PDO', 'Imagen', NULL, 'assets/uploads/cursos/diagrama_pdo.png', 'Esquema visual del patrón de conexión segura con MySQL/MariaDB.', 1, '2026-02-22 09:00:00'),
+(5, 4, 'Script de Prueba de Sentencias Preparadas', 'Archivo', NULL, 'assets/uploads/cursos/ejemplo_pdo_crud.zip', 'Código de ejemplo con consultas SELECT, INSERT y UPDATE comentadas.', 1, '2026-02-22 14:20:00'),
+(6, 5, 'Video Explicativo: Ataques CSRF y Mitigación', 'Video', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', NULL, 'Demostración práctica de cómo proteger formularios contra falsificación de petición.', 1, '2026-02-23 10:15:00'),
+(7, 6, 'Manual Oficial de Pinout Arduino Uno R3', 'PDF', NULL, 'assets/uploads/cursos/pinout_arduino_uno.pdf', 'Diagrama esquemático con los pines de entrada y salida digital y analógica.', 1, '2026-02-23 15:00:00'),
+(8, 7, 'Código Sketch: Radar Ultrasónico', 'Archivo', NULL, 'assets/uploads/cursos/sketch_radar_hcsr04.ino', 'Sketch de Arduino para leer distancia y accionar una señal lumínica.', 1, '2026-02-24 09:30:00'),
+(9, 9, 'Dataset de Prueba: Ventas y Estadísticas (.csv)', 'Archivo', NULL, 'assets/uploads/cursos/dataset_ventas_2026.csv', 'Conjunto de datos estructurados con 500 filas para ejercicios de análisis.', 1, '2026-02-25 11:00:00'),
+(10, 10, 'Kit de UI y Design System en Figma Community', 'Enlace', 'https://www.figma.com/community/file/classia-ui-kit', NULL, 'Archivo base de Figma con componentes atómicos y paleta de colores.', 1, '2026-02-28 17:30:00');
+
+INSERT IGNORE INTO solicitud_mensajes (id_mensaje, id_solicitud, id_usuario, mensaje, fecha_mensaje) VALUES
+(1, 1, 6, 'Hola María, te comparto las medidas requeridas: 45mm de diámetro exterior y 12 dientes en el engranaje.', '2026-03-02 09:20:00'),
+(2, 1, 2, 'Recibido Juan. Lo imprimiré con altura de capa de 0.2mm en PETG para máxima resistencia mecánica.', '2026-03-02 09:45:00'),
+(3, 2, 7, 'Hola, tengo dudas puntuales sobre LEFT JOIN múltiples y cláusulas HAVING en reportes.', '2026-03-02 11:45:00'),
+(4, 2, 2, '¡Perfecto Ana! Coordinamos una sesión de 2 horas con ejercicios prácticos basados en tu esquema.', '2026-03-02 12:10:00'),
+(5, 3, 8, 'Hola Roberto, ¿el taller incluye la configuración de la librería WiFi y cliente MQTT?', '2026-03-03 14:15:00'),
+(6, 4, 9, 'Hola Lucía, te adjunto el link al repositorio para que puedas revisar el flujo de navegación.', '2026-03-04 10:35:00'),
+(7, 4, 4, 'Excelente Sofía, revisé el repo y veo áreas claras de mejora en el renderizado condicional.', '2026-03-04 11:20:00'),
+(8, 5, 10, 'Hola, necesitaría que el soporte tenga orificios para tornillos métricos M3.', '2026-03-05 17:00:00'),
+(9, 5, 2, 'Anotado Martín, adapto el modelo CAD y te envío un render antes de imprimir.', '2026-03-05 17:30:00'),
+(10, 10, 10, 'Gonzalo, gracias por aceptar la consulta. ¿Podemos enfocarnos en la comparativa de consumo energético?', '2026-03-10 14:25:00');
+
+INSERT IGNORE INTO noticias (id_noticia, titulo, subtitulo, cuerpo, imagen, categoria, autor, fecha_publicacion, orden, estado) VALUES
+(1, 'Lanzamiento de Classia 2.0 y Nuevos Entornos de Aprendizaje', 'Una plataforma renovada para fortalecer la educación técnica y el intercambio profesional.', 'Nos complace presentar Classia 2.0, una evolución integral diseñada para conectar a estudiantes, docentes y entusiastas de la tecnología. Con módulos de cursos estructurados, visor de documentos integrado y un sistema ágil de solicitud de servicios personalizados, la plataforma refuerza el compromiso de democratizar el acceso a la educación tecnológica de calidad.', 'assets/images/cybersecurity_lab.jpg', 'Institucional', 'Equipo AniTech', '2026-09-01 10:00:00', 1, 'Publicada'),
+(2, 'Taller de Ciberseguridad y Auditoría Web en CeRP del Suroeste', 'Capacitación práctica en buenas prácticas OWASP y defensas activas en servidores.', 'Se llevó a cabo con gran concurrencia el taller presencial de ciberseguridad aplicada en el Laboratorio del CeRP del Suroeste. Durante la jornada se abordaron técnicas de auditoría de vulnerabilidades, protección contra inyecciones SQL y mitigación de ataques CSRF en arquitecturas modernas.', 'assets/images/network_security_center.jpg', 'Ciberseguridad', 'Gonzalo Martínez', '2026-09-08 14:30:00', 2, 'Publicada'),
+(3, 'Nueva Convocatoria para Docentes y Creadores de Contenido TI', 'Sumate a la red de instructores y compartí tus cursos y servicios especializados.', 'Abrimos la convocatoria para docentes, profesionales independientes y técnicos que deseen publicar sus propios cursos y ofrecer servicios de consultoría o fabricación técnica dentro del ecosistema Classia.', 'assets/images/cloud_server_facility.jpg', 'Académico', 'Carlos Admin', '2026-09-15 09:15:00', 3, 'Publicada');
+
+INSERT IGNORE INTO eventos (id_evento, titulo, descripcion, tipo, modalidad, fecha_evento, ubicacion_enlace, cupos, imagen, estado) VALUES
+(1, 'Webinar: Seguridad en el Desarrollo Web Moderno (OWASP Top 10)', 'Aprende a identificar y mitigar las vulnerabilidades más críticas en aplicaciones web: inyecciones, CSRF, autenticación rota y configuraciones de seguridad esenciales.', 'Webinar', 'Online', '2026-10-15 19:00:00', 'https://meet.google.com/classia-security', 120, 'assets/images/cybersecurity_lab.jpg', 'Abierto'),
+(2, 'Taller Práctico: Diseño y Fabricación Digital con Impresión 3D', 'Jornada intensiva para aprender calibración de impresoras FDM, modelado en Fusion 360 y optimización de parámetros de laminado con PLA y PETG.', 'Taller', 'Presencial', '2026-10-22 14:30:00', 'Laboratorio CeRP del Suroeste (Colonia)', 30, 'assets/images/network_security_center.jpg', 'Abierto'),
+(3, 'Mesa Redonda: Desafíos de la Educación Técnica y el Software Libre', 'Intercambio abierto entre docentes y estudiantes sobre la adopción de herramientas libres y metodologías activas en la formación tecnológica.', 'Conferencia', 'Híbrido', '2026-11-05 18:00:00', 'Salón de Actos CeRP & Transmisión en Vivo', 80, 'assets/images/cloud_server_facility.jpg', 'Abierto');

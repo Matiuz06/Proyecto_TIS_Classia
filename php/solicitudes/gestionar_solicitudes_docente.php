@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Permite a administración aprobar o rechazar solicitudes de rol docente.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 
@@ -31,7 +35,6 @@ function obtener_solicitudes_docente_pendientes(?PDO $pdo_param = null): array
 {
     global $pdo;
     $db = $pdo_param ?? $pdo;
-    asegurar_tabla_solicitudes_docente($db);
 
     try {
         $sql = "SELECT sd.id_solicitud_docente, sd.estado, sd.motivo, sd.fecha_solicitud,

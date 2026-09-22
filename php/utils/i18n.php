@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Carga traducciones y resuelve textos según el idioma activo.
+ */
+
 function inicializar_i18n(): string
 {
     // La plataforma opera exclusivamente en español.

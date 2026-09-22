@@ -1,6 +1,11 @@
 <?php
 
+/**
+ * Responsabilidad: Administra el carrito de publicaciones guardado en sesión.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
+require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
@@ -20,8 +25,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_publicacion = (int) ($_POST['id_publicacion'] ?? 0);
 
     if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
-        $_SESSION['carrito_error'] = 'La sesión del formulario expiró. Recargá la página e intentá nuevamente.';
+        $_SESSION['carrito_error'] = 'La sesión del formulario expiró. Recarga la página e intenta nuevamente.';
     } elseif ($accion === 'agregar' && $id_publicacion > 0) {
+        if (es_admin()) {
+            $_SESSION['carrito_error'] = 'El administrador no realiza compras de cursos ni servicios.';
+            header("Location: ../../views/catalogo.php");
+            exit;
+        }
+
+        $stmtCheck = $pdo->prepare("SELECT id_usuario FROM publicaciones WHERE id_publicacion = :id LIMIT 1");
+        $stmtCheck->execute(['id' => $id_publicacion]);
+        $autor_id = (int)$stmtCheck->fetchColumn();
+        $currUser = usuario_actual();
+        if ($currUser && (int)$currUser['id_usuario'] === $autor_id) {
+            $_SESSION['carrito_error'] = 'No puedes comprar tus propias publicaciones.';
+            header("Location: ../../views/catalogo.php");
+            exit;
+        }
+
         $_SESSION['carrito_publicaciones'] = $_SESSION['carrito_publicaciones'] ?? [];
         if (!in_array($id_publicacion, $_SESSION['carrito_publicaciones'], true)) {
             $_SESSION['carrito_publicaciones'][] = $id_publicacion;

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Carga datos necesarios para mostrar la pasarela de pago.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 
