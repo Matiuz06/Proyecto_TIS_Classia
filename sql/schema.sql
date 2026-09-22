@@ -83,7 +83,11 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     id_usuario INT NOT NULL,
     id_categoria INT NOT NULL,
     CONSTRAINT fk_publicaciones_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_publicaciones_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT fk_publicaciones_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_pub_usuario (id_usuario),
+    INDEX idx_pub_categoria (id_categoria),
+    INDEX idx_pub_estado_tipo (estado, tipo),
+    INDEX idx_pub_fecha (fecha_creacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS solicitudes (
@@ -102,7 +106,11 @@ CREATE TABLE IF NOT EXISTS solicitudes (
     id_publicacion INT NULL,
     id_contratacion INT NULL,
     CONSTRAINT fk_solicitudes_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_solicitudes_publicaciones FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT fk_solicitudes_publicaciones FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_sol_usuario (id_usuario),
+    INDEX idx_sol_publicacion (id_publicacion),
+    INDEX idx_sol_estado (estado),
+    INDEX idx_sol_contratacion (id_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS solicitudes_docente (
@@ -127,7 +135,10 @@ CREATE TABLE IF NOT EXISTS contrataciones (
     id_usuario INT NOT NULL,
     CONSTRAINT fk_contrataciones_usuarios
         FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_cont_usuario (id_usuario),
+    INDEX idx_cont_estado (estado),
+    INDEX idx_cont_fecha (fecha_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS detalles_contratacion (
@@ -142,7 +153,9 @@ CREATE TABLE IF NOT EXISTS detalles_contratacion (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_detalles_publicaciones
         FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
-        ON DELETE RESTRICT ON UPDATE CASCADE
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_det_contratacion (id_contratacion),
+    INDEX idx_det_publicacion (id_publicacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS pagos (
@@ -155,7 +168,9 @@ CREATE TABLE IF NOT EXISTS pagos (
     id_contratacion INT NOT NULL,
     CONSTRAINT fk_pagos_contrataciones
         FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_pagos_contratacion (id_contratacion),
+    INDEX idx_pagos_estado (estado_pago)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS valoraciones (
@@ -176,7 +191,10 @@ CREATE TABLE IF NOT EXISTS valoraciones (
         FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT uq_valoraciones_contratacion_usuario
-        UNIQUE (id_contratacion, id_usuario)
+        UNIQUE (id_contratacion, id_usuario),
+    INDEX idx_val_publicacion (id_publicacion),
+    INDEX idx_val_usuario (id_usuario),
+    INDEX idx_val_contratacion (id_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -270,6 +288,40 @@ CREATE TABLE IF NOT EXISTS solicitud_mensajes (
     CONSTRAINT fk_solicitud_mensajes_solicitud FOREIGN KEY (id_solicitud) REFERENCES solicitudes(id_solicitud) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_solicitud_mensajes_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_solicitud_mensajes_fecha (id_solicitud,fecha_mensaje)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS noticias (
+    id_noticia INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    subtitulo VARCHAR(255) NULL,
+    cuerpo TEXT NOT NULL,
+    imagen VARCHAR(255) NULL,
+    categoria VARCHAR(100) DEFAULT 'Institucional',
+    autor VARCHAR(100) DEFAULT 'Equipo AniTech',
+    id_usuario INT NULL,
+    fecha_publicacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    orden INT DEFAULT 0,
+    estado VARCHAR(50) DEFAULT 'Publicada',
+    CONSTRAINT fk_noticias_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_noticias_estado (estado),
+    INDEX idx_noticias_fecha (fecha_publicacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS eventos (
+    id_evento INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT NOT NULL,
+    tipo VARCHAR(100) DEFAULT 'Webinar',
+    modalidad VARCHAR(50) DEFAULT 'Online',
+    fecha_evento DATETIME NOT NULL,
+    ubicacion_enlace VARCHAR(255) NULL,
+    cupos INT DEFAULT 0,
+    imagen VARCHAR(255) NULL,
+    id_usuario INT NULL,
+    estado VARCHAR(50) DEFAULT 'Abierto',
+    CONSTRAINT fk_eventos_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_eventos_estado (estado),
+    INDEX idx_eventos_fecha (fecha_evento)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE solicitudes
@@ -454,3 +506,13 @@ INSERT IGNORE INTO solicitud_mensajes (id_mensaje, id_solicitud, id_usuario, men
 (8, 5, 10, 'Hola, necesitaría que el soporte tenga orificios para tornillos métricos M3.', '2026-03-05 17:00:00'),
 (9, 5, 2, 'Anotado Martín, adapto el modelo CAD y te envío un render antes de imprimir.', '2026-03-05 17:30:00'),
 (10, 10, 10, 'Gonzalo, gracias por aceptar la consulta. ¿Podemos enfocarnos en la comparativa de consumo energético?', '2026-03-10 14:25:00');
+
+INSERT IGNORE INTO noticias (id_noticia, titulo, subtitulo, cuerpo, imagen, categoria, autor, fecha_publicacion, orden, estado) VALUES
+(1, 'Lanzamiento de Classia 2.0 y Nuevos Entornos de Aprendizaje', 'Una plataforma renovada para fortalecer la educación técnica y el intercambio profesional.', 'Nos complace presentar Classia 2.0, una evolución integral diseñada para conectar a estudiantes, docentes y entusiastas de la tecnología. Con módulos de cursos estructurados, visor de documentos integrado y un sistema ágil de solicitud de servicios personalizados, la plataforma refuerza el compromiso de democratizar el acceso a la educación tecnológica de calidad.', 'assets/images/cybersecurity_lab.jpg', 'Institucional', 'Equipo AniTech', '2026-09-01 10:00:00', 1, 'Publicada'),
+(2, 'Taller de Ciberseguridad y Auditoría Web en CeRP del Suroeste', 'Capacitación práctica en buenas prácticas OWASP y defensas activas en servidores.', 'Se llevó a cabo con gran concurrencia el taller presencial de ciberseguridad aplicada en el Laboratorio del CeRP del Suroeste. Durante la jornada se abordaron técnicas de auditoría de vulnerabilidades, protección contra inyecciones SQL y mitigación de ataques CSRF en arquitecturas modernas.', 'assets/images/network_security_center.jpg', 'Ciberseguridad', 'Gonzalo Martínez', '2026-09-08 14:30:00', 2, 'Publicada'),
+(3, 'Nueva Convocatoria para Docentes y Creadores de Contenido TI', 'Sumate a la red de instructores y compartí tus cursos y servicios especializados.', 'Abrimos la convocatoria para docentes, profesionales independientes y técnicos que deseen publicar sus propios cursos y ofrecer servicios de consultoría o fabricación técnica dentro del ecosistema Classia.', 'assets/images/cloud_server_facility.jpg', 'Académico', 'Carlos Admin', '2026-09-15 09:15:00', 3, 'Publicada');
+
+INSERT IGNORE INTO eventos (id_evento, titulo, descripcion, tipo, modalidad, fecha_evento, ubicacion_enlace, cupos, imagen, estado) VALUES
+(1, 'Webinar: Seguridad en el Desarrollo Web Moderno (OWASP Top 10)', 'Aprende a identificar y mitigar las vulnerabilidades más críticas en aplicaciones web: inyecciones, CSRF, autenticación rota y configuraciones de seguridad esenciales.', 'Webinar', 'Online', '2026-10-15 19:00:00', 'https://meet.google.com/classia-security', 120, 'assets/images/cybersecurity_lab.jpg', 'Abierto'),
+(2, 'Taller Práctico: Diseño y Fabricación Digital con Impresión 3D', 'Jornada intensiva para aprender calibración de impresoras FDM, modelado en Fusion 360 y optimización de parámetros de laminado con PLA y PETG.', 'Taller', 'Presencial', '2026-10-22 14:30:00', 'Laboratorio CeRP del Suroeste (Colonia)', 30, 'assets/images/network_security_center.jpg', 'Abierto'),
+(3, 'Mesa Redonda: Desafíos de la Educación Técnica y el Software Libre', 'Intercambio abierto entre docentes y estudiantes sobre la adopción de herramientas libres y metodologías activas en la formación tecnológica.', 'Conferencia', 'Híbrido', '2026-11-05 18:00:00', 'Salón de Actos CeRP & Transmisión en Vivo', 80, 'assets/images/cloud_server_facility.jpg', 'Abierto');

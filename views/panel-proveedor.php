@@ -38,68 +38,53 @@ $stmt_pubs = $pdo->prepare(
 $stmt_pubs->execute(['id_usuario' => $uid]);
 $publicaciones_proveedor = $stmt_pubs->fetchAll();
 
-$activas = (int) proveedor_escalar(
-    $pdo,
-    "SELECT COUNT(*) FROM publicaciones WHERE id_usuario = :u AND estado = 'Activo'",
-    ['u' => $uid]
-);
+// Contar activas en memoria sin consultar de nuevo a la base de datos
+$activas = 0;
+foreach ($publicaciones_proveedor as $pub) {
+    if (($pub['estado'] ?? '') === 'Activo') {
+        $activas++;
+    }
+}
 
-$pendientes = (int) proveedor_escalar(
-    $pdo,
-    "SELECT COUNT(*)
-     FROM solicitudes s
-     JOIN publicaciones p ON p.id_publicacion = s.id_publicacion
-     WHERE p.id_usuario = :u
-       AND p.tipo = 'Servicio'
-       AND s.estado = 'Pendiente'",
-    ['u' => $uid]
-);
+// Estadisticas de solicitudes de servicios
+$stmt_sol_stats = $pdo->prepare("
+    SELECT 
+        COUNT(CASE WHEN s.estado = 'Pendiente' THEN 1 END) AS pendientes,
+        COUNT(CASE WHEN s.estado = 'En Proceso' THEN 1 END) AS en_proceso
+    FROM solicitudes s
+    JOIN publicaciones p ON p.id_publicacion = s.id_publicacion
+    WHERE p.id_usuario = :u AND p.tipo = 'Servicio'
+");
+$stmt_sol_stats->execute(['u' => $uid]);
+$sol_stats = $stmt_sol_stats->fetch() ?: [];
+$pendientes = (int) ($sol_stats['pendientes'] ?? 0);
+$enProceso  = (int) ($sol_stats['en_proceso'] ?? 0);
 
-$enProceso = (int) proveedor_escalar(
-    $pdo,
-    "SELECT COUNT(*)
-     FROM solicitudes s
-     JOIN publicaciones p ON p.id_publicacion = s.id_publicacion
-     WHERE p.id_usuario = :u
-       AND p.tipo = 'Servicio'
-       AND s.estado = 'En Proceso'",
-    ['u' => $uid]
-);
+// Resumen de contrataciones, estudiantes e ingresos en una sola consulta
+$stmt_resumen = $pdo->prepare("
+    SELECT 
+        COUNT(DISTINCT CASE WHEN p.tipo = 'Curso' AND c.estado IN ('En Proceso', 'Completada') THEN c.id_usuario END) AS estudiantes,
+        COUNT(DISTINCT CASE WHEN c.estado = 'Completada' THEN c.id_contratacion END) AS trabajos_completados,
+        COALESCE(SUM(CASE WHEN pg.estado_pago = 'Aprobado' THEN dc.subtotal ELSE 0 END), 0) AS ingresos
+    FROM detalles_contratacion dc
+    JOIN publicaciones p ON p.id_publicacion = dc.id_publicacion
+    JOIN contrataciones c ON c.id_contratacion = dc.id_contratacion
+    LEFT JOIN pagos pg ON pg.id_contratacion = c.id_contratacion
+    WHERE p.id_usuario = :u
+");
+$stmt_resumen->execute(['u' => $uid]);
+$resumen = $stmt_resumen->fetch() ?: [];
+$estudiantes          = (int) ($resumen['estudiantes'] ?? 0);
+$trabajos_completados = (int) ($resumen['trabajos_completados'] ?? 0);
+$ingresos             = (float) ($resumen['ingresos'] ?? 0);
 
-$estudiantes = (int) proveedor_escalar(
-    $pdo,
-    "SELECT COUNT(DISTINCT c.id_usuario)
-     FROM contrataciones c
-     JOIN detalles_contratacion dc ON dc.id_contratacion = c.id_contratacion
-     JOIN publicaciones p ON p.id_publicacion = dc.id_publicacion
-     WHERE p.id_usuario = :u
-       AND p.tipo = 'Curso'
-       AND c.estado IN ('En Proceso', 'Completada')",
-    ['u' => $uid]
-);
-
+// Promedio de valoraciones
 $valoracion = proveedor_escalar(
     $pdo,
     "SELECT ROUND(AVG(v.puntuacion), 1)
      FROM valoraciones v
      JOIN publicaciones p ON p.id_publicacion = v.id_publicacion
      WHERE p.id_usuario = :u",
-    ['u' => $uid]
-);
-
-$ingresos = (float) proveedor_escalar(
-    $pdo,
-    "SELECT COALESCE(SUM(dc.subtotal), 0)
-     FROM detalles_contratacion dc
-     JOIN contrataciones c ON c.id_contratacion = dc.id_contratacion
-     JOIN publicaciones p ON p.id_publicacion = dc.id_publicacion
-     WHERE p.id_usuario = :u
-       AND EXISTS (
-           SELECT 1
-           FROM pagos pg
-           WHERE pg.id_contratacion = c.id_contratacion
-             AND pg.estado_pago = 'Aprobado'
-       )",
     ['u' => $uid]
 );
 
@@ -132,17 +117,6 @@ $stmtValoraciones = $pdo->prepare(
 );
 $stmtValoraciones->execute(['u' => $uid]);
 $valoraciones_recientes = $stmtValoraciones->fetchAll();
-
-$trabajos_completados = (int) proveedor_escalar(
-    $pdo,
-    "SELECT COUNT(DISTINCT c.id_contratacion)
-     FROM contrataciones c
-     JOIN detalles_contratacion dc ON dc.id_contratacion = c.id_contratacion
-     JOIN publicaciones p ON p.id_publicacion = dc.id_publicacion
-     WHERE p.id_usuario = :u
-       AND c.estado = 'Completada'",
-    ['u' => $uid]
-);
 
 $notificaciones = [];
 foreach (array_slice($solicitudes_recientes, 0, 3) as $sol) {
@@ -193,6 +167,8 @@ include '../includes/header.php';
                 <?php if (es_docente() || es_admin()): ?>
                     <li><a href="solicitudes-servicios.php">Ver solicitudes</a></li>
                     <li><a href="editar-perfil-profesional.php">Editar perfil profesional</a></li>
+                    <li><a href="eventos.php">Proponer o ver eventos</a></li>
+                    <li><a href="noticias.php">Proponer o ver noticias</a></li>
                 <?php endif; ?>
             </ul>
         </nav>

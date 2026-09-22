@@ -13,6 +13,8 @@ if (empty($_SESSION['csrf_token'])) {
 
 $publicaciones_recientes = [];
 $categorias_home = [];
+$noticias_home = [];
+$eventos_home = [];
 
 try {
     $stmt_recientes = $pdo->prepare(
@@ -36,8 +38,18 @@ try {
     );
     $stmt_categorias->execute();
     $categorias_home = $stmt_categorias->fetchAll();
+
+    // Consultar noticias recientes
+    $stmt_noticias = $pdo->query("SELECT * FROM noticias WHERE estado = 'Publicada' ORDER BY orden ASC, fecha_publicacion DESC LIMIT 3");
+    $noticias_home = $stmt_noticias->fetchAll();
+
+    // Consultar eventos recientes
+    $stmt_eventos = $pdo->query("SELECT * FROM eventos WHERE estado = 'Abierto' ORDER BY fecha_evento ASC LIMIT 3");
+    $eventos_home = $stmt_eventos->fetchAll();
 } catch (PDOException $e) {
-    error_log("Error al consultar publicaciones recientes en home: " . $e->getMessage());
+    error_log("Error al consultar datos en home: " . $e->getMessage());
     $publicaciones_recientes = [];
     $categorias_home = [];
+    $noticias_home = [];
+    $eventos_home = [];
 }

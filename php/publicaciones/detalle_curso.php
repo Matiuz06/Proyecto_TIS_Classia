@@ -42,6 +42,7 @@ if ($id_curso > 0) {
                     SELECT c.id_contratacion, c.estado
                     FROM detalles_contratacion dc
                     JOIN contrataciones c ON dc.id_contratacion = c.id_contratacion
+                    JOIN pagos pag ON pag.id_contratacion = c.id_contratacion AND pag.estado_pago = 'Aprobado'
                     WHERE c.id_usuario = :id_usuario AND dc.id_publicacion = :id_publicacion
                       AND c.estado IN ('Completada', 'En Proceso')
                     ORDER BY c.id_contratacion DESC

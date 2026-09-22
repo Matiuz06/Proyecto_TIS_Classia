@@ -19,21 +19,58 @@ function obtener_curso_del_docente(PDO $pdo, int $id_publicacion, int $id_usuari
 
 function obtener_contenido_curso(PDO $pdo, int $id_publicacion): array
 {
-    $s = $pdo->prepare("SELECT * FROM curso_modulos WHERE id_publicacion=:id ORDER BY orden,id_modulo");
+    // 1. Obtener los modulos del curso
+    $s = $pdo->prepare("SELECT * FROM curso_modulos WHERE id_publicacion = :id ORDER BY orden, id_modulo");
     $s->execute(['id' => $id_publicacion]);
     $mods = $s->fetchAll();
 
+    if (empty($mods)) {
+        return [];
+    }
+
+    // 2. Obtener todas las unidades de los modulos del curso en una sola consulta
+    $s_unidades = $pdo->prepare("
+        SELECT u.* 
+        FROM curso_unidades u 
+        JOIN curso_modulos m ON m.id_modulo = u.id_modulo 
+        WHERE m.id_publicacion = :id 
+        ORDER BY u.orden, u.id_unidad
+    ");
+    $s_unidades->execute(['id' => $id_publicacion]);
+    $todas_unidades = $s_unidades->fetchAll();
+
+    // 3. Obtener todos los recursos de las unidades en una sola consulta
+    $s_recursos = $pdo->prepare("
+        SELECT r.* 
+        FROM curso_recursos r 
+        JOIN curso_unidades u ON u.id_unidad = r.id_unidad 
+        JOIN curso_modulos m ON m.id_modulo = u.id_modulo 
+        WHERE m.id_publicacion = :id 
+        ORDER BY r.orden, r.id_recurso
+    ");
+    $s_recursos->execute(['id' => $id_publicacion]);
+    $todos_recursos = $s_recursos->fetchAll();
+
+    // 4. Agrupar recursos por unidad
+    $recursos_por_unidad = [];
+    foreach ($todos_recursos as $rec) {
+        $id_u = (int) $rec['id_unidad'];
+        $recursos_por_unidad[$id_u][] = $rec;
+    }
+
+    // 5. Agrupar unidades por modulo y asociar recursos
+    $unidades_por_modulo = [];
+    foreach ($todas_unidades as $uni) {
+        $id_u = (int) $uni['id_unidad'];
+        $id_m = (int) $uni['id_modulo'];
+        $uni['recursos'] = $recursos_por_unidad[$id_u] ?? [];
+        $unidades_por_modulo[$id_m][] = $uni;
+    }
+
+    // 6. Asociar unidades a cada modulo
     foreach ($mods as &$m) {
-        $u = $pdo->prepare("SELECT * FROM curso_unidades WHERE id_modulo=:id ORDER BY orden,id_unidad");
-        $u->execute(['id' => $m['id_modulo']]);
-        $uns = $u->fetchAll();
-        foreach ($uns as &$un) {
-            $r = $pdo->prepare("SELECT * FROM curso_recursos WHERE id_unidad=:id ORDER BY orden,id_recurso");
-            $r->execute(['id' => $un['id_unidad']]);
-            $un['recursos'] = $r->fetchAll();
-        }
-        unset($un);
-        $m['unidades'] = $uns;
+        $id_m = (int) $m['id_modulo'];
+        $m['unidades'] = $unidades_por_modulo[$id_m] ?? [];
     }
     unset($m);
 
@@ -47,14 +84,32 @@ function url_recurso_valida(?string $url): bool
     return is_array($p) && isset($p['scheme']) && in_array(strtolower($p['scheme']), ['http', 'https'], true);
 }
 
-function obtener_youtube_embed_url(?string $url): ?string
+function obtener_video_embed_url(?string $url): ?string
 {
     if (!$url) return null;
     $url = trim($url);
+    // YouTube
     if (preg_match('#(?:youtube\.com/(?:watch\?v=|embed/|v/|shorts/)|youtu\.be/)([a-zA-Z0-9_-]{11})#i', $url, $matches)) {
         return 'https://www.youtube-nocookie.com/embed/' . $matches[1] . '?rel=0&modestbranding=1';
     }
+    // Vimeo
+    if (preg_match('#(?:vimeo\.com/(?:video/)?|player\.vimeo\.com/video/)([0-9]+)#i', $url, $matches)) {
+        return 'https://player.vimeo.com/video/' . $matches[1];
+    }
+    // Dailymotion
+    if (preg_match('#(?:dailymotion\.com/(?:video/|embed/video/)|dai\.ly/)([a-zA-Z0-9]+)#i', $url, $matches)) {
+        return 'https://www.dailymotion.com/embed/video/' . $matches[1];
+    }
+    // Loom
+    if (preg_match('#(?:loom\.com/share/|loom\.com/embed/)([a-zA-Z0-9]+)#i', $url, $matches)) {
+        return 'https://www.loom.com/embed/' . $matches[1];
+    }
     return null;
+}
+
+function obtener_youtube_embed_url(?string $url): ?string
+{
+    return obtener_video_embed_url($url);
 }
 
 function tipos_recurso_curso(): array
@@ -75,6 +130,19 @@ function icono_recurso_curso(string $tipo): string
     ][$tipo] ?? 'REC';
 }
 
+function icono_emoji_recurso(string $tipo): string
+{
+    return match($tipo) {
+        'Video'             => '🎥',
+        'PDF'               => '📄',
+        'Entrega de Tareas' => '📝',
+        'Foro'              => '💬',
+        'Imagen'            => '🖼️',
+        'Enlace'            => '🔗',
+        default             => '📥'
+    };
+}
+
 function recurso_archivo_permite_tipo(string $tipo, string $nombre): bool
 {
     $ext = strtolower(pathinfo($nombre, PATHINFO_EXTENSION));
@@ -85,6 +153,18 @@ function recurso_archivo_permite_tipo(string $tipo, string $nombre): bool
         return in_array($ext, ['pdf', 'zip', 'rar', '7z', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'webm', 'stl', 'obj', '3mf'], true);
     }
     return true;
+}
+
+function recurso_es_visualizable_nativamente(string $tipo, ?string $archivo = null): bool
+{
+    if ($tipo === 'PDF' || $tipo === 'Imagen') {
+        return true;
+    }
+    if ($archivo) {
+        $ext = strtolower(pathinfo($archivo, PATHINFO_EXTENSION));
+        return in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'txt'], true);
+    }
+    return false;
 }
 
 function intercambiar_orden(PDO $pdo, string $tabla, string $id_col, int $id, string $scope_col, int $scope_id, string $direccion): bool
@@ -146,10 +226,10 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
         } elseif ($a === 'editar_unidad') {
             $t = trim($post['titulo'] ?? '');
             if ($t === '') return ['ok' => false, 'mensaje' => 'La clase necesita un título.'];
-            $q = $pdo->prepare("UPDATE curso_unidades u JOIN curso_modulos m ON m.id_modulo=u.id_modulo SET u.titulo=:t,u.descripcion=:d,u.orden=:o WHERE u.id_unidad=:u AND m.id_publicacion=:p");
+            $q = $pdo->prepare("UPDATE curso_unidades SET titulo=:t, descripcion=:d, orden=:o WHERE id_unidad=:u AND id_modulo IN (SELECT id_modulo FROM curso_modulos WHERE id_publicacion=:p)");
             $q->execute(['t' => $t, 'd' => trim($post['descripcion'] ?? '') ?: null, 'o' => max(1, (int)($post['orden'] ?? 1)), 'u' => (int)$post['id_unidad'], 'p' => $id_publicacion]);
         } elseif ($a === 'eliminar_unidad') {
-            $q = $pdo->prepare("DELETE u FROM curso_unidades u JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE u.id_unidad=:u AND m.id_publicacion=:p");
+            $q = $pdo->prepare("DELETE FROM curso_unidades WHERE id_unidad=:u AND id_modulo IN (SELECT id_modulo FROM curso_modulos WHERE id_publicacion=:p)");
             $q->execute(['u' => (int)$post['id_unidad'], 'p' => $id_publicacion]);
         } elseif (in_array($a, ['subir_unidad', 'bajar_unidad'], true)) {
             $q = $pdo->prepare("SELECT u.id_modulo FROM curso_unidades u JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE u.id_unidad=:u AND m.id_publicacion=:p");
@@ -204,6 +284,20 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
                     $archivo = $nuevo;
                 }
             }
+            // Exclusión mutua: si se sube un nuevo archivo se anula la URL; si se especifica URL y no se sube archivo, se elimina el archivo previo
+            if ($nuevo !== null) {
+                $url = null;
+            } elseif ($url !== null && $tipo !== 'Foro' && $tipo !== 'Entrega de Tareas') {
+                if (!empty($actual['archivo'])) {
+                    if (str_starts_with($actual['archivo'], 'supabase:')) {
+                        supabase_eliminar_archivo(substr($actual['archivo'], 9));
+                    } else {
+                        eliminar_archivo_guardado($actual['archivo']);
+                    }
+                }
+                $archivo = null;
+            }
+
             if ($tipo === 'Enlace') {
                 $archivo = null;
                 if (!$url) return ['ok' => false, 'mensaje' => 'Indicá una URL http/https válida para el enlace.'];
@@ -251,7 +345,7 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
             $q = $pdo->prepare("SELECT r.archivo FROM curso_recursos r JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE r.id_recurso=:r AND m.id_publicacion=:p");
             $q->execute(['r' => (int)$post['id_recurso'], 'p' => $id_publicacion]);
             $ruta = $q->fetchColumn();
-            $d = $pdo->prepare("DELETE r FROM curso_recursos r JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE r.id_recurso=:r AND m.id_publicacion=:p");
+            $d = $pdo->prepare("DELETE FROM curso_recursos WHERE id_recurso=:r AND id_unidad IN (SELECT u.id_unidad FROM curso_unidades u JOIN curso_modulos m ON m.id_modulo=u.id_modulo WHERE m.id_publicacion=:p)");
             $d->execute(['r' => (int)$post['id_recurso'], 'p' => $id_publicacion]);
             if ($ruta) {
                 if (str_starts_with($ruta, 'supabase:')) {

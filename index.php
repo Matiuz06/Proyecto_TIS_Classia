@@ -225,7 +225,7 @@ include 'includes/header.php';
     <section class="home-section home-provider-cta" aria-labelledby="proveedores-heading">
       <div>
         <p class="section-title-tag-sm">Docentes y proveedores</p>
-        <h2 id="proveedores-heading">Enseñá o brindá servicios desde Classia</h2>
+        <h2 id="proveedores-heading">Enseña o brinda servicios desde Classia</h2>
         <p>Publicá cursos, mentorías o servicios educativos y tecnológicos en el mismo entorno donde los estudiantes descubren nuevas oportunidades.</p>
       </div>
       <a href="views/solicitar-docente.php" class="btn">Postularme como docente</a>
@@ -237,53 +237,33 @@ include 'includes/header.php';
           <h2 id="noticias-heading"><?= __t('sec_news') ?></h2>
           <p><?= __t('sec_news_sub') ?></p>
         </div>
+        <a href="views/noticias.php" class="btn btn-sm">Ver todas las noticias →</a>
       </div>
 
       <div class="home-news-grid">
-        <article class="home-news-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/cybersecurity_lab.jpg" alt="Ciberseguridad y 2FA" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="news-meta">
-              <span class="badge badge-brand-soft"><?= __t('news_tag_institutional') ?></span>
-              <time datetime="2026-09-10"><?= __t('news_date_1') ?></time>
-            </div>
-            <h3><?= __t('news_title_1') ?></h3>
-            <p><?= __t('news_desc_1') ?></p>
-          </div>
-          <a href="views/institucional.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_1') ?></a>
-        </article>
-
-        <article class="home-news-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/hero_education.jpg" alt="Integración OAuth" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="news-meta">
-              <span class="badge badge-brand-soft"><?= __t('news_tag_edtech') ?></span>
-              <time datetime="2026-09-04"><?= __t('news_date_2') ?></time>
-            </div>
-            <h3><?= __t('news_title_2') ?></h3>
-            <p><?= __t('news_desc_2') ?></p>
-          </div>
-          <a href="views/login.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_2') ?></a>
-        </article>
-
-        <article class="home-news-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/tech_conference.jpg" alt="Convocatoria Docente" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="news-meta">
-              <span class="badge badge-brand-soft"><?= __t('news_tag_academic') ?></span>
-              <time datetime="2026-08-28"><?= __t('news_date_3') ?></time>
-            </div>
-            <h3><?= __t('news_title_3') ?></h3>
-            <p><?= __t('news_desc_3') ?></p>
-          </div>
-          <a href="views/solicitar-docente.php" class="link u-text-xs u-font-semibold"><?= __t('news_link_3') ?></a>
-        </article>
+        <?php if (!empty($noticias_home)): ?>
+          <?php foreach ($noticias_home as $noticia): ?>
+            <?php 
+              $imgN = !empty($noticia['imagen']) ? htmlspecialchars($noticia['imagen']) : 'assets/images/cybersecurity_lab.jpg';
+            ?>
+            <article class="home-news-card">
+              <div class="card-media-wrapper">
+                <img src="<?= $imgN ?>" alt="<?= htmlspecialchars($noticia['titulo']) ?>" class="card-media-img" loading="lazy" />
+              </div>
+              <div>
+                <div class="news-meta">
+                  <span class="badge badge-brand-soft"><?= htmlspecialchars($noticia['categoria']) ?></span>
+                  <time datetime="<?= date('Y-m-d', strtotime($noticia['fecha_publicacion'])) ?>"><?= date('d/m/Y', strtotime($noticia['fecha_publicacion'])) ?></time>
+                </div>
+                <h3><?= htmlspecialchars($noticia['titulo']) ?></h3>
+                <p><?= htmlspecialchars($noticia['subtitulo'] ?: substr(strip_tags($noticia['cuerpo']), 0, 110) . '...') ?></p>
+              </div>
+              <a href="views/noticia-detalle.php?id=<?= (int)$noticia['id_noticia'] ?>" class="link u-text-xs u-font-semibold">Leer noticia completa →</a>
+            </article>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="text-muted">No hay noticias publicadas actualmente.</p>
+        <?php endif; ?>
       </div>
     </section>
 
@@ -293,71 +273,40 @@ include 'includes/header.php';
           <h2 id="eventos-heading"><?= __t('sec_events') ?></h2>
           <p><?= __t('sec_events_sub') ?></p>
         </div>
+        <a href="views/eventos.php" class="btn btn-sm">Ver agenda de eventos →</a>
       </div>
 
       <div class="home-events-grid">
-        <article class="home-event-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/event_webinar.jpg" alt="Webinar de Seguridad" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="event-meta">
-              <span class="event-tag event-tag--own"><?= __t('event_own') ?></span>
-              <span class="u-inline-flex-center u-gap-xs">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <?= __t('event_date_1') ?>
-              </span>
-            </div>
-            <h3><?= __t('event_title_1') ?></h3>
-            <p><?= __t('event_desc_1') ?></p>
-          </div>
-          <div class="event-footer-strip">
-            <span class="u-text-xs u-font-bold u-text-success"><?= __t('event_status_1') ?></span>
-            <a href="views/contacto.php" class="btn btn-sm"><?= __t('event_btn_1') ?></a>
-          </div>
-        </article>
-
-        <article class="home-event-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/event_symposium.jpg" alt="Simposio EdTech y Fabricación 3D" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="event-meta">
-              <span class="event-tag event-tag--sector"><?= __t('event_sector') ?></span>
-              <span class="u-inline-flex-center u-gap-xs">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <?= __t('event_date_2') ?>
-              </span>
-            </div>
-            <h3><?= __t('event_title_2') ?></h3>
-            <p><?= __t('event_desc_2') ?></p>
-          </div>
-          <div class="event-footer-strip">
-            <span class="u-text-xs u-text-muted"><?= __t('event_status_2') ?></span>
-            <a href="views/contacto.php" class="btn btn-sm btn-ghost"><?= __t('event_btn_2') ?></a>
-          </div>
-        </article>
-
-        <article class="home-event-card">
-          <div class="card-media-wrapper">
-            <img src="assets/images/event_national.jpg" alt="Jornadas Nacionales de Informática" class="card-media-img" loading="lazy" />
-          </div>
-          <div>
-            <div class="event-meta">
-              <span class="event-tag event-tag--national"><?= __t('event_national') ?></span>
-              <span class="u-inline-flex-center u-gap-xs">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <?= __t('event_date_3') ?>
-              </span>
-            </div>
-            <h3><?= __t('event_title_3') ?></h3>
-            <p><?= __t('event_desc_3') ?></p>
-          </div>
-          <div class="event-footer-strip">
-            <span class="u-text-xs u-text-muted"><?= __t('event_status_3') ?></span>
-            <a href="views/contacto.php" class="btn btn-sm btn-ghost"><?= __t('event_btn_3') ?></a>
-          </div>
-        </article>
+        <?php if (!empty($eventos_home)): ?>
+          <?php foreach ($eventos_home as $evento): ?>
+            <?php 
+              $imgE = !empty($evento['imagen']) ? htmlspecialchars($evento['imagen']) : 'assets/images/event_webinar.jpg';
+              $fechaE = strtotime($evento['fecha_evento']);
+            ?>
+            <article class="home-event-card">
+              <div class="card-media-wrapper">
+                <img src="<?= $imgE ?>" alt="<?= htmlspecialchars($evento['titulo']) ?>" class="card-media-img" loading="lazy" />
+              </div>
+              <div>
+                <div class="event-meta">
+                  <span class="event-tag event-tag--own"><?= htmlspecialchars($evento['tipo']) ?></span>
+                  <span class="u-inline-flex-center u-gap-xs">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <?= date('d/m/Y H:i', $fechaE) ?> hs
+                  </span>
+                </div>
+                <h3><?= htmlspecialchars($evento['titulo']) ?></h3>
+                <p><?= htmlspecialchars(substr($evento['descripcion'], 0, 110) . '...') ?></p>
+              </div>
+              <div class="event-footer-strip">
+                <span class="u-text-xs u-font-bold u-text-success"><?= htmlspecialchars($evento['modalidad']) ?></span>
+                <a href="views/evento-detalle.php?id=<?= (int)$evento['id_evento'] ?>" class="btn btn-sm">Ver evento →</a>
+              </div>
+            </article>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="text-muted">No hay eventos programados actualmente.</p>
+        <?php endif; ?>
       </div>
     </section>
 
