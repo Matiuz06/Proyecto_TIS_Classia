@@ -140,10 +140,15 @@ $cartCount = count($cartItems);
                   <?= __t('nav_perfil_profesional', 'Perfil profesional') ?>
                 </a>
               <?php elseif (es_admin()): ?>
-                <a href="<?= $panelAdminHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'panel-administrador' ? ' active' : '' ?>">
-                  <?= __t('nav_panel_admin') ?>
+                <a href="<?= $panelAdminHref ?>"
+                role="menuitem"
+                class="user-dropdown-item<?= $activePage === 'panel-administrador' ? ' active' : '' ?>">
+                <?= __t('nav_panel_admin') ?>
                 </a>
-                <a href="<?= ($cssPrefix === '.') ? 'views/solicitudes-docente.php' : 'solicitudes-docente.php' ?>" role="menuitem" class="user-dropdown-item">
+
+                <a href="<?= ($cssPrefix === '.') ? 'views/solicitudes-docente.php' : 'solicitudes-docente.php' ?>"
+                  role="menuitem"
+                  class="user-dropdown-item<?= $activePage === 'solicitudes-docente' ? ' active' : '' ?>">
                   <?= __t('nav_solicitudes_docentes', 'Solicitudes docentes') ?>
                 </a>
                 <a href="<?= $eventosHref ?>" role="menuitem" class="user-dropdown-item">
@@ -155,7 +160,8 @@ $cartCount = count($cartItems);
                 <a href="<?= $panelProveedorHref ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_panel_proveedor', 'Panel proveedor') ?>
                 </a>
-              <?php endif; ?>
+
+                <?php endif; ?>
 
               <div class="user-dropdown-divider" role="separator"></div>
               <a href="<?= $logoutHref ?>" role="menuitem" class="user-dropdown-item user-dropdown-item--logout">

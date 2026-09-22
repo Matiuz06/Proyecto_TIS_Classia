@@ -8,16 +8,67 @@ $description = 'Panel de supervisión y gestión integral de la plataforma Class
 $cssPrefix   = '..';
 $jsPrefix    = '..';
 $activePage  = 'panel-administrador';
+
 include '../includes/header.php';
 ?>
 
-    <main>
-      <header>
-        <p>Plataforma educativa</p>
-        <h1>Panel de Administración y Control</h1>
+<main class="admin-panel">
+
+  <header class="admin-panel-header">
+    <p class="admin-panel-kicker">Plataforma educativa</p>
+
+    <h1>Panel de administración y control</h1>
+
+    <p>
+      Espacio centralizado para supervisar usuarios, gestionar solicitudes docentes,
+      revisar publicaciones y coordinar la actividad global de Classia.
+    </p>
+  </header>
+
+
+  <section class="admin-panel-section" aria-labelledby="apartados-admin">
+
+    <h2 id="apartados-admin">Apartados del panel</h2>
+
+    <div class="admin-panel-dropdown">
+
+      <button type="button" class="admin-panel-trigger">
+        <span>Seleccionar apartado</span>
+        <span class="admin-panel-caret">▾</span>
+      </button>
+
+      <div class="admin-panel-menu">
+
+        <a href="#" class="admin-panel-item">
+          Usuarios
+        </a>
+
+        <a href="#" class="admin-panel-item">
+          Solicitudes docentes
+        </a>
+
+        <a href="#" class="admin-panel-item">
+          Publicaciones
+        </a>
+
+        <a href="#" class="admin-panel-item">
+          Actividad
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div class="admin-panel-general">
+
+      <div class="admin-panel-general-header">
+
+        <h3>Estado de la plataforma</h3>
+
         <p>
-          Espacio centralizado para supervisar usuarios, gestionar solicitudes docentes,
-          revisar publicaciones y coordinar la actividad global de Classia.
+          Consulta rápida de los principales elementos que requieren
+          supervisión dentro de Classia.
         </p>
         <p class="action-row">
           <a class="btn" href="catalogo.php">Explorar catálogo</a>
@@ -77,7 +128,13 @@ include '../includes/header.php';
             <span class="role-card-action">Gestionar Noticias</span>
           </a>
         </div>
-      </section>
-    </main>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
 
 <?php include '../includes/footer.php'; ?>
