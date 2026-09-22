@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Prepara datos privados del usuario autenticado para su panel personal.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../valoraciones/obtener_contrataciones_valorables.php';

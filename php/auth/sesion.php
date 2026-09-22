@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Centraliza inicio, lectura y cierre seguro de sesión de usuario.
+ */
+
 function iniciar_sesion(): void
 {
     if (session_status() !== PHP_SESSION_NONE) {

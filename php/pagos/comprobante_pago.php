@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Genera y envía comprobantes de pago por correo electrónico.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/mailer.php';

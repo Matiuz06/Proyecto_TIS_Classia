@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Carga el detalle de un curso, su contenido y valoraciones asociadas.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/contenido_curso.php';

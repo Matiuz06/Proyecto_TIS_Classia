@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Obtiene publicaciones activas filtradas para el catálogo.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 iniciar_sesion();
 

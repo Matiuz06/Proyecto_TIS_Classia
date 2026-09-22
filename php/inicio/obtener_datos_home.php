@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Obtiene publicaciones, noticias y eventos destacados para la página de inicio.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/i18n.php';
 require_once __DIR__ . '/../auth/sesion.php';

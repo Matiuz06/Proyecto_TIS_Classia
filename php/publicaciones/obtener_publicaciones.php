@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Prepara listados reutilizables de publicaciones para vistas y paneles.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 

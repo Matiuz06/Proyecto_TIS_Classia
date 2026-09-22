@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Activa 2FA tras validar el código TOTP inicial.
+ */
+
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/roles.php';
 require_once __DIR__ . '/totp.php';

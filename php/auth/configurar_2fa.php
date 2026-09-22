@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Prepara secreto, QR y token CSRF para configurar autenticación de dos factores.
+ */
+
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/roles.php';
 require_once __DIR__ . '/totp.php';

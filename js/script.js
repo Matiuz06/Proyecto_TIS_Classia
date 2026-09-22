@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Menú lateral del curso: en móvil se cierra al navegar a una unidad.
   const sidebarToggle = document.querySelector("[data-course-sidebar-toggle]");
   const courseSidebar = document.querySelector("[data-course-sidebar]");
 
@@ -19,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let lastDialogTrigger = null;
 
+  // Delegación de eventos para diálogos de recursos y limpieza de adjuntos.
   document.addEventListener("click", (event) => {
     const openTrigger = event.target.closest("[data-dialog-open]");
 
@@ -92,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const updateResourceMutualExclusivity = (form) => {
+    // Un recurso puede tener enlace o archivo, salvo el tipo "Enlace", que fuerza URL.
     if (!form) return;
     const tipoSelect = form.querySelector('select[name="tipo_recurso"]');
     const tipo = tipoSelect ? tipoSelect.value : "";
@@ -171,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const syncResourceFields = (select) => {
+    // Ajusta ayudas y placeholders según el tipo de recurso seleccionado.
     const form = select.closest("form");
     if (!form) return;
 
@@ -248,6 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const onboardingForm = document.querySelector(".onboarding-page form");
   if (onboardingForm) {
+    // Precarga respuestas guardadas para que el onboarding pueda retomarse.
     const dataScript = document.getElementById("onboarding-data");
     if (dataScript) {
       try {
@@ -301,6 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nuevaChoiceBox = inputNueva.closest(".publication-choice");
 
     const sincronizarCategorias = () => {
+      // Evita enviar categoría existente y categoría nueva en el mismo formulario.
       const tieneSeleccion = selectCat.value.trim() !== "";
       if (tieneSeleccion) {
         inputNueva.disabled = true;
@@ -329,6 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const serviceForm = document.querySelector("form[data-service-form]");
   if (serviceForm) {
+    // Muestra solo la sección técnica correspondiente al tipo de servicio.
     const tipo = serviceForm.dataset.tipoServicio || "";
     const ids = {
       impresion_3d: "solicitud-diseno-3d",

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Autentica credenciales, valida CSRF/reCAPTCHA y prepara sesión o 2FA.
+ */
+
 require_once __DIR__ . "/sesion.php";
 require_once __DIR__ . "/../utils/recaptcha.php";
 

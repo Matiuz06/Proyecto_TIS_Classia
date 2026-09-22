@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Responsabilidad: Gestiona solicitudes personalizadas de servicios entre usuarios y proveedores.
+ */
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/plantillas_servicio.php';
