@@ -3,7 +3,8 @@
 /**
  * Configuración de Supabase Storage para Classia.
  *
- * Carga automáticamente las credenciales desde el archivo .env o desde variables de entorno del servidor.
+ * Carga automáticamente las credenciales desde el archivo .env o desde
+ * variables de entorno del servidor.
  */
 
 $envPath = __DIR__ . '/../.env';

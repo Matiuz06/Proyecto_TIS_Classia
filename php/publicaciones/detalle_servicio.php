@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Carga el detalle de un servicio, proveedor y reseñas relacionadas.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../solicitudes/plantillas_servicio.php';
 

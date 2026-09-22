@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Guarda y recupera el avance del onboarding de usuarios.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 

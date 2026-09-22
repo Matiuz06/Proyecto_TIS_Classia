@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Confirma cambios de correo mediante token temporal.
+ */
+
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 

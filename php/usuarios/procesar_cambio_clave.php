@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Permite a un usuario autenticado actualizar su contraseña.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';

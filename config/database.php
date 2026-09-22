@@ -28,7 +28,8 @@ if (!isset($pdo)) {
     $db_pass   = $db_pass === false ? "" : $db_pass;
     $db_ssl    = getenv("DB_SSLMODE") ?: "require";
 
-    // Auto-detectar driver si no se especifica explícitamente
+    // Permite usar la misma configuración en MySQL local o Supabase/PostgreSQL
+    // sin obligar a definir DB_DRIVER en entornos simples.
     if (empty($db_driver)) {
         if (str_contains($db_host, 'supabase.co') || str_contains($db_host, 'supabase.com') || $db_port === '5432' || $db_port === '6543') {
             $db_driver = 'pgsql';

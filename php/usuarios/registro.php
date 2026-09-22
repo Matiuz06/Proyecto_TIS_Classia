@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Procesa altas de usuarios con validaciones, roles y confirmación de correo.
+ */
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

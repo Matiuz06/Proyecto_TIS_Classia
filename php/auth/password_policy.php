@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Define reglas reutilizables para validar fortaleza de contraseñas.
+ */
+
 function validar_contrasena(string $contrasena): array
 {
     $errores = [];

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Verifica el segundo factor antes de completar el inicio de sesión.
+ */
+
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/totp.php';
 require_once __DIR__ . '/../../config/database.php';

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Crea una contratación desde el carrito validando publicaciones y cupos.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 

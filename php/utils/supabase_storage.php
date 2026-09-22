@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Integra la aplicación con Supabase Storage para recursos privados de cursos.
+ */
+
 function supabase_config(): array
 {
     static $config = null;

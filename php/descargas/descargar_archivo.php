@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Responsabilidad: Entrega archivos privados verificando permisos de acceso.
+ */
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/file_upload_helper.php';

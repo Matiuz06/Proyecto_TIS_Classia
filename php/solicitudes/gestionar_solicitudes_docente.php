@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Permite a administración aprobar o rechazar solicitudes de rol docente.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 

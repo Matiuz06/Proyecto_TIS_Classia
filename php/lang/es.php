@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Define los textos de interfaz en español para el sistema de internacionalización.
+ */
+
 return [
     'nav_inicio'            => 'Inicio',
     'nav_catalogo'          => 'Catálogo',

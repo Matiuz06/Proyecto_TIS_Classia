@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Registra solicitudes para obtener rol docente/proveedor.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 
 function asegurar_tabla_solicitudes_docente(PDO $db): void

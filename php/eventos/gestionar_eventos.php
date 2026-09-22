@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Administra creación, moderación y consulta de eventos de la plataforma.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 
 function obtener_eventos(PDO $pdo, int $limite = 0, string $estado = 'Abierto', ?int $id_usuario_docente = null, bool $es_admin = false): array

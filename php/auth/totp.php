@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * Responsabilidad: Implementa generación y validación de códigos TOTP para 2FA.
+ */
+
+/**
  * Módulo de Autenticación de Dos Factores (2FA / TOTP)
  * Compatible con Google Authenticator, Microsoft Authenticator, Authy, 1Password, etc.
  * Basado en RFC 6238 (TOTP) y RFC 4226 (HOTP).
