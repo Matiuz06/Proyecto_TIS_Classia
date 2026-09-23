@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Valida y envía mensajes recibidos desde el formulario de contacto.
+ */
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

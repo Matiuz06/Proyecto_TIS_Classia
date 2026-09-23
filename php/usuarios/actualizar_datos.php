@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Actualiza datos personales del usuario y gestiona cambios de correo.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';

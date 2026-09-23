@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Desactiva el segundo factor del usuario autenticado.
+ */
+
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/roles.php';
 require_once __DIR__ . '/../../config/database.php';

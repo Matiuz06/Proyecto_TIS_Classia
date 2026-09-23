@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Procesa la creación de cursos o servicios por docentes y administradores.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/upload_helper.php';

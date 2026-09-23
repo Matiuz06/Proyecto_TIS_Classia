@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Completa el flujo OAuth de Google y crea o actualiza la sesión local.
+ */
+
 
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/roles.php';

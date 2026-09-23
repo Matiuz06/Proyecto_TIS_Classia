@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Administra creación, moderación, ordenamiento y consulta de noticias.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 
 function obtener_noticias(PDO $pdo, int $limite = 0, string $estado = 'Publicada', ?int $id_usuario_docente = null, bool $es_admin = false): array

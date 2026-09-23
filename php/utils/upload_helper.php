@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Centraliza validaciones y persistencia de imágenes subidas por formularios.
+ */
+
 const TIPOS_MIME_PERMITIDOS = [
     'image/jpeg' => 'jpg',
     'image/png'  => 'png',

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Gestiona archivos privados subidos y resuelve rutas internas permitidas.
+ */
+
 function ruta_absoluta_archivo_guardado(?string $ruta): ?string
 {
     if (!$ruta) return null;

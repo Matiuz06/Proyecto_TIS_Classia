@@ -5,11 +5,19 @@ CREATE DATABASE IF NOT EXISTS classia_db
 USE classia_db;
 
 
+-- =========================================================
+-- Permisos locales de desarrollo
+-- Usuario con privilegios acotados al esquema de Classia
+-- =========================================================
 CREATE USER IF NOT EXISTS 'classia_user'@'localhost' IDENTIFIED BY 'CONTRASENA_LOCAL';
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, INDEX ON classia_db.* TO 'classia_user'@'localhost';
 FLUSH PRIVILEGES;
 
 
+-- =========================================================
+-- Identidad, roles y perfiles base
+-- Usuarios contiene autenticación, onboarding y recuperación
+-- =========================================================
 CREATE TABLE IF NOT EXISTS roles (
     id_rol INT AUTO_INCREMENT PRIMARY KEY,
     nombre_rol VARCHAR(50) NOT NULL UNIQUE,
@@ -53,6 +61,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Catálogo de cursos y servicios
+-- Publicaciones pertenecen a usuarios proveedores y categorías
+-- =========================================================
 CREATE TABLE IF NOT EXISTS categorias (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nombre_categoria VARCHAR(100) NOT NULL UNIQUE,
@@ -90,6 +102,10 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     INDEX idx_pub_fecha (fecha_creacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Solicitudes, contrataciones y pagos
+-- Vinculan pedidos personalizados, órdenes y comprobantes
+-- =========================================================
 CREATE TABLE IF NOT EXISTS solicitudes (
     id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(200) NOT NULL,
@@ -113,6 +129,10 @@ CREATE TABLE IF NOT EXISTS solicitudes (
     INDEX idx_sol_contratacion (id_contratacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Solicitudes de rol docente
+-- Registra postulaciones y revisión administrativa de proveedores
+-- =========================================================
 CREATE TABLE IF NOT EXISTS solicitudes_docente (
     id_solicitud_docente INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -173,6 +193,10 @@ CREATE TABLE IF NOT EXISTS pagos (
     INDEX idx_pagos_estado (estado_pago)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Valoraciones y perfil profesional
+-- Relacionan reputación pública con usuarios y contrataciones
+-- =========================================================
 CREATE TABLE IF NOT EXISTS valoraciones (
     id_valoracion INT AUTO_INCREMENT PRIMARY KEY,
     puntuacion INT NOT NULL CHECK (puntuacion BETWEEN 1 AND 5),
@@ -199,6 +223,10 @@ CREATE TABLE IF NOT EXISTS valoraciones (
 
 
 
+-- =========================================================
+-- Perfiles profesionales
+-- Datos públicos ampliados para docentes y proveedores
+-- =========================================================
 CREATE TABLE IF NOT EXISTS perfiles_profesionales (
     id_perfil INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL UNIQUE,
@@ -220,6 +248,10 @@ CREATE TABLE IF NOT EXISTS perfiles_profesionales (
     CONSTRAINT fk_perfiles_profesionales_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Contenido de cursos
+-- Módulos, unidades, recursos, entregas y participación
+-- =========================================================
 CREATE TABLE IF NOT EXISTS curso_modulos (
     id_modulo INT AUTO_INCREMENT PRIMARY KEY,
     id_publicacion INT NOT NULL,

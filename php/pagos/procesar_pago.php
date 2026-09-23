@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Valida datos de pago y marca una contratación como abonada.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';

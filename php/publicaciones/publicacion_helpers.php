@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Agrupa validaciones y utilidades compartidas para publicaciones.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../solicitudes/plantillas_servicio.php';
 

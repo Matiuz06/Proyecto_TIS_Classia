@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Envía correos transaccionales mediante SMTP con plantillas HTML simples.
+ */
+
 function cargar_configuracion_correo(): array
 {
     $env_path = __DIR__ . '/../../.env';

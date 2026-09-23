@@ -6,6 +6,7 @@
 -- ============================================================================
 
 -- Función utilitaria para actualizar automáticamente las columnas de timestamp
+-- Mantiene sincronizadas las columnas de auditoría sin repetir lógica por tabla.
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -81,6 +82,7 @@ CREATE TABLE IF NOT EXISTS categorias (
 -- ----------------------------------------------------------------------------
 -- 4. TABLA: publicaciones (Cursos y Servicios)
 -- ----------------------------------------------------------------------------
+-- Catálogo principal: cada publicación pertenece a un proveedor y una categoría.
 CREATE TABLE IF NOT EXISTS publicaciones (
     id_publicacion SERIAL PRIMARY KEY,
     titulo VARCHAR(200) NOT NULL,
@@ -111,6 +113,7 @@ EXECUTE FUNCTION trigger_set_timestamp();
 -- ----------------------------------------------------------------------------
 -- 5. TABLA: contrataciones
 -- ----------------------------------------------------------------------------
+-- Orden de compra generada desde carrito o desde una solicitud aceptada.
 CREATE TABLE IF NOT EXISTS contrataciones (
     id_contratacion SERIAL PRIMARY KEY,
     fecha_contratacion TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -122,6 +125,7 @@ CREATE TABLE IF NOT EXISTS contrataciones (
 -- ----------------------------------------------------------------------------
 -- 6. TABLA: solicitudes
 -- ----------------------------------------------------------------------------
+-- Solicitudes personalizadas para servicios que requieren acuerdo previo.
 CREATE TABLE IF NOT EXISTS solicitudes (
     id_solicitud SERIAL PRIMARY KEY,
     titulo VARCHAR(200) NOT NULL,
@@ -188,6 +192,7 @@ CREATE TABLE IF NOT EXISTS pagos (
 -- ----------------------------------------------------------------------------
 -- 10. TABLA: valoraciones
 -- ----------------------------------------------------------------------------
+-- Una contratación solo puede generar una valoración por usuario.
 CREATE TABLE IF NOT EXISTS valoraciones (
     id_valoracion SERIAL PRIMARY KEY,
     puntuacion INT NOT NULL CHECK (puntuacion BETWEEN 1 AND 5),

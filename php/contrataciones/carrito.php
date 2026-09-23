@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Administra el carrito de publicaciones guardado en sesión.
+ */
+
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';

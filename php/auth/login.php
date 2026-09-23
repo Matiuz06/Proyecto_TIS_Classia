@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Procesa login tradicional conservado para compatibilidad.
+ */
+
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 

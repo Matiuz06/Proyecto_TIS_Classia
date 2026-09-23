@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Define plantillas y campos esperados para tipos de servicios personalizados.
+ */
+
 function plantillas_servicio(): array
 {
     return [

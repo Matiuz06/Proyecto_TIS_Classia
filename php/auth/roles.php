@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Define roles y barreras de autorización reutilizables.
+ */
+
 require_once __DIR__ . "/sesion.php";
 
 const ROL_ESTUDIANTE = 1;
