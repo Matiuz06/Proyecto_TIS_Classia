@@ -158,9 +158,6 @@ $cartCount = count($cartItems);
                 <a href="<?= $noticiasHref ?>" role="menuitem" class="user-dropdown-item">
                   <?= __t('nav_admin_noticias', 'Gestión de Noticias') ?>
                 </a>
-                <a href="<?= $panelProveedorHref ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_panel_proveedor', 'Panel proveedor') ?>
-                </a>
 
                 <?php endif; ?>
 
