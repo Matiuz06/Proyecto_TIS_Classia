@@ -28,6 +28,8 @@ include '../includes/header.php';
 
   <section class="admin-panel-section" aria-labelledby="apartados-admin">
 
+    <p class="admin-panel-kicker">Gestión clara</p>
+
     <h2 id="apartados-admin">Apartados del panel</h2>
 
     <div class="admin-panel-dropdown">
@@ -63,6 +65,7 @@ include '../includes/header.php';
     <div class="admin-panel-general">
 
       <div class="admin-panel-general-header">
+        <p class="admin-panel-kicker">Resumen general</p>
 
         <h3>Estado de la plataforma</h3>
 
@@ -70,63 +73,82 @@ include '../includes/header.php';
           Consulta rápida de los principales elementos que requieren
           supervisión dentro de Classia.
         </p>
-        <p class="action-row">
-          <a class="btn" href="catalogo.php">Explorar catálogo</a>
-          <a class="btn" href="solicitudes-docente.php">Gestionar solicitudes docentes</a>
-        </p>
-      </header>
+      </div>
 
-      <section aria-labelledby="roles-classia">
-        <header>
-          <p>Gestión clara</p>
-          <h2 id="roles-classia">Una misma plataforma para cada rol</h2>
-        </header>
-        <div class="role-grid">
-          <a
-            class="content-card role-card-link motion-card"
-            href="usuario.php">
-            <span class="badge role-card-meta">Estudiante</span>
-            <h3>Cliente</h3>
-            <p class="role-card-text">
-              Explora cursos y servicios, consulta publicaciones, contrata
-              propuestas educativas y gestiona su actividad.
-            </p>
-            <span class="role-card-action">Acceder</span>
-          </a>
 
-          <a
-            class="content-card role-card-link motion-card"
-            href="panel-proveedor.php">
-            <span class="badge role-card-meta">Publicador</span>
-            <h3>Docente / Proveedor</h3>
-            <p class="role-card-text">
-              Publica cursos, ofrece servicios, administra publicaciones y
-              gestiona solicitudes desde su panel.
-            </p>
-            <span class="role-card-action">Acceder</span>
-          </a>
+      <div class="admin-panel-stats">
 
-          <a
-            class="content-card role-card-link motion-card"
-            href="eventos.php">
-            <span class="badge role-card-meta">Comunidad</span>
-            <h3>Eventos &amp; Webinars</h3>
-            <p class="role-card-text">
-              Supervisa, crea, aprueba o rechaza eventos propuestos por docentes y la institución.
-            </p>
-            <span class="role-card-action">Gestionar Eventos</span>
-          </a>
+        <article class="admin-panel-stat">
+          <span class="admin-panel-stat-label">Usuarios</span>
 
-          <a
-            class="content-card role-card-link motion-card"
-            href="noticias.php">
-            <span class="badge role-card-meta">Prensa</span>
-            <h3>Noticias &amp; Novedades</h3>
-            <p class="role-card-text">
-              Publica y modera artículos, comunicados institucionales y noticias académicas.
-            </p>
-            <span class="role-card-action">Gestionar Noticias</span>
-          </a>
+          <strong class="admin-panel-stat-value">0</strong>
+
+          <span class="admin-panel-stat-description">
+            Usuarios registrados
+          </span>
+        </article>
+
+
+        <article class="admin-panel-stat">
+          <span class="admin-panel-stat-label">Solicitudes docentes</span>
+
+          <strong class="admin-panel-stat-value">0</strong>
+
+          <span class="admin-panel-stat-description">
+            Solicitudes pendientes
+          </span>
+        </article>
+
+
+        <article class="admin-panel-stat">
+          <span class="admin-panel-stat-label">Publicaciones</span>
+
+          <strong class="admin-panel-stat-value">0</strong>
+
+          <span class="admin-panel-stat-description">
+            Publicaciones disponibles
+          </span>
+        </article>
+
+
+        <article class="admin-panel-stat">
+          <span class="admin-panel-stat-label">Actividad</span>
+
+          <strong class="admin-panel-stat-value">0</strong>
+
+          <span class="admin-panel-stat-description">
+            Actividades recientes
+          </span>
+        </article>
+
+      </div>
+
+
+      <div class="admin-panel-general-info">
+
+        <div class="admin-panel-info-card">
+
+          <h4>Supervisión de la plataforma</h4>
+
+          <p>
+            Desde este panel podés consultar y supervisar los principales
+            movimientos de Classia, manteniendo organizada la gestión
+            administrativa de la plataforma.
+          </p>
+
+        </div>
+
+
+        <div class="admin-panel-info-card">
+
+          <h4>Gestión administrativa</h4>
+
+          <p>
+            Utilizá los apartados del panel para acceder a la información
+            correspondiente a usuarios, publicaciones, solicitudes docentes
+            y actividad general.
+          </p>
+
         </div>
 
       </div>
