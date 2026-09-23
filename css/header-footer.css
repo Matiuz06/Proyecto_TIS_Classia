@@ -73,7 +73,10 @@
   text-decoration: none;
   white-space: nowrap;
   border-radius: var(--radius-sm, 6px);
-  transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease;
 }
 
 .site-header .site-nav > a:focus-visible {
@@ -106,7 +109,10 @@
   text-decoration: none;
   white-space: nowrap;
   border-radius: var(--radius-sm, 6px);
-  transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease;
 }
 
 .site-header .nav-cart-btn:hover {
@@ -155,7 +161,9 @@
   color: var(--color-text-muted);
   text-decoration: none;
   border-radius: 4px;
-  transition: color var(--transition-fast), background-color var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
 }
 
 .site-header .lang-btn:hover {
@@ -194,7 +202,10 @@
   border: 1px solid var(--color-border, #cbd5e0);
   border-radius: 9999px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .site-header .user-nav-name {
@@ -242,7 +253,9 @@
   background: #ffffff;
   border: 1px solid var(--color-border, #e2e8f0);
   border-radius: var(--radius-md, 8px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.15),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
 .site-header .site-nav .user-dropdown-menu::before {
@@ -251,7 +264,7 @@
   right: 0;
   left: 0;
   height: 8px;
-  content: '';
+  content: "";
 }
 
 .site-header .user-nav-dropdown:hover .user-dropdown-menu,
@@ -282,7 +295,9 @@
   white-space: normal;
   background: transparent;
   border-radius: 0;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .site-header .site-nav .user-dropdown-item:hover,
@@ -332,7 +347,6 @@
     justify-content: flex-start;
   }
 }
-
 
 @media (width <=420px) {
   .site-header .site-brand img {
