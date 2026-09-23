@@ -49,6 +49,7 @@ $cartCount = count($cartItems);
   <title><?= htmlspecialchars($title) ?></title>
   <link rel="stylesheet" href="<?= $cssPrefix ?>/css/animation.css?v=<?= filemtime(__DIR__ . '/../css/animation.css') ?>" />
   <link rel="stylesheet" href="<?= $cssPrefix ?>/css/style.css?v=<?= filemtime(__DIR__ . '/../css/style.css') ?>" />
+  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/header-footer.css?v=<?= filemtime(__DIR__ . '/../css/header-footer.css') ?>" />
   <link rel="icon" type="image/png" href="<?= $cssPrefix ?>/assets/images/favicon.png" />
 </head>
 <body<?= ($bodyClass ?? '') ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?>>
