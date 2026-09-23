@@ -12,19 +12,6 @@
   transform: translateY(2px);
 }
 
-.site-brand img,
-#logoC {
-  transition: transform 200ms ease;
-}
-
-.site-brand:hover img,
-#logoC:hover {
-  transform: scale(1.05);
-}
-
-.site-nav a {
-  transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease;
-}
 
 .btn,
 button {
@@ -495,15 +482,6 @@ body.catalog-page>main {
   animation: fade-slide-up var(--dur-medium, 250ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
 }
 
-/* ── Carrito badge pulse ── */
-.nav-cart-badge {
-  animation: pulse-badge 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes pulse-badge {
-  0% { transform: scale(0.6); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
 
 /* ── Auth container entrance ── */
 @keyframes authEntradaInicial {
