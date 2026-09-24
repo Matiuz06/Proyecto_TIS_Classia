@@ -6,9 +6,58 @@
 
 require_once __DIR__ . '/sesion.php';
 
+function verificar_estado_usuario_activo(string $url_login = 'login.php'): void
+{
+    if (!esta_autenticado()) {
+        return;
+    }
+
+    $usr = usuario_actual();
+    $id_usuario = (int) ($usr['id_usuario'] ?? 0);
+    if ($id_usuario <= 0) {
+        return;
+    }
+
+    global $pdo;
+    try {
+        if (!isset($pdo)) {
+            require_once __DIR__ . '/../../config/database.php';
+        }
+    } catch (Throwable $e) {
+        error_log('Error al cargar la conexión para validar usuario activo: ' . $e->getMessage());
+        return;
+    }
+
+    try {
+        $stmt = $pdo->prepare('SELECT activo, motivo_bloqueo FROM usuarios WHERE id_usuario = :id LIMIT 1');
+        $stmt->execute(['id' => $id_usuario]);
+        $row = $stmt->fetch();
+
+        if ($row && isset($row['activo']) && (int) $row['activo'] === 0) {
+            $motivo = !empty($row['motivo_bloqueo']) ? ' Motivo: ' . htmlspecialchars($row['motivo_bloqueo']) : '';
+            cerrar_sesion();
+            iniciar_sesion();
+            $_SESSION['login_error'] = 'Tu cuenta se encuentra suspendida o bloqueada por la administración.' . $motivo;
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Pragma: no-cache');
+            header('Location: ' . $url_login);
+            exit;
+        }
+    } catch (PDOException $e) {
+        error_log('Error al verificar usuario activo: ' . $e->getMessage());
+    }
+}
+
 function requerir_onboarding_completo(string $url_onboarding): void
 {
-    if (!esta_autenticado() || (int) usuario_actual()['id_rol'] !== 1) {
+    if (!esta_autenticado()) {
+        return;
+    }
+
+    $login_url = (basename(dirname($_SERVER['SCRIPT_NAME'] ?? '')) === 'views') ? 'login.php' : 'views/login.php';
+    verificar_estado_usuario_activo($login_url);
+
+    if ((int) usuario_actual()['id_rol'] !== 1) {
         return;
     }
 
