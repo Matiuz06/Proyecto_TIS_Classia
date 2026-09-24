@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     password_reset_expira TIMESTAMPTZ NULL,
     activo SMALLINT NOT NULL DEFAULT 1,
     fecha_baja TIMESTAMPTZ NULL,
+    motivo_bloqueo VARCHAR(255) NULL,
     onboarding_step SMALLINT NOT NULL DEFAULT 1,
     onboarding_data TEXT NULL
 );

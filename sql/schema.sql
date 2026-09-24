@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     password_reset_expira DATETIME NULL,
     activo TINYINT(1) NOT NULL DEFAULT 1,
     fecha_baja DATETIME NULL,
+    motivo_bloqueo VARCHAR(255) NULL,
     onboarding_step TINYINT UNSIGNED NOT NULL DEFAULT 1,
     onboarding_data TEXT NULL,
     CONSTRAINT fk_usuarios_roles
