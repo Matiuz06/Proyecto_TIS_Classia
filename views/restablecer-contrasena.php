@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Solicitud de recuperación de contraseña por correo electrónico.
+ */
+
 require_once '../php/auth/sesion.php';
 iniciar_sesion();
 

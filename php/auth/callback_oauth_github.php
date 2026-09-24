@@ -242,6 +242,11 @@ try {
         }
     }
 
+    if ($usuario && isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
+        $motivo = !empty($usuario['motivo_bloqueo']) ? ' Motivo: ' . $usuario['motivo_bloqueo'] : '';
+        github_oauth_error('Tu cuenta se encuentra bloqueada o suspendida por la administración.' . $motivo);
+    }
+
     establecer_usuario_sesion(
         (int) $usuario['id_usuario'],
         $usuario['nombre'] . ' ' . $usuario['apellido'],

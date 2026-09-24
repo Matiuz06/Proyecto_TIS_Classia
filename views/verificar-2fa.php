@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Verificación de código de seguridad TOTP de doble factor.
+ */
+
 require_once '../php/auth/sesion.php';
 
 iniciar_sesion();

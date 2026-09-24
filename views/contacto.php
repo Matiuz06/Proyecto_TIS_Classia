@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Formulario de contacto institucional y consultas generales.
+ */
+
 $errores = [];
 $enviado = false;
 require_once '../php/contacto/enviar.php';

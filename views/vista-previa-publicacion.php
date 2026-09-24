@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Vista previa completa de una publicación.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 require_once '../config/database.php';

@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Edición, actualización de cupos y cambio de estado de publicaciones.
+ */
+
 $publicacion = null;
 $categorias = [];
 require_once '../php/auth/roles.php';

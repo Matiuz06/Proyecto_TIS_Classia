@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Formulario para valorar y reseñar cursos o servicios completados.
+ */
+
 require_once '../php/auth/roles.php';
 require_once '../php/valoraciones/obtener_contrataciones_valorables.php';
 

@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Aula virtual del curso con clases, foros de debate, entregas y recursos.
+ */
+
 require_once '../php/publicaciones/detalle_curso.php';
 
 $title = $curso ? htmlspecialchars($curso['titulo']) : 'Curso no encontrado';
@@ -140,7 +145,7 @@ include '../includes/header.php';
           <?php if (!empty($clases_planas)): ?>
             <nav class="course-lesson-nav" aria-label="Navegación de clases">
               <span></span>
-              <a class="btn" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$clases_planas[0]['unidad']['id_unidad'] ?>">Primera clase →</a>
+              <a class="btn" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$clases_planas[0]['unidad']['id_unidad'] ?>">Comienza ahora →</a>
             </nav>
           <?php else: ?>
             <div class="course-empty-state"><p>Este curso todavía no tiene clases cargadas.</p></div>
@@ -165,7 +170,7 @@ include '../includes/header.php';
                   $ytEmbed = !empty($vid['url']) ? obtener_youtube_embed_url($vid['url']) : null; 
                 ?>
                 <div class="course-video-wrapper u-mb-md" id="recurso-<?= (int)$vid['id_recurso'] ?>">
-                  <div class="course-video-header u-mb-xs" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                  <div class="course-video-header-row">
                     <div>
                       <span class="course-resource-code"><?= $codVid ?></span>
                       <strong>🎥 <?= htmlspecialchars($vid['titulo']) ?></strong>
@@ -181,17 +186,17 @@ include '../includes/header.php';
                     <?php endif; ?>
                   </div>
                   <?php if ($embedUrl = obtener_video_embed_url($vid['url'] ?? '')): ?>
-                    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-lg);background:#000;box-shadow:var(--shadow-md);">
-                      <iframe src="<?= htmlspecialchars($embedUrl) ?>" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
+                    <div class="course-video-responsive-wrap">
+                      <iframe src="<?= htmlspecialchars($embedUrl) ?>" class="course-video-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
                     </div>
                   <?php elseif (!empty($vid['archivo'])): ?>
-                    <video controls style="width:100%;border-radius:var(--radius-lg);max-height:640px;background:#000;box-shadow:var(--shadow-md);display:block;">
+                    <video controls class="course-video-player">
                       <source src="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$vid['id_recurso'] ?>">
                       Tu navegador no soporta la reproducción directa de video.
                     </video>
                   <?php elseif (!empty($vid['url'])): ?>
-                    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-lg);background:#000;box-shadow:var(--shadow-md);">
-                      <iframe src="<?= htmlspecialchars($vid['url']) ?>" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
+                    <div class="course-video-responsive-wrap">
+                      <iframe src="<?= htmlspecialchars($vid['url']) ?>" class="course-video-iframe" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
                     </div>
                   <?php endif; ?>
                 </div>
@@ -317,6 +322,19 @@ include '../includes/header.php';
                                     </div>
                                     <div class="course-forum-body">
                                       <?= nl2br(htmlspecialchars($msg['mensaje'])) ?>
+                                      <?php if (es_admin() || $es_propietario || ((int)($usuario_actual['id_usuario'] ?? 0) === (int)$msg['id_usuario'])): ?>
+                                        <div class="course-forum-actions-cell">
+                                          <form method="POST" class="inline-form" onsubmit="return confirm('¿Eliminar este mensaje del foro?');">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                                            <input type="hidden" name="accion" value="eliminar_mensaje_foro">
+                                            <input type="hidden" name="id_mensaje" value="<?= (int)$msg['id_mensaje'] ?>">
+                                            <input type="hidden" name="id_unidad" value="<?= (int)($unidad['id_unidad'] ?? 0) ?>">
+                                            <button type="submit" class="course-forum-delete-btn">
+                                              🗑️ Eliminar mensaje
+                                            </button>
+                                          </form>
+                                        </div>
+                                      <?php endif; ?>
                                     </div>
                                   </article>
                                 <?php endforeach; ?>
@@ -390,7 +408,7 @@ include '../includes/header.php';
                               <p><strong>Estado:</strong> Entregada el <?= date('d/m/Y H:i', strtotime($entrega['fecha_entrega'])) ?> hs.</p>
                               <?php if (!empty($entrega['archivo_entrega'])): ?>
                                 <?php $entregaVisualizable = recurso_es_visualizable_nativamente('Archivo', $entrega['archivo_entrega']); ?>
-                                <div class="u-mt-xs" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+                                <div class="course-delivery-actions-row">
                                   <?php if ($entregaVisualizable): ?>
                                     <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=entrega&id=<?= (int)$entrega['id_entrega'] ?>&modo=inline" target="_blank" rel="noopener">👁️ Ver mi archivo entregado</a>
                                   <?php endif; ?>

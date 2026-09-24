@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Validación y confirmación de dirección de correo electrónico.
+ */
+
 $resultado = $_GET['resultado'] ?? 'invalido';
 $mensaje = match ($resultado) {
   'pendiente' => 'Revisá tu correo electrónico para confirmar tu cuenta antes de continuar.',

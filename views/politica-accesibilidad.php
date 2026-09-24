@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Declaración y compromiso de accesibilidad web (WCAG).
+ */
+
 $title       = 'Política de accesibilidad — Classia';
 $description = 'Política de accesibilidad y uso responsable de Classia.';
 $cssPrefix   = '..';

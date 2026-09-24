@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Edición de datos personales del perfil de usuario.
+ */
+
 require_once '../php/usuarios/perfil.php';
 require_once '../php/utils/cedula_uy.php';
 

@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Pie de página institucional, enlaces de navegación e información legal.
+ */
+
 $cssPrefix = $cssPrefix ?? '..';
 $jsPrefix  = $jsPrefix  ?? '..';
 

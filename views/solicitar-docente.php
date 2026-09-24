@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Postulación para habilitar el rol docente / proveedor en la cuenta.
+ */
+
 require_once '../php/auth/roles.php';
 require_once '../php/solicitudes/solicitar_docente.php';
 

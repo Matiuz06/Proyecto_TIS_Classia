@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Cartelera de eventos institucionales y propuesta de nuevas actividades.
+ */
+
 require_once __DIR__ . '/../php/auth/sesion.php';
 require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../config/database.php';

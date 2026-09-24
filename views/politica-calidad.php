@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Política y estándares de calidad institucional y académica.
+ */
+
 $title       = 'Política de calidad — Classia';
 $description = 'Política de calidad de Classia para garantizar servicios seguros, claros, accesibles y sostenibles.';
 $cssPrefix   = '..';

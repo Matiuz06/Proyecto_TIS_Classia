@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Historial de solicitudes de servicios realizadas por el estudiante.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_rol(ROL_ESTUDIANTE, 'usuario.php');
 require_once '../php/solicitudes/solicitudes_servicio.php';

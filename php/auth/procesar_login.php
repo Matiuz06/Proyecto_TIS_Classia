@@ -70,7 +70,9 @@ try {
             email_verificado,
             onboarding_step,
             dos_factores_activo,
-            dos_factores_secreto
+            dos_factores_secreto,
+            COALESCE(activo, 1) AS activo,
+            motivo_bloqueo
          FROM usuarios
          WHERE email = :email
          LIMIT 1"
@@ -98,6 +100,11 @@ if (
         "Email o contraseña incorrectos.",
         $email
     );
+}
+
+if (isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
+    $motivo = !empty($usuario['motivo_bloqueo']) ? ' Motivo: ' . $usuario['motivo_bloqueo'] : '';
+    volver_login('Tu cuenta se encuentra bloqueada o suspendida por la administración.' . $motivo, $email);
 }
 
 if (isset($usuario['email_verificado']) && !(int) $usuario['email_verificado']) {

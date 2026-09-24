@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Lectura completa de noticias y comunicados institucionales.
+ */
+
 require_once __DIR__ . '/../php/auth/sesion.php';
 require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../config/database.php';
@@ -94,18 +99,5 @@ include '../includes/header.php';
     </article>
   </main>
 
-  <script>
-    function copiarAlPortapapeles(url, btn) {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(function() {
-          var original = btn.innerText;
-          btn.innerText = '✓ ¡Copiado!';
-          setTimeout(function() { btn.innerText = original; }, 2000);
-        });
-      } else {
-        prompt('Copia este enlace para compartir:', url);
-      }
-    }
-  </script>
-
 <?php include '../includes/footer.php'; ?>
+
