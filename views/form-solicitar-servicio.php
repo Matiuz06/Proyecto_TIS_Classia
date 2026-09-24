@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Formulario de solicitud personalizada de servicios.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_rol(ROL_ESTUDIANTE, 'usuario.php');
 require_once '../php/solicitudes/solicitudes_servicio.php';

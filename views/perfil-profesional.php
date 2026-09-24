@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Perfil público del docente con sus publicaciones y valoraciones.
+ */
+
 require_once '../php/auth/roles.php';
 require_once '../php/usuarios/perfil_profesional.php';
 

@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Lineamientos de divulgación responsable de vulnerabilidades y seguridad.
+ */
+
 $title       = 'Divulgación responsable — Classia';
 $description = 'Política de divulgación responsable de vulnerabilidades de Classia y AniTech S.A.';
 $cssPrefix   = '..';

@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Perfil del estudiante con cursos activos, historial y configuración.
+ */
+
 $userData = [];
 $rol_actual = 'Usuario';
 $cursos_contratados = [];

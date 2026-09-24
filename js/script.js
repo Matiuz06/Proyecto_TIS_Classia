@@ -359,3 +359,46 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+/**
+ * Copia una URL al portapapeles y actualiza el botón de feedback (noticias).
+ * @param {string} url
+ * @param {HTMLElement} btn
+ */
+function copiarAlPortapapeles(url, btn) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      var original = btn.innerText;
+      btn.innerText = '✓ ¡Copiado!';
+      setTimeout(function() { btn.innerText = original; }, 2000);
+    });
+  } else {
+    prompt('Copia este enlace para compartir:', url);
+  }
+}
+
+/**
+ * Copia el enlace de un evento al portapapeles y actualiza estilos de feedback.
+ * @param {string} url
+ * @param {HTMLElement} btn
+ */
+function copiarEnlaceEvento(url, btn) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      var textoOriginal = btn.innerText;
+      btn.innerText = '✓ ¡Copiado!';
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-primary');
+      setTimeout(function() {
+        btn.innerText = textoOriginal;
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-secondary');
+      }, 2200);
+    }).catch(function() {
+      prompt('Copia este enlace:', url);
+    });
+  } else {
+    prompt('Copia este enlace:', url);
+  }
+}
+
+

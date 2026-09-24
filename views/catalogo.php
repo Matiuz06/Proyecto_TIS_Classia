@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Catálogo general de cursos y servicios con filtros por categoría y modalidad.
+ */
+
 require_once __DIR__ . '/../php/publicaciones/catalogo.php';
 
 $title       = 'Catálogo de cursos y servicios';

@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Edición del perfil docente, biografía, competencias y experiencia.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 require_once '../php/usuarios/perfil_profesional.php';

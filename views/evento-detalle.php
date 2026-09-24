@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Detalle informativo, fecha, modalidad y agenda de un evento.
+ */
+
 require_once __DIR__ . '/../php/auth/sesion.php';
 require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../config/database.php';
@@ -213,22 +218,5 @@ include '../includes/header.php';
     </article>
   </main>
 
-  <script>
-    function copiarEnlaceEvento(url, btn) {
-      navigator.clipboard.writeText(url).then(function() {
-        var textoOriginal = btn.innerText;
-        btn.innerText = '✓ ¡Copiado!';
-        btn.classList.remove('btn-secondary');
-        btn.classList.add('btn-primary');
-        setTimeout(function() {
-          btn.innerText = textoOriginal;
-          btn.classList.remove('btn-primary');
-          btn.classList.add('btn-secondary');
-        }, 2200);
-      }).catch(function() {
-        prompt('Copia este enlace:', url);
-      });
-    }
-  </script>
-
 <?php include '../includes/footer.php'; ?>
+

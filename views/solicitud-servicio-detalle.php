@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Gestión de solicitud de servicio recibida por el docente/proveedor.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_rol(ROL_DOCENTE, 'usuario.php');
 require_once '../php/solicitudes/solicitudes_servicio.php';

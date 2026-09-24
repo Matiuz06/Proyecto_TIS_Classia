@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Activación y configuración de autenticación de dos factores (TOTP/2FA).
+ */
+
 require_once '../php/auth/configurar_2fa.php';
 
 $title     = 'Configurar Autenticación en Dos Pasos (2FA)';

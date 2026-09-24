@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Formulario de registro de nuevas cuentas en la plataforma.
+ */
+
 require_once '../php/usuarios/registro.php';
 require_once '../php/utils/recaptcha.php';
 

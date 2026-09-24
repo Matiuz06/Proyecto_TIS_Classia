@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Perfil público del proveedor con su catálogo de servicios.
+ */
+
 $publicaciones_docente = [];
 $resenas = [];
 $promedio_calificacion = 0.0;

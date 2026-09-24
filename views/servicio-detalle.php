@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Detalle de un servicio profesional, tarifas y paquetes disponibles.
+ */
+
 require_once '../php/publicaciones/detalle_servicio.php';
 
 $title       = $servicio ? htmlspecialchars($servicio['titulo']) : 'Servicio no encontrado';

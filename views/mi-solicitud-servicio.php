@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Seguimiento y mensajería de una solicitud de servicio enviada por el estudiante.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_rol(ROL_ESTUDIANTE,'usuario.php');
 require_once '../php/solicitudes/solicitudes_servicio.php';

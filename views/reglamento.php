@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Reglamento de convivencia, condiciones y uso de la plataforma.
+ */
+
 $title       = 'Reglamento — Classia';
 $description = 'Reglamento de uso, conducta y operación de Classia para usuarios, proveedores y administradores.';
 $cssPrefix   = '..';

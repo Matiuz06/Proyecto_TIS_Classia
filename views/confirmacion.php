@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Confirmación de contratación o matriculación exitosa.
+ */
+
 $contratacion = [];
 $detalles = [];
 $error = '';

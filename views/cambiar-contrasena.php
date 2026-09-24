@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Formulario de actualización de contraseña para usuarios autenticados.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_autenticacion('login.php');
 

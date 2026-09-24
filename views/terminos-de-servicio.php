@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Términos y condiciones legales para el uso de Classia.
+ */
+
 $title       = 'Términos de servicio — Classia';
 $description = 'Términos y condiciones de uso de la plataforma Classia, el entorno virtual de aprendizaje y contratación de servicios educativos desarrollado por AniTech S.A.';
 $cssPrefix   = '..';

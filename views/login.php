@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Inicio de sesión para estudiantes, docentes y administradores.
+ */
+
 require_once '../php/auth/sesion.php';
 require_once '../php/utils/recaptcha.php';
 

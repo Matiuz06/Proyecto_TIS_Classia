@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Carrito de compras con resumen de publicaciones seleccionadas para abonar.
+ */
+
 require_once __DIR__ . '/../php/contrataciones/carrito.php';
 requerir_autenticacion('login.php');
 

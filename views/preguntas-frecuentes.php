@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Respuestas a preguntas frecuentes sobre el funcionamiento de Classia.
+ */
+
 $title       = 'Preguntas frecuentes — Classia';
 $description = 'Respuestas rápidas sobre registro, seguridad, pagos, contrataciones y uso de la plataforma Classia.';
 $cssPrefix   = '..';
