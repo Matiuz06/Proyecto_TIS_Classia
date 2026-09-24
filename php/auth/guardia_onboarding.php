@@ -34,13 +34,27 @@ function verificar_estado_usuario_activo(string $url_login = 'login.php'): void
         $row = $stmt->fetch();
 
         if ($row && isset($row['activo']) && (int) $row['activo'] === 0) {
-            $motivo = !empty($row['motivo_bloqueo']) ? ' Motivo: ' . htmlspecialchars($row['motivo_bloqueo']) : '';
+            $motivo = !empty($row['motivo_bloqueo']) ? htmlspecialchars($row['motivo_bloqueo']) : '';
+
+            // Destruir sesión completamente y abrir una nueva para pasar el mensaje
             cerrar_sesion();
-            iniciar_sesion();
-            $_SESSION['login_error'] = 'Tu cuenta se encuentra suspendida o bloqueada por la administración.' . $motivo;
+
+            // cerrar_sesion() llama session_destroy() que deja el status en PHP_SESSION_NONE
+            // Iniciamos manualmente para poder setear la variable de bloqueo
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $_SESSION['cuenta_bloqueada_motivo'] = $motivo;
+
+            // Determinar ruta correcta a la página de bloqueado según la ubicación del script actual
+            $script_dir = basename(dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+            $bloqueado_url = ($script_dir === 'views')
+                ? 'cuenta-bloqueada.php'
+                : 'views/cuenta-bloqueada.php';
+
             header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
             header('Pragma: no-cache');
-            header('Location: ' . $url_login);
+            header('Location: ' . $bloqueado_url);
             exit;
         }
     } catch (PDOException $e) {
@@ -54,10 +68,12 @@ function requerir_onboarding_completo(string $url_onboarding): void
         return;
     }
 
+    // Verificar bloqueo para TODOS los roles (estudiante, docente, admin)
     $login_url = (basename(dirname($_SERVER['SCRIPT_NAME'] ?? '')) === 'views') ? 'login.php' : 'views/login.php';
     verificar_estado_usuario_activo($login_url);
 
-    if ((int) usuario_actual()['id_rol'] !== 1) {
+    // Solo los estudiantes (rol=1) necesitan completar el onboarding
+    if ((int) usuario_actual()['id_rol'] !== ROL_ESTUDIANTE) {
         return;
     }
 
@@ -72,7 +88,7 @@ function requerir_onboarding_completo(string $url_onboarding): void
     }
 
     $pagina_actual = basename(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH));
-    if (in_array($pagina_actual, ['primeros-pasos.php', 'confirmar-correo.php', 'politica-privacidad.php'], true)) {
+    if (in_array($pagina_actual, ['primeros-pasos.php', 'confirmar-correo.php', 'politica-privacidad.php', 'cuenta-bloqueada.php'], true)) {
         return;
     }
 

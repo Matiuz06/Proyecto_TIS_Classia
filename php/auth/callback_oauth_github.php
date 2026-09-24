@@ -243,8 +243,12 @@ try {
     }
 
     if ($usuario && isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
-        $motivo = !empty($usuario['motivo_bloqueo']) ? ' Motivo: ' . $usuario['motivo_bloqueo'] : '';
-        github_oauth_error('Tu cuenta se encuentra bloqueada o suspendida por la administración.' . $motivo);
+        $motivo = !empty($usuario['motivo_bloqueo']) ? htmlspecialchars($usuario['motivo_bloqueo']) : '';
+        $_SESSION['cuenta_bloqueada_motivo'] = $motivo;
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Location: ../../views/cuenta-bloqueada.php');
+        exit;
     }
 
     establecer_usuario_sesion(

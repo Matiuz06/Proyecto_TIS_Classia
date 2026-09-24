@@ -8,7 +8,8 @@
 
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# El script vive en switchBD/ — los archivos .env y docker-compose están en el padre
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ACTIVE_FILE="$SCRIPT_DIR/.env.active"
 LOCAL_FILE="$SCRIPT_DIR/.env.local"
 SUPABASE_FILE="$SCRIPT_DIR/.env.supabase"
@@ -72,7 +73,7 @@ switch_to() {
     # Reinicia solo el contenedor web (no la BD ni mailpit)
     if docker ps --format "{{.Names}}" | grep -q "^classia_web$"; then
         echo -e "${YELLOW}↻ Reiniciando classia_web...${NC}"
-        docker compose restart web 2>/dev/null || docker restart classia_web
+        (cd "$SCRIPT_DIR" && docker compose restart web 2>/dev/null) || docker restart classia_web
         echo -e "${GREEN}${BOLD}✓ Listo. BD activa: ${label}${NC}"
     else
         echo -e "${YELLOW}ℹ  Contenedor no está corriendo. Levantá con: docker compose up -d${NC}"
