@@ -9917,3 +9917,509 @@ body.course-builder-page.course-dialog-open {
   gap: 0.5rem;
   margin-top: var(--space-1);
 }
+
+/* ==========================================================================
+   PANEL ADMIN — Solicitudes docentes
+   ========================================================================== */
+
+.admin-requests-section {
+  margin-top: var(--space-6);
+}
+
+.admin-requests-section > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-border, #cbd5e0);
+}
+
+.admin-requests-section > header h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-heading, #1a202c);
+}
+
+.admin-requests-section > header p {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #718096);
+}
+
+/* Badge de conteo (número destacado en rojo) */
+.admin-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding-inline: 0.4rem;
+  background: var(--color-danger, #e53e3e);
+  color: #fff;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  vertical-align: middle;
+  letter-spacing: 0.01em;
+}
+
+/* Cards de solicitudes docentes */
+.admin-requests-section article {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-surface-elevated, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-left: 4px solid var(--color-brand-primary, #157156);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-4);
+  transition:
+    box-shadow 150ms ease,
+    border-color 150ms ease;
+}
+
+.admin-requests-section article:hover {
+  box-shadow: var(--shadow-md);
+  border-left-color: var(--color-brand-secondary, #0e9f6e);
+}
+
+.admin-requests-section article > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.admin-requests-section article > header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-heading, #1a202c);
+}
+
+.admin-requests-section article > header p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted, #718096);
+}
+
+.admin-requests-section article > header p strong {
+  color: var(--color-brand-primary, #157156);
+}
+
+/* DL de info de solicitud */
+.admin-requests-section dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-soft, #f7fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.admin-requests-section dl > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.admin-requests-section dt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted, #718096);
+}
+
+.admin-requests-section dd {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text, #2d3748);
+}
+
+/* Motivo/descripción de la solicitud */
+.admin-requests-section article > p {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--color-text, #2d3748);
+  background: var(--color-bg-subtle, #fafafa);
+  border-left: 3px solid var(--color-border-strong, #a0aec0);
+  border-radius: 0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0;
+}
+
+/* Form de decisión aprobar/rechazar */
+.admin-decision-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border, #e2e8f0);
+}
+
+/* ==========================================================================
+   PANEL ADMIN — Secciones genéricas (noticias, eventos, publicaciones)
+   ========================================================================== */
+
+.admin-news-section,
+.admin-events-section,
+.admin-publications-section,
+.admin-users-section {
+  margin-top: var(--space-6);
+}
+
+.admin-news-section > header,
+.admin-events-section > header,
+.admin-publications-section > header,
+.admin-users-section > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-border, #cbd5e0);
+}
+
+.admin-news-section > header h2,
+.admin-events-section > header h2,
+.admin-publications-section > header h2,
+.admin-users-section > header h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-heading, #1a202c);
+}
+
+.admin-news-section > header p,
+.admin-events-section > header p,
+.admin-publications-section > header p,
+.admin-users-section > header p {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #718096);
+}
+
+/* Artículos genéricos de moderación (noticias, eventos) */
+.admin-news-section article,
+.admin-events-section article {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface-elevated, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-left: 4px solid var(--color-warning, #dd6b20);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-3);
+  transition:
+    box-shadow 150ms ease;
+}
+
+.admin-news-section article:hover,
+.admin-events-section article:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.admin-news-section article > header,
+.admin-events-section article > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.admin-news-section article > header h3,
+.admin-events-section article > header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-heading, #1a202c);
+}
+
+.admin-news-section dl,
+.admin-events-section dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+}
+
+.admin-news-section dl > div,
+.admin-events-section dl > div {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.admin-news-section dt,
+.admin-events-section dt {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.admin-news-section dd,
+.admin-events-section dd {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--color-text);
+}
+
+/* Alerta pill (ej: "5 eventos pendientes") */
+.admin-alert-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.3rem 0.75rem;
+  background: #fff7ed;
+  color: #c05621;
+  border: 1px solid #fed7aa;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   PANEL ADMIN — Modal de bloqueo mejorado
+   ========================================================================== */
+
+.admin-dialog-bloqueo {
+  max-width: 480px;
+  width: 92%;
+  padding: 0;
+  background: var(--color-surface-elevated, #ffffff);
+  border: 1px solid var(--color-border, #cbd5e0);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.admin-dialog-bloqueo::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+/* Header rojo de advertencia en el modal */
+.admin-dialog-bloqueo form {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-dialog-bloqueo h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #c53030 0%, #e53e3e 100%);
+}
+
+.admin-dialog-bloqueo h3::before {
+  content: "⛔";
+  font-size: 1.1rem;
+}
+
+.admin-dialog-bloqueo > form > p,
+.admin-dialog-bloqueo p {
+  margin: 0;
+  padding: var(--space-4) var(--space-5) 0;
+  font-size: 0.88rem;
+  color: var(--color-text, #2d3748);
+  line-height: 1.5;
+}
+
+.admin-dialog-bloqueo p strong {
+  color: var(--color-danger, #c53030);
+  font-weight: 700;
+}
+
+.admin-dialog-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  margin: var(--space-3) var(--space-5);
+  font-size: var(--text-sm);
+}
+
+.admin-dialog-label strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--color-heading, #1a202c);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-dialog-textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 0.65rem 0.75rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background: var(--color-surface, #ffffff);
+  border: 1.5px solid var(--color-border, #cbd5e0);
+  border-radius: var(--radius-sm, 6px);
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.admin-dialog-textarea:focus {
+  outline: none;
+  border-color: var(--color-danger, #e53e3e);
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.12);
+}
+
+.admin-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin: var(--space-3) var(--space-5) var(--space-5);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border, #e2e8f0);
+}
+
+.admin-dialog-actions .btn-status-delete {
+  padding: 0.55rem 1.25rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   PANEL ADMIN — Tabla de usuarios: mejoras
+   ========================================================================== */
+
+.admin-users-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.admin-users-table thead {
+  background: var(--color-bg-soft, #f7fafc);
+}
+
+.admin-users-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #718096);
+  border-bottom: 2px solid var(--color-border, #e2e8f0);
+  white-space: nowrap;
+}
+
+.admin-users-table td {
+  padding: 0.85rem 1rem;
+  color: var(--color-text, #2d3748);
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  vertical-align: middle;
+}
+
+.admin-users-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-users-table tbody tr:hover {
+  background: var(--color-bg-soft, #f7fafc);
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.role-badge--estudiante {
+  background: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #bee3f8;
+}
+
+.role-badge--docente {
+  background: #e6fffa;
+  color: #276749;
+  border: 1px solid #9ae6b4;
+}
+
+.role-badge--admin {
+  background: #faf5ff;
+  color: #553c9a;
+  border: 1px solid #d6bcfa;
+}
+
+/* ==========================================================================
+   RESPONSIVE — Ajustes admin para mobile
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .admin-requests-section dl {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-decision-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-dialog-bloqueo {
+    width: 96%;
+  }
+
+  .admin-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .admin-dialog-actions button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .admin-users-table th,
+  .admin-users-table td {
+    padding: 0.6rem 0.75rem;
+  }
+}

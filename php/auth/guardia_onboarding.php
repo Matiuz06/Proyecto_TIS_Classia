@@ -54,10 +54,12 @@ function requerir_onboarding_completo(string $url_onboarding): void
         return;
     }
 
+    // Verificar bloqueo para TODOS los roles (estudiante, docente, admin)
     $login_url = (basename(dirname($_SERVER['SCRIPT_NAME'] ?? '')) === 'views') ? 'login.php' : 'views/login.php';
     verificar_estado_usuario_activo($login_url);
 
-    if ((int) usuario_actual()['id_rol'] !== 1) {
+    // Solo los estudiantes (rol=1) necesitan completar el onboarding
+    if ((int) usuario_actual()['id_rol'] !== ROL_ESTUDIANTE) {
         return;
     }
 
