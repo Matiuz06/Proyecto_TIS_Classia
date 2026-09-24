@@ -103,8 +103,12 @@ if (
 }
 
 if (isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
-    $motivo = !empty($usuario['motivo_bloqueo']) ? ' Motivo: ' . $usuario['motivo_bloqueo'] : '';
-    volver_login('Tu cuenta se encuentra bloqueada o suspendida por la administración.' . $motivo, $email);
+    $motivo = !empty($usuario['motivo_bloqueo']) ? htmlspecialchars($usuario['motivo_bloqueo']) : '';
+    $_SESSION['cuenta_bloqueada_motivo'] = $motivo;
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header("Location: ../../views/cuenta-bloqueada.php");
+    exit;
 }
 
 if (isset($usuario['email_verificado']) && !(int) $usuario['email_verificado']) {
