@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Gestión de módulos, unidades temáticas y recursos de un curso.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 require_once '../php/publicaciones/contenido_curso.php';
@@ -395,5 +400,5 @@ include '../includes/header.php';
     </dialog>
   <?php endif; ?>
 </main>
-<script src="<?= $jsPrefix ?>/js/script.js" defer></script>
 <?php include '../includes/footer.php'; ?>
+

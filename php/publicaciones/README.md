@@ -1,31 +1,81 @@
-# php/publicaciones/
+# Módulo de publicaciones — PHP
 
-Módulo de gestión del ciclo de vida de cursos y servicios educativos para la plataforma Classia (Sprint 3 — Segunda Entrega).
+Responsable de toda la lógica de negocio relacionada con publicaciones, cursos, servicios y su contenido estructurado.
 
 ---
 
-## 📚 CRUD y Gestión de Publicaciones
+## Arquitectura POO del contenido de cursos
 
-Este módulo gestiona la creación, edición, consulta, control de estados y contenidos modulares ofertados por docentes y proveedores en Classia.
+### Jerarquía de composición
 
-### Componentes y scripts:
+```
+Curso (publicaciones)
+ └── Modulo          (curso_modulos)
+      └── Unidad     (curso_unidades)
+           └── Recurso (curso_recursos)
+```
 
-### 1. `crear_publicacion.php`
-- Procesa el alta de nuevos cursos o servicios (`views/crear-publicacion.php`).
-- **Validaciones:** Comprobación de token CSRF, campos requeridos (título, descripción, precio, tipo), precios positivos, y **regla de exclusividad de categoría**: sólo se permite crear una categoría nueva si la categoría existente está deseleccionada.
-- **Subida de portada:** Validación MIME y almacenamiento seguro en `assets/uploads/publicaciones/` con `.htaccess` de protección.
-- **Persistencia:** Inserción en la tabla `publicaciones` mediante PDO vinculando el `id_usuario` del docente autenticado.
+### Clases de dominio (sin PDO)
 
-### 2. `editar_publicacion.php`
-- Modificación y actualización de publicaciones existentes (`views/editar-publicacion.php`).
-- Soporte para actualización o eliminación de imagen de portada y sincronización de categorías.
+| Clase | Archivo | Responsabilidad |
+|-------|---------|-----------------|
+| `Modulo` | `Modulo.php` | Representa un módulo; compone `Unidad[]` |
+| `Unidad` | `Unidad.php` | Representa una unidad/clase; compone `Recurso[]` |
+| `Recurso` | `Recurso.php` | Representa un recurso; contiene lógica de presentación (iconos, embed, visualización) |
 
-### 3. `cambiar_estado.php`
-- Transición entre estados del ciclo de vida (`Activo`, `Pausado`, `Inactivo`, `Eliminado`).
+Las clases de dominio **no tienen dependencias de PDO**. Son objetos puros que encapsulan datos y lógica de presentación.
 
-### 4. `contenido_curso.php` & `php/utils/supabase_storage.php`
-- Gestión jerárquica de módulos (`curso_modulos`), unidades (`curso_unidades`) y recursos (`curso_recursos`).
-- Soporte para almacenamiento en la nube mediante **Supabase Storage** con generación de URLs firmadas temporales para descargas protegidas.
+### Repositorio
 
-### 5. `publicacion_helpers.php`
-- Helpers centralizados para resolución de categorías con exclusividad (`resolver_categoria_publicacion`) y validación de tipos, modalidades y plantillas de servicio.
+| Clase | Archivo | Responsabilidad |
+|-------|---------|-----------------|
+| `ContenidoCursoRepository` | `ContenidoCursoRepository.php` | Único punto de acceso a BD para contenido de cursos. Construye los objetos de dominio. Realiza todas las operaciones CRUD. |
+
+### Wrappers de compatibilidad (`contenido_curso.php`)
+
+Las funciones libres (globales) de `contenido_curso.php` son **wrappers delgados** que delegan al repositorio. Permiten que las vistas existentes sigan funcionando sin cambios de firma. Las funciones marcadas como `@deprecated` deben migrase a usar directamente la clase `Recurso`.
+
+### Cómo usar el repositorio directamente
+
+```php
+// Cargar módulos como objetos
+$repo    = new ContenidoCursoRepository($pdo);
+$modulos = $repo->obtenerPorCurso($id_curso); // Modulo[]
+
+foreach ($modulos as $modulo) {
+    echo $modulo->getTitulo();
+    foreach ($modulo->getUnidades() as $unidad) {
+        echo $unidad->getTitulo();
+        foreach ($unidad->getRecursos() as $recurso) {
+            echo $recurso->getEmojiIcono() . ' ' . $recurso->getTitulo();
+            echo $recurso->getVideoEmbedUrl(); // null si no es video
+        }
+    }
+}
+
+// Para plantillas que esperan arrays:
+$contenido = $repo->obtenerPorCursoComoArray($id_curso);
+// equivalente a: array_map(fn($m) => $m->toArray(), $modulos)
+```
+
+### Separación de responsabilidades
+
+- **Consultas SQL** → solo en `ContenidoCursoRepository`
+- **Lógica de presentación** (iconos, embed) → en `Recurso`
+- **Composición y conteo** → en `Modulo` y `Unidad`
+- **Validación y orquestación de POST** → en `procesar_contenido_curso()` (delega al repositorio)
+- **Subida de archivos** → en `file_upload_helper.php` y `supabase_storage.php`
+
+---
+
+## Otros archivos del módulo
+
+| Archivo | Responsabilidad |
+|---------|-----------------|
+| `catalogo.php` | Listado y filtrado de publicaciones |
+| `crear_publicacion.php` | Alta de publicaciones |
+| `editar_publicacion.php` | Modificación de publicaciones |
+| `detalle_curso.php` | Carga de datos del curso para la vista |
+| `detalle_servicio.php` | Carga de datos del servicio para la vista |
+| `obtener_publicaciones.php` | Consultas de publicaciones por usuario |
+| `publicacion_helpers.php` | Validaciones y utilidades compartidas |
