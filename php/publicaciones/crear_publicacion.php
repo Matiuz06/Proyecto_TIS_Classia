@@ -8,6 +8,7 @@ require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/upload_helper.php';
 require_once __DIR__ . '/publicacion_helpers.php';
+require_once __DIR__ . '/PublicacionRepository.php';
 
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], '../../views/usuario.php');
 
@@ -20,6 +21,7 @@ $usuario = usuario_actual();
 $id_usuario_autenticado = (int) ($usuario['id_usuario'] ?? 0);
 $categorias = obtener_categorias($pdo);
 $plantillas_servicios = plantillas_servicio();
+$publicacionRepository = new PublicacionRepository($pdo);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token_recibido = $_POST['csrf_token'] ?? '';
@@ -54,25 +56,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errores)) {
         try {
-            $stmt = $pdo->prepare("INSERT INTO publicaciones
-                (titulo,descripcion,precio,tipo,modalidad,nivel_experiencia,duracion_horas,cupos,disponibilidad,tipo_servicio,estado,imagen,id_usuario,id_categoria)
-                VALUES (:titulo,:descripcion,:precio,:tipo,:modalidad,:nivel,:duracion,:cupos,:disponibilidad,:tipo_servicio,'Activo',:imagen,:usuario,:categoria)");
-            $stmt->execute([
+            $datosPublicacion = [
                 'titulo'=>trim($_POST['titulo']),
                 'descripcion'=>trim($_POST['descripcion']),
                 'precio'=>(float)$_POST['precio'],
-                'tipo'=>$_POST['tipo'],
                 'modalidad'=>trim($_POST['modalidad'] ?? '') ?: null,
-                'nivel'=>trim($_POST['nivel_experiencia'] ?? '') ?: null,
-                'duracion'=>trim($_POST['duracion_horas'] ?? '') !== '' ? (int)$_POST['duracion_horas'] : null,
+                'nivel_experiencia'=>trim($_POST['nivel_experiencia'] ?? '') ?: null,
+                'duracion_horas'=>trim($_POST['duracion_horas'] ?? '') !== '' ? (int)$_POST['duracion_horas'] : null,
                 'cupos'=>trim($_POST['cupos'] ?? '') !== '' ? (int)$_POST['cupos'] : null,
                 'disponibilidad'=>trim($_POST['disponibilidad'] ?? '') ?: null,
                 'tipo_servicio'=>$_POST['tipo']==='Servicio' ? (trim($_POST['tipo_servicio'] ?? '') ?: null) : null,
+                'estado'=>'Activo',
                 'imagen'=>$ruta_imagen,
-                'usuario'=>$id_usuario_autenticado,
-                'categoria'=>$categoria['id'],
-            ]);
-            $id = (int)$pdo->lastInsertId();
+                'id_usuario'=>$id_usuario_autenticado,
+                'id_categoria'=>$categoria['id'],
+            ];
+            $publicacion = $_POST['tipo'] === 'Servicio'
+                ? new Servicio($datosPublicacion)
+                : new Curso($datosPublicacion);
+            $id = $publicacionRepository->crear($publicacion);
             if ($_POST['tipo'] === 'Curso') {
                 header("Location: gestionar-contenido-curso.php?id={$id}&mensaje=creada");
             } else {
