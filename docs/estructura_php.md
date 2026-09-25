@@ -1,225 +1,112 @@
-# Estructura PHP y Arquitectura Backend — Classia · Segunda Entrega
+# Estructura y Arquitectura Backend — Classia
 
-Este documento define la arquitectura y organización técnica del backend PHP para la plataforma **Classia**, actualizado al cierre de la segunda entrega funcional y técnica.
-
-> **Última actualización:** Segunda entrega funcional y técnica (Sprint 2)
+Documento técnico que describe la organización del backend en PHP, la gestión de base de datos, los controladores y las reglas de seguridad del proyecto **Classia**.
 
 ---
 
-## Estructura de carpetas y módulos
+## 1. Organización del Proyecto
 
 ```text
 Proyecto_TIS_Classia/
-├── index.php                        # Punto de entrada principal de la plataforma
+├── index.php                         # Página principal de inicio
 ├── config/
-│   └── database.php                 # Conexión centralizada PDO a MariaDB/MySQL (.env)
+│   ├── database.php                  # Conexión PDO compatible con MySQL y PostgreSQL/Supabase
+│   └── supabase.php                  # Parámetros y utilidades para Supabase
 ├── includes/
-│   ├── header.php                   # Barra de navegación modular con control de sesión
-│   └── footer.php                   # Pie de página institucional modular
-├── views/                           # Vistas y páginas accesibles al usuario (.php, kebab-case)
-│   ├── login.php                    # Inicio de sesión con feedback y redirección por rol
-│   ├── registro.php                 # Formulario de registro con validaciones PHP + CSRF
-│   ├── panel-proveedor.php          # Panel del docente: listado dinámico de publicaciones PDO
-│   ├── panel-administrador.php      # Panel de administración y métricas institucionales
-│   ├── crear-publicacion.php        # Interfaz de alta de cursos y servicios
-│   ├── editar-publicacion.php       # Interfaz de edición y cambio de estado de publicaciones
-│   ├── catalogo.php                 # Catálogo interactivo de cursos y servicios
-│   ├── curso.php                    # Vista de detalle de un curso
-│   ├── servicio-detalle.php         # Vista de detalle y paquetes de un servicio
-│   ├── form-solicitar-servicio.php  # Formulario de solicitud personalizada de servicio (solicitud docente)
-│   ├── solicitud-impresion-3d.php   # Formulario especializado de solicitud de impresión 3D
-│   ├── carrito.php                  # Carrito de compras (simulado)
-│   ├── pasarela-pago.php            # Simulación de pasarela de pago segura
-│   ├── confirmacion.php             # Confirmación de contratación exitosa
-│   ├── usuario.php                  # Perfil del usuario / estudiante
-│   ├── valoracion.php               # Formulario de emisión de reseñas y valoraciones
-│   ├── cambiar-contrasena.php       # Cambio de credenciales de usuario
-│   ├── restablecer-contrasena.php   # Recuperación de contraseña
-│   ├── primeros-pasos.php           # Guía de onboarding para nuevos usuarios
-│   └── politica-privacidad.php      # Política de privacidad (Ley 18.331 / URCDP)
-├── php/                             # Lógica de negocio backend organizada por módulo
-│   ├── auth/                        # ✅ IMPLEMENTADO
-│   │   ├── sesion.php               # Helper canónico de sesiones seguras y control de acceso
-│   │   └── logout.php               # Cierre seguro de sesión y destrucción de cookies
-│   │   ├── confirmar_correo.php      # Confirmación del correo mediante token
-│   ├── usuarios/                    # ✅ IMPLEMENTADO
-│   │   ├── registro.php             # Registro con validaciones, unicidad de email, bcrypt
-│   │   └── onboarding.php            # Persistencia del progreso y preferencias iniciales
-│   ├── publicaciones/               # ✅ IMPLEMENTADO
-│   │   ├── crear_publicacion.php    # Alta de publicaciones (INSERT PDO con CSRF)
-│   │   ├── editar_publicacion.php   # Edición y cambio de estado (UPDATE PDO con CSRF)
-│   │   ├── catalogo.php              # Consulta y recomendaciones personalizadas
-│   │   └── obtener_publicaciones.php # Helper para consulta dinámica de publicaciones
+│   ├── header.php                    # Encabezado común y navegación por rol
+│   └── footer.php                    # Pie de página común
+├── views/                            # Vistas del sistema (.php)
+│   ├── login.php                     # Inicio de sesión y 2FA
+│   ├── registro.php                  # Registro de usuarios
+│   ├── panel-proveedor.php           # Panel para docentes y proveedores
+│   ├── panel-administrador.php       # Panel de administración, supervisión y matriculación
+│   ├── catalogo.php                  # Catálogo de cursos y servicios con filtros
+│   ├── curso.php                     # Aula virtual: temario, entregas, foros y videos
+│   ├── contenido-curso.php           # Gestión y ordenamiento del temario (docente/admin)
+│   ├── crear-publicacion.php         # Alta de nuevos cursos y servicios
+│   ├── editar-publicacion.php        # Edición de publicaciones
+│   ├── servicio-detalle.php          # Vista de servicio y paquetes
+│   ├── form-solicitar-servicio.php   # Formulario de solicitud personalizada
+│   ├── solicitud-impresion-3d.php    # Formulario especializado de impresión 3D
+│   ├── carrito.php                   # Carrito de compras
+│   ├── pasarela-pago.php             # Simulación de pago
+│   ├── confirmacion.php              # Confirmación de compra
+│   ├── comprobante.php               # Comprobante de pago
+│   ├── usuario.php                   # Perfil y cursos del estudiante
+│   ├── perfil-profesional.php        # Perfil público del docente
+│   ├── editar-perfil.php             # Edición de datos personales
+│   ├── editar-perfil-profesional.php # Edición de datos docentes
+│   ├── eventos.php                   # Lista y propuesta de eventos
+│   ├── evento-detalle.php            # Detalle de evento
+│   ├── noticias.php                  # Lista y propuesta de noticias
+│   ├── noticia-detalle.php           # Detalle de noticia
+│   ├── valoracion.php                # Emisión de valoraciones y reseñas
+│   ├── primeros-pasos.php            # Onboarding para nuevos usuarios
+│   └── reglamento.php                # Términos y reglamento institucional
+├── php/                              # Lógica de negocio y controladores
+│   ├── admin/
+│   │   └── acciones_admin.php        # Estadísticas, bloqueo de usuarios, matriculación y moderación
+│   ├── auth/
+│   │   ├── sesion.php                # Manejo de sesiones y autenticación
+│   │   ├── roles.php                 # Constantes de roles y guardias de acceso
+│   │   ├── procesar_login.php        # Validación de credenciales y bloqueo de cuenta
+│   │   ├── logout.php                # Cierre seguro de sesión
+│   │   ├── activar_2fa.php           # Activación de TOTP / 2FA
+│   │   └── confirmar_correo.php      # Verificación de correo electrónico
+│   ├── publicaciones/
+│   │   ├── ContenidoCursoRepository.php # Repositorio PDO de cursos, módulos, clases y recursos
+│   │   ├── ElementoCurso.php         # Clase abstracta base
+│   │   ├── Modulo.php                # Entidad de módulo
+│   │   ├── Unidad.php                # Entidad de clase/unidad
+│   │   ├── Recurso.php               # Entidad de recurso multimedia
+│   │   ├── contenido_curso.php       # Procesamiento de temario y wrappers de compatibilidad
+│   │   ├── detalle_curso.php         # Carga de aula virtual, foros y entregas
+│   │   ├── crear_publicacion.php     # Creación de publicaciones
+│   │   └── editar_publicacion.php    # Edición de publicaciones
+│   ├── contrataciones/
+│   │   └── crear_contratacion.php    # Generación de orden de compra
 │   ├── pagos/
-│   │   ├── pasarela.php              # Consulta de la orden para la vista de pago
-│   │   └── procesar_pago.php         # Validación y persistencia del pago
-│   ├── contacto/
-│   │   └── enviar.php                # Validación y envío del formulario de contacto
+│   │   ├── pasarela.php              # Carga de orden de pago
+│   │   ├── procesar_pago.php         # Procesamiento y emisión de recibo
+│   │   └── comprobante_pago.php      # Generación de comprobante
+│   ├── solicitudes/
+│   │   ├── gestionar_solicitudes_docente.php # Aprobación de solicitudes para ser docente
+│   │   └── solicitudes_servicio.php  # Mensajería y seguimiento de servicios
+│   ├── noticias/
+│   │   └── gestionar_noticias.php    # CRUD y moderación de noticias
+│   ├── eventos/
+│   │   └── gestionar_eventos.php     # CRUD y moderación de eventos
+│   ├── valoraciones/
+│   │   └── guardar_valoracion.php    # Guardado de puntuación y comentario
 │   └── utils/
-│       └── mailer.php                # Transporte mail()/SMTP y plantillas de correo
-│   ├── solicitudes/                 # 🔄 EN DESARROLLO — vista disponible, backend pendiente
-│   ├── contrataciones/              # 🔄 EN DESARROLLO — vista disponible, backend pendiente
-│   ├── pagos/                       # 🔄 EN DESARROLLO — vista disponible, backend pendiente
-│   └── valoraciones/                # 🔄 EN DESARROLLO — vista disponible, backend pendiente
+│       ├── file_upload_helper.php    # Manejo local de subida de archivos
+│       ├── supabase_storage.php      # Manejo de subida a Supabase Storage
+│       └── mailer.php                # Envío de correos electrónicos
 ├── sql/
-│   └── schema.sql                   # Esquema relacional DDL completo (9 tablas, 3FN)
-└── docs/                            # Documentación técnica y diagramas UML
+│   ├── schema.sql                    # Esquema DDL para MySQL / MariaDB
+│   └── schema_supabase.sql           # Esquema DDL para PostgreSQL / Supabase
+└── docs/                             # Documentación del proyecto
 ```
 
 ---
 
-## Estado de implementación por módulo
+## 2. Base de Datos y Conexión
 
-| Módulo | Vista frontend | Lógica backend PHP | Persistencia BD |
-|:---|:---:|:---:|:---:|
-| Autenticación / Sesiones | ✅ `login.php` | ✅ `php/auth/sesion.php` | ✅ tabla `usuarios` |
-| Registro de usuarios | ✅ `registro.php` | ✅ `php/usuarios/registro.php` | ✅ INSERT `usuarios` |
-| Crear publicación | ✅ `crear-publicacion.php` | ✅ `php/publicaciones/crear_publicacion.php` | ✅ INSERT `publicaciones` |
-| Editar publicación | ✅ `editar-publicacion.php` | ✅ `php/publicaciones/editar_publicacion.php` | ✅ UPDATE `publicaciones` |
-| Recomendaciones del catálogo | ✅ `catalogo.php` | ✅ `php/publicaciones/catalogo.php` | ✅ `usuarios.onboarding_data` + `publicaciones` |
-| Confirmación de correo | ✅ `confirmar-correo.php` | ✅ `php/auth/confirmar_correo.php` | ✅ token en `usuarios` |
-| Pasarela de pago | ✅ `pasarela-pago.php` | ✅ `php/pagos/pasarela.php` | ✅ SELECT de contratación |
-| Panel proveedor | ✅ `panel-proveedor.php` | ✅ `php/publicaciones/obtener_publicaciones.php` | ✅ SELECT dinámico |
-| Solicitud de servicio | ✅ `form-solicitar-servicio.php` | 🔄 `php/solicitudes/` — pendiente | 🔄 tabla `solicitudes` lista |
-| Solicitud impresión 3D | ✅ `solicitud-impresion-3d.php` | 🔄 pendiente | 🔄 tabla `solicitudes` lista |
-| Carrito / Contratación | ✅ `carrito.php`, `confirmacion.php` | 🔄 `php/contrataciones/` — pendiente | 🔄 tablas listas |
-| Pasarela de pago | ✅ `pasarela-pago.php` | 🔄 `php/pagos/` — pendiente | 🔄 tabla `pagos` lista |
-| Valoraciones | ✅ `valoracion.php` | 🔄 `php/valoraciones/` — pendiente | 🔄 tabla `valoraciones` lista |
-| Panel administrador | ✅ `panel-administrador.php` | 🔄 `php/admin/` — pendiente | — |
-| Login autenticado BD | ✅ `login.php` (vista) | 🔄 `php/auth/login.php` — pendiente | 🔄 SELECT `usuarios` |
+La base de datos se conecta a través de PDO en `config/database.php`. El archivo detecta automáticamente si el entorno está usando MySQL o PostgreSQL (Supabase) según las variables de `.env`.
+
+- **MySQL / MariaDB local:** puerto 3306.
+- **Supabase / PostgreSQL:** puerto 5432 / 6543 o host `supabase.co`.
+
+Todas las consultas utilizan sentencias preparadas (`$pdo->prepare()` y `$stmt->execute()`) para evitar inyecciones SQL.
 
 ---
 
-## Conexión PHP / MySQL (PDO)
+## 3. Seguridad y Control de Acceso
 
-La conexión a la base de datos se centraliza en `config/database.php` mediante **PDO (PHP Data Objects)**, que expone la variable `$pdo` para todos los scripts que la requieran mediante `require_once`.
-
-### Configuración mediante variables de entorno
-
-Las credenciales se gestionan a través de un archivo `.env` local (tomar como referencia `.env.example`), evitando subir datos sensibles al repositorio:
-
-```
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=classia_db
-DB_USER=classia_user
-DB_PASSWORD=tu_contrasena_local
-```
-
-### Implementación de `config/database.php`
-
-```php
-$dsn = "mysql:host={$host};port={$port};dbname={$database};charset=utf8mb4";
-
-$pdo = new PDO($dsn, $user, $password, [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,   // sentencias preparadas nativas
-]);
-```
-
-### Uso en controladores (ejemplo)
-
-```php
-require_once __DIR__ . '/../../config/database.php';
-
-// Consulta parametrizada (previene SQL Injection)
-$stmt = $pdo->prepare("SELECT id_usuario FROM usuarios WHERE email = :email");
-$stmt->execute(['email' => $correo]);
-$usuario = $stmt->fetch();
-```
-
----
-
-## Manejo de Sesiones y Autenticación
-
-El control de sesiones se gestiona en `php/auth/sesion.php`.
-
-### Funciones disponibles
-
-| Función | Descripción |
-|:---|:---|
-| `iniciar_sesion()` | Inicia la sesión de forma segura si no existe una activa. Configura cookie `HttpOnly`, `SameSite=Lax`. |
-| `establecer_usuario_sesion($id, $nombre, $email, $id_rol)` | Regenera el ID de sesión y almacena datos del usuario. |
-| `esta_autenticado()` | Retorna `true` si existe `$_SESSION["usuario"]` con datos válidos. |
-| `usuario_actual()` | Devuelve el array del usuario autenticado o `null`. |
-| `requerir_autenticacion($login_url)` | Redirige a `$login_url` si no hay sesión activa. |
-| `cerrar_sesion()` | Limpia `$_SESSION`, destruye la cookie de sesión y finaliza la sesión. |
-
-### Estructura de datos en sesión
-
-```php
-$_SESSION["usuario"] = [
-    "id_usuario" => 1,
-    "nombre"     => "Nombre del Usuario",
-    "email"      => "usuario@classia.local",
-    "id_rol"     => 2,  // 1=Cliente/Estudiante, 2=Docente/Proveedor, 3=Administrador
-];
-```
-
-> ⚠️ **Política de seguridad:** Nunca almacenar contraseñas, hashes, instancias de PDO ni tokens confidenciales dentro de `$_SESSION`.
-
----
-
-## Roles y Permisos (RBAC)
-
-| `id_rol` | Nombre | Panel de acceso | Acciones habilitadas |
-|:---:|:---|:---|:---|
-| 1 | `Cliente/Estudiante` | `views/usuario.php` | Explorar catálogo, contratar, solicitar servicios, valorar |
-| 2 | `Docente/Proveedor` | `views/panel-proveedor.php` | Crear/editar publicaciones, ver solicitudes, ver contrataciones |
-| 3 | `Administrador` | `views/panel-administrador.php` | Gestión de usuarios, moderación, administración de categorías |
-
-El `id_rol` se verifica en cada controlador antes de procesar acciones sensibles. Ejemplo:
-
-```php
-// Verificar que el usuario tiene rol Docente/Proveedor (id_rol=2)
-if (!esta_autenticado() || usuario_actual()['id_rol'] !== 2) {
-    header("Location: ../views/login.php");
-    exit;
-}
-```
-
----
-
-## Protección CSRF
-
-Todos los formularios que realizan escrituras en la base de datos implementan tokens CSRF:
-
-```php
-// Generación del token (en el controlador, antes de renderizar el formulario)
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-// Validación al recibir POST
-if (!hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'] ?? '')) {
-    $errores[] = "La sesión del formulario expiró.";
-}
-```
-
-Formularios con protección CSRF activa: `registro.php`, `crear_publicacion.php`, `editar_publicacion.php`.
-
----
-
-## Reutilización y rutas relativas con `__DIR__`
-
-Para incluir configuración, helpers o componentes reutilizables se utilizan rutas absolutas basadas en `__DIR__`:
-
-```php
-require_once __DIR__ . "/../../config/database.php";
-require_once __DIR__ . "/../auth/session.php";
-```
-
----
-
-## Convenciones de nomenclatura y desarrollo
-
-| Recurso | Convención | Ejemplo |
-|:---|:---|:---|
-| Archivos PHP de vista | `kebab-case` | `panel-proveedor.php`, `crear-publicacion.php` |
-| Archivos PHP de controlador | `snake_case` | `crear_publicacion.php`, `session.php` |
-| Tablas SQL | `snake_case` plural | `usuarios`, `publicaciones`, `detalles_contratacion` |
-| Claves primarias | `snake_case`: `id_entidad` | `id_usuario`, `id_publicacion`, `id_rol` |
-| Variables / funciones PHP | `snake_case` | `$id_usuario`, `requerir_autenticacion()` |
-| Consultas SQL | PDO preparadas (`prepare()` + `execute()`) | Obligatorio; previene SQL Injection |
-| Credenciales | Solo en `.env` local; nunca al repositorio | Ver `.env.example` |
+- **Roles del sistema:**
+  - `1`: Estudiante (acceso a compras, catálogo, aula virtual y solicitudes).
+  - `2`: Docente / Proveedor (panel de publicaciones, gestión de temarios, atención de servicios y propuestas).
+  - `3`: Administrador (supervisión global, métricas, moderación de contenidos, bloqueo de usuarios y matriculación).
+- **Protección CSRF:** Todos los formularios POST envían y validan un token generado en `$_SESSION['csrf_token']` mediante `hash_equals()`.
+- **Bloqueo de cuentas:** El administrador puede suspender usuarios indicando un motivo. Al intentar iniciar sesión, el sistema valida el estado y deniega el acceso a cuentas inactivas.
+- **Subida de archivos:** Se validan extensiones y tipos MIME permitidos tanto en almacenamiento local como en Supabase Storage.

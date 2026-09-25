@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Vista informativa de acceso denegado por restricciones de rol o permisos.
+ */
+
 require_once '../php/auth/sesion.php';
 
 requerir_autenticacion('login.php');

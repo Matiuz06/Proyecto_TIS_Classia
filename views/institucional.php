@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Presentación institucional sobre la plataforma Classia y el equipo AniTech.
+ */
+
 $title       = 'Sobre Nosotros — Classia & AniTech';
 $description = 'Conoce la historia, el equipo de desarrollo, la filosofía y el compromiso institucional detrás de Classia y AniTech.';
 $cssPrefix   = '..';

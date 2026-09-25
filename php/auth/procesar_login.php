@@ -70,7 +70,9 @@ try {
             email_verificado,
             onboarding_step,
             dos_factores_activo,
-            dos_factores_secreto
+            dos_factores_secreto,
+            COALESCE(activo, 1) AS activo,
+            motivo_bloqueo
          FROM usuarios
          WHERE email = :email
          LIMIT 1"
@@ -98,6 +100,15 @@ if (
         "Email o contraseña incorrectos.",
         $email
     );
+}
+
+if (isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
+    $motivo = !empty($usuario['motivo_bloqueo']) ? htmlspecialchars($usuario['motivo_bloqueo']) : '';
+    $_SESSION['cuenta_bloqueada_motivo'] = $motivo;
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header("Location: ../../views/cuenta-bloqueada.php");
+    exit;
 }
 
 if (isset($usuario['email_verificado']) && !(int) $usuario['email_verificado']) {

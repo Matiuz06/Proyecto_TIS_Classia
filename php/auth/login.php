@@ -36,12 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = "Por favor, ingresá tu correo electrónico y contraseña.";
     } else {
         try {
-            $stmt = $pdo->prepare("SELECT id_usuario, nombre, apellido, email, password_hash, id_rol, email_verificado FROM usuarios WHERE email = :email LIMIT 1");
+            $stmt = $pdo->prepare("SELECT id_usuario, nombre, apellido, email, password_hash, id_rol, email_verificado, COALESCE(activo, 1) AS activo, motivo_bloqueo FROM usuarios WHERE email = :email LIMIT 1");
             $stmt->execute(['email' => $correo]);
             $usuario = $stmt->fetch();
 
             if ($usuario && password_verify($contrasena, $usuario['password_hash'])) {
-                if (!(int) $usuario['email_verificado']) {
+                if (isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
+                    $motivo = !empty($usuario['motivo_bloqueo']) ? ' Motivo: ' . $usuario['motivo_bloqueo'] : '';
+                    $errores[] = "Tu cuenta se encuentra bloqueada o suspendida por la administración." . $motivo;
+                } elseif (!(int) $usuario['email_verificado']) {
                     $errores[] = "Confirmá tu correo electrónico antes de iniciar sesión.";
                 }
             }

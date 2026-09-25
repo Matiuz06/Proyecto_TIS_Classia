@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Panel del docente para administrar publicaciones, solicitudes y alumnos.
+ */
+
 require_once '../php/auth/roles.php';
 
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');

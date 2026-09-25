@@ -147,7 +147,7 @@ if ($google_apellido === '') {
 try {
     $onboarding_step_usuario = 1;
     $stmt = $pdo->prepare("
-        SELECT id_usuario, nombre, apellido, email, id_rol, foto_perfil, onboarding_step
+        SELECT id_usuario, nombre, apellido, email, id_rol, foto_perfil, onboarding_step, COALESCE(activo, 1) AS activo, motivo_bloqueo
         FROM usuarios
         WHERE email = :email
         LIMIT 1
@@ -156,6 +156,15 @@ try {
     $usuario = $stmt->fetch();
 
     if ($usuario) {
+        if (isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
+            $motivo = !empty($usuario['motivo_bloqueo']) ? htmlspecialchars($usuario['motivo_bloqueo']) : '';
+            $_SESSION['cuenta_bloqueada_motivo'] = $motivo;
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Pragma: no-cache');
+            header('Location: ../../views/cuenta-bloqueada.php');
+            exit;
+        }
+
         $onboarding_step_usuario = (int) ($usuario['onboarding_step'] ?? 1);
 
         // Si Google autenticó este mismo correo, podemos considerarlo verificado.

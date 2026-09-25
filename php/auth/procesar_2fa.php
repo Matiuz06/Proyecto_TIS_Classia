@@ -43,9 +43,17 @@ if ($codigo === '') {
 }
 
 try {
-    $stmt = $pdo->prepare('SELECT dos_factores_secreto, dos_factores_backup_codes FROM usuarios WHERE id_usuario = :id LIMIT 1');
+    $stmt = $pdo->prepare('SELECT dos_factores_secreto, dos_factores_backup_codes, COALESCE(activo, 1) AS activo, motivo_bloqueo FROM usuarios WHERE id_usuario = :id LIMIT 1');
     $stmt->execute(['id' => (int) $pending['id_usuario']]);
     $user_2fa = $stmt->fetch();
+
+    if ($user_2fa && isset($user_2fa['activo']) && (int) $user_2fa['activo'] === 0) {
+        unset($_SESSION['2fa_pending']);
+        $motivo = !empty($user_2fa['motivo_bloqueo']) ? ' Motivo: ' . $user_2fa['motivo_bloqueo'] : '';
+        $_SESSION['login_error'] = 'Tu cuenta se encuentra bloqueada o suspendida por la administración.' . $motivo;
+        header('Location: ../../views/login.php');
+        exit;
+    }
 
     if (!$user_2fa || empty($user_2fa['dos_factores_secreto'])) {
         unset($_SESSION['2fa_pending']);

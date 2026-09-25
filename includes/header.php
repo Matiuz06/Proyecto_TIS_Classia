@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Encabezado global, navegación por rol y control de sesión.
+ */
+
 require_once __DIR__ . '/../php/auth/sesion.php';
 iniciar_sesion();
 
@@ -125,19 +130,7 @@ $cartCount = count($cartItems);
                 <a href="<?= $panelProveedorHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'panel-proveedor' ? ' active' : '' ?>">
                   <?= __t('nav_panel_docente') ?>
                 </a>
-                <a href="<?= ($cssPrefix === '.') ? 'views/crear-publicacion.php' : 'crear-publicacion.php' ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_crear_publicacion', 'Crear publicación') ?>
-                </a>
-                <a href="<?= $eventosHref ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_docente_eventos', 'Proponer / Ver Eventos') ?>
-                </a>
-                <a href="<?= $noticiasHref ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_docente_noticias', 'Proponer / Ver Noticias') ?>
-                </a>
-                <a href="<?= $solicitudesProveedorHref ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_solicitudes_servicios', 'Solicitudes de servicios') ?>
-                </a>
-                <a href="<?= $perfilProfesionalHref ?>" role="menuitem" class="user-dropdown-item">
+                <a href="<?= $perfilProfesionalHref ?>" role="menuitem" class="user-dropdown-item<?= $activePage === 'perfil-profesional' ? ' active' : '' ?>">
                   <?= __t('nav_perfil_profesional', 'Perfil profesional') ?>
                 </a>
               <?php elseif (es_admin()): ?>

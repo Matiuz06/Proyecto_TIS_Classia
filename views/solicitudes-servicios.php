@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Bandeja de solicitudes de servicios asignadas al docente/proveedor.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_rol(ROL_DOCENTE, 'usuario.php');
 require_once '../php/solicitudes/solicitudes_servicio.php';

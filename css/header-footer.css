@@ -1,6 +1,6 @@
 /* =========================================================
-   HEADER
-   Header global, marca, navegación principal y menú de usuario
+   CABECERA GLOBAL (HEADER)
+   Estructura general, posición fija y contenedor
    ========================================================= */
 
 .site-header {
@@ -23,6 +23,10 @@
   margin-inline: auto;
   padding-block: var(--space-3);
 }
+
+/* =========================================================
+   Marca y Logotipo
+   ========================================================= */
 
 .site-header .site-brand {
   display: inline-flex;
@@ -50,6 +54,10 @@
   transform: scale(1.05);
 }
 
+/* =========================================================
+   Navegación Principal
+   ========================================================= */
+
 .site-header .site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -61,7 +69,7 @@
   list-style: none;
 }
 
-.site-header .site-nav > a {
+.site-header .site-nav>a {
   display: inline-flex;
   align-items: center;
   min-height: 2.25rem;
@@ -79,22 +87,26 @@
     border-color 200ms ease;
 }
 
-.site-header .site-nav > a:focus-visible {
+.site-header .site-nav>a:focus-visible {
   outline: 3px solid rgb(21, 113, 86);
 }
 
-.site-header .site-nav > a:hover {
+.site-header .site-nav>a:hover {
   color: var(--color-brand-primary);
   background: var(--color-bg-soft);
   text-decoration: none;
 }
 
-.site-header .site-nav > a[aria-current="page"] {
+.site-header .site-nav>a[aria-current="page"] {
   color: var(--color-brand-primary);
   font-weight: 700;
   background: var(--color-brand-primary-soft, #e6f7f2);
   text-decoration: none;
 }
+
+/* =========================================================
+   Acceso y Badge del Carrito
+   ========================================================= */
 
 .site-header .nav-cart-btn {
   display: inline-flex;
@@ -143,6 +155,10 @@
   animation: pulse-badge 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* =========================================================
+   Selector de Idioma
+   ========================================================= */
+
 .site-header .lang-selector-nav {
   display: inline-flex;
   align-items: center;
@@ -181,6 +197,10 @@
   color: var(--color-border-strong);
   font-size: 0.75rem;
 }
+
+/* =========================================================
+   Menú Desplegable de Usuario y Sesión
+   ========================================================= */
 
 .site-header .user-nav-dropdown {
   position: relative;
@@ -336,6 +356,10 @@
   }
 }
 
+/* =========================================================
+   Adaptabilidad Responsive y Accesibilidad del Header
+   ========================================================= */
+
 @media (width <=720px) {
   .site-header .site-header__inner {
     grid-template-columns: 1fr;
@@ -353,9 +377,11 @@
     height: 2.1rem;
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
+
   .site-header .site-brand img,
-  .site-header .site-nav > a,
+  .site-header .site-nav>a,
   .site-header .nav-cart-btn,
   .site-header .nav-cart-badge,
   .site-header .user-nav-trigger,
@@ -366,8 +392,8 @@
 }
 
 /* =========================================================
-   FOOTER
-   Footer global, navegación institucional e información legal
+   PIE DE PÁGINA GLOBAL (FOOTER)
+   Estructura general, grid de navegación y enlaces legales
    ========================================================= */
 
 .site-footer {
@@ -443,6 +469,10 @@
   margin: 0 0 var(--space-1) 0;
 }
 
+/* =========================================================
+   Créditos Institucionales y Pie Inferior
+   ========================================================= */
+
 .site-footer .site-footer__bottom {
   display: flex;
   flex-direction: column;
@@ -471,17 +501,23 @@
   text-decoration: underline;
 }
 
+/* =========================================================
+   Adaptabilidad Responsive e Impresión del Footer
+   ========================================================= */
+
 @media (max-width: 700px) {
   .site-footer .site-footer__grid {
     grid-template-columns: 1fr;
   }
 }
+
 .auth-page .site-footer {
   flex: 0 0 auto;
   margin-top: 0;
 }
 
 @media print {
+
   .site-header,
   .site-footer {
     display: none !important;

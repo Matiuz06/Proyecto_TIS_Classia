@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Información sobre el uso de cookies y almacenamiento local.
+ */
+
 $title       = 'Política de cookies — Classia';
 $description = 'Política de cookies y tecnologías similares de Classia.';
 $cssPrefix   = '..';

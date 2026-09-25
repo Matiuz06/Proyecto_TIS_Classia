@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Bandeja administrativa para evaluar solicitudes de rol docente.
+ */
+
 require_once '../php/auth/roles.php';
 require_once '../php/solicitudes/gestionar_solicitudes_docente.php';
 

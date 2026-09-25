@@ -2,6 +2,7 @@
    Microinteracciones globales
    Transiciones reutilizadas por enlaces, botones y tarjetas
    ========================================================= */
+
 .link {
   transition:
     transform 250ms ease,
@@ -11,7 +12,6 @@
 .link:hover {
   transform: translateY(2px);
 }
-
 
 .btn,
 button {
@@ -68,6 +68,10 @@ button:active,
   }
 }
 
+/* =========================================================
+   Keyframes base de transición
+   ========================================================= */
+
 @keyframes fade-slide-up {
   from {
     opacity: 0;
@@ -97,9 +101,11 @@ button:active,
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* =========================================================
+   Accesibilidad y reducción de movimiento
+   ========================================================= */
 
-  /* Respeta preferencias de accesibilidad reduciendo movimiento no esencial. */
+@media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
@@ -112,6 +118,10 @@ button:active,
     animation: none;
   }
 }
+
+/* =========================================================
+   Animaciones de autenticación y bienvenida
+   ========================================================= */
 
 .auth-intro {
   animation: entrar-texto 1.6s ease-in-out 1 both;
@@ -145,10 +155,18 @@ button:active,
   }
 }
 
+/* =========================================================
+   Animaciones de vistas principales y catálogo
+   ========================================================= */
+
 body.home-page>main,
 body.catalog-page>main {
   animation: fade-slide-up var(--dur-medium) var(--ease-out) both;
 }
+
+/* =========================================================
+   Animaciones de carrito y pasarela de pago
+   ========================================================= */
 
 .page-container>.page-header {
   animation: carrito-header 0.8s ease-out 1 both;
@@ -208,6 +226,26 @@ body.catalog-page>main {
   }
 }
 
+@keyframes entradaPago {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.payment-card.motion-entry {
+  animation: entradaPago 1s ease-in-out both;
+}
+
+/* =========================================================
+   Animaciones de servicios y tarjetas interactivas
+   ========================================================= */
+
 .tipo-trabajo-card {
   transition:
     transform var(--dur-short) var(--ease-out),
@@ -218,6 +256,10 @@ body.catalog-page>main {
 .tipo-trabajo-card:hover {
   transform: translateY(-2px);
 }
+
+/* =========================================================
+   Animaciones de aula virtual y visor de cursos
+   ========================================================= */
 
 .layout-sidebar>.sidebar {
   animation: curso-sidebar 1s ease-out 1 both;
@@ -316,6 +358,10 @@ body.catalog-page>main {
   }
 }
 
+/* =========================================================
+   Animaciones de formularios de registro y acceso
+   ========================================================= */
+
 .auth-page .auth-intro {
   animation-name: entrar-desde-derecha;
   animation-duration: 1.8s;
@@ -358,21 +404,26 @@ body.catalog-page>main {
   }
 }
 
-@keyframes entradaPago {
+@keyframes authEntradaInicial {
   from {
     opacity: 0;
-    transform: translateX(-100px);
+    transform: translateY(60px);
   }
-
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
-.payment-card.motion-entry {
-  animation: entradaPago 1s ease-in-out both;
+@media (min-width: 900px) {
+  body.auth-page .auth-container {
+    animation: authEntradaInicial 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
+
+/* =========================================================
+   Animaciones de onboarding y pasos guiados
+   ========================================================= */
 
 .onboarding-step {
   animation: none;
@@ -414,6 +465,14 @@ body.catalog-page>main {
   animation-delay: 450ms;
 }
 
+.onboarding-step--active {
+  animation: fade-slide-up var(--dur-medium, 250ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+/* =========================================================
+   Animaciones de perfil de usuario y navegación por pestañas
+   ========================================================= */
+
 .profile-tabs button {
   animation: fade-slide-up 1.2s var(--ease-out) both;
 }
@@ -446,6 +505,9 @@ body.catalog-page>main {
   animation-delay: 1280ms;
 }
 
+/* =========================================================
+   Animaciones de alertas y tarjetas de publicación
+   ========================================================= */
 
 .alert {
   animation: fade-slide-up var(--dur-medium, 300ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
@@ -477,26 +539,34 @@ body.catalog-page>main {
     opacity var(--dur-short, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
-/* ── Onboarding active step ── */
-.onboarding-step--active {
-  animation: fade-slide-up var(--dur-medium, 250ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+/* ── Cuenta bloqueada — animaciones ──────────────────── */
+@keyframes blocked-in {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
-
-/* ── Auth container entrance ── */
-@keyframes authEntradaInicial {
-  from {
-    opacity: 0;
-    transform: translateY(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0   rgba(239, 68, 68, .3); }
+    50%       { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
 }
 
-@media (min-width: 900px) {
-  body.auth-page .auth-container {
-    animation: authEntradaInicial 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
+.blocked-card {
+    animation: blocked-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.blocked-icon-wrap {
+    animation: pulse-red 2.4s ease-in-out infinite;
+}
+
+.blocked-actions .btn-primary {
+    transition: opacity .2s, transform .2s;
+}
+
+.blocked-actions .btn-primary:hover {
+    opacity: .88;
+    transform: translateY(-1px);
+}
+
+.blocked-actions .btn-secondary {
+    transition: background .2s, color .2s;
 }

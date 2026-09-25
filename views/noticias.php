@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Cartelera de noticias y artículos propuestos por la comunidad educativa.
+ */
+
 require_once __DIR__ . '/../php/auth/sesion.php';
 require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../config/database.php';

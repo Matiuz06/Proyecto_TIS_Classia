@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Lineamientos de seguridad de cuentas y protección de información.
+ */
+
 $title       = 'Política de seguridad — Classia';
 $description = 'Política de seguridad de Classia para proteger la información, los accesos y la confianza de la comunidad.';
 $cssPrefix   = '..';

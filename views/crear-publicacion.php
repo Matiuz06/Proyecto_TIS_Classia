@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Formulario de alta para nuevos cursos y servicios.
+ */
+
 $categorias = [];
 require_once '../php/auth/roles.php';
 requerir_rol(ROL_DOCENTE, 'usuario.php');

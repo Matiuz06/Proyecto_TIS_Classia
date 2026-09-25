@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Pasarela de pago para procesar la contratación de cursos y servicios.
+ */
+
 $currentUser = [];
 $id_contratacion = 0;
 $monto_total = 0.0;

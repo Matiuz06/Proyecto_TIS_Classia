@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Formulario especializado para solicitudes y presupuestos de impresión 3D.
+ */
+
 $title       = 'Solicitar impresión 3D | Classia';
 $description = 'Solicita un presupuesto personalizado para diseño e impresión 3D en Classia.';
 $cssPrefix   = '..';

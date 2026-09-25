@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Política de privacidad y protección de datos personales (Ley 18.331).
+ */
+
 $title       = 'Política de privacidad — Classia';
 $description = 'Política de privacidad de Classia. Conocé cómo recopilamos, usamos y protegemos tus datos personales conforme a la Ley 18.331 de Uruguay.';
 $cssPrefix   = '..';

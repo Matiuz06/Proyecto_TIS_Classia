@@ -2,11 +2,20 @@
 
 /**
  * Responsabilidad: Carga el detalle de un curso, su contenido y valoraciones asociadas.
+ *
+ * Arquitectura POO:
+ *   El contenido del curso se carga a través de ContenidoCursoRepository,
+ *   que construye objetos Modulo > Unidad > Recurso.
+ *   La variable $contenido_curso es un array de arrays (via toArray()) para
+ *   mantener compatibilidad con las plantillas de la vista curso.php.
+ *   Para trabajar con objetos nativos, usar:
+ *     $repo = new ContenidoCursoRepository($pdo);
+ *     $modulos = $repo->obtenerPorCurso($id_curso); // devuelve Modulo[]
  */
 
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
-require_once __DIR__ . '/contenido_curso.php';
+require_once __DIR__ . '/contenido_curso.php';   // carga ContenidoCursoRepository + clases de dominio
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
@@ -151,6 +160,35 @@ if ($id_curso > 0) {
                             'msg'  => $mensaje,
                         ]);
                         $_SESSION['curso_exito'] = '¡Tu comentario fue publicado en el foro de debate!';
+                        header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
+                        exit;
+                    }
+                }
+
+                // Moderar o eliminar mensaje del foro
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'eliminar_mensaje_foro') {
+                    $token = $_POST['csrf_token'] ?? '';
+                    $id_msg = (int)($_POST['id_mensaje'] ?? 0);
+                    $id_unidad_foro = (int)($_POST['id_unidad'] ?? 0);
+
+                    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+                        $_SESSION['curso_error'] = 'Token de seguridad inválido.';
+                    } elseif ($id_msg <= 0) {
+                        $_SESSION['curso_error'] = 'Mensaje no válido.';
+                    } else {
+                        $es_adm = es_admin();
+                        $uid_act = (int)$usuario_actual['id_usuario'];
+                        $stmt_check_msg = $pdo->prepare("SELECT id_usuario FROM curso_foro_mensajes WHERE id_mensaje = :id");
+                        $stmt_check_msg->execute(['id' => $id_msg]);
+                        $msg_row = $stmt_check_msg->fetch();
+
+                        if ($msg_row && ($es_adm || $uid_act === (int)$curso['id_usuario'] || $uid_act === (int)$msg_row['id_usuario'])) {
+                            $stmt_del_m = $pdo->prepare("DELETE FROM curso_foro_mensajes WHERE id_mensaje = :id");
+                            $stmt_del_m->execute(['id' => $id_msg]);
+                            $_SESSION['curso_exito'] = 'Mensaje eliminado correctamente.';
+                        } else {
+                            $_SESSION['curso_error'] = 'No tenés permisos para eliminar este mensaje.';
+                        }
                         header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
                         exit;
                     }
