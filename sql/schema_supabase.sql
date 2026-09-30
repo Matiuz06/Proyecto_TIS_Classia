@@ -206,6 +206,19 @@ CREATE TABLE IF NOT EXISTS valoraciones (
 );
 
 -- ----------------------------------------------------------------------------
+-- 10b. TABLA: publicacion_visitas (Estadísticas REQ-ADM-02, REQ-ADM-04)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS publicacion_visitas (
+    id_visita SERIAL PRIMARY KEY,
+    id_publicacion INT NOT NULL REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
+    fecha_visita DATE NOT NULL DEFAULT CURRENT_DATE,
+    visitas INT NOT NULL DEFAULT 1,
+    CONSTRAINT uq_pub_visita_fecha UNIQUE (id_publicacion, fecha_visita)
+);
+CREATE INDEX IF NOT EXISTS idx_visitas_pub ON publicacion_visitas (id_publicacion);
+CREATE INDEX IF NOT EXISTS idx_visitas_fecha ON publicacion_visitas (fecha_visita);
+
+-- ----------------------------------------------------------------------------
 -- 11. TABLA: perfiles_profesionales
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS perfiles_profesionales (

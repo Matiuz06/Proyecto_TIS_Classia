@@ -13,6 +13,7 @@ $uid     = (int) ($usuario['id_usuario'] ?? 0);
 
 require_once '../config/database.php';
 require_once '../php/admin/acciones_admin.php';
+require_once '../php/admin/estadisticas_admin.php';
 require_once '../php/solicitudes/gestionar_solicitudes_docente.php';
 require_once '../php/noticias/gestionar_noticias.php';
 require_once '../php/eventos/gestionar_eventos.php';
@@ -133,6 +134,19 @@ $noticias_moderacion = obtener_noticias($pdo, 30, 'Pendiente', null, true);
 $eventos_pendientes  = obtener_eventos($pdo, 5, 'Pendiente', null, true);
 $total_eventos_pend  = $stats['eventos_pendientes'];
 
+// Carga de analíticas y estadísticas
+$filtro_periodo      = $_GET['periodo'] ?? '30d';
+$filtro_desde        = $_GET['desde'] ?? null;
+$filtro_hasta        = $_GET['hasta'] ?? null;
+$filtro_pub          = (int)($_GET['publicacion'] ?? 0);
+
+$info_rango          = obtener_rango_fechas_analiticas($filtro_periodo, $filtro_desde, $filtro_hasta);
+$kpis_analiticas     = obtener_kpis_analiticas($pdo, $info_rango['desde'], $info_rango['hasta'], $filtro_pub);
+$series_graficos     = obtener_series_graficos($pdo, $info_rango['desde'], $info_rango['hasta'], $filtro_pub);
+$dist_valoraciones   = obtener_distribucion_valoraciones($pdo, $info_rango['desde'], $info_rango['hasta'], $filtro_pub);
+$top_servicios       = obtener_top_servicios_ingresos($pdo, $info_rango['desde'], $info_rango['hasta'], 5);
+$desglose_servicios  = obtener_desglose_servicios_periodo($pdo, $info_rango['desde'], $info_rango['hasta'], $filtro_pub);
+
 // Configuración de página
 
 $title       = 'Panel de administración — Classia';
@@ -194,6 +208,11 @@ include '../includes/header.php';
 
         <a href="#dashboard" class="admin-panel-item" role="menuitem">
           Estado general
+        </a>
+
+        <a href="#analiticas" class="admin-panel-item" role="menuitem">
+          Analíticas y Métricas
+          <span class="admin-badge-count">KPIs</span>
         </a>
 
         <a href="#usuarios" class="admin-panel-item" role="menuitem">
@@ -336,6 +355,237 @@ include '../includes/header.php';
 
     </div>
 
+  </section>
+
+
+  <!--ANALÍTICAS Y RENDIMIENTO. Métricas de visitas, contrataciones, ingresos y valoraciones-->
+  <section id="analiticas" class="admin-analytics-section" aria-labelledby="titulo-analiticas">
+    <header class="admin-analytics-header">
+      <div class="admin-analytics-title-wrap">
+        <p class="admin-panel-kicker">Métricas y Rendimiento</p>
+        <h2 id="titulo-analiticas">Panel de analíticas institucionales</h2>
+        <p>Estadísticas de visitas, contrataciones, ingresos generados y satisfacción consolidada.</p>
+      </div>
+
+      <!-- FILTRO POR PERÍODO Y SERVICIO (REQ-ADM-02) -->
+      <form method="GET" action="panel-administrador.php" class="admin-analytics-filter-form" role="search" aria-label="Filtro de analíticas">
+        <div class="admin-filter-group">
+          <label for="analytics-periodo-select" class="admin-filter-label">Período:</label>
+          <select id="analytics-periodo-select" name="periodo" class="admin-filter-select" aria-label="Seleccionar período de análisis">
+            <option value="7d" <?= $filtro_periodo === '7d' ? 'selected' : '' ?>>Últimos 7 días</option>
+            <option value="30d" <?= $filtro_periodo === '30d' ? 'selected' : '' ?>>Últimos 30 días</option>
+            <option value="mes" <?= $filtro_periodo === 'mes' ? 'selected' : '' ?>>Este mes</option>
+            <option value="anio" <?= $filtro_periodo === 'anio' ? 'selected' : '' ?>>Este año</option>
+            <option value="todo" <?= $filtro_periodo === 'todo' ? 'selected' : '' ?>>Todo el histórico</option>
+            <option value="custom" <?= $filtro_periodo === 'custom' ? 'selected' : '' ?>>Personalizado...</option>
+          </select>
+        </div>
+
+        <div id="analytics-custom-dates" class="admin-filter-group admin-custom-dates" style="<?= $filtro_periodo === 'custom' ? 'display: flex;' : 'display: none;' ?>">
+          <label for="analytics-desde" class="admin-filter-label">Desde:</label>
+          <input type="date" id="analytics-desde" name="desde" value="<?= htmlspecialchars($info_rango['desde']) ?>" class="admin-filter-input">
+          <label for="analytics-hasta" class="admin-filter-label">Hasta:</label>
+          <input type="date" id="analytics-hasta" name="hasta" value="<?= htmlspecialchars($info_rango['hasta']) ?>" class="admin-filter-input">
+        </div>
+
+        <div class="admin-filter-group">
+          <label for="analytics-pub-select" class="admin-filter-label">Servicio / Curso:</label>
+          <select id="analytics-pub-select" name="publicacion" class="admin-filter-select" aria-label="Filtrar por publicación específica">
+            <option value="0">Todos los servicios y cursos</option>
+            <?php foreach ($todas_publicaciones as $pub): ?>
+              <?php if ($pub['estado'] !== 'Eliminado'): ?>
+                <option value="<?= (int)$pub['id_publicacion'] ?>" <?= $filtro_pub === (int)$pub['id_publicacion'] ? 'selected' : '' ?>>
+                  [<?= htmlspecialchars($pub['tipo']) ?>] <?= htmlspecialchars(mb_strimwidth($pub['titulo'], 0, 40, '…')) ?>
+                </option>
+              <?php endif; ?>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="admin-filter-actions">
+          <button type="submit" class="btn btn-sm">Aplicar filtros</button>
+          <?php if ($filtro_periodo !== '30d' || $filtro_pub > 0): ?>
+            <a href="panel-administrador.php#analiticas" class="btn btn-ghost btn-sm">Restablecer</a>
+          <?php endif; ?>
+        </div>
+      </form>
+    </header>
+
+    <!-- Rango activo badge -->
+    <div class="admin-analytics-active-range">
+      <span>Rango consultado: <strong><?= htmlspecialchars($info_rango['etiqueta']) ?></strong></span>
+      <?php if ($filtro_pub > 0): ?>
+        <?php 
+          $pub_sel_nombre = 'Publicación #' . $filtro_pub;
+          foreach ($todas_publicaciones as $p) {
+              if ((int)$p['id_publicacion'] === $filtro_pub) { $pub_sel_nombre = $p['titulo']; break; }
+          }
+        ?>
+        <span class="admin-analytics-active-tag">Filtrado por: <em><?= htmlspecialchars($pub_sel_nombre) ?></em></span>
+      <?php endif; ?>
+    </div>
+
+    <!-- TARJETAS KPIS DINÁMICAS (REQ-ADM-04) -->
+    <div class="admin-analytics-kpi-grid">
+      <article class="admin-kpi-card">
+        <span class="admin-kpi-label">Ingresos del período</span>
+        <strong class="admin-kpi-value admin-kpi-value--accent">$<?= number_format($kpis_analiticas['ingresos_totales'], 2, ',', '.') ?></strong>
+        <span class="admin-kpi-sub">Monto total contratado</span>
+      </article>
+
+      <article class="admin-kpi-card">
+        <span class="admin-kpi-label">Contrataciones</span>
+        <strong class="admin-kpi-value"><?= number_format($kpis_analiticas['contrataciones_totales']) ?></strong>
+        <span class="admin-kpi-sub">Órdenes concretadas</span>
+      </article>
+
+      <article class="admin-kpi-card">
+        <span class="admin-kpi-label">Visitas registradas</span>
+        <strong class="admin-kpi-value"><?= number_format($kpis_analiticas['visitas_totales']) ?></strong>
+        <span class="admin-kpi-sub">Visualizaciones en detalle</span>
+      </article>
+
+      <article class="admin-kpi-card">
+        <span class="admin-kpi-label">Tasa de conversión</span>
+        <strong class="admin-kpi-value admin-kpi-value--success"><?= number_format($kpis_analiticas['tasa_conversion'], 2, ',', '.') ?>%</strong>
+        <span class="admin-kpi-sub">Contrataciones / Visitas</span>
+      </article>
+
+      <article class="admin-kpi-card">
+        <span class="admin-kpi-label">Satisfacción media</span>
+        <strong class="admin-kpi-value admin-kpi-value--warning">
+          <?php if ($kpis_analiticas['promedio_valoracion'] > 0): ?>
+            ★ <?= number_format($kpis_analiticas['promedio_valoracion'], 1) ?> <span class="admin-kpi-sub-text">/ 5.0</span>
+          <?php else: ?>
+            —
+          <?php endif; ?>
+        </strong>
+        <span class="admin-kpi-sub"><?= $kpis_analiticas['total_valoraciones'] ?> valoracion<?= $kpis_analiticas['total_valoraciones'] !== 1 ? 'es' : '' ?></span>
+      </article>
+    </div>
+
+    <!-- GRÁFICOS INTERACTIVOS (REQ-ADM-04) -->
+    <div class="admin-charts-grid">
+      <!-- Gráfico 1: Evolución Ingresos y Contrataciones -->
+      <div class="admin-chart-card admin-chart-card--wide">
+        <div class="admin-chart-header">
+          <h3>Evolución de Ingresos y Contrataciones</h3>
+          <span class="admin-chart-legend-badge">Ingresos ($) vs Cantidad</span>
+        </div>
+        <div class="admin-chart-container">
+          <canvas id="chart-ingresos-contrataciones" aria-label="Gráfico de evolución de ingresos y contrataciones"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 2: Visitas vs Conversión -->
+      <div class="admin-chart-card">
+        <div class="admin-chart-header">
+          <h3>Visitas vs. Contrataciones</h3>
+          <span class="admin-chart-legend-badge">Embudo de demanda</span>
+        </div>
+        <div class="admin-chart-container">
+          <canvas id="chart-visitas-conversion" aria-label="Gráfico de visitas versus contrataciones"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 3: Distribución de Valoraciones -->
+      <div class="admin-chart-card">
+        <div class="admin-chart-header">
+          <h3>Distribución de Valoraciones</h3>
+          <span class="admin-chart-legend-badge">Calificaciones de clientes</span>
+        </div>
+        <div class="admin-chart-container">
+          <canvas id="chart-valoraciones-distribucion" aria-label="Gráfico de distribución de calificaciones de 1 a 5 estrellas"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 4: Top Servicios por Ingresos -->
+      <?php if (!empty($top_servicios)): ?>
+        <div class="admin-chart-card admin-chart-card--wide">
+          <div class="admin-chart-header">
+            <h3>Publicaciones con mayor volumen de ingresos</h3>
+            <span class="admin-chart-legend-badge">Top 5 más demandados</span>
+          </div>
+          <div class="admin-chart-container">
+            <canvas id="chart-top-servicios" aria-label="Gráfico de publicaciones más rentables"></canvas>
+          </div>
+        </div>
+      <?php endif; ?>
+    </div>
+
+    <!-- TABLA DE DESGLOSE POR SERVICIO Y PERÍODO (REQ-ADM-02) -->
+    <div class="admin-services-breakdown-section">
+      <header class="admin-breakdown-header">
+        <div>
+          <h3>Desglose de rendimiento por servicio y curso</h3>
+          <p>Métricas consolidadas de visitas, contrataciones, tasa de conversión e ingresos en el período seleccionado.</p>
+        </div>
+      </header>
+
+      <?php if (empty($desglose_servicios)): ?>
+        <p class="muted">No hay publicaciones con actividad en el período consultado.</p>
+      <?php else: ?>
+        <div class="admin-users-table-wrap">
+          <table class="admin-users-table admin-breakdown-table" aria-label="Estadísticas de visitas y contrataciones por servicio y período">
+            <thead>
+              <tr>
+                <th scope="col">Publicación</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Categoría</th>
+                <th scope="col">Docente / Proveedor</th>
+                <th scope="col">Visitas</th>
+                <th scope="col">Contrataciones</th>
+                <th scope="col">Conversión</th>
+                <th scope="col">Ingresos</th>
+                <th scope="col">Valoración</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($desglose_servicios as $ds): ?>
+                <?php
+                  $tipo_class = ($ds['tipo'] === 'Curso') ? 'badge-course' : 'badge-service';
+                  $conv = (float)$ds['conversion_pct'];
+                ?>
+                <tr>
+                  <td>
+                    <strong><?= htmlspecialchars($ds['titulo']) ?></strong>
+                    <div class="text-muted" style="font-size: var(--text-xs);">Precio unitario: $<?= number_format($ds['precio'], 2, ',', '.') ?></div>
+                  </td>
+                  <td>
+                    <span class="badge <?= $tipo_class ?>"><?= htmlspecialchars($ds['tipo']) ?></span>
+                  </td>
+                  <td><?= htmlspecialchars($ds['nombre_categoria']) ?></td>
+                  <td><?= htmlspecialchars($ds['docente_nombre']) ?></td>
+                  <td><strong><?= number_format($ds['visitas_periodo']) ?></strong></td>
+                  <td><strong><?= number_format($ds['contrataciones_periodo']) ?></strong></td>
+                  <td>
+                    <div class="admin-conversion-indicator" title="Tasa de conversión: <?= $conv ?>%">
+                      <span><?= $conv ?>%</span>
+                      <div class="admin-conversion-bar-bg">
+                        <div class="admin-conversion-bar-fill" style="width: <?= min(100, $conv * 4) ?>%;"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <strong class="admin-table-money">$<?= number_format($ds['ingresos_periodo'], 2, ',', '.') ?></strong>
+                  </td>
+                  <td>
+                    <?php if ((float)$ds['promedio_valoracion'] > 0): ?>
+                      <span class="admin-table-rating" title="<?= $ds['total_valoraciones'] ?> valoraciones">
+                        ★ <?= number_format((float)$ds['promedio_valoracion'], 1) ?>
+                        <small>(<?= (int)$ds['total_valoraciones'] ?>)</small>
+                      </span>
+                    <?php else: ?>
+                      <span class="text-muted">—</span>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      <?php endif; ?>
+    </div>
   </section>
 
 
@@ -836,6 +1086,17 @@ include '../includes/header.php';
   </form>
 </dialog>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  window.classiaAnalyticsData = {
+    periodo: <?= json_encode($info_rango) ?>,
+    kpis: <?= json_encode($kpis_analiticas) ?>,
+    series: <?= json_encode($series_graficos) ?>,
+    distribucionValoraciones: <?= json_encode($dist_valoraciones) ?>,
+    topServicios: <?= json_encode($top_servicios) ?>
+  };
+</script>
 <script src="<?= $jsPrefix ?>/js/admin.js" defer></script>
+<script src="<?= $jsPrefix ?>/js/admin-charts.js" defer></script>
 
 <?php include '../includes/footer.php'; ?>
