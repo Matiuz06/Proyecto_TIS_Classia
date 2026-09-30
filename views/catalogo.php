@@ -42,6 +42,30 @@ $puedeAgregar = esta_autenticado();
               value="<?= htmlspecialchars($busqueda) ?>"
               placeholder="<?= __t('catalog_search_ph') ?>" />
           </p>
+          <p class="catalog-sort-group">
+            <label for="sort-order"><?= __t('sort_label', 'Ordenar por') ?></label>
+            <select
+              id="sort-order"
+              name="orden"
+              class="catalog-sort-select"
+              aria-label="<?= __t('sort_label', 'Ordenar por') ?>">
+              <option value="reciente"<?= $orden === 'reciente' ? ' selected' : '' ?>>
+                <?= __t('sort_reciente', 'Más reciente') ?>
+              </option>
+              <option value="valoracion"<?= $orden === 'valoracion' ? ' selected' : '' ?>>
+                <?= __t('sort_valoracion', 'Mejor valoración') ?>
+              </option>
+              <option value="popularidad"<?= $orden === 'popularidad' ? ' selected' : '' ?>>
+                <?= __t('sort_popularidad', 'Más popular') ?>
+              </option>
+              <option value="precio_asc"<?= $orden === 'precio_asc' ? ' selected' : '' ?>>
+                <?= __t('sort_precio_asc', 'Precio: menor a mayor') ?>
+              </option>
+              <option value="precio_desc"<?= $orden === 'precio_desc' ? ' selected' : '' ?>>
+                <?= __t('sort_precio_desc', 'Precio: mayor a menor') ?>
+              </option>
+            </select>
+          </p>
           <button type="submit" class="btnAlignIzq"><?= __t('btn_search') ?></button>
         </form>
       </header>
@@ -52,6 +76,9 @@ $puedeAgregar = esta_autenticado();
           <form action="catalogo.php" method="get">
             <?php if (!empty($busqueda)): ?>
               <input type="hidden" name="busqueda" value="<?= htmlspecialchars($busqueda) ?>" />
+            <?php endif; ?>
+            <?php if (!empty($orden) && $orden !== 'reciente'): ?>
+              <input type="hidden" name="orden" value="<?= htmlspecialchars($orden) ?>" />
             <?php endif; ?>
             
             <fieldset>
@@ -189,6 +216,21 @@ $puedeAgregar = esta_autenticado();
                             <dd><strong>$<?= number_format($curso['precio'], 2, ',', '.') ?></strong></dd>
                           </div>
                         </dl>
+                        <?php if ((float)$curso['promedio_valoracion'] > 0): ?>
+                          <p class="catalog-rating" aria-label="Valoración: <?= number_format((float)$curso['promedio_valoracion'], 1) ?> de 5">
+                            <span class="catalog-rating__stars" aria-hidden="true">
+                              <?php
+                                $prom = round((float)$curso['promedio_valoracion']);
+                                for ($i = 1; $i <= 5; $i++): ?>
+                                  <span class="catalog-rating__star<?= $i <= $prom ? ' catalog-rating__star--filled' : '' ?>" aria-hidden="true">★</span>
+                              <?php endfor; ?>
+                            </span>
+                            <span class="catalog-rating__value"><?= number_format((float)$curso['promedio_valoracion'], 1) ?></span>
+                            <?php if ((int)$curso['total_contrataciones'] > 0): ?>
+                              <span class="catalog-rating__count">(<?= (int)$curso['total_contrataciones'] ?>)</span>
+                            <?php endif; ?>
+                          </p>
+                        <?php endif; ?>
                         <p class="catalog-actions">
                           <a class="btn" href="curso.php?id=<?= $curso['id_publicacion'] ?>"><?= __t('btn_view_course') ?></a>
                           <?php if ($puedeAgregar): ?>
@@ -247,6 +289,21 @@ $puedeAgregar = esta_autenticado();
                             <dd><strong>$<?= number_format($serv['precio'], 2, ',', '.') ?></strong></dd>
                           </div>
                         </dl>
+                        <?php if ((float)$serv['promedio_valoracion'] > 0): ?>
+                          <p class="catalog-rating" aria-label="Valoración: <?= number_format((float)$serv['promedio_valoracion'], 1) ?> de 5">
+                            <span class="catalog-rating__stars" aria-hidden="true">
+                              <?php
+                                $prom = round((float)$serv['promedio_valoracion']);
+                                for ($i = 1; $i <= 5; $i++): ?>
+                                  <span class="catalog-rating__star<?= $i <= $prom ? ' catalog-rating__star--filled' : '' ?>" aria-hidden="true">★</span>
+                              <?php endfor; ?>
+                            </span>
+                            <span class="catalog-rating__value"><?= number_format((float)$serv['promedio_valoracion'], 1) ?></span>
+                            <?php if ((int)$serv['total_contrataciones'] > 0): ?>
+                              <span class="catalog-rating__count">(<?= (int)$serv['total_contrataciones'] ?>)</span>
+                            <?php endif; ?>
+                          </p>
+                        <?php endif; ?>
                         <p class="catalog-actions">
                           <a class="btn" href="servicio-detalle.php?id=<?= $serv['id_publicacion'] ?>"><?= __t('btn_request_service') ?></a>
                           <?php if ($puedeAgregar): ?>

@@ -100,7 +100,9 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     INDEX idx_pub_usuario (id_usuario),
     INDEX idx_pub_categoria (id_categoria),
     INDEX idx_pub_estado_tipo (estado, tipo),
-    INDEX idx_pub_fecha (fecha_creacion)
+    INDEX idx_pub_fecha (fecha_creacion),
+    INDEX idx_pub_precio (precio),
+    INDEX idx_pub_tipo_precio (tipo, precio)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =========================================================
@@ -219,7 +221,8 @@ CREATE TABLE IF NOT EXISTS valoraciones (
         UNIQUE (id_contratacion, id_usuario),
     INDEX idx_val_publicacion (id_publicacion),
     INDEX idx_val_usuario (id_usuario),
-    INDEX idx_val_contratacion (id_contratacion)
+    INDEX idx_val_contratacion (id_contratacion),
+    INDEX idx_val_pub_puntuacion (id_publicacion, puntuacion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

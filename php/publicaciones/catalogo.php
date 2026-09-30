@@ -13,9 +13,15 @@ if (empty($_SESSION['csrf_token'])) {
 
 require_once __DIR__ . '/../../config/database.php';
 
-$busqueda = trim($_GET['busqueda'] ?? '');
-$tipo_filtro = trim($_GET['tipo'] ?? '');
+$busqueda        = trim($_GET['busqueda'] ?? '');
+$tipo_filtro     = trim($_GET['tipo'] ?? '');
 $categoria_filtro = isset($_GET['categoria']) ? (int) $_GET['categoria'] : 0;
+
+// Whitelist de criterios de ordenamiento permitidos (REQ-SER-06)
+$ordenes_permitidos = ['reciente', 'valoracion', 'popularidad', 'precio_asc', 'precio_desc'];
+$orden = in_array($_GET['orden'] ?? '', $ordenes_permitidos, true)
+    ? $_GET['orden']
+    : 'reciente';
 $preferencias_usuario = [];
 
 if (esta_autenticado()) {
@@ -38,10 +44,21 @@ try {
     error_log("Error al consultar categorias: " . $e->getMessage());
 }
 
-$sql = "SELECT p.*, c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido 
-        FROM publicaciones p 
-        JOIN categorias c ON p.id_categoria = c.id_categoria 
-        JOIN usuarios u ON p.id_usuario = u.id_usuario 
+// JOIN con valoraciones y contrataciones para soportar ordenamiento dinámico
+$sql = "SELECT
+            p.*,
+            c.nombre_categoria,
+            u.nombre  AS autor_nombre,
+            u.apellido AS autor_apellido,
+            COALESCE(AVG(v.puntuacion), 0)     AS promedio_valoracion,
+            COUNT(DISTINCT dc.id_contratacion) AS total_contrataciones
+        FROM publicaciones p
+        JOIN categorias c  ON p.id_categoria = c.id_categoria
+        JOIN usuarios u    ON p.id_usuario   = u.id_usuario
+        LEFT JOIN valoraciones v
+            ON v.id_publicacion = p.id_publicacion
+        LEFT JOIN detalles_contratacion dc
+            ON dc.id_publicacion = p.id_publicacion
         WHERE p.estado = 'Activo'";
 $params = [];
 
@@ -66,7 +83,18 @@ if ($categoria_filtro > 0) {
     $params['categoria'] = $categoria_filtro;
 }
 
-$sql .= " ORDER BY p.fecha_creacion DESC";
+// GROUP BY necesario por los LEFT JOINs de agregación
+$sql .= " GROUP BY p.id_publicacion, c.nombre_categoria, u.nombre, u.apellido";
+
+// Ordenamiento dinámico
+$orden_sql = match ($orden) {
+    'valoracion'  => 'promedio_valoracion DESC, total_contrataciones DESC, p.fecha_creacion DESC',
+    'popularidad' => 'total_contrataciones DESC, promedio_valoracion DESC, p.fecha_creacion DESC',
+    'precio_asc'  => 'p.precio ASC,  p.fecha_creacion DESC',
+    'precio_desc' => 'p.precio DESC, p.fecha_creacion DESC',
+    default       => 'p.fecha_creacion DESC',
+};
+$sql .= " ORDER BY $orden_sql";
 
 try {
     $stmt = $pdo->prepare($sql);
