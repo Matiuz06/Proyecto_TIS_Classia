@@ -303,6 +303,8 @@ CREATE INDEX IF NOT EXISTS idx_pub_usuario ON publicaciones (id_usuario);
 CREATE INDEX IF NOT EXISTS idx_pub_categoria ON publicaciones (id_categoria);
 CREATE INDEX IF NOT EXISTS idx_pub_estado_tipo ON publicaciones (estado, tipo);
 CREATE INDEX IF NOT EXISTS idx_pub_fecha ON publicaciones (fecha_creacion);
+CREATE INDEX IF NOT EXISTS idx_pub_precio ON publicaciones (precio);
+CREATE INDEX IF NOT EXISTS idx_pub_tipo_precio ON publicaciones (tipo, precio);
 
 CREATE INDEX IF NOT EXISTS idx_sol_usuario ON solicitudes (id_usuario);
 CREATE INDEX IF NOT EXISTS idx_sol_publicacion ON solicitudes (id_publicacion);
@@ -322,6 +324,7 @@ CREATE INDEX IF NOT EXISTS idx_pagos_estado ON pagos (estado_pago);
 CREATE INDEX IF NOT EXISTS idx_val_publicacion ON valoraciones (id_publicacion);
 CREATE INDEX IF NOT EXISTS idx_val_usuario ON valoraciones (id_usuario);
 CREATE INDEX IF NOT EXISTS idx_val_contratacion ON valoraciones (id_contratacion);
+CREATE INDEX IF NOT EXISTS idx_val_pub_puntuacion ON valoraciones (id_publicacion, puntuacion);
 
 -- ============================================================================
 -- INSERCIÓN DE DATOS SEMILLA INICIALES
