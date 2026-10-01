@@ -46,13 +46,11 @@ include '../includes/header.php';
     <section class="profile-hero" aria-labelledby="perfil-usuario">
       <div class="profile-hero-content">
         <div class="profile-avatar-wrapper">
-          <?php 
-            $fotoPerfil = (string) ($userData['foto_perfil'] ?? '');
-            $fotoPerfilSrc = $fotoPerfil !== ''
-              ? (preg_match('#^https?://#i', $fotoPerfil) ? $fotoPerfil : $cssPrefix . '/' . ltrim($fotoPerfil, '/'))
-              : ($cssPrefix . '/assets/images/default-avatar.svg');
+          <?php
+            $fotoPerfilSrc = obtener_avatar_usuario($userData, $cssPrefix, 256);
+            $avatarFallback = obtener_avatar_default($cssPrefix);
           ?>
-          <img src="<?php echo htmlspecialchars($fotoPerfilSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre']); ?>" class="profile-avatar-img" />
+          <img src="<?php echo htmlspecialchars($fotoPerfilSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre'], ENT_QUOTES, 'UTF-8'); ?>" class="profile-avatar-img" onerror="this.onerror=null;this.src='<?php echo htmlspecialchars($avatarFallback, ENT_QUOTES, 'UTF-8'); ?>';" />
           
           <div class="profile-avatar-actions">
             <form action="../php/usuarios/foto_perfil.php" method="POST" enctype="multipart/form-data" class="profile-photo-form">

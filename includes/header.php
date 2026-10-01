@@ -10,6 +10,7 @@ iniciar_sesion();
 require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../php/auth/guardia_onboarding.php';
 require_once __DIR__ . '/../php/utils/i18n.php';
+require_once __DIR__ . '/../php/utils/avatar_helper.php';
 
 $current_lang = inicializar_i18n();
 
@@ -37,6 +38,7 @@ $noticiasHref = ($cssPrefix === '.') ? 'views/noticias.php'  : 'noticias.php';
 
 $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
+$defaultAvatarSrc = obtener_avatar_default($cssPrefix);
 $onboardingHref = ($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php';
 requerir_onboarding_completo($onboardingHref);
 
@@ -88,7 +90,7 @@ $cartCount = count($cartItems);
           <div class="user-nav-dropdown">
             <a href="<?= $loginHref ?>" class="user-nav-trigger" title="Acceder a tu cuenta">
               <span class="user-nav-name"><?= __t('nav_cuenta') ?></span>
-              <img src="<?= $cssPrefix ?>/assets/images/default-avatar.svg" alt="Cuenta" class="user-nav-avatar" />
+              <img src="<?= htmlspecialchars($defaultAvatarSrc, ENT_QUOTES, 'UTF-8') ?>" alt="Cuenta" class="user-nav-avatar" />
               <span class="user-nav-caret" aria-hidden="true">&#9662;</span>
             </a>
 
@@ -103,16 +105,13 @@ $cartCount = count($cartItems);
           </div>
         <?php else: ?>
           <?php
-            $fotoPerfil = (string) ($currentUser['foto_perfil'] ?? '');
-            $navAvatarSrc = $fotoPerfil !== ''
-              ? (preg_match('#^https?://#i', $fotoPerfil) ? $fotoPerfil : $cssPrefix . '/' . ltrim($fotoPerfil, '/'))
-              : ($cssPrefix . '/assets/images/default-avatar.svg');
+            $navAvatarSrc = obtener_avatar_usuario($currentUser ?? [], $cssPrefix, 64);
             $primerNombre = htmlspecialchars(explode(' ', trim($currentUser['nombre'] ?? 'Usuario'))[0]);
           ?>
           <div class="user-nav-dropdown">
             <a href="<?= $cuentaHref ?>" class="user-nav-trigger" title="Ir a mi cuenta (<?= $primerNombre ?>)">
               <span class="user-nav-name"><?= $primerNombre ?></span>
-              <img src="<?= htmlspecialchars($navAvatarSrc, ENT_QUOTES, 'UTF-8') ?>" alt="Avatar de <?= $primerNombre ?>" class="user-nav-avatar" />
+              <img src="<?= htmlspecialchars($navAvatarSrc, ENT_QUOTES, 'UTF-8') ?>" alt="Avatar de <?= $primerNombre ?>" class="user-nav-avatar" onerror="this.onerror=null;this.src='<?= htmlspecialchars($defaultAvatarSrc, ENT_QUOTES, 'UTF-8') ?>';" />
               <span class="user-nav-caret" aria-hidden="true">&#9662;</span>
             </a>
 

@@ -132,13 +132,11 @@ include '../includes/header.php';
         <section class="provider-hero-card" aria-labelledby="titulo-perfil-profesional">
             <div class="provider-hero-inner">
                 <div class="profile-avatar-wrapper">
-                    <?php 
-                        $fotoPerfil = (string)($perfil['foto_perfil'] ?? '');
-                        $fotoSrc = $fotoPerfil !== ''
-                            ? (preg_match('#^https?://#i', $fotoPerfil) ? $fotoPerfil : $cssPrefix . '/' . ltrim($fotoPerfil, '/'))
-                            : ($cssPrefix . '/assets/images/default-avatar.svg');
+                    <?php
+                        $fotoSrc = obtener_avatar_usuario($perfil, $cssPrefix, 256);
+                        $avatarFallback = obtener_avatar_default($cssPrefix);
                     ?>
-                    <img src="<?= htmlspecialchars($fotoSrc, ENT_QUOTES, 'UTF-8') ?>" alt="Foto de <?= htmlspecialchars($nombreCompleto) ?>" class="provider-hero-avatar" />
+                    <img src="<?= htmlspecialchars($fotoSrc, ENT_QUOTES, 'UTF-8') ?>" alt="Foto de <?= htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8') ?>" class="provider-hero-avatar" onerror="this.onerror=null;this.src='<?= htmlspecialchars($avatarFallback, ENT_QUOTES, 'UTF-8') ?>';" />
                 </div>
 
                 <div class="profile-hero-text">
