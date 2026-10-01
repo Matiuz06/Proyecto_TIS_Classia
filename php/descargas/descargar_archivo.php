@@ -43,6 +43,22 @@ if ($tipo === 'recurso' && $id > 0) {
         $ruta = $row['archivo_entrega'];
         $nombreDescarga = 'entrega_' . $row['titulo'];
     }
+} elseif ($tipo === 'entrega_archivo' && $id > 0) {
+    $stmt = $pdo->prepare("SELECT a.ruta, a.nombre_original, e.id_usuario, p.id_usuario AS docente_id FROM curso_entrega_archivos a JOIN curso_entregas e ON e.id_entrega=a.id_entrega JOIN curso_tareas t ON t.id_tarea=e.id_tarea JOIN curso_recursos r ON r.id_recurso=t.id_recurso JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo JOIN publicaciones p ON p.id_publicacion=m.id_publicacion WHERE a.id_archivo=:id LIMIT 1");
+    $stmt->execute(['id' => $id]);
+    $row = $stmt->fetch();
+    if ($row && (es_admin() || (int)$row['id_usuario'] === $uid || (int)$row['docente_id'] === $uid)) {
+        $ruta = $row['ruta'];
+        $nombreDescarga = $row['nombre_original'] ?: 'entrega';
+    }
+} elseif ($tipo === 'feedback' && $id > 0) {
+    $stmt = $pdo->prepare("SELECT e.archivo_feedback, e.id_usuario, r.titulo, p.id_usuario AS docente_id FROM curso_entregas e JOIN curso_tareas t ON t.id_tarea=e.id_tarea JOIN curso_recursos r ON r.id_recurso=t.id_recurso JOIN curso_unidades u ON u.id_unidad=r.id_unidad JOIN curso_modulos m ON m.id_modulo=u.id_modulo JOIN publicaciones p ON p.id_publicacion=m.id_publicacion WHERE e.id_entrega=:id LIMIT 1");
+    $stmt->execute(['id' => $id]);
+    $row = $stmt->fetch();
+    if ($row && (es_admin() || (int)$row['id_usuario'] === $uid || (int)$row['docente_id'] === $uid)) {
+        $ruta = $row['archivo_feedback'];
+        $nombreDescarga = 'feedback_' . $row['titulo'];
+    }
 }
 
 $modo = $_GET['modo'] ?? 'descargar';
