@@ -307,18 +307,66 @@ CREATE TABLE IF NOT EXISTS curso_recursos (
     INDEX idx_curso_recursos_unidad_orden (id_unidad,orden)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS curso_tareas (
+    id_tarea INT AUTO_INCREMENT PRIMARY KEY,
+    id_recurso INT NOT NULL,
+    fecha_disponible DATETIME NULL,
+    fecha_limite DATETIME NULL,
+    fecha_cierre DATETIME NULL,
+    permite_entrega_tardia TINYINT(1) NOT NULL DEFAULT 0,
+    permite_archivos TINYINT(1) NOT NULL DEFAULT 1,
+    permite_texto TINYINT(1) NOT NULL DEFAULT 0,
+    permite_enlace TINYINT(1) NOT NULL DEFAULT 0,
+    max_archivos INT NOT NULL DEFAULT 1,
+    max_tamano_mb INT NOT NULL DEFAULT 20,
+    formatos_permitidos JSON NULL,
+    requisito_entrega ENUM('cualquiera','todos') NOT NULL DEFAULT 'cualquiera',
+    puntaje_maximo DECIMAL(8,2) NULL,
+    tipo_calificacion ENUM('numerica','aprobado_reprobado','sin_calificacion') NOT NULL DEFAULT 'numerica',
+    permite_feedback_archivo TINYINT(1) NOT NULL DEFAULT 0,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_curso_tareas_recurso FOREIGN KEY (id_recurso) REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uq_curso_tareas_recurso (id_recurso)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS curso_entregas (
     id_entrega INT AUTO_INCREMENT PRIMARY KEY,
+    id_tarea INT NOT NULL,
     id_recurso INT NOT NULL,
     id_usuario INT NOT NULL,
     archivo_entrega VARCHAR(500) NULL,
+    texto_entrega TEXT NULL,
+    enlace_entrega VARCHAR(500) NULL,
     comentario_entrega TEXT NULL,
     estado ENUM('Entregada', 'Calificada') NOT NULL DEFAULT 'Entregada',
-    calificacion DECIMAL(4,2) NULL,
-    fecha_entrega DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    estado_entrega ENUM('borrador','entregada') NOT NULL DEFAULT 'entregada',
+    calificacion VARCHAR(30) NULL,
+    feedback_docente TEXT NULL,
+    archivo_feedback VARCHAR(500) NULL,
+    fecha_calificacion DATETIME NULL,
+    id_docente_calificador INT NULL,
+    fecha_entrega DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_curso_entregas_tarea FOREIGN KEY (id_tarea) REFERENCES curso_tareas(id_tarea) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_curso_entregas_recurso FOREIGN KEY (id_recurso) REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_curso_entregas_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
-    UNIQUE KEY uk_recurso_usuario (id_recurso, id_usuario)
+    CONSTRAINT fk_curso_entregas_docente FOREIGN KEY (id_docente_calificador) REFERENCES usuarios(id_usuario) ON DELETE SET NULL ON UPDATE CASCADE,
+    UNIQUE KEY uk_tarea_usuario (id_tarea, id_usuario),
+    INDEX idx_curso_entregas_tarea_fecha (id_tarea, fecha_entrega)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_entrega_archivos (
+    id_archivo INT AUTO_INCREMENT PRIMARY KEY,
+    id_entrega INT NOT NULL,
+    nombre_original VARCHAR(255) NOT NULL,
+    ruta VARCHAR(500) NOT NULL,
+    mime_type VARCHAR(120) NULL,
+    extension VARCHAR(20) NULL,
+    tamano BIGINT NULL,
+    fecha_subida DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_curso_entrega_archivos_entrega FOREIGN KEY (id_entrega) REFERENCES curso_entregas(id_entrega) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_entrega_archivos_entrega (id_entrega)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS curso_foro_mensajes (

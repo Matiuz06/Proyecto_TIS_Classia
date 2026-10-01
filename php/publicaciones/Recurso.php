@@ -53,6 +53,11 @@ class Recurso extends ElementoCurso
     public function getUrl(): ?string   { return $this->url; }
     public function getArchivo(): ?string { return $this->archivo; }
 
+    public function esTarea(): bool
+    {
+        return $this->tipo === 'Entrega de Tareas';
+    }
+
     //Presentación / utilidades
 
     /**

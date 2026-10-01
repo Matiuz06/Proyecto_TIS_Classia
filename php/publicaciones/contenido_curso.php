@@ -18,6 +18,7 @@ require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/file_upload_helper.php';
 require_once __DIR__ . '/../utils/supabase_storage.php';
 require_once __DIR__ . '/ContenidoCursoRepository.php';   // incluye Modulo, Unidad, Recurso
+require_once __DIR__ . '/TareaRepository.php';
 
 //Instancia del repositorio
 
@@ -112,6 +113,20 @@ function icono_recurso_curso(string $tipo): string
     return $r->getIcono();
 }
 
+function tarea_repo(PDO $pdo): TareaRepository
+{
+    static $repo = null;
+    if ($repo === null) {
+        $repo = new TareaRepository($pdo);
+    }
+    return $repo;
+}
+
+function obtener_tarea_por_recurso(PDO $pdo, int $id_recurso): ?Tarea
+{
+    return tarea_repo($pdo)->buscarPorRecurso($id_recurso);
+}
+
 /**
  * @deprecated Usar Recurso->getEmojiIcono().
  */
@@ -128,7 +143,7 @@ function recurso_archivo_permite_tipo(string $tipo, string $nombre): bool
     if ($tipo === 'Imagen') return in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true);
     if ($tipo === 'Video')  return in_array($ext, ['mp4', 'webm'], true);
     if (in_array($tipo, ['Archivo', 'Foro', 'Entrega de Tareas'], true)) {
-        return in_array($ext, ['pdf', 'zip', 'rar', '7z', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'webm', 'stl', 'obj', '3mf'], true);
+        return in_array($ext, ['pdf', 'zip', 'rar', '7z', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'json', 'xml', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'webm', 'stl', 'obj', '3mf'], true);
     }
     return true;
 }
@@ -297,10 +312,42 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
                 'o'   => max(1, (int)($post['orden'] ?? 1)),
             ];
 
+            $tareaRepo = tarea_repo($pdo);
+            $tareaPendiente = null;
+            if ($tipo === 'Entrega de Tareas') {
+                $tareaPendiente = Tarea::desdeFormulario($rid, $post);
+                $erroresTarea = $tareaPendiente->validar();
+                if ($erroresTarea) {
+                    return ['ok' => false, 'mensaje' => $erroresTarea[0]];
+                }
+            }
+
             if ($a === 'agregar_recurso') {
-                $repo->crearRecurso($data);
+                if ($tipo === 'Entrega de Tareas') {
+                    $pdo->beginTransaction();
+                    $ridNuevo = $repo->crearRecurso($data);
+                    $datosTarea = $tareaPendiente->toArray();
+                    $datosTarea['id_recurso'] = $ridNuevo;
+                    $tareaRepo->crear(Tarea::fromArray($datosTarea));
+                    $pdo->commit();
+                } else {
+                    $repo->crearRecurso($data);
+                }
             } else {
-                $repo->editarRecurso($rid, $data);
+                if ($tipo === 'Entrega de Tareas') {
+                    $pdo->beginTransaction();
+                    $repo->editarRecurso($rid, $data);
+                    $datosTarea = $tareaPendiente->toArray();
+                    $datosTarea['id_recurso'] = $rid;
+                    $datosTarea['id_tarea'] = $tareaRepo->buscarPorRecurso($rid)?->getId();
+                    $tareaRepo->guardar(Tarea::fromArray($datosTarea));
+                    $pdo->commit();
+                } else {
+                    $repo->editarRecurso($rid, $data);
+                    if (($actual['tipo'] ?? '') === 'Entrega de Tareas') {
+                        $tareaRepo->eliminarPorRecurso($rid);
+                    }
+                }
                 // Limpiar archivo anterior si se reemplazó
                 if ($nuevo && !empty($actual['archivo']) && $actual['archivo'] !== $nuevo) {
                     _eliminar_archivo_storage($actual['archivo']);
@@ -325,7 +372,7 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
 
         return ['ok' => true, 'mensaje' => 'Contenido actualizado correctamente.'];
 
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         error_log('Contenido curso: ' . $e->getMessage());
         return ['ok' => false, 'mensaje' => 'No se pudo actualizar el contenido del curso.'];

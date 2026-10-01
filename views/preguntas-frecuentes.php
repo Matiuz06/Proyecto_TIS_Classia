@@ -92,7 +92,8 @@ include '../includes/header.php';
       <h2 id="faq-9"><span class="section-num" aria-hidden="true">9</span> ¿Qué hago si no aparece mi foto de Google?</h2>
       <p>
         La foto se carga desde la URL proporcionada por Google y puede depender de la conexión o de los permisos de la
-        cuenta. Si no está disponible, Classia muestra el avatar predeterminado; también podés subir una imagen desde tu perfil.
+        cuenta. Si no tenés una foto elegida, Classia genera automáticamente un avatar para tu cuenta; también podés
+        sustituirlo subiendo una imagen desde tu perfil.
       </p>
     </section>
 

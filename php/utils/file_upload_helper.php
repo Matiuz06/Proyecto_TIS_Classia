@@ -23,6 +23,15 @@ function eliminar_archivo_guardado(?string $ruta): bool
     return is_file($abs) ? unlink($abs) : false;
 }
 
+function eliminar_archivo_storage(?string $ruta): bool
+{
+    if (!$ruta) return true;
+    if (str_starts_with($ruta, 'supabase:')) {
+        return function_exists('supabase_eliminar_archivo') && supabase_eliminar_archivo(substr($ruta, 9));
+    }
+    return eliminar_archivo_guardado($ruta);
+}
+
 function guardar_archivo_subido(array $archivo, string $subcarpeta, int $max_megabytes = 20): array
 {
     if (!isset($archivo['error']) || is_array($archivo['error'])) return ['ok'=>false,'error'=>'Parámetros de archivo no válidos.'];
@@ -44,7 +53,7 @@ function guardar_archivo_subido(array $archivo, string $subcarpeta, int $max_meg
 
     $nombreOriginal = (string)($archivo['name'] ?? '');
     $extensionOriginal = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
-    $extPermitidas = ['pdf','zip','rar','7z','doc','docx','ppt','pptx','pps','ppsx','xls','xlsx','odt','ods','odp','txt','csv','jpg','jpeg','png','webp','gif','mp4','webm','stl','obj','3mf'];
+    $extPermitidas = ['pdf','zip','rar','7z','doc','docx','ppt','pptx','pps','ppsx','xls','xlsx','odt','ods','odp','txt','csv','json','xml','jpg','jpeg','png','webp','gif','mp4','webm','stl','obj','3mf'];
     if (!in_array($extensionOriginal, $extPermitidas, true)) return ['ok'=>false,'error'=>'La extensión del archivo no está permitida.'];
 
     $mimePermitidos = [
@@ -66,6 +75,9 @@ function guardar_archivo_subido(array $archivo, string $subcarpeta, int $max_meg
         'application/vnd.oasis.opendocument.presentation'=>['odp'],
         'text/plain'=>['txt', 'csv'],
         'text/csv'=>['csv'],
+        'application/json'=>['json'],
+        'text/xml'=>['xml'],
+        'application/xml'=>['xml'],
         'image/jpeg'=>['jpg','jpeg'],
         'image/png'=>['png'],
         'image/webp'=>['webp'],

@@ -182,6 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const urlLabel = form.querySelector('[data-field-container="url"]');
     const descLabel = form.querySelector('[data-field-container="descripcion"]');
     const hintElem = form.querySelector("[data-resource-hint]");
+    const taskConfig = form.querySelector("[data-task-config]");
 
     if (hintElem) {
       hintElem.textContent = HINTS_RECURSOS[tipo] || "";
@@ -191,6 +192,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const isVideo = tipo === "Video";
     const isForum = tipo === "Foro";
     const isTask = tipo === "Entrega de Tareas";
+
+    if (taskConfig) {
+      taskConfig.hidden = !isTask;
+      taskConfig.querySelectorAll("input, select, textarea").forEach((control) => {
+        control.disabled = !isTask;
+      });
+    }
 
     if (urlLabel) {
       const urlInput = urlLabel.querySelector("input");

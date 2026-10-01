@@ -278,15 +278,17 @@ include '../includes/header.php';
                           <?php endif; ?>
                         <?php endif; ?>
                         <?php if ($recurso['tipo'] === 'Entrega de Tareas'): ?>
-                          <?php $entrega = $mis_entregas[$recurso['id_recurso']] ?? null; ?>
+                          <?php $tarea = $tareas_curso[$recurso['id_recurso']] ?? null; $entrega = $mis_entregas[$recurso['id_recurso']] ?? null; $puedeEntregarTarea = !$tarea || $tarea->puedeEntregar(new DateTimeImmutable()); ?>
                           <?php if ($entrega): ?>
                             <button class="btn btn-sm btn-outline" type="button" data-dialog-open="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
                               ✓ Ver / Actualizar entrega
                             </button>
-                          <?php else: ?>
+                          <?php elseif ($puedeEntregarTarea): ?>
                             <button class="btn btn-sm btn-primary-action" type="button" data-dialog-open="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
                               📤 Entregar tarea
                             </button>
+                          <?php else: ?>
+                            <span class="badge badge-warning-soft">No acepta entregas ahora</span>
                           <?php endif; ?>
                         <?php endif; ?>
                       </div>
@@ -389,7 +391,7 @@ include '../includes/header.php';
                     <?php endif; ?>
 
                     <?php if ($recurso['tipo'] === 'Entrega de Tareas'): ?>
-                      <?php $entrega = $mis_entregas[$recurso['id_recurso']] ?? null; ?>
+                      <?php $tarea = $tareas_curso[$recurso['id_recurso']] ?? null; $entrega = $mis_entregas[$recurso['id_recurso']] ?? null; $archivosEntrega = $entrega ? ($archivos_entregas[(int)$entrega['id_entrega']] ?? []) : []; $puedeEntregarTarea = !$tarea || $tarea->puedeEntregar(new DateTimeImmutable()); ?>
                       <dialog class="course-dialog" id="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
                         <div class="course-dialog-header">
                           <h2 id="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">Entrega de tarea: <?= htmlspecialchars($recurso['titulo']) ?></h2>
@@ -402,11 +404,17 @@ include '../includes/header.php';
                               <p><?= nl2br(htmlspecialchars($recurso['descripcion'])) ?></p>
                             </div>
                           <?php endif; ?>
+                          <?php if ($tarea): ?>
+                            <div class="course-delivery-consigna u-mb-md">
+                              <strong>Fecha limite:</strong>
+                              <p><?= $tarea->getFechaLimite() ? date('d/m/Y H:i', strtotime($tarea->getFechaLimite())) . ' hs' : 'Pendiente de definir por el docente' ?><?= $tarea->getFechaCierre() ? ' - Cierre: ' . date('d/m/Y H:i', strtotime($tarea->getFechaCierre())) . ' hs' : '' ?></p>
+                            </div>
+                          <?php endif; ?>
 
                           <?php if ($entrega): ?>
                             <div class="alert alert-success u-mb-md">
                               <p><strong>Estado:</strong> Entregada el <?= date('d/m/Y H:i', strtotime($entrega['fecha_entrega'])) ?> hs.</p>
-                              <?php if (!empty($entrega['archivo_entrega'])): ?>
+                              <?php if (!empty($entrega['archivo_entrega']) && empty($archivosEntrega)): ?>
                                 <?php $entregaVisualizable = recurso_es_visualizable_nativamente('Archivo', $entrega['archivo_entrega']); ?>
                                 <div class="course-delivery-actions-row">
                                   <?php if ($entregaVisualizable): ?>
@@ -414,6 +422,19 @@ include '../includes/header.php';
                                   <?php endif; ?>
                                   <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=entrega&id=<?= (int)$entrega['id_entrega'] ?>&modo=descargar">📥 Descargar mi archivo entregado</a>
                                 </div>
+                              <?php endif; ?>
+                              <?php if ($archivosEntrega): ?>
+                                <div class="course-delivery-actions-row">
+                                  <?php foreach ($archivosEntrega as $archivoEntregado): ?>
+                                    <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=<?= !empty($archivoEntregado['legacy']) ? 'entrega' : 'entrega_archivo' ?>&id=<?= !empty($archivoEntregado['legacy']) ? (int)$entrega['id_entrega'] : (int)$archivoEntregado['id_archivo'] ?>&modo=descargar"><?= htmlspecialchars($archivoEntregado['nombre_original']) ?></a>
+                                  <?php endforeach; ?>
+                                </div>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['texto_entrega'])): ?>
+                                <p class="u-mt-xs"><strong>Texto:</strong> <?= nl2br(htmlspecialchars($entrega['texto_entrega'])) ?></p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['enlace_entrega'])): ?>
+                                <p class="u-mt-xs"><strong>Enlace:</strong> <a href="<?= htmlspecialchars($entrega['enlace_entrega']) ?>" target="_blank" rel="noopener">Abrir enlace entregado</a></p>
                               <?php endif; ?>
                               <?php if (!empty($entrega['comentario_entrega'])): ?>
                                 <p class="u-mt-xs"><strong>Tus notas:</strong> <?= nl2br(htmlspecialchars($entrega['comentario_entrega'])) ?></p>
@@ -428,9 +449,26 @@ include '../includes/header.php';
                             <input type="hidden" name="id_unidad" value="<?= (int)($unidad['id_unidad'] ?? 0) ?>">
 
                             <label class="form-grid-full">
-                              <?= $entrega ? 'Reemplazar o adjuntar archivo de entrega' : 'Adjuntar archivo de entrega (PDF, DOCX, ZIP, imágenes)' ?>
-                              <input type="file" name="archivo_entrega" <?= !$entrega ? 'required' : '' ?>>
+                              <?= $entrega ? 'Reemplazar archivos de la entrega' : 'Adjuntar archivos de entrega' ?>
+                              <input type="file" name="archivo_entrega[]" multiple <?= ($tarea && !$tarea->permiteArchivos()) ? 'disabled' : '' ?>>
                             </label>
+                            <?php if ($entrega && $archivosEntrega): ?>
+                              <p class="form-grid-full text-muted">Si no seleccionas archivos nuevos, se conservaran los enviados anteriormente. Los archivos seleccionados reemplazaran a los anteriores.</p>
+                            <?php endif; ?>
+
+                            <?php if ($tarea && $tarea->permiteTexto()): ?>
+                              <label class="form-grid-full">
+                                Texto en linea
+                                <textarea name="texto_entrega" rows="4"><?= htmlspecialchars($entrega['texto_entrega'] ?? '') ?></textarea>
+                              </label>
+                            <?php endif; ?>
+
+                            <?php if ($tarea && $tarea->permiteEnlace()): ?>
+                              <label class="form-grid-full">
+                                Enlace de entrega
+                                <input type="url" name="enlace_entrega" value="<?= htmlspecialchars($entrega['enlace_entrega'] ?? '') ?>" placeholder="https://...">
+                              </label>
+                            <?php endif; ?>
 
                             <label class="form-grid-full">
                               Comentarios o respuesta escrita (opcional)
@@ -439,7 +477,7 @@ include '../includes/header.php';
 
                             <div class="course-dialog-actions form-grid-full">
                               <button class="btn btn-secondary" type="button" data-dialog-close>Cancelar</button>
-                              <button class="btn btn-primary-action" type="submit"><?= $entrega ? 'Actualizar entrega' : 'Enviar entrega' ?></button>
+                              <button class="btn btn-primary-action" type="submit" <?= $puedeEntregarTarea ? '' : 'disabled' ?>><?= $entrega ? 'Actualizar entrega' : 'Enviar entrega' ?></button>
                             </div>
                           </form>
                         </div>

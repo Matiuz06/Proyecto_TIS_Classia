@@ -7,6 +7,7 @@
 require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 require_once '../php/publicaciones/contenido_curso.php';
+require_once '../php/publicaciones/EntregaRepository.php';
 
 if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 $usuario = usuario_actual();
@@ -25,6 +26,8 @@ if (!$curso) {
 }
 
 $contenido = $curso ? obtener_contenido_curso($pdo, $id_publicacion) : [];
+$tareaRepoVista = $curso ? tarea_repo($pdo) : null;
+$entregaRepoVista = $curso ? new EntregaRepository($pdo) : null;
 $total_clases = array_sum(array_map(fn($m) => count($m['unidades']), $contenido));
 $total_recursos = 0;
 foreach ($contenido as $modulo) foreach ($modulo['unidades'] as $unidad) $total_recursos += count($unidad['recursos']);
@@ -32,6 +35,83 @@ foreach ($contenido as $modulo) foreach ($modulo['unidades'] as $unidad) $total_
 function campo_base_curso(int $id_publicacion): void { ?>
   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
   <input type="hidden" name="id_publicacion" value="<?= $id_publicacion ?>">
+<?php }
+
+function valor_datetime_local(?string $fecha): string
+{
+    return $fecha ? date('Y-m-d\TH:i', strtotime($fecha)) : '';
+}
+
+function grupos_de_tarea_para_formatos(array $formatos): array
+{
+    $grupos = [];
+    foreach (Tarea::gruposFormatos() as $grupo => $exts) {
+        if (array_intersect($exts, $formatos)) $grupos[] = $grupo;
+    }
+    return $grupos;
+}
+
+function campos_tarea(?Tarea $tarea = null): void
+{
+    $d = $tarea?->toArray() ?? [
+        'id_tarea' => null,
+        'fecha_disponible' => null,
+        'fecha_limite' => '',
+        'fecha_cierre' => null,
+        'permite_entrega_tardia' => true,
+        'permite_archivos' => true,
+        'permite_texto' => false,
+        'permite_enlace' => false,
+        'max_archivos' => 1,
+        'max_tamano_mb' => 20,
+        'formatos_permitidos' => ['pdf', 'doc', 'docx', 'txt', 'zip'],
+        'requisito_entrega' => 'cualquiera',
+        'puntaje_maximo' => 10,
+        'tipo_calificacion' => 'numerica',
+        'permite_feedback_archivo' => false,
+    ];
+    $gruposSeleccionados = grupos_de_tarea_para_formatos($d['formatos_permitidos']);
+    ?>
+    <fieldset class="task-config form-grid-full" data-task-config>
+      <legend>Configuracion de tarea</legend>
+      <input type="hidden" name="id_tarea" value="<?= (int)($d['id_tarea'] ?? 0) ?>">
+      <label>Disponible desde<input type="datetime-local" name="fecha_disponible" value="<?= htmlspecialchars(valor_datetime_local($d['fecha_disponible'])) ?>"></label>
+      <label>Fecha limite<input type="datetime-local" name="fecha_limite" value="<?= htmlspecialchars(valor_datetime_local($d['fecha_limite'])) ?>" data-task-required required></label>
+      <label>Fecha de cierre<input type="datetime-local" name="fecha_cierre" value="<?= htmlspecialchars(valor_datetime_local($d['fecha_cierre'])) ?>"></label>
+      <label class="course-check"><input type="checkbox" name="permite_entrega_tardia" value="1" <?= $d['permite_entrega_tardia'] ? 'checked' : '' ?>> Permitir entrega tardia</label>
+
+      <fieldset class="form-grid-full task-options">
+        <legend>Tipos de entrega</legend>
+        <label class="course-check"><input type="checkbox" name="tipos_entrega[]" value="archivos" <?= $d['permite_archivos'] ? 'checked' : '' ?>> Archivos</label>
+        <label class="course-check"><input type="checkbox" name="tipos_entrega[]" value="texto" <?= $d['permite_texto'] ? 'checked' : '' ?>> Texto en linea</label>
+        <label class="course-check"><input type="checkbox" name="tipos_entrega[]" value="enlace" <?= $d['permite_enlace'] ? 'checked' : '' ?>> Enlace</label>
+        <label>Requisito
+          <select name="requisito_entrega">
+            <option value="cualquiera" <?= $d['requisito_entrega'] === 'cualquiera' ? 'selected' : '' ?>>Al menos uno</option>
+            <option value="todos" <?= $d['requisito_entrega'] === 'todos' ? 'selected' : '' ?>>Todos</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <label>Cantidad maxima de archivos<input type="number" min="1" name="max_archivos" value="<?= (int)$d['max_archivos'] ?>"></label>
+      <label>Tamano maximo por archivo (MB)<input type="number" min="1" name="max_tamano_mb" value="<?= (int)$d['max_tamano_mb'] ?>"></label>
+      <fieldset class="form-grid-full task-options">
+        <legend>Formatos permitidos</legend>
+        <?php foreach (Tarea::gruposFormatos() as $grupo => $exts): ?>
+          <label class="course-check"><input type="checkbox" name="formatos_grupos[]" value="<?= htmlspecialchars($grupo) ?>" <?= in_array($grupo, $gruposSeleccionados, true) ? 'checked' : '' ?>> <?= htmlspecialchars(ucfirst($grupo)) ?> <small><?= htmlspecialchars(implode(', ', $exts)) ?></small></label>
+        <?php endforeach; ?>
+      </fieldset>
+
+      <label>Tipo de calificacion
+        <select name="tipo_calificacion">
+          <option value="numerica" <?= $d['tipo_calificacion'] === 'numerica' ? 'selected' : '' ?>>Numerica</option>
+          <option value="aprobado_reprobado" <?= $d['tipo_calificacion'] === 'aprobado_reprobado' ? 'selected' : '' ?>>Aprobado / Reprobado</option>
+          <option value="sin_calificacion" <?= $d['tipo_calificacion'] === 'sin_calificacion' ? 'selected' : '' ?>>Sin calificacion</option>
+        </select>
+      </label>
+      <label>Puntaje maximo<input type="number" min="0.01" step="0.01" name="puntaje_maximo" value="<?= htmlspecialchars((string)($d['puntaje_maximo'] ?? '')) ?>"></label>
+      <label class="course-check"><input type="checkbox" name="permite_feedback_archivo" value="1" <?= $d['permite_feedback_archivo'] ? 'checked' : '' ?>> Permitir archivo de devolucion</label>
+    </fieldset>
 <?php }
 
 $title = 'Contenido del curso';
@@ -181,6 +261,16 @@ include '../includes/header.php';
                               <div class="course-resource-actions">
                                 <?php if ($r['url']): ?><a href="<?= htmlspecialchars($r['url']) ?>" target="_blank" rel="noopener">Abrir</a><?php endif; ?>
                                 <?php if ($r['archivo']): ?><a href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$r['id_recurso'] ?>">Descargar</a><?php endif; ?>
+                                <?php if ($r['tipo'] === 'Entrega de Tareas'): ?>
+                                  <?php $tareaCard = $tareaRepoVista->buscarPorRecurso((int)$r['id_recurso']); ?>
+                                  <?php if ($tareaCard): ?>
+                                    <?php $resumenTarea = $entregaRepoVista->obtenerResumenPorTarea((int)$tareaCard->getId(), $id_publicacion); ?>
+                                    <a href="entregas-tarea.php?id=<?= (int)$tareaCard->getId() ?>">Ver entregas</a>
+                                    <span><?= (int)$resumenTarea['total'] ?> estudiantes · <?= (int)$resumenTarea['entregaron'] ?> entregaron · <?= (int)$resumenTarea['calificadas'] ?> calificadas</span>
+                                  <?php else: ?>
+                                    <span>Tarea pendiente de configuracion</span>
+                                  <?php endif; ?>
+                                <?php endif; ?>
                               </div>
                             </div>
                             <div class="course-actions course-resource-controls">
@@ -243,6 +333,7 @@ include '../includes/header.php';
                                 <label class="form-grid-full" data-field-container="descripcion">Consigna / Descripción
                                   <textarea name="descripcion_recurso" rows="3"><?= htmlspecialchars($r['descripcion'] ?? '') ?></textarea>
                                 </label>
+                                <?php campos_tarea($r['tipo'] === 'Entrega de Tareas' ? $tareaRepoVista->buscarPorRecurso((int)$r['id_recurso']) : null); ?>
                                 <div class="course-dialog-actions form-grid-full">
                                   <button class="btn btn-secondary" type="button" data-dialog-close>Cancelar</button>
                                   <button class="btn btn-primary-action" type="submit">Guardar recurso</button>
@@ -301,6 +392,7 @@ include '../includes/header.php';
                         <label class="form-grid-full" data-field-container="descripcion">Consigna / Descripción
                           <textarea name="descripcion_recurso" rows="3" placeholder="Detallá la descripción, consigna o pautas para los estudiantes..."></textarea>
                         </label>
+                        <?php campos_tarea(); ?>
                         <div class="course-dialog-actions form-grid-full">
                           <button class="btn btn-secondary" type="button" data-dialog-close>Cancelar</button>
                           <button class="btn btn-primary-action" type="submit">Agregar recurso</button>
