@@ -81,7 +81,7 @@ include '../includes/header.php';
         </div>
         <figure class="course-page-cover">
           <?php if (!empty($curso['imagen'])): ?>
-            <img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>">
+            <img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" loading="lazy">
           <?php else: ?>
             <div class="course-page-cover__placeholder">Classia</div>
           <?php endif; ?>
@@ -525,7 +525,7 @@ include '../includes/header.php';
             </div>
           </div>
           <?php if (!empty($curso['imagen'])): ?>
-            <div class="product-media-wrapper"><img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>"></div>
+            <div class="product-media-wrapper"><img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" loading="lazy"></div>
           <?php endif; ?>
           <div class="product-body">
             <h3>Acerca de este curso</h3>

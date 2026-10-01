@@ -43,12 +43,24 @@ try {
     $stmt_categorias->execute();
     $categorias_home = $stmt_categorias->fetchAll();
 
-    // Consultar noticias recientes
-    $stmt_noticias = $pdo->query("SELECT * FROM noticias WHERE estado = 'Publicada' ORDER BY orden ASC, fecha_publicacion DESC LIMIT 3");
+    // Consultar noticias recientes (columnas específicas para optimizar carga y memoria)
+    $stmt_noticias = $pdo->query(
+        "SELECT id_noticia, titulo, subtitulo, cuerpo, categoria, imagen, fecha_publicacion
+         FROM noticias
+         WHERE estado = 'Publicada'
+         ORDER BY orden ASC, fecha_publicacion DESC
+         LIMIT 3"
+    );
     $noticias_home = $stmt_noticias->fetchAll();
 
-    // Consultar eventos recientes
-    $stmt_eventos = $pdo->query("SELECT * FROM eventos WHERE estado = 'Abierto' ORDER BY fecha_evento ASC LIMIT 3");
+    // Consultar eventos recientes (columnas específicas)
+    $stmt_eventos = $pdo->query(
+        "SELECT id_evento, titulo, descripcion, tipo, modalidad, imagen, fecha_evento
+         FROM eventos
+         WHERE estado = 'Abierto'
+         ORDER BY fecha_evento ASC
+         LIMIT 3"
+    );
     $eventos_home = $stmt_eventos->fetchAll();
 } catch (PDOException $e) {
     error_log("Error al consultar datos en home: " . $e->getMessage());
