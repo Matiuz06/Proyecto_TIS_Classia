@@ -143,11 +143,11 @@ class ContenidoCursoRepository
 
     public function crearModulo(int $id_publicacion, string $titulo, ?string $descripcion, int $orden): int
     {
-        $q = $this->pdo->prepare(
-            'INSERT INTO curso_modulos(id_publicacion, titulo, descripcion, orden) VALUES(:p, :t, :d, :o)'
-        );
+        $sql = 'INSERT INTO curso_modulos(id_publicacion, titulo, descripcion, orden) VALUES(:p, :t, :d, :o)';
+        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') $sql .= ' RETURNING id_modulo';
+        $q = $this->pdo->prepare($sql);
         $q->execute(['p' => $id_publicacion, 't' => $titulo, 'd' => $descripcion, 'o' => max(1, $orden)]);
-        return (int) $this->pdo->lastInsertId();
+        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? (int)$q->fetchColumn() : (int) $this->pdo->lastInsertId();
     }
 
     public function editarModulo(int $id_modulo, int $id_publicacion, string $titulo, ?string $descripcion, int $orden): void
@@ -179,11 +179,11 @@ class ContenidoCursoRepository
 
     public function crearUnidad(int $id_modulo, string $titulo, ?string $descripcion, int $orden): int
     {
-        $q = $this->pdo->prepare(
-            'INSERT INTO curso_unidades(id_modulo, titulo, descripcion, orden) VALUES(:m, :t, :d, :o)'
-        );
+        $sql = 'INSERT INTO curso_unidades(id_modulo, titulo, descripcion, orden) VALUES(:m, :t, :d, :o)';
+        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') $sql .= ' RETURNING id_unidad';
+        $q = $this->pdo->prepare($sql);
         $q->execute(['m' => $id_modulo, 't' => $titulo, 'd' => $descripcion, 'o' => max(1, $orden)]);
-        return (int) $this->pdo->lastInsertId();
+        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? (int)$q->fetchColumn() : (int) $this->pdo->lastInsertId();
     }
 
     public function editarUnidad(int $id_unidad, int $id_publicacion, string $titulo, ?string $descripcion, int $orden): void
@@ -254,14 +254,63 @@ class ContenidoCursoRepository
         return $q->fetch() ?: null;
     }
 
+    public function crearMensajeForo(int $id_recurso, int $id_usuario, string $mensaje): void
+    {
+        $q = $this->pdo->prepare('INSERT INTO curso_foro_mensajes (id_recurso, id_usuario, mensaje) VALUES (:r, :u, :m)');
+        $q->execute(['r' => $id_recurso, 'u' => $id_usuario, 'm' => $mensaje]);
+    }
+
+    public function listarMensajesForoPorCurso(int $id_publicacion): array
+    {
+        $q = $this->pdo->prepare("
+            SELECT fm.*, u.nombre, u.apellido, u.foto_perfil, u.id_rol, ro.nombre_rol
+            FROM curso_foro_mensajes fm
+            JOIN usuarios u ON u.id_usuario = fm.id_usuario
+            JOIN roles ro ON ro.id_rol = u.id_rol
+            JOIN curso_recursos cr ON cr.id_recurso = fm.id_recurso
+            JOIN curso_unidades cu ON cu.id_unidad = cr.id_unidad
+            JOIN curso_modulos cm ON cm.id_modulo = cu.id_modulo
+            WHERE cm.id_publicacion = :id AND cr.tipo = 'Foro'
+            ORDER BY fm.fecha_mensaje ASC
+        ");
+        $q->execute(['id' => $id_publicacion]);
+        $mensajes = [];
+        foreach ($q->fetchAll() as $row) {
+            $mensajes[(int)$row['id_recurso']][] = $row;
+        }
+        return $mensajes;
+    }
+
+    public function eliminarMensajeForoAutorizado(int $id_mensaje, int $id_publicacion, int $id_usuario, bool $admin, bool $docenteCurso): bool
+    {
+        $q = $this->pdo->prepare("
+            SELECT fm.id_usuario
+            FROM curso_foro_mensajes fm
+            JOIN curso_recursos r ON r.id_recurso = fm.id_recurso
+            JOIN curso_unidades u ON u.id_unidad = r.id_unidad
+            JOIN curso_modulos m ON m.id_modulo = u.id_modulo
+            WHERE fm.id_mensaje = :msg AND m.id_publicacion = :curso AND r.tipo = 'Foro'
+            LIMIT 1
+        ");
+        $q->execute(['msg' => $id_mensaje, 'curso' => $id_publicacion]);
+        $mensaje = $q->fetch();
+        if (!$mensaje || (!$admin && !$docenteCurso && $id_usuario !== (int)$mensaje['id_usuario'])) {
+            return false;
+        }
+
+        $d = $this->pdo->prepare('DELETE FROM curso_foro_mensajes WHERE id_mensaje = :id');
+        $d->execute(['id' => $id_mensaje]);
+        return $d->rowCount() > 0;
+    }
+
     public function crearRecurso(array $datos): int
     {
-        $q = $this->pdo->prepare(
-            'INSERT INTO curso_recursos(id_unidad, titulo, tipo, url, archivo, descripcion, orden)
-             VALUES(:u, :t, :tipo, :url, :a, :d, :o)'
-        );
+        $sql = 'INSERT INTO curso_recursos(id_unidad, titulo, tipo, url, archivo, descripcion, orden)
+             VALUES(:u, :t, :tipo, :url, :a, :d, :o)';
+        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') $sql .= ' RETURNING id_recurso';
+        $q = $this->pdo->prepare($sql);
         $q->execute($datos);
-        return (int) $this->pdo->lastInsertId();
+        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? (int)$q->fetchColumn() : (int) $this->pdo->lastInsertId();
     }
 
     public function editarRecurso(int $id_recurso, array $datos): void

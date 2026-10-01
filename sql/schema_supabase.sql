@@ -268,17 +268,61 @@ CREATE TABLE IF NOT EXISTS curso_recursos (
 );
 CREATE INDEX IF NOT EXISTS idx_curso_recursos_unidad_orden ON curso_recursos (id_unidad, orden);
 
+CREATE TABLE IF NOT EXISTS curso_tareas (
+    id_tarea SERIAL PRIMARY KEY,
+    id_recurso INT NOT NULL REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    fecha_disponible TIMESTAMPTZ NULL,
+    fecha_limite TIMESTAMPTZ NULL,
+    fecha_cierre TIMESTAMPTZ NULL,
+    permite_entrega_tardia BOOLEAN NOT NULL DEFAULT FALSE,
+    permite_archivos BOOLEAN NOT NULL DEFAULT TRUE,
+    permite_texto BOOLEAN NOT NULL DEFAULT FALSE,
+    permite_enlace BOOLEAN NOT NULL DEFAULT FALSE,
+    max_archivos INT NOT NULL DEFAULT 1,
+    max_tamano_mb INT NOT NULL DEFAULT 20,
+    formatos_permitidos JSONB NULL,
+    requisito_entrega VARCHAR(20) NOT NULL DEFAULT 'cualquiera' CHECK (requisito_entrega IN ('cualquiera','todos')),
+    puntaje_maximo NUMERIC(8,2) NULL,
+    tipo_calificacion VARCHAR(30) NOT NULL DEFAULT 'numerica' CHECK (tipo_calificacion IN ('numerica','aprobado_reprobado','sin_calificacion')),
+    permite_feedback_archivo BOOLEAN NOT NULL DEFAULT FALSE,
+    fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_curso_tareas_recurso UNIQUE (id_recurso)
+);
+
 CREATE TABLE IF NOT EXISTS curso_entregas (
     id_entrega SERIAL PRIMARY KEY,
+    id_tarea INT NOT NULL REFERENCES curso_tareas(id_tarea) ON DELETE CASCADE ON UPDATE CASCADE,
     id_recurso INT NOT NULL REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
     id_usuario INT NOT NULL REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
     archivo_entrega VARCHAR(500) NULL,
+    texto_entrega TEXT NULL,
+    enlace_entrega VARCHAR(500) NULL,
     comentario_entrega TEXT NULL,
     estado VARCHAR(30) NOT NULL DEFAULT 'Entregada' CHECK (estado IN ('Entregada', 'Calificada')),
-    calificacion NUMERIC(4,2) NULL,
+    estado_entrega VARCHAR(20) NOT NULL DEFAULT 'entregada' CHECK (estado_entrega IN ('borrador','entregada')),
+    calificacion VARCHAR(30) NULL,
+    feedback_docente TEXT NULL,
+    archivo_feedback VARCHAR(500) NULL,
+    fecha_calificacion TIMESTAMPTZ NULL,
+    id_docente_calificador INT NULL REFERENCES usuarios(id_usuario) ON DELETE SET NULL ON UPDATE CASCADE,
     fecha_entrega TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uk_recurso_usuario UNIQUE (id_recurso, id_usuario)
+    fecha_actualizacion TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_tarea_usuario UNIQUE (id_tarea, id_usuario)
 );
+CREATE INDEX IF NOT EXISTS idx_curso_entregas_tarea_fecha ON curso_entregas (id_tarea, fecha_entrega);
+
+CREATE TABLE IF NOT EXISTS curso_entrega_archivos (
+    id_archivo SERIAL PRIMARY KEY,
+    id_entrega INT NOT NULL REFERENCES curso_entregas(id_entrega) ON DELETE CASCADE ON UPDATE CASCADE,
+    nombre_original VARCHAR(255) NOT NULL,
+    ruta VARCHAR(500) NOT NULL,
+    mime_type VARCHAR(120) NULL,
+    extension VARCHAR(20) NULL,
+    tamano BIGINT NULL,
+    fecha_subida TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_curso_entrega_archivos_entrega ON curso_entrega_archivos (id_entrega);
 
 CREATE TABLE IF NOT EXISTS curso_foro_mensajes (
     id_mensaje SERIAL PRIMARY KEY,

@@ -48,6 +48,9 @@ function supabase_tipos_permitidos(): array
         'application/vnd.oasis.opendocument.presentation' => ['odp'],
         'text/plain'      => ['txt', 'csv'],
         'text/csv'        => ['csv'],
+        'application/json' => ['json'],
+        'text/xml'        => ['xml'],
+        'application/xml' => ['xml'],
         'application/zip' => ['zip'],
         'application/x-zip-compressed' => ['zip'],
         'application/x-rar-compressed' => ['rar'],
@@ -111,7 +114,7 @@ function supabase_validar_archivo_subido(array $archivo, string $tipo_recurso = 
         'pdf',
         'jpg', 'jpeg', 'png', 'webp', 'gif',
         'mp4', 'webm',
-        'doc', 'docx', 'ppt', 'pptx', 'pps', 'ppsx', 'xls', 'xlsx', 'odt', 'ods', 'odp', 'csv', 'txt',
+        'doc', 'docx', 'ppt', 'pptx', 'pps', 'ppsx', 'xls', 'xlsx', 'odt', 'ods', 'odp', 'csv', 'txt', 'json', 'xml',
         'zip', 'rar', '7z',
         'stl', 'obj', '3mf'
     ];
