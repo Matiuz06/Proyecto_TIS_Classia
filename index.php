@@ -333,7 +333,7 @@ include 'includes/header.php';
             </p>
           </div>
           <div class="testimonial-author">
-            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" />
+            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" loading="lazy" />
             <div>
               <p class="testimonial-name"><?= __t('testimonial_name_1') ?></p>
               <p class="testimonial-role"><?= __t('testimonial_role_1') ?></p>
@@ -355,7 +355,7 @@ include 'includes/header.php';
             </p>
           </div>
           <div class="testimonial-author">
-            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" />
+            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" loading="lazy" />
             <div>
               <p class="testimonial-name"><?= __t('testimonial_name_2') ?></p>
               <p class="testimonial-role"><?= __t('testimonial_role_2') ?></p>
@@ -377,7 +377,7 @@ include 'includes/header.php';
             </p>
           </div>
           <div class="testimonial-author">
-            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" />
+            <img src="assets/images/default-avatar.svg" alt="Avatar" class="testimonial-avatar" loading="lazy" />
             <div>
               <p class="testimonial-name"><?= __t('testimonial_name_3') ?></p>
               <p class="testimonial-role"><?= __t('testimonial_role_3') ?></p>

@@ -88,7 +88,10 @@ function eliminar_ruta_entrega(?string $ruta): void
 if ($id_curso > 0) {
     try {
         $stmt = $pdo->prepare("
-            SELECT p.*, c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido,
+            SELECT p.id_publicacion, p.id_usuario, p.titulo, p.descripcion, p.precio, p.tipo,
+                   p.modalidad, p.imagen, p.id_categoria, p.nivel_experiencia, p.duracion_horas,
+                   p.fecha_creacion, p.estado,
+                   c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido,
                    u.id_usuario AS autor_id, u.foto_perfil AS autor_foto
             FROM publicaciones p 
             JOIN categorias c ON p.id_categoria = c.id_categoria 
@@ -100,11 +103,9 @@ if ($id_curso > 0) {
         $curso = $stmt->fetch();
 
         if ($curso) {
-            // Verificar si el usuario actual ya contratÃ³ o comprÃ³ el curso
+            // Registrar visita
             registrar_visita_publicacion($pdo, $id_curso);
-        }
 
-        if ($curso) {
             // Verificar si el usuario actual ya contrató o compró el curso
             if ($usuario_actual) {
                 $stmt_compra = $pdo->prepare("
@@ -330,9 +331,10 @@ if ($id_curso > 0) {
                 $mensajes_foro = $contenidoRepo->listarMensajesForoPorCurso($id_curso);
             }
 
-            // ReseÃ±as del curso
+            // Reseñas del curso
             $stmt_res = $pdo->prepare("
-                SELECT v.*, u.nombre, u.apellido, u.foto_perfil
+                SELECT v.id_valoracion, v.id_publicacion, v.id_usuario, v.puntuacion, v.comentario, v.fecha_valoracion,
+                       u.nombre, u.apellido, u.foto_perfil
                 FROM valoraciones v
                 JOIN usuarios u ON v.id_usuario = u.id_usuario
                 WHERE v.id_publicacion = :id
@@ -349,12 +351,13 @@ if ($id_curso > 0) {
 
             // Cursos relacionados
             $stmt_rel = $pdo->prepare("
-                SELECT p.*, c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido
+                SELECT p.id_publicacion, p.titulo, p.descripcion, p.precio, p.tipo, p.modalidad, p.imagen,
+                       c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido
                 FROM publicaciones p
                 JOIN categorias c ON p.id_categoria = c.id_categoria
                 JOIN usuarios u ON p.id_usuario = u.id_usuario
                 WHERE p.tipo = 'Curso' AND p.id_publicacion != :id AND p.estado = 'Activo'
-                ORDER BY (p.id_categoria = :id_categoria) DESC, p.fecha_creacion DESC
+                ORDER BY (CASE WHEN p.id_categoria = :id_categoria THEN 1 ELSE 0 END) DESC, p.fecha_creacion DESC
                 LIMIT 3
             ");
             $stmt_rel->execute([

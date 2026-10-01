@@ -18,6 +18,13 @@ $puedeAgregar = esta_autenticado();
 ?>
 
     <main>
+      <nav aria-label="Ruta de navegación" class="breadcrumb-nav">
+        <ol class="breadcrumb-list">
+          <li><a href="../index.php"><?= __t('nav_inicio', 'Inicio') ?></a> /</li>
+          <li aria-current="page"><?= __t('nav_catalogo', 'Catálogo') ?></li>
+        </ol>
+      </nav>
+
       <header>
         <p><?= __t('catalog_title') ?></p>
         <h1><?= __t('catalog_heading') ?></h1>
@@ -146,7 +153,7 @@ $puedeAgregar = esta_autenticado();
                   <article class="catalog-card" aria-labelledby="recomendacion-<?= (int) $recomendacion['id_publicacion'] ?>">
                     <?php if (!empty($recomendacion['imagen'])): ?>
                       <div class="catalog-card-media">
-                        <img class="catalog-card-image" src="../<?= htmlspecialchars($recomendacion['imagen']) ?>" alt="<?= htmlspecialchars($recomendacion['titulo']) ?>" />
+                        <img class="catalog-card-image" src="../<?= htmlspecialchars($recomendacion['imagen']) ?>" alt="<?= htmlspecialchars($recomendacion['titulo']) ?>" loading="lazy" />
                       </div>
                     <?php else: ?>
                       <div class="placeholder-visual" aria-hidden="true"><?= $esCurso ? __t('label_course') : __t('label_service') ?></div>
@@ -168,12 +175,21 @@ $puedeAgregar = esta_autenticado();
           <?php endif; ?>
 
           <?php if (empty($publicaciones)): ?>
-            <section class="empty-state" aria-labelledby="sin-mas-cursos">
+            <section class="empty-state catalog-empty-state" aria-labelledby="sin-mas-cursos">
+              <div class="empty-state-icon" aria-hidden="true">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </div>
               <h3 id="sin-mas-cursos"><?= __t('catalog_empty') ?></h3>
               <p>
                 <?= __t('catalog_empty_sub') ?>
               </p>
-              <p><a href="catalogo.php" class="btn"><?= __t('btn_view_catalog') ?></a></p>
+              <div class="empty-state-actions">
+                <a href="catalogo.php" class="btn"><?= __t('btn_view_catalog') ?></a>
+              </div>
             </section>
           <?php else: ?>
 
@@ -190,7 +206,7 @@ $puedeAgregar = esta_autenticado();
                     <article class="catalog-card" aria-labelledby="curso-<?= $curso['id_publicacion'] ?>">
                       <?php if (!empty($curso['imagen'])): ?>
                         <div class="catalog-card-media">
-                          <img class="catalog-card-image" src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" />
+                          <img class="catalog-card-image" src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" loading="lazy" />
                         </div>
                       <?php else: ?>
                         <div class="placeholder-visual" aria-hidden="true"><?= __t('label_course') ?></div>
@@ -263,7 +279,7 @@ $puedeAgregar = esta_autenticado();
                     <article class="catalog-card" aria-labelledby="servicio-<?= $serv['id_publicacion'] ?>">
                       <?php if (!empty($serv['imagen'])): ?>
                         <div class="catalog-card-media">
-                          <img class="catalog-card-image" src="../<?= htmlspecialchars($serv['imagen']) ?>" alt="<?= htmlspecialchars($serv['titulo']) ?>" />
+                          <img class="catalog-card-image" src="../<?= htmlspecialchars($serv['imagen']) ?>" alt="<?= htmlspecialchars($serv['titulo']) ?>" loading="lazy" />
                         </div>
                       <?php else: ?>
                         <div class="placeholder-visual" aria-hidden="true"><?= __t('label_service') ?></div>
