@@ -242,6 +242,7 @@ try {
         }
     }
 
+    // Verificar bloqueo de cuenta ANTES de establecer sesión (cubre todos los flujos)
     if ($usuario && isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
         $motivo = !empty($usuario['motivo_bloqueo']) ? htmlspecialchars($usuario['motivo_bloqueo']) : '';
         $_SESSION['cuenta_bloqueada_motivo'] = $motivo;
@@ -262,7 +263,14 @@ try {
         $_SESSION['usuario_foto'] = $usuario['foto_perfil'];
     }
 
-    if ((int) ($usuario['onboarding_step'] ?? 1) <= 1) {
+    $onboarding_step_gh = (int) ($usuario['onboarding_step'] ?? 1);
+    $id_rol_gh = (int) ($usuario['id_rol'] ?? 1);
+
+    if ($id_rol_gh === ROL_ADMIN) {
+        header('Location: ../../views/panel-administrador.php');
+    } elseif ($id_rol_gh === ROL_DOCENTE) {
+        header('Location: ../../views/panel-proveedor.php');
+    } elseif ($onboarding_step_gh <= 1) {
         header('Location: ../../views/primeros-pasos.php');
     } else {
         header('Location: ../../views/usuario.php');

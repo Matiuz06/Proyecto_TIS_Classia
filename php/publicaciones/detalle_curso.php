@@ -18,6 +18,7 @@ require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/contenido_curso.php';   // carga ContenidoCursoRepository + clases de dominio
 require_once __DIR__ . '/EntregaRepository.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../admin/estadisticas_admin.php';
 
 iniciar_sesion();
 
@@ -100,6 +101,11 @@ if ($id_curso > 0) {
 
         if ($curso) {
             // Verificar si el usuario actual ya contratÃ³ o comprÃ³ el curso
+            registrar_visita_publicacion($pdo, $id_curso);
+        }
+
+        if ($curso) {
+            // Verificar si el usuario actual ya contrató o compró el curso
             if ($usuario_actual) {
                 $stmt_compra = $pdo->prepare("
                     SELECT c.id_contratacion, c.estado

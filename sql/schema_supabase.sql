@@ -206,6 +206,19 @@ CREATE TABLE IF NOT EXISTS valoraciones (
 );
 
 -- ----------------------------------------------------------------------------
+-- 10b. TABLA: publicacion_visitas (Estadísticas REQ-ADM-02, REQ-ADM-04)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS publicacion_visitas (
+    id_visita SERIAL PRIMARY KEY,
+    id_publicacion INT NOT NULL REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
+    fecha_visita DATE NOT NULL DEFAULT CURRENT_DATE,
+    visitas INT NOT NULL DEFAULT 1,
+    CONSTRAINT uq_pub_visita_fecha UNIQUE (id_publicacion, fecha_visita)
+);
+CREATE INDEX IF NOT EXISTS idx_visitas_pub ON publicacion_visitas (id_publicacion);
+CREATE INDEX IF NOT EXISTS idx_visitas_fecha ON publicacion_visitas (fecha_visita);
+
+-- ----------------------------------------------------------------------------
 -- 11. TABLA: perfiles_profesionales
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS perfiles_profesionales (
@@ -347,6 +360,8 @@ CREATE INDEX IF NOT EXISTS idx_pub_usuario ON publicaciones (id_usuario);
 CREATE INDEX IF NOT EXISTS idx_pub_categoria ON publicaciones (id_categoria);
 CREATE INDEX IF NOT EXISTS idx_pub_estado_tipo ON publicaciones (estado, tipo);
 CREATE INDEX IF NOT EXISTS idx_pub_fecha ON publicaciones (fecha_creacion);
+CREATE INDEX IF NOT EXISTS idx_pub_precio ON publicaciones (precio);
+CREATE INDEX IF NOT EXISTS idx_pub_tipo_precio ON publicaciones (tipo, precio);
 
 CREATE INDEX IF NOT EXISTS idx_sol_usuario ON solicitudes (id_usuario);
 CREATE INDEX IF NOT EXISTS idx_sol_publicacion ON solicitudes (id_publicacion);
@@ -366,6 +381,7 @@ CREATE INDEX IF NOT EXISTS idx_pagos_estado ON pagos (estado_pago);
 CREATE INDEX IF NOT EXISTS idx_val_publicacion ON valoraciones (id_publicacion);
 CREATE INDEX IF NOT EXISTS idx_val_usuario ON valoraciones (id_usuario);
 CREATE INDEX IF NOT EXISTS idx_val_contratacion ON valoraciones (id_contratacion);
+CREATE INDEX IF NOT EXISTS idx_val_pub_puntuacion ON valoraciones (id_publicacion, puntuacion);
 
 -- ============================================================================
 -- INSERCIÓN DE DATOS SEMILLA INICIALES

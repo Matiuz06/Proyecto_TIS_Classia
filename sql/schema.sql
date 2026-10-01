@@ -100,7 +100,9 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     INDEX idx_pub_usuario (id_usuario),
     INDEX idx_pub_categoria (id_categoria),
     INDEX idx_pub_estado_tipo (estado, tipo),
-    INDEX idx_pub_fecha (fecha_creacion)
+    INDEX idx_pub_fecha (fecha_creacion),
+    INDEX idx_pub_precio (precio),
+    INDEX idx_pub_tipo_precio (tipo, precio)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =========================================================
@@ -219,7 +221,25 @@ CREATE TABLE IF NOT EXISTS valoraciones (
         UNIQUE (id_contratacion, id_usuario),
     INDEX idx_val_publicacion (id_publicacion),
     INDEX idx_val_usuario (id_usuario),
-    INDEX idx_val_contratacion (id_contratacion)
+    INDEX idx_val_contratacion (id_contratacion),
+    INDEX idx_val_pub_puntuacion (id_publicacion, puntuacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- Estadísticas de visitas por publicación
+-- Métricas agregadas por fecha
+-- =========================================================
+CREATE TABLE IF NOT EXISTS publicacion_visitas (
+    id_visita INT AUTO_INCREMENT PRIMARY KEY,
+    id_publicacion INT NOT NULL,
+    fecha_visita DATE NOT NULL,
+    visitas INT UNSIGNED NOT NULL DEFAULT 1,
+    CONSTRAINT fk_visitas_publicaciones
+        FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uq_pub_visita_fecha (id_publicacion, fecha_visita),
+    INDEX idx_visitas_pub (id_publicacion),
+    INDEX idx_visitas_fecha (fecha_visita)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
