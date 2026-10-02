@@ -23,6 +23,7 @@ abstract class Publicacion
     protected ?string $fecha_actualizacion;
     protected int $id_usuario;
     protected int $id_categoria;
+    protected ?string $nombre_categoria;
 
     /**
      * @param array $datos Fila de publicaciones o datos validados del formulario.
@@ -46,6 +47,7 @@ abstract class Publicacion
         $this->fecha_actualizacion = self::textoOpcional($datos['fecha_actualizacion'] ?? null);
         $this->id_usuario = (int) ($datos['id_usuario'] ?? 0);
         $this->id_categoria = (int) ($datos['id_categoria'] ?? 0);
+        $this->nombre_categoria = self::textoOpcional($datos['nombre_categoria'] ?? null);
     }
 
     /** Devuelve el identificador de la publicacion, si ya fue persistida. */
@@ -56,6 +58,26 @@ abstract class Publicacion
 
     /** Devuelve el tipo discriminador usado por la base de datos. */
     public function getTipo(): string { return $this->tipo; }
+
+    public function getPrecio(): float {
+        return $this->precio;
+    }
+
+    public function getModalidad(): ?string {
+        return $this->modalidad;
+    }
+
+    public function getNivelExperiencia(): ?string {
+        return $this->nivel_experiencia;
+    }
+
+    public function getDuracionHoras(): ?int {
+        return $this->duracion_horas;
+    }
+
+    public function getNombreCategoria(): ?string {
+        return $this->nombre_categoria;
+    }
 
     /** Devuelve el usuario propietario de la publicacion. */
     public function getIdUsuario(): int { return $this->id_usuario; }
