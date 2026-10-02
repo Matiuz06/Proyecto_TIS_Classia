@@ -17,7 +17,7 @@ $bodyClass = 'publication-editor-page';
 $activePage = 'cuenta';
 include '../includes/header.php';
 ?>
-<main class="publication-editor" aria-labelledby="publication-editor-title">
+<main id="main-content" class="publication-editor" aria-labelledby="publication-editor-title">
   <header class="publication-editor__header">
     <div>
       <p class="publication-editor__eyebrow">Editor de publicacion</p>

@@ -12,7 +12,7 @@ $activePage  = 'institucional';
 include '../includes/header.php';
 ?>
 
-  <main class="privacy-page institutional-page motion-entry">
+  <main id="main-content" class="privacy-page institutional-page motion-entry">
     <header>
       <h1>Sobre Nosotros</h1>
       <p>

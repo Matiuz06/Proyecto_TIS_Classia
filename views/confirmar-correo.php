@@ -18,7 +18,7 @@ $jsPrefix = '..';
 $activePage = 'cuenta';
 include '../includes/header.php';
 ?>
-<main class="auth-shell">
+<main id="main-content" class="auth-shell">
   <section class="auth-card" aria-labelledby="titulo-confirmacion">
     <h1 id="titulo-confirmacion"><?= htmlspecialchars($mensaje) ?></h1>
     <?php if ($resultado === 'confirmado'): ?>

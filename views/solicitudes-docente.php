@@ -38,7 +38,7 @@ $activePage = 'panel-administrador';
 include '../includes/header.php';
 ?>
 
-<main>
+<main id="main-content">
   <section aria-labelledby="titulo-solicitudes-docente">
     <h1 id="titulo-solicitudes-docente">Solicitudes docentes pendientes</h1>
 

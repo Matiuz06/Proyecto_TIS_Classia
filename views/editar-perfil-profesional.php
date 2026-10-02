@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 $perfil=obtener_perfil_profesional($pdo,$uid) ?: [];
 $title='Editar perfil profesional'; $description='Configuración del perfil profesional de proveedor.'; $cssPrefix='..'; $jsPrefix='..'; $activePage='panel-proveedor'; include '../includes/header.php';
 ?>
-<main class="provider-editor">
+<main id="main-content" class="provider-editor">
 <header class="section-heading"><h1>Perfil profesional</h1><p>Completá la información que ayuda a estudiantes y clientes a entender quién sos, tu experiencia y cómo trabajás.</p></header>
 <?php if($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
 <?php if($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>

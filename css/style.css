@@ -5,37 +5,55 @@
 :root {
   color-scheme: light;
 
+  /* --- Marca --- */
   --color-brand-primary: oklch(28% 0.07 238deg);
   --color-brand-primary-hover: oklch(22% 0.08 238deg);
   --color-brand-primary-soft: oklch(94% 0.025 238deg);
   --color-brand-accent: oklch(63% 0.13 190deg);
   --color-brand-accent-hover: oklch(57% 0.13 190deg);
   --color-brand-accent-soft: oklch(94% 0.04 190deg);
+
+  /* --- Fondos y superficies --- */
   --color-bg: oklch(98% 0.012 210deg);
   --color-bg-soft: oklch(95.5% 0.02 205deg);
   --color-surface: oklch(99% 0.006 210deg);
   --color-surface-elevated: oklch(100% 0 0deg);
   --color-header-bg: oklch(99% 0.006 210deg / 94%);
-  --color-heading: oklch(24% 0.04 240deg);
-  --color-text: oklch(34% 0.03 240deg);
-  --color-text-muted: oklch(45% 0.03 240deg);
+
+  /* --- Texto (ratio WCAG AA ≥ 4.5:1 sobre fondos claros) --- */
+  --color-heading: oklch(18% 0.04 240deg);
+  --color-text: oklch(26% 0.03 240deg);
+  --color-text-muted: oklch(40% 0.025 240deg);
   --color-text-inverse: oklch(98% 0.01 205deg);
+
+  /* --- Bordes --- */
   --color-border: oklch(86% 0.02 218deg);
   --color-border-strong: oklch(70% 0.035 220deg);
-  --color-focus: oklch(54% 0.16 190deg);
-  --color-success: oklch(42% 0.12 155deg);
+
+  /* --- Foco (WCAG 2.4.11 – Focus Appearance) --- */
+  --color-focus: oklch(50% 0.18 190deg);
+  --color-focus-ring: 0 0 0 3px var(--color-focus);
+
+  /* --- Estados semánticos --- */
+  --color-success: oklch(38% 0.13 155deg);
   --color-success-bg: oklch(94% 0.04 155deg);
-  --color-warning: oklch(42% 0.11 75deg);
+  --color-warning: oklch(38% 0.12 75deg);
   --color-warning-bg: oklch(94% 0.06 75deg);
-  --color-danger: oklch(46% 0.16 28deg);
+  --color-danger: oklch(42% 0.17 28deg);
   --color-danger-bg: oklch(95% 0.04 28deg);
-  --color-info: oklch(38% 0.12 238deg);
+  --color-info: oklch(34% 0.12 238deg);
   --color-info-bg: oklch(94% 0.03 238deg);
+
+  /* --- Sombras --- */
   --shadow-sm: 0 0.35rem 1rem oklch(24% 0.04 240deg / 7%);
   --shadow-md: 0 1rem 2.5rem oklch(24% 0.04 240deg / 8%);
+
+  /* --- Radios --- */
   --radius-sm: 0.45rem;
   --radius-md: 0.7rem;
   --radius-lg: 0.9rem;
+
+  /* --- Espaciado --- */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -43,6 +61,8 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
   --space-8: 3rem;
+
+  /* --- Tipografía --- */
   --font-sans:
     system-ui, -apple-system, blinkmacsystemfont, "Segoe UI", sans-serif;
   --font-mono: "SFMono-Regular", consolas, "Liberation Mono", monospace;
@@ -54,17 +74,74 @@
   --text-xl: 1.75rem;
   --text-2xl: 2.25rem;
   --text-display: clamp(2.25rem, 6vw, 4.35rem);
+
+  /* --- Layout --- */
   --max-page: 1120px;
   --max-readable: 68ch;
+
+  /* --- Animación --- */
   --dur-short: 160ms;
   --dur-medium: 320ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* --- Transición de tema (Dark Mode) --- */
+  --theme-transition: background-color var(--dur-medium) var(--ease-out),
+    color var(--dur-medium) var(--ease-out),
+    border-color var(--dur-medium) var(--ease-out);
 }
 
-/* =========================================================
-   Base del documento
-   Normalización visual y elementos HTML compartidos
-   ========================================================= */
+/* MODO OSCURO — tokens sobreescritos por data-theme="dark"
+   Todos los tokens de color se redefinen aquí.
+   Ratio mínimo de contraste WCAG AA: 4.5:1 (texto normal) */
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* --- Marca (más luminosa para contrastar sobre oscuro) --- */
+  --color-brand-primary: oklch(72% 0.12 190deg);
+  --color-brand-primary-hover: oklch(80% 0.13 190deg);
+  --color-brand-primary-soft: oklch(22% 0.06 238deg);
+  --color-brand-accent: oklch(70% 0.14 190deg);
+  --color-brand-accent-hover: oklch(78% 0.14 190deg);
+  --color-brand-accent-soft: oklch(20% 0.05 190deg);
+
+  /* --- Fondos y superficies --- */
+  --color-bg: oklch(14% 0.015 240deg);
+  --color-bg-soft: oklch(17% 0.018 240deg);
+  --color-surface: oklch(18% 0.02 240deg);
+  --color-surface-elevated: oklch(21% 0.022 240deg);
+  --color-header-bg: oklch(18% 0.02 240deg / 92%);
+
+  /* --- Texto (ratio WCAG AA ≥ 4.5:1 sobre fondos oscuros) --- */
+  --color-heading: oklch(95% 0.01 210deg);
+  --color-text: oklch(88% 0.01 210deg);
+  --color-text-muted: oklch(68% 0.015 220deg);
+  --color-text-inverse: oklch(14% 0.015 240deg);
+
+  /* --- Bordes --- */
+  --color-border: oklch(30% 0.025 230deg);
+  --color-border-strong: oklch(42% 0.03 225deg);
+
+  /* --- Foco (WCAG 2.4.11) --- */
+  --color-focus: oklch(74% 0.18 190deg);
+
+  /* --- Estados semánticos --- */
+  --color-success: oklch(68% 0.14 155deg);
+  --color-success-bg: oklch(18% 0.06 155deg);
+  --color-warning: oklch(72% 0.14 75deg);
+  --color-warning-bg: oklch(18% 0.07 75deg);
+  --color-danger: oklch(68% 0.18 28deg);
+  --color-danger-bg: oklch(18% 0.07 28deg);
+  --color-info: oklch(68% 0.13 238deg);
+  --color-info-bg: oklch(18% 0.05 238deg);
+
+  /* --- Sombras --- */
+  --shadow-sm: 0 0.35rem 1rem oklch(5% 0.01 240deg / 30%);
+  --shadow-md: 0 1rem 2.5rem oklch(5% 0.01 240deg / 35%);
+}
+
+/* Base del documento
+   Normalización visual y elementos HTML compartidos */
 * {
   box-sizing: border-box;
 }
@@ -722,9 +799,12 @@ input:hover {
    Estados de carga (Skeletons y Spinners)
    ========================================================= */
 @keyframes skeleton-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.45;
   }
@@ -1035,7 +1115,7 @@ th {
   }
 
   .btn,
-  button,
+  button:not(.btn-theme-toggle),
   .auth-card form button {
     width: 100%;
     white-space: normal;
@@ -11558,5 +11638,260 @@ body.course-builder-page.course-dialog-open {
 
   .admin-filter-actions {
     margin-top: var(--space-2);
+  }
+}
+
+/* =========================================================
+   RNF-17: ACCESIBILIDAD WEB (WCAG 2.1 AA)
+   Skip-link, transición de tema y refinamientos globales
+   ========================================================= */
+
+/* Skip-link: navegación por teclado accesible */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 9999;
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-text-inverse);
+  background: var(--color-brand-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: top var(--dur-short) var(--ease-out);
+}
+
+.skip-link:focus {
+  top: var(--space-3);
+}
+
+/* Transición suave al cambiar de tema */
+html {
+  transition: var(--theme-transition);
+}
+
+body,
+.site-header,
+.site-footer,
+.card,
+.card-container,
+.auth-card,
+.catalog-card,
+.content-card,
+.account-section,
+.profile-hero,
+.empty-state,
+.metric,
+.panel,
+.page-container,
+.media-card,
+.main-content,
+input,
+select,
+textarea,
+table,
+.sidebar,
+.catalog-filters,
+fieldset,
+details,
+figure {
+  transition: var(--theme-transition);
+}
+
+/* Foco visible: refuerzo global consistente (WCAG 2.4.7) */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Asegurar que el foco no se oculte detrás del header fijo */
+:target {
+  scroll-margin-top: 5rem;
+}
+
+/* Botón de modo oscuro — circular perfecto */
+.btn-theme-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2.35rem !important;
+  height: 2.35rem !important;
+  min-width: 2.35rem !important;
+  min-height: 2.35rem !important;
+  max-width: 2.35rem !important;
+  max-height: 2.35rem !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  margin: 0 0 0 var(--space-4) !important;
+  margin-inline-start: var(--space-4) !important;
+  box-sizing: border-box !important;
+  color: var(--color-text-muted) !important;
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition:
+    color var(--dur-short) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    transform var(--dur-short) var(--ease-out);
+}
+
+.btn-theme-toggle:hover {
+  color: var(--color-heading) !important;
+  background: var(--color-bg-soft) !important;
+  border-color: var(--color-border-strong) !important;
+  transform: rotate(15deg);
+}
+
+.btn-theme-toggle:focus-visible {
+  outline: 3px solid var(--color-focus) !important;
+  outline-offset: 3px !important;
+}
+
+.btn-theme-toggle svg {
+  display: block;
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+  max-width: 1.15rem !important;
+  max-height: 1.15rem !important;
+  pointer-events: none;
+}
+
+/* Icono según modo activo (SOLO UN ICONO VISIBLE) */
+.btn-theme-toggle .icon-sun {
+  display: none !important;
+}
+
+.btn-theme-toggle .icon-moon {
+  display: block !important;
+}
+
+[data-theme="dark"] .btn-theme-toggle .icon-sun {
+  display: block !important;
+}
+
+[data-theme="dark"] .btn-theme-toggle .icon-moon {
+  display: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .btn-theme-toggle .icon-sun {
+    display: block !important;
+  }
+
+  :root:not([data-theme="light"]) .btn-theme-toggle .icon-moon {
+    display: none !important;
+  }
+}
+
+/* =========================================================
+   RNF-18: DISEÑO ADAPTABLE — Breakpoints adicionales
+   Correcciones de desborde y fluid layouts
+   ========================================================= */
+
+/* Prevenir desborde horizontal en cualquier contexto */
+img,
+video,
+svg,
+iframe,
+embed,
+object {
+  max-width: 100%;
+}
+
+/* Tablas responsivas: permitir scroll horizontal contenido */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md);
+}
+
+.table-responsive table {
+  min-width: 480px;
+}
+
+/* Breakpoint 360px: dispositivos muy pequeños */
+@media (width <=360px) {
+  :root {
+    --text-base: 0.95rem;
+  }
+
+  main,
+  .page-container,
+  .layout-sidebar {
+    width: calc(100% - 1rem);
+  }
+
+  .btn,
+  button:not(.btn-theme-toggle) {
+    padding: 0.6rem 0.8rem;
+    font-size: var(--text-sm);
+  }
+}
+
+/* Breakpoint 1280px+: pantallas anchas */
+@media (width >=1280px) {
+  :root {
+    --max-page: 1200px;
+  }
+}
+
+/* Modo de alto contraste del SO (prefers-contrast) */
+@media (prefers-contrast: more) {
+  :root {
+    --color-border: oklch(50% 0.03 220deg);
+    --color-border-strong: oklch(35% 0.04 220deg);
+    --color-focus: oklch(40% 0.2 190deg);
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline-width: 4px;
+    outline-offset: 4px;
+  }
+}
+
+/* Modo oscuro automático por preferencia del SO (si no se ha forzado tema) */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    color-scheme: dark;
+
+    --color-brand-primary: oklch(72% 0.12 190deg);
+    --color-brand-primary-hover: oklch(80% 0.13 190deg);
+    --color-brand-primary-soft: oklch(22% 0.06 238deg);
+    --color-brand-accent: oklch(70% 0.14 190deg);
+    --color-brand-accent-hover: oklch(78% 0.14 190deg);
+    --color-brand-accent-soft: oklch(20% 0.05 190deg);
+    --color-bg: oklch(14% 0.015 240deg);
+    --color-bg-soft: oklch(17% 0.018 240deg);
+    --color-surface: oklch(18% 0.02 240deg);
+    --color-surface-elevated: oklch(21% 0.022 240deg);
+    --color-header-bg: oklch(18% 0.02 240deg / 92%);
+    --color-heading: oklch(95% 0.01 210deg);
+    --color-text: oklch(88% 0.01 210deg);
+    --color-text-muted: oklch(68% 0.015 220deg);
+    --color-text-inverse: oklch(14% 0.015 240deg);
+    --color-border: oklch(30% 0.025 230deg);
+    --color-border-strong: oklch(42% 0.03 225deg);
+    --color-focus: oklch(74% 0.18 190deg);
+    --color-success: oklch(68% 0.14 155deg);
+    --color-success-bg: oklch(18% 0.06 155deg);
+    --color-warning: oklch(72% 0.14 75deg);
+    --color-warning-bg: oklch(18% 0.07 75deg);
+    --color-danger: oklch(68% 0.18 28deg);
+    --color-danger-bg: oklch(18% 0.07 28deg);
+    --color-info: oklch(68% 0.13 238deg);
+    --color-info-bg: oklch(18% 0.05 238deg);
+    --shadow-sm: 0 0.35rem 1rem oklch(5% 0.01 240deg / 30%);
+    --shadow-md: 0 1rem 2.5rem oklch(5% 0.01 240deg / 35%);
   }
 }

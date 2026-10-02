@@ -24,7 +24,7 @@ if (isset($_GET['2fa_desactivado'])) {
 include '../includes/header.php';
 ?>
 
-  <main class="motion-entry">
+  <main id="main-content" class="motion-entry">
     <?php if (!empty($mensaje_acceso)): ?>
       <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($mensaje_acceso); ?>

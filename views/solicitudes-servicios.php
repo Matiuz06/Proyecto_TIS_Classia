@@ -20,7 +20,7 @@ $jsPrefix = '..';
 $activePage = 'panel-proveedor';
 include '../includes/header.php';
 ?>
-<main class="provider-editor provider-workspace requests-management-page">
+<main id="main-content" class="provider-editor provider-workspace requests-management-page">
     <header class="section-heading provider-page-heading">
         <p class="course-eyebrow">Servicios</p>
         <h1>Solicitudes de servicios</h1>

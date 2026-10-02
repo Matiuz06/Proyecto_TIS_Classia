@@ -43,7 +43,7 @@ include '../includes/header.php';
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <?php endif; ?>
 
-<main class="auth-shell">
+<main id="main-content" class="auth-shell">
     <section class="auth-intro" aria-labelledby="intro-login">
         <h1 id="intro-login">Entrá a tu espacio educativo</h1>
         <p>

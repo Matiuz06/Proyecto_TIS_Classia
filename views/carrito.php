@@ -19,7 +19,7 @@ $activePage = 'carrito';
 include '../includes/header.php';
 ?>
 
-    <main class="page-container">
+    <main id="main-content" class="page-container">
       <header class="page-header">
         <p>Contratación y checkout</p>
         <h1>Carrito de compras</h1>

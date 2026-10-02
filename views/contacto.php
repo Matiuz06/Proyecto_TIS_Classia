@@ -16,7 +16,7 @@ $activePage  = '';
 include '../includes/header.php';
 ?>
 
-  <main class="contact-page motion-entry">
+  <main id="main-content" class="contact-page motion-entry">
 
     <header>
       <p>AniTech S.A.</p>

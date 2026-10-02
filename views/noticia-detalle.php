@@ -37,7 +37,7 @@ $activePage  = 'noticias';
 include '../includes/header.php';
 ?>
 
-  <main class="news-detail-container motion-entry">
+  <main id="main-content" class="news-detail-container motion-entry">
     <div class="u-mb-4">
       <a href="noticias.php" class="btn btn-secondary">← Volver a Noticias</a>
     </div>
