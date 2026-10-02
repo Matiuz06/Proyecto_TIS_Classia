@@ -17,7 +17,7 @@ include '../includes/header.php';
 $puedeAgregar = esta_autenticado();
 ?>
 
-    <main>
+    <main id="main-content">
       <nav aria-label="Ruta de navegación" class="breadcrumb-nav">
         <ol class="breadcrumb-list">
           <li><a href="../index.php"><?= __t('nav_inicio', 'Inicio') ?></a> /</li>

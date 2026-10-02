@@ -13,7 +13,7 @@ $activePage  = '';
 include '../includes/header.php';
 ?>
 
-  <main class="privacy-page motion-entry">
+  <main id="main-content" class="privacy-page motion-entry">
 
     <header>
       <p>Información legal</p>

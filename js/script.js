@@ -1,4 +1,63 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // =========================================================
+  // MODO OSCURO — RNF-17 (Accesibilidad) y preferencia de tema
+  // =========================================================
+  const themeToggleBtn = document.getElementById("theme-toggle-btn");
+
+  if (themeToggleBtn) {
+    /**
+     * Actualiza el estado visual y semántico del botón según el tema activo.
+     * @param {string} theme - "dark" | "light"
+     */
+    const applyTheme = (theme) => {
+      const isDark = theme === "dark";
+      document.documentElement.setAttribute("data-theme", theme);
+      themeToggleBtn.setAttribute(
+        "aria-label",
+        isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
+      );
+      try {
+        localStorage.setItem("classia-theme", theme);
+      } catch (e) {
+        // localStorage no disponible (modo privado, etc.)
+      }
+    };
+
+    // Determinar el tema inicial: localStorage > preferencia del SO
+    const getInitialTheme = () => {
+      try {
+        const saved = localStorage.getItem("classia-theme");
+        if (saved === "dark" || saved === "light") return saved;
+      } catch (e) {}
+      // Fallback: prefers-color-scheme
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    };
+
+    // Aplicar tema inicial (el anti-FOUC ya lo aplicó, esto sincroniza el aria-label)
+    const initialTheme = getInitialTheme();
+    applyTheme(initialTheme);
+
+    // Toggle al hacer clic
+    themeToggleBtn.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+
+    // Sincronizar si el usuario cambia la preferencia del SO mientras la página está abierta
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+      // Solo sincronizar si el usuario no tiene preferencia guardada
+      try {
+        if (!localStorage.getItem("classia-theme")) {
+          applyTheme(e.matches ? "dark" : "light");
+        }
+      } catch (err) {
+        applyTheme(e.matches ? "dark" : "light");
+      }
+    });
+  }
+
   // Menú lateral del curso: en móvil se cierra al navegar a una unidad.
   const sidebarToggle = document.querySelector("[data-course-sidebar-toggle]");
   const courseSidebar = document.querySelector("[data-course-sidebar]");

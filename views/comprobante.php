@@ -60,7 +60,7 @@ $activePage  = 'cuenta';
 include '../includes/header.php';
 ?>
 
-  <main class="receipt-page motion-entry">
+  <main id="main-content" class="receipt-page motion-entry">
     <div class="receipt-actions u-no-print">
       <a href="usuario.php" class="btn btn-secondary">← Volver a mi cuenta</a>
       <div>

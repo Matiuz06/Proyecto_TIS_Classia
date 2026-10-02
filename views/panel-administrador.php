@@ -158,7 +158,7 @@ $activePage  = 'panel-administrador';
 include '../includes/header.php';
 ?>
 
-<main class="admin-panel">
+<main id="main-content" class="admin-panel">
 
   <?php if ($mensaje_admin !== ''): ?>
     <div class="alert alert-success motion-entry" role="alert">

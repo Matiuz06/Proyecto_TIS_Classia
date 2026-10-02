@@ -10,7 +10,7 @@ require_once 'php/inicio/obtener_datos_home.php';
 include 'includes/header.php';
 ?>
 
-  <main>
+  <main id="main-content">
     <section class="home-hero-centered motion-entry" aria-labelledby="hero-heading">
       <div class="home-hero-content">
         <h1 id="hero-heading" class="home-hero-title">

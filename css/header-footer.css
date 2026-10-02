@@ -88,7 +88,8 @@
 }
 
 .site-header .site-nav>a:focus-visible {
-  outline: 3px solid rgb(21, 113, 86);
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
 }
 
 .site-header .site-nav>a:hover {
@@ -199,6 +200,28 @@
 }
 
 /* =========================================================
+   Botón de Cambio de Tema (Modo Claro / Oscuro)
+   ========================================================= */
+
+.site-header .btn-theme-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2.35rem !important;
+  height: 2.35rem !important;
+  min-width: 2.35rem !important;
+  min-height: 2.35rem !important;
+  max-width: 2.35rem !important;
+  max-height: 2.35rem !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  margin-left: var(--space-4);
+  margin-inline-start: var(--space-4);
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
    Menú Desplegable de Usuario y Sesión
    ========================================================= */
 
@@ -270,12 +293,10 @@
   min-width: 200px;
   padding: 0.4rem 0;
   margin-top: 4px;
-  background: #ffffff;
-  border: 1px solid var(--color-border, #e2e8f0);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md, 8px);
-  box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.15),
-    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .site-header .site-nav .user-dropdown-menu::before {
@@ -328,20 +349,20 @@
 }
 
 .site-header .site-nav .user-dropdown-item.active {
-  color: var(--color-brand-primary, #157156);
+  color: var(--color-brand-primary);
   font-weight: 600;
-  background-color: #f0fdf4;
+  background-color: var(--color-brand-primary-soft);
 }
 
 .site-header .site-nav .user-dropdown-item--logout {
-  color: #e53e3e;
+  color: var(--color-danger);
 }
 
 .site-header .site-nav .user-dropdown-item--logout:hover,
 .site-header .site-nav .user-dropdown-item--logout:focus,
 .site-header .site-nav .user-dropdown-item--logout:focus-visible {
-  color: #c53030;
-  background-color: #fff5f5;
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
 }
 
 @keyframes pulse-badge {
@@ -356,9 +377,7 @@
   }
 }
 
-/* =========================================================
-   Adaptabilidad Responsive y Accesibilidad del Header
-   ========================================================= */
+/* Adaptabilidad Responsive y Accesibilidad del Header */
 
 @media (width <=720px) {
   .site-header .site-header__inner {

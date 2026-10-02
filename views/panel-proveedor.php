@@ -147,7 +147,7 @@ $activePage = 'panel-proveedor';
 include '../includes/header.php';
 ?>
 
-<main class="provider-dashboard provider-workspace">
+<main id="main-content" class="provider-dashboard provider-workspace">
     <?php if (isset($_GET['mensaje'])): ?>
         <div class="alert alert-success">
             <?php

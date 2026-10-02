@@ -17,7 +17,7 @@ $activePage  = 'carrito';
 include '../includes/header.php';
 ?>
 
-  <main class="card-container confirmation-card motion-entry" aria-labelledby="contratacion-confirmada">
+  <main id="main-content" class="card-container confirmation-card motion-entry" aria-labelledby="contratacion-confirmada">
     <?php if ($error !== '' || empty($contratacion)): ?>
       <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
       <p><a href="catalogo.php" class="btn btn-secondary">Volver al catálogo</a></p>

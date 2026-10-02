@@ -29,7 +29,7 @@ if ($datos_cambiados_en) {
 $email_pendiente = $userData['nuevo_email_pendiente'] ?? null;
 ?>
 
-  <main class="product-detail-container motion-entry">
+  <main id="main-content" class="product-detail-container motion-entry">
     <div class="card-container payment-card card-narrow-650">
       <span class="brand-mark">Classia</span>
       <h1>Modificar Datos Personales</h1>

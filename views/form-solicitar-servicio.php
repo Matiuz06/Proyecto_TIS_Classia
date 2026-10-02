@@ -36,7 +36,7 @@ $activePage  = 'catalogo';
 include '../includes/header.php';
 ?>
 
-  <main class="service-req-container motion-entry">
+  <main id="main-content" class="service-req-container motion-entry">
     <nav aria-label="Ruta de navegación" class="breadcrumb u-mb-4">
       <ol class="breadcrumb__list">
         <li><a href="../index.php">Inicio</a> /</li>

@@ -38,7 +38,7 @@ $bodyClass = 'publication-preview-page';
 $activePage = 'panel-proveedor';
 include '../includes/header.php';
 ?>
-<main class="publication-preview" aria-labelledby="publication-preview-title">
+<main id="main-content" class="publication-preview" aria-labelledby="publication-preview-title">
   <?php if (!$p): ?>
     <div class="alert alert-danger">Publicacion no encontrada.</div>
   <?php else: ?>

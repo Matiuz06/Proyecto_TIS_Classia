@@ -42,7 +42,7 @@ $activePage = 'solicitar-docente';
 include '../includes/header.php';
 ?>
 
-<main class="auth-shell">
+<main id="main-content" class="auth-shell">
   <section class="auth-card" aria-labelledby="titulo-solicitud-docente">
     <h1 id="titulo-solicitud-docente">Solicitar ser docente</h1>
 

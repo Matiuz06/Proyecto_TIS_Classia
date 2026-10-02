@@ -24,7 +24,7 @@ $activePage  = 'cuenta';
 include '../includes/header.php';
 ?>
 
-  <main class="onboarding-page motion-entry">
+  <main id="main-content" class="onboarding-page motion-entry">
     <nav aria-label="Ruta de navegación" class="breadcrumb-nav">
       <ol class="breadcrumb-list">
         <li><a href="../index.php">Inicio</a> /</li>

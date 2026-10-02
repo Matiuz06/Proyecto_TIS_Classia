@@ -122,7 +122,7 @@ $bodyClass = 'course-builder-page';
 $activePage = 'panel-proveedor';
 include '../includes/header.php';
 ?>
-<main class="provider-editor course-editor course-builder">
+<main id="main-content" class="provider-editor course-editor course-builder">
   <header class="section-heading course-editor-heading">
     <div>
       <p class="course-eyebrow">Constructor de curso</p>

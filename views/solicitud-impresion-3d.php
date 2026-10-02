@@ -13,7 +13,7 @@ $activePage  = 'catalogo';
 include '../includes/header.php';
 ?>
 
-    <main class="solicitud-3d">
+    <main id="main-content" class="solicitud-3d">
       <nav class="breadcrumb" aria-label="Ruta de navegación">
         <ol>
           <li>

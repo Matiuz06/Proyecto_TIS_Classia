@@ -33,7 +33,7 @@ $puedeAgregar = esta_autenticado();
 include '../includes/header.php';
 ?>
 
-<main class="product-detail-container motion-entry">
+<main id="main-content" class="product-detail-container motion-entry">
   <nav aria-label="Ruta de navegación" class="breadcrumb-nav">
     <ol class="breadcrumb-list">
       <li><a href="../index.php">Inicio</a> /</li>
