@@ -12,7 +12,7 @@ $filtro = $_GET['filtro'] ?? 'todos';
 $error = '';
 $tareaInfo = null;
 $filas = [];
-$resumen = ['total' => 0, 'entregaron' => 0, 'tardias' => 0, 'sin_entregar' => 0, 'calificadas' => 0, 'sin_calificar' => 0];
+$resumen = ['total' => 0, 'entregaron' => 0, 'sin_entregar' => 0, 'calificadas' => 0, 'sin_calificar' => 0];
 
 try {
     $tareaRepo = new TareaRepository($pdo);
@@ -22,16 +22,13 @@ try {
         $error = 'No tenes permisos para revisar esta tarea.';
     } else {
         $repo = new EntregaRepository($pdo);
-        $tarea = Tarea::fromArray($tareaInfo);
         $filas = $repo->listarPorTareaConEstudiantes($id_tarea, (int)$tareaInfo['id_publicacion']);
-        $resumen = $repo->obtenerResumenPorTarea($id_tarea, (int)$tareaInfo['id_publicacion'], $tarea);
-        $filas = array_values(array_filter($filas, function ($fila) use ($filtro, $tarea) {
+        $resumen = $repo->obtenerResumenPorTarea($id_tarea, (int)$tareaInfo['id_publicacion']);
+        $filas = array_values(array_filter($filas, function ($fila) use ($filtro) {
             $entrego = !empty($fila['id_entrega']);
-            $tardia = $entrego && Entrega::fromArray($fila)->esTardia($tarea);
-            $calificada = $entrego && $fila['fecha_calificacion'];
+            $calificada = $entrego && (!empty($fila['fecha_calificacion']) || (($fila['estado'] ?? '') === 'Calificada'));
             return match ($filtro) {
                 'entregados' => $entrego,
-                'tardios' => $tardia,
                 'sin_entregar' => !$entrego,
                 'sin_calificar' => $entrego && !$calificada,
                 'calificados' => $calificada,
@@ -65,7 +62,6 @@ include '../includes/header.php';
       <dl class="course-editor-stats" aria-label="Resumen de entregas">
         <div><dt>Estudiantes</dt><dd><?= $resumen['total'] ?></dd></div>
         <div><dt>Entregaron</dt><dd><?= $resumen['entregaron'] ?></dd></div>
-        <div><dt>Tardias</dt><dd><?= $resumen['tardias'] ?></dd></div>
         <div><dt>Pendientes</dt><dd><?= $resumen['sin_entregar'] ?></dd></div>
         <div><dt>Calificadas</dt><dd><?= $resumen['calificadas'] ?></dd></div>
       </dl>
@@ -73,19 +69,18 @@ include '../includes/header.php';
 
     <nav class="provider-toolbar">
       <a class="btn" href="gestionar-contenido-curso.php?id=<?= (int)$tareaInfo['id_publicacion'] ?>">Volver al contenido</a>
-      <?php foreach (['todos' => 'Todos', 'entregados' => 'Entregados', 'tardios' => 'Tardios', 'sin_entregar' => 'Sin entregar', 'sin_calificar' => 'Sin calificar', 'calificados' => 'Calificados'] as $key => $label): ?>
+      <?php foreach (['todos' => 'Todos', 'entregados' => 'Entregados', 'sin_entregar' => 'Sin entregar', 'sin_calificar' => 'Sin calificar', 'calificados' => 'Calificados'] as $key => $label): ?>
         <a class="btn btn-sm<?= $filtro === $key ? ' btn-primary-action' : '' ?>" href="entregas-tarea.php?id=<?= $id_tarea ?>&filtro=<?= $key ?>"><?= $label ?></a>
       <?php endforeach; ?>
     </nav>
 
     <div class="admin-users-table-wrap">
       <table class="admin-users-table">
-        <thead><tr><th>Estudiante</th><th>Estado</th><th>Tipo</th><th>Fecha</th><th>Condicion</th><th>Calificacion</th><th>Accion</th></tr></thead>
+        <thead><tr><th>Estudiante</th><th>Estado</th><th>Tipo</th><th>Fecha</th><th>Calificacion</th><th>Accion</th></tr></thead>
         <tbody>
           <?php foreach ($filas as $fila): ?>
             <?php
               $entrego = !empty($fila['id_entrega']);
-              $tardia = $entrego && Entrega::fromArray($fila)->esTardia(Tarea::fromArray($tareaInfo));
               $tipos = $fila['tipos_entrega'] ?? [];
             ?>
             <tr>
@@ -93,7 +88,6 @@ include '../includes/header.php';
               <td><?= $entrego ? 'Entregada' : 'Sin entrega' ?></td>
               <td><?= $entrego ? htmlspecialchars(implode(' + ', $tipos) ?: '-') : '-' ?></td>
               <td><?= $entrego ? date('d/m/Y H:i', strtotime($fila['fecha_entrega'])) : '-' ?></td>
-              <td><?= $entrego ? ($tardia ? 'Tardia' : 'En fecha') : 'Pendiente' ?></td>
               <td><?= $fila['calificacion'] !== null ? htmlspecialchars((string)$fila['calificacion']) : '-' ?></td>
               <td><?= $entrego ? '<a class="btn btn-sm" href="revisar-entrega.php?id=' . (int)$fila['id_entrega'] . '">Revisar</a>' : 'Sin entrega' ?></td>
             </tr>
