@@ -12,10 +12,8 @@ class Tarea
     public function __construct(
         private ?int $id_tarea,
         private int $id_recurso,
-        private ?string $fecha_disponible,
-        private ?string $fecha_limite,
+        private ?string $fecha_apertura,
         private ?string $fecha_cierre,
-        private bool $permite_entrega_tardia,
         private bool $permite_archivos,
         private bool $permite_texto,
         private bool $permite_enlace,
@@ -41,10 +39,8 @@ class Tarea
         return new self(
             isset($row['id_tarea']) ? (int)$row['id_tarea'] : null,
             (int)$row['id_recurso'],
-            $row['fecha_disponible'] ?? null,
-            $row['fecha_limite'] ?? null,
+            $row['fecha_apertura'] ?? null,
             $row['fecha_cierre'] ?? null,
-            (bool)($row['permite_entrega_tardia'] ?? false),
             (bool)($row['permite_archivos'] ?? true),
             (bool)($row['permite_texto'] ?? false),
             (bool)($row['permite_enlace'] ?? false),
@@ -70,10 +66,8 @@ class Tarea
         return new self(
             isset($post['id_tarea']) && (int)$post['id_tarea'] > 0 ? (int)$post['id_tarea'] : null,
             $id_recurso,
-            self::normalizarFecha($post['fecha_disponible'] ?? null),
-            (string)self::normalizarFecha($post['fecha_limite'] ?? ''),
+            self::normalizarFecha($post['fecha_apertura'] ?? null),
             self::normalizarFecha($post['fecha_cierre'] ?? null),
-            !empty($post['permite_entrega_tardia']),
             in_array('archivos', $tipos, true),
             in_array('texto', $tipos, true),
             in_array('enlace', $tipos, true),
@@ -90,28 +84,25 @@ class Tarea
     public function validar(): array
     {
         $errores = [];
-        if ($this->fecha_limite === null || $this->fecha_limite === '') $errores[] = 'La fecha limite es obligatoria.';
         if (!$this->permite_archivos && !$this->permite_texto && !$this->permite_enlace) $errores[] = 'Selecciona al menos un tipo de entrega.';
         if ($this->permite_archivos && empty($this->formatos_permitidos)) $errores[] = 'Selecciona al menos un grupo de formatos permitidos.';
         if ($this->tipo_calificacion === 'numerica' && (!$this->puntaje_maximo || $this->puntaje_maximo <= 0)) $errores[] = 'El puntaje maximo debe ser mayor que cero.';
         if ($this->tipo_calificacion !== 'numerica' && $this->puntaje_maximo !== null) $errores[] = 'Este tipo de calificacion no acepta nota numerica.';
 
         try {
-            $disponible = $this->fecha_disponible ? new DateTimeImmutable($this->fecha_disponible) : null;
-            $limite = $this->fecha_limite ? new DateTimeImmutable($this->fecha_limite) : null;
+            $apertura = $this->fecha_apertura ? new DateTimeImmutable($this->fecha_apertura) : null;
             $cierre = $this->fecha_cierre ? new DateTimeImmutable($this->fecha_cierre) : null;
         } catch (Exception) {
             return ['Las fechas ingresadas no son validas.'];
         }
-        if ($disponible && $limite && $disponible > $limite) $errores[] = 'La fecha disponible no puede ser posterior a la fecha limite.';
-        if ($limite && $cierre && $limite > $cierre) $errores[] = 'La fecha de cierre no puede ser anterior a la fecha limite.';
+        if ($apertura && $cierre && $apertura >= $cierre) $errores[] = 'La fecha de cierre debe ser posterior a la fecha de apertura.';
 
         return $errores;
     }
 
     public function estaDisponible(DateTimeImmutable $ahora): bool
     {
-        return !$this->fecha_disponible || $ahora >= new DateTimeImmutable($this->fecha_disponible);
+        return !$this->fecha_apertura || $ahora >= new DateTimeImmutable($this->fecha_apertura);
     }
 
     public function estaCerrada(DateTimeImmutable $ahora): bool
@@ -121,16 +112,7 @@ class Tarea
 
     public function puedeEntregar(DateTimeImmutable $ahora): bool
     {
-        if (!$this->estaDisponible($ahora) || $this->estaCerrada($ahora)) return false;
-        if ($this->fecha_limite === null || $this->fecha_limite === '') return true;
-        if ($ahora <= new DateTimeImmutable($this->fecha_limite)) return true;
-        return $this->permite_entrega_tardia;
-    }
-
-    public function esEntregaTardia(DateTimeImmutable $fechaEntrega): bool
-    {
-        if ($this->fecha_limite === null || $this->fecha_limite === '') return false;
-        return $fechaEntrega > new DateTimeImmutable($this->fecha_limite);
+        return $this->estaDisponible($ahora) && !$this->estaCerrada($ahora);
     }
 
     public function permiteTipoEntrega(string $tipo): bool
@@ -191,10 +173,8 @@ class Tarea
         return [
             'id_tarea' => $this->id_tarea,
             'id_recurso' => $this->id_recurso,
-            'fecha_disponible' => $this->fecha_disponible,
-            'fecha_limite' => $this->fecha_limite,
+            'fecha_apertura' => $this->fecha_apertura,
             'fecha_cierre' => $this->fecha_cierre,
-            'permite_entrega_tardia' => $this->permite_entrega_tardia,
             'permite_archivos' => $this->permite_archivos,
             'permite_texto' => $this->permite_texto,
             'permite_enlace' => $this->permite_enlace,
@@ -212,7 +192,7 @@ class Tarea
 
     public function getId(): ?int { return $this->id_tarea; }
     public function getIdRecurso(): int { return $this->id_recurso; }
-    public function getFechaLimite(): ?string { return $this->fecha_limite; }
+    public function getFechaApertura(): ?string { return $this->fecha_apertura; }
     public function getFechaCierre(): ?string { return $this->fecha_cierre; }
     public function permiteArchivos(): bool { return $this->permite_archivos; }
     public function permiteTexto(): bool { return $this->permite_texto; }

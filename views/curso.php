@@ -30,6 +30,81 @@ $prev = $indice_actual !== null && isset($clases_planas[$indice_actual - 1]) ? $
 $next = $indice_actual !== null && isset($clases_planas[$indice_actual + 1]) ? $clases_planas[$indice_actual + 1]['unidad'] : null;
 $puedeAgregar = esta_autenticado();
 
+function curso_entrega_esta_corregida(array $entrega): bool
+{
+    return !empty($entrega['fecha_calificacion']) || (($entrega['estado'] ?? '') === 'Calificada');
+}
+
+function curso_formatear_numero_calificacion(float $valor): string
+{
+    return rtrim(rtrim(number_format($valor, 2, '.', ''), '0'), '.');
+}
+
+function curso_formatear_calificacion_entrega(array $entrega, ?Tarea $tarea): ?string
+{
+    $calificacion = trim((string)($entrega['calificacion'] ?? ''));
+    if ($calificacion === '' || !$tarea) return null;
+
+    if ($tarea->getTipoCalificacion() === 'numerica') {
+        $nota = curso_formatear_numero_calificacion((float)$calificacion);
+        $maximo = $tarea->getPuntajeMaximo();
+        return $maximo !== null ? $nota . ' / ' . curso_formatear_numero_calificacion($maximo) : $nota;
+    }
+
+    return match ($tarea->getTipoCalificacion()) {
+        'aprobado_reprobado' => $calificacion === 'aprobado' ? 'Aprobado' : 'Reprobado',
+        default => null,
+    };
+}
+
+function curso_formatear_calificacion_docente(array $entrega): ?string
+{
+    $calificacion = trim((string)($entrega['calificacion'] ?? ''));
+    if ($calificacion === '') return null;
+
+    if (($entrega['tipo_calificacion'] ?? '') === 'numerica') {
+        $nota = curso_formatear_numero_calificacion((float)$calificacion);
+        $maximo = isset($entrega['puntaje_maximo']) ? (float)$entrega['puntaje_maximo'] : 0.0;
+        return $maximo > 0 ? $nota . ' / ' . curso_formatear_numero_calificacion($maximo) : $nota;
+    }
+
+    return ($entrega['tipo_calificacion'] ?? '') === 'aprobado_reprobado'
+        ? ($calificacion === 'aprobado' ? 'Aprobado' : 'Reprobado')
+        : $calificacion;
+}
+
+function curso_estado_tarea_alumno(array $fila, DateTimeImmutable $ahora): array
+{
+    if (!empty($fila['id_entrega'])) {
+        if (!empty($fila['fecha_calificacion']) || (($fila['estado'] ?? '') === 'Calificada')) {
+            return ['clave' => 'calificada', 'texto' => 'Calificada', 'badge' => 'badge-success-soft'];
+        }
+        return ['clave' => 'pendiente_correccion', 'texto' => 'Pendiente de corrección', 'badge' => 'badge-info-soft'];
+    }
+
+    $tarea = Tarea::fromArray($fila);
+    if (!$tarea->estaDisponible($ahora)) {
+        return ['clave' => 'pendiente', 'texto' => 'No disponible', 'badge' => 'badge-info-soft'];
+    }
+    if (!$tarea->puedeEntregar($ahora)) {
+        return ['clave' => 'vencida', 'texto' => 'Vencida', 'badge' => 'badge-danger-soft'];
+    }
+    return ['clave' => 'pendiente', 'texto' => 'Pendiente', 'badge' => 'badge-warning-soft'];
+}
+
+$filas_calificaciones = [];
+if ($comprado && !empty($tareas_alumno_curso)) {
+    $ahora = new DateTimeImmutable();
+    foreach ($tareas_alumno_curso as $filaTarea) {
+        $estadoAcademico = curso_estado_tarea_alumno($filaTarea, $ahora);
+        $tareaFila = Tarea::fromArray($filaTarea);
+        $calificacionFila = $estadoAcademico['clave'] === 'calificada'
+            ? curso_formatear_calificacion_entrega($filaTarea, $tareaFila)
+            : null;
+        $filas_calificaciones[] = [$filaTarea, $estadoAcademico, $calificacionFila];
+    }
+}
+
 include '../includes/header.php';
 ?>
 
@@ -92,7 +167,15 @@ include '../includes/header.php';
     <div class="course-shell<?= !$item_actual ? ' course-shell--overview' : '' ?>">
       <aside class="course-sidebar" id="course-sidebar" data-course-sidebar aria-label="Contenido del curso">
         <div class="course-sidebar-title">Contenido del curso</div>
-        <a class="course-sidebar-general<?= $item_actual ? '' : ' is-active' ?>" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>" <?= $item_actual ? '' : 'aria-current="page"' ?>></a>
+        <?php if (!empty($puede_gestionar_entregas)): ?>
+          <div class="course-sidebar-actions">
+            <button class="course-sidebar-action" type="button" data-dialog-open="dialog-entregas">Entregas</button>
+          </div>
+        <?php elseif ($comprado): ?>
+          <div class="course-sidebar-actions">
+            <button class="course-sidebar-action" type="button" data-dialog-open="dialog-calificaciones">Calificaciones</button>
+          </div>
+        <?php endif; ?>
         <?php foreach ($contenido_curso as $modulo): ?>
           <details class="course-nav-module" open>
             <summary>
@@ -135,6 +218,145 @@ include '../includes/header.php';
           </details>
         <?php endforeach; ?>
       </aside>
+
+      <?php if ($comprado): ?>
+        <dialog class="course-dialog course-grades-dialog" id="dialog-calificaciones" aria-labelledby="titulo-dialog-calificaciones">
+          <div class="course-dialog-header">
+            <div>
+              <h2 id="titulo-dialog-calificaciones">Calificaciones</h2>
+              <p class="course-dialog-context">Curso: <?= htmlspecialchars($curso['titulo']) ?></p>
+            </div>
+            <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
+          </div>
+          <div class="course-dialog-body">
+            <?php if (empty($tareas_alumno_curso)): ?>
+              <div class="course-empty-state course-empty-state-small">
+                <p>Este curso todavía no tiene tareas.</p>
+              </div>
+            <?php else: ?>
+              <p class="course-grades-intro">Estado de tus tareas del curso.</p>
+              <div class="course-grades-table-wrap">
+                <table class="course-grades-table">
+                  <thead>
+                    <tr>
+                      <th class="course-grades-cell">Actividad</th>
+                      <th class="course-grades-cell">Estado</th>
+                      <th class="course-grades-cell">Calificación</th>
+                      <th class="course-grades-cell">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($filas_calificaciones as [$filaTarea, $estadoAcademico, $calificacionFila]): ?>
+                      <?php
+                        $hrefTarea = 'curso.php?id=' . (int)$curso['id_publicacion'] . '&unidad=' . (int)$filaTarea['id_unidad'] . '#recurso-' . (int)$filaTarea['id_recurso'];
+                        $accionTarea = match ($estadoAcademico['clave']) {
+                            'calificada' => 'Ver devolución',
+                            'pendiente_correccion' => 'Ver entrega',
+                            default => 'Ir a la tarea',
+                        };
+                      ?>
+                      <tr>
+                        <td class="course-grades-cell course-grades-task" data-label="Actividad">
+                          <strong><?= htmlspecialchars($filaTarea['titulo']) ?></strong>
+                          <span class="course-grades-location"><?= htmlspecialchars($filaTarea['modulo_titulo']) ?> · <?= htmlspecialchars($filaTarea['unidad_titulo']) ?></span>
+                        </td>
+                        <td class="course-grades-cell" data-label="Estado"><span class="badge <?= htmlspecialchars($estadoAcademico['badge']) ?>"><?= htmlspecialchars($estadoAcademico['texto']) ?></span></td>
+                        <td class="course-grades-cell course-grades-score" data-label="Calificación"><?= $calificacionFila !== null ? htmlspecialchars($calificacionFila) : '—' ?></td>
+                        <td class="course-grades-cell" data-label="Acción"><a class="btn btn-sm btn-outline course-grades-action" href="<?= htmlspecialchars($hrefTarea) ?>"><?= htmlspecialchars($accionTarea) ?></a></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
+            <?php endif; ?>
+          </div>
+        </dialog>
+      <?php endif; ?>
+
+      <?php if (!empty($puede_gestionar_entregas)): ?>
+        <dialog class="course-dialog course-deliveries-dialog" id="dialog-entregas" aria-labelledby="titulo-dialog-entregas">
+          <div class="course-dialog-header">
+            <div>
+              <h2 id="titulo-dialog-entregas">Entregas</h2>
+            </div>
+            <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
+          </div>
+          <div class="course-dialog-body">
+            <?php if (empty($resumen_entregas_docente)): ?>
+              <div class="course-empty-state course-empty-state-small">
+                <p>Este curso todavia no tiene tareas.</p>
+              </div>
+            <?php else: ?>
+              <div class="course-deliveries-list">
+                <?php foreach ($resumen_entregas_docente as $tareaEntrega): ?>
+                  <?php
+                    $idTareaEntrega = (int)$tareaEntrega['id_tarea'];
+                    $totalEntregas = (int)($tareaEntrega['total_entregas'] ?? 0);
+                    $calificadas = (int)($tareaEntrega['calificadas'] ?? 0);
+                    $pendientesCorreccion = (int)($tareaEntrega['pendientes_correccion'] ?? 0);
+                    $entregasTarea = $entregas_docente_por_tarea[$idTareaEntrega] ?? [];
+                    $textoEntregas = $totalEntregas === 1 ? '1 entrega' : $totalEntregas . ' entregas';
+                    $textoCalificadas = $calificadas === 1 ? '1 calificada' : $calificadas . ' calificadas';
+                    $textoPendientes = $pendientesCorreccion === 1 ? '1 pendiente' : $pendientesCorreccion . ' pendientes';
+                  ?>
+                  <details class="course-deliveries-task">
+                    <summary>
+                      <span class="course-deliveries-summary-main">
+                        <span class="course-deliveries-task-title"><?= htmlspecialchars($tareaEntrega['titulo']) ?></span>
+                        <span class="course-deliveries-meta">
+                          <?= $totalEntregas > 0 ? htmlspecialchars($textoEntregas) : 'Sin entregas' ?>
+                          <?php if ($totalEntregas > 0): ?>
+                            <span><?= htmlspecialchars($textoCalificadas) ?></span>
+                            <span><?= htmlspecialchars($textoPendientes) ?></span>
+                          <?php endif; ?>
+                        </span>
+                      </span>
+                      <span class="course-deliveries-chevron" aria-hidden="true"></span>
+                    </summary>
+                    <?php if ($totalEntregas === 0): ?>
+                      <p class="course-empty-note">Sin entregas para revisar.</p>
+                    <?php else: ?>
+                      <div class="course-grades-table-wrap">
+                        <table class="course-grades-table">
+                          <thead>
+                            <tr>
+                              <th class="course-grades-cell">Alumno</th>
+                              <th class="course-grades-cell">Fecha</th>
+                              <th class="course-grades-cell">Estado</th>
+                              <th class="course-grades-cell">Calificacion</th>
+                              <th class="course-grades-cell">Accion</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <?php foreach ($entregasTarea as $entregaDocente): ?>
+                              <?php
+                                $corregida = !empty($entregaDocente['fecha_calificacion']) || (($entregaDocente['estado'] ?? '') === 'Calificada');
+                                $estadoEntregaDocente = $corregida ? 'Calificada' : 'Pendiente de correccion';
+                                $badgeEntregaDocente = $corregida ? 'badge-success-soft' : 'badge-info-soft';
+                                $calificacionDocente = $corregida ? curso_formatear_calificacion_docente($entregaDocente) : null;
+                              ?>
+                              <tr>
+                                <td class="course-grades-cell course-grades-task" data-label="Alumno">
+                                  <strong><?= htmlspecialchars($entregaDocente['nombre'] . ' ' . $entregaDocente['apellido']) ?></strong>
+                                  <span class="course-grades-location"><?= htmlspecialchars($entregaDocente['email']) ?></span>
+                                </td>
+                                <td class="course-grades-cell" data-label="Fecha"><?= !empty($entregaDocente['fecha_entrega']) ? date('d/m/Y H:i', strtotime($entregaDocente['fecha_entrega'])) : '-' ?></td>
+                                <td class="course-grades-cell" data-label="Estado"><span class="badge <?= $badgeEntregaDocente ?>"><?= htmlspecialchars($estadoEntregaDocente) ?></span></td>
+                                <td class="course-grades-cell course-grades-score" data-label="Calificacion"><?= $calificacionDocente !== null ? htmlspecialchars($calificacionDocente) : '-' ?></td>
+                                <td class="course-grades-cell" data-label="Accion"><a class="btn btn-sm btn-outline course-grades-action" href="revisar-entrega.php?id=<?= (int)$entregaDocente['id_entrega'] ?>"><?= $corregida ? 'Ver correccion' : 'Revisar' ?></a></td>
+                              </tr>
+                            <?php endforeach; ?>
+                          </tbody>
+                        </table>
+                      </div>
+                    <?php endif; ?>
+                  </details>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </div>
+        </dialog>
+      <?php endif; ?>
 
       <article class="course-content" aria-live="polite">
         <?php if (!$item_actual): ?>
@@ -220,14 +442,19 @@ include '../includes/header.php';
                   <?php 
                     $codRec = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($idxRec + 1);
                     $emoji = icono_emoji_recurso($recurso['tipo']);
+                    $esTareaEntregable = $recurso['tipo'] === 'Entrega de Tareas';
                   ?>
                   <li class="course-resource course-resource--<?= strtolower(str_replace(' ', '-', $recurso['tipo'])) ?>" id="recurso-<?= (int)$recurso['id_recurso'] ?>">
-                    <span class="course-resource-icon" aria-hidden="true"><?= $emoji ?></span>
+                    <?php if (!$esTareaEntregable): ?>
+                      <span class="course-resource-icon" aria-hidden="true"><?= $emoji ?></span>
+                    <?php endif; ?>
                     <div>
                       <div class="course-resource-title-row">
                         <span class="course-resource-code"><?= $codRec ?></span>
                         <strong><?= htmlspecialchars($recurso['titulo']) ?></strong>
-                        <span class="course-resource-tag"><?= htmlspecialchars($recurso['tipo']) ?></span>
+                        <?php if (!$esTareaEntregable): ?>
+                          <span class="course-resource-tag"><?= htmlspecialchars($recurso['tipo']) ?></span>
+                        <?php endif; ?>
                       </div>
                       <?php if (!empty($recurso['descripcion'])): ?><p><?= nl2br(htmlspecialchars($recurso['descripcion'])) ?></p><?php endif; ?>
                       <div class="course-resource-actions">
@@ -278,7 +505,20 @@ include '../includes/header.php';
                           <?php endif; ?>
                         <?php endif; ?>
                         <?php if ($recurso['tipo'] === 'Entrega de Tareas'): ?>
-                          <?php $tarea = $tareas_curso[$recurso['id_recurso']] ?? null; $entrega = $mis_entregas[$recurso['id_recurso']] ?? null; $puedeEntregarTarea = !$tarea || $tarea->puedeEntregar(new DateTimeImmutable()); ?>
+                          <?php
+                            $tarea = $tareas_curso[$recurso['id_recurso']] ?? null;
+                            $entrega = $mis_entregas[$recurso['id_recurso']] ?? null;
+                            $entregaCorregida = $entrega ? curso_entrega_esta_corregida($entrega) : false;
+                            $puedeEntregarTarea = !$tarea || $tarea->puedeEntregar(new DateTimeImmutable());
+                          ?>
+                          <?php if (!$entrega): ?>
+                            <span class="badge badge-warning-soft">Pendiente de entrega</span>
+                          <?php elseif ($entregaCorregida): ?>
+                            <span class="badge badge-success-soft">Corregida</span>
+                          <?php else: ?>
+                            <span class="badge badge-course">Entregada</span>
+                            <span class="badge badge-warning-soft">Pendiente de corrección</span>
+                          <?php endif; ?>
                           <?php if ($entrega): ?>
                             <button class="btn btn-sm btn-outline" type="button" data-dialog-open="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
                               ✓ Ver / Actualizar entrega
@@ -391,7 +631,14 @@ include '../includes/header.php';
                     <?php endif; ?>
 
                     <?php if ($recurso['tipo'] === 'Entrega de Tareas'): ?>
-                      <?php $tarea = $tareas_curso[$recurso['id_recurso']] ?? null; $entrega = $mis_entregas[$recurso['id_recurso']] ?? null; $archivosEntrega = $entrega ? ($archivos_entregas[(int)$entrega['id_entrega']] ?? []) : []; $puedeEntregarTarea = !$tarea || $tarea->puedeEntregar(new DateTimeImmutable()); ?>
+                      <?php
+                        $tarea = $tareas_curso[$recurso['id_recurso']] ?? null;
+                        $entrega = $mis_entregas[$recurso['id_recurso']] ?? null;
+                        $entregaCorregida = $entrega ? curso_entrega_esta_corregida($entrega) : false;
+                        $calificacionDocente = $entregaCorregida ? curso_formatear_calificacion_entrega($entrega, $tarea) : null;
+                        $archivosEntrega = $entrega ? ($archivos_entregas[(int)$entrega['id_entrega']] ?? []) : [];
+                        $puedeEntregarTarea = !$tarea || $tarea->puedeEntregar(new DateTimeImmutable());
+                      ?>
                       <dialog class="course-dialog" id="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
                         <div class="course-dialog-header">
                           <h2 id="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">Entrega de tarea: <?= htmlspecialchars($recurso['titulo']) ?></h2>
@@ -406,14 +653,19 @@ include '../includes/header.php';
                           <?php endif; ?>
                           <?php if ($tarea): ?>
                             <div class="course-delivery-consigna u-mb-md">
-                              <strong>Fecha limite:</strong>
-                              <p><?= $tarea->getFechaLimite() ? date('d/m/Y H:i', strtotime($tarea->getFechaLimite())) . ' hs' : 'Pendiente de definir por el docente' ?><?= $tarea->getFechaCierre() ? ' - Cierre: ' . date('d/m/Y H:i', strtotime($tarea->getFechaCierre())) . ' hs' : '' ?></p>
+                              <strong>Fechas de entrega:</strong>
+                              <p><?= $tarea->getFechaApertura() ? 'Disponible desde: ' . date('d/m/Y H:i', strtotime($tarea->getFechaApertura())) . ' hs' : 'Disponible desde ahora' ?><?= $tarea->getFechaCierre() ? ' - Cierre: ' . date('d/m/Y H:i', strtotime($tarea->getFechaCierre())) . ' hs' : '' ?></p>
                             </div>
                           <?php endif; ?>
 
                           <?php if ($entrega): ?>
                             <div class="alert alert-success u-mb-md">
                               <p><strong>Estado:</strong> Entregada el <?= date('d/m/Y H:i', strtotime($entrega['fecha_entrega'])) ?> hs.</p>
+                              <?php if ($entregaCorregida): ?>
+                                <p class="u-mt-xs"><span class="badge badge-success-soft">Corregida</span></p>
+                              <?php else: ?>
+                                <p class="u-mt-xs"><span class="badge badge-warning-soft">Pendiente de corrección</span></p>
+                              <?php endif; ?>
                               <?php if (!empty($entrega['archivo_entrega']) && empty($archivosEntrega)): ?>
                                 <?php $entregaVisualizable = recurso_es_visualizable_nativamente('Archivo', $entrega['archivo_entrega']); ?>
                                 <div class="course-delivery-actions-row">
@@ -438,6 +690,26 @@ include '../includes/header.php';
                               <?php endif; ?>
                               <?php if (!empty($entrega['comentario_entrega'])): ?>
                                 <p class="u-mt-xs"><strong>Tus notas:</strong> <?= nl2br(htmlspecialchars($entrega['comentario_entrega'])) ?></p>
+                              <?php endif; ?>
+                            </div>
+                          <?php endif; ?>
+
+                          <?php if ($entrega && $entregaCorregida): ?>
+                            <div class="course-delivery-consigna u-mb-md">
+                              <strong>Devolución del docente</strong>
+                              <?php if ($calificacionDocente !== null): ?>
+                                <p class="u-mt-xs"><strong>Calificación</strong><br><?= htmlspecialchars($calificacionDocente) ?></p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['feedback_docente'])): ?>
+                                <p class="u-mt-xs"><strong>Retroalimentación</strong><br><?= nl2br(htmlspecialchars($entrega['feedback_docente'])) ?></p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['fecha_calificacion'])): ?>
+                                <p class="u-mt-xs"><strong>Corregida el</strong><br><?= date('d/m/Y H:i', strtotime($entrega['fecha_calificacion'])) ?> hs.</p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['archivo_feedback'])): ?>
+                                <p class="u-mt-xs">
+                                  <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=feedback&id=<?= (int)$entrega['id_entrega'] ?>&modo=descargar">Descargar archivo de devolución</a>
+                                </p>
                               <?php endif; ?>
                             </div>
                           <?php endif; ?>

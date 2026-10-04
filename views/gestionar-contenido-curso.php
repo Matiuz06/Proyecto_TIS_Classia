@@ -55,10 +55,8 @@ function campos_tarea(?Tarea $tarea = null): void
 {
     $d = $tarea?->toArray() ?? [
         'id_tarea' => null,
-        'fecha_disponible' => null,
-        'fecha_limite' => '',
+        'fecha_apertura' => null,
         'fecha_cierre' => null,
-        'permite_entrega_tardia' => true,
         'permite_archivos' => true,
         'permite_texto' => false,
         'permite_enlace' => false,
@@ -75,10 +73,8 @@ function campos_tarea(?Tarea $tarea = null): void
     <fieldset class="task-config form-grid-full" data-task-config>
       <legend>Configuracion de tarea</legend>
       <input type="hidden" name="id_tarea" value="<?= (int)($d['id_tarea'] ?? 0) ?>">
-      <label>Disponible desde<input type="datetime-local" name="fecha_disponible" value="<?= htmlspecialchars(valor_datetime_local($d['fecha_disponible'])) ?>"></label>
-      <label>Fecha limite<input type="datetime-local" name="fecha_limite" value="<?= htmlspecialchars(valor_datetime_local($d['fecha_limite'])) ?>" data-task-required required></label>
+      <label>Fecha de apertura<input type="datetime-local" name="fecha_apertura" value="<?= htmlspecialchars(valor_datetime_local($d['fecha_apertura'])) ?>"></label>
       <label>Fecha de cierre<input type="datetime-local" name="fecha_cierre" value="<?= htmlspecialchars(valor_datetime_local($d['fecha_cierre'])) ?>"></label>
-      <label class="course-check"><input type="checkbox" name="permite_entrega_tardia" value="1" <?= $d['permite_entrega_tardia'] ? 'checked' : '' ?>> Permitir entrega tardia</label>
 
       <fieldset class="form-grid-full task-options">
         <legend>Tipos de entrega</legend>

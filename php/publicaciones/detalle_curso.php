@@ -32,6 +32,10 @@ $comprado = false;
 $contenido_curso = [];
 $puede_ver_recursos = false;
 $tareas_curso = [];
+$tareas_alumno_curso = [];
+$puede_gestionar_entregas = false;
+$resumen_entregas_docente = [];
+$entregas_docente_por_tarea = [];
 $archivos_entregas = [];
 
 $usuario_actual = usuario_actual();
@@ -303,6 +307,7 @@ if ($id_curso > 0) {
             }
 
             $es_propietario = $usuario_actual && (int)$usuario_actual['id_usuario'] === (int)$curso['id_usuario'];
+            $puede_gestionar_entregas = $usuario_actual && ($es_propietario || es_admin());
             if ($curso['estado'] !== 'Activo' && !$comprado && !$es_propietario && !es_admin()) {
                 $curso = null;
             }
@@ -321,6 +326,13 @@ if ($id_curso > 0) {
                 $entregaRepo = new EntregaRepository($pdo);
                 $tareas_curso = (new TareaRepository($pdo))->listarPorCurso($id_curso);
                 $mis_entregas = $entregaRepo->listarEntregasUsuarioPorCurso($id_curso, (int)$usuario_actual['id_usuario']);
+                if ($puede_gestionar_entregas) {
+                    $resumen_entregas_docente = $entregaRepo->obtenerResumenEntregasCurso($id_curso);
+                    $entregas_docente_por_tarea = $entregaRepo->listarEntregasCursoAgrupadas($id_curso);
+                }
+                if ($comprado) {
+                    $tareas_alumno_curso = $entregaRepo->obtenerTareasAlumnoCurso($id_curso, (int)$usuario_actual['id_usuario']);
+                }
 
                 if ($mis_entregas) {
                     foreach ($mis_entregas as $ent) {

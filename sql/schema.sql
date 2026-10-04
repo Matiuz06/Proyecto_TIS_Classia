@@ -310,10 +310,8 @@ CREATE TABLE IF NOT EXISTS curso_recursos (
 CREATE TABLE IF NOT EXISTS curso_tareas (
     id_tarea INT AUTO_INCREMENT PRIMARY KEY,
     id_recurso INT NOT NULL,
-    fecha_disponible DATETIME NULL,
-    fecha_limite DATETIME NULL,
+    fecha_apertura DATETIME NULL,
     fecha_cierre DATETIME NULL,
-    permite_entrega_tardia TINYINT(1) NOT NULL DEFAULT 0,
     permite_archivos TINYINT(1) NOT NULL DEFAULT 1,
     permite_texto TINYINT(1) NOT NULL DEFAULT 0,
     permite_enlace TINYINT(1) NOT NULL DEFAULT 0,
