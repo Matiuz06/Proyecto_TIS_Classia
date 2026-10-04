@@ -24,7 +24,15 @@ $activePage  = 'cuenta';
 include '../includes/header.php';
 ?>
 
-  <main class="onboarding-page motion-entry">
+  <main id="main-content" class="onboarding-page motion-entry">
+    <nav aria-label="Ruta de navegación" class="breadcrumb-nav">
+      <ol class="breadcrumb-list">
+        <li><a href="../index.php">Inicio</a> /</li>
+        <li><a href="usuario.php">Mi Cuenta</a> /</li>
+        <li aria-current="page">Primeros pasos</li>
+      </ol>
+    </nav>
+
     <header class="onboarding-header">
       <p class="onboarding-subtitle">Configuración inicial</p>
       <h1>Contanos qué buscás en Classia</h1>
@@ -33,6 +41,16 @@ include '../includes/header.php';
         proyectos, mentorías y servicios relacionados con tus intereses.
         Podrás modificar estas preferencias más adelante desde tu perfil.
       </p>
+
+      <div class="onboarding-progress-box" role="progressbar" aria-valuenow="<?= $paso_actual ?>" aria-valuemin="1" aria-valuemax="9" aria-label="Progreso de configuración inicial">
+        <div class="onboarding-progress-labels">
+          <span class="onboarding-progress-current">Paso <?= $paso_actual ?> de 9</span>
+          <span class="onboarding-progress-percentage"><?= round(($paso_actual / 9) * 100) ?>% completado</span>
+        </div>
+        <div class="onboarding-progress-track">
+          <div class="onboarding-progress-bar" style="width: <?= round(($paso_actual / 9) * 100) ?>%;"></div>
+        </div>
+      </div>
     </header>
 
     <form action="../php/usuarios/onboarding.php" method="post">

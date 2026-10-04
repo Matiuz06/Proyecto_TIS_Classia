@@ -20,7 +20,7 @@ $activePage  = 'catalogo';
 include '../includes/header.php';
 ?>
 
-  <main class="product-detail-container provider-public-view motion-entry">
+  <main id="main-content" class="product-detail-container provider-public-view motion-entry">
     <?php if (!$proveedor): ?>
       <section class="empty-state" aria-labelledby="sin-proveedor">
         <h1 id="sin-proveedor">Proveedor no encontrado</h1>

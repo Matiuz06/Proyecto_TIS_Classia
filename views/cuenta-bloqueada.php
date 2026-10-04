@@ -35,7 +35,7 @@ include '../includes/header.php';
 ?>
 
 
-<main class="blocked-shell">
+<main id="main-content" class="blocked-shell">
     <div class="blocked-card" role="region" aria-labelledby="blocked-title">
 
         <!-- Ícono de advertencia / bloqueo -->

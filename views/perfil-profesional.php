@@ -95,7 +95,7 @@ $activePage = 'catalogo';
 include '../includes/header.php';
 ?>
 
-<main class="product-detail-container motion-entry">
+<main id="main-content" class="product-detail-container motion-entry">
     <?php if (!$perfil): ?>
         <section class="empty-state" aria-labelledby="perfil-no-encontrado">
             <h1 id="perfil-no-encontrado">Perfil profesional no disponible</h1>

@@ -35,7 +35,7 @@ $activePage = 'cuenta';
 include '../includes/header.php';
 ?>
 
-<main class="auth-shell">
+<main id="main-content" class="auth-shell">
     <section class="auth-intro" aria-labelledby="intro-2fa">
         <h1 id="intro-2fa">Verificación de Seguridad</h1>
         <p>

@@ -79,6 +79,7 @@ $activePage = 'panel-proveedor';
 include '../includes/header.php';
 ?>
 <main class="provider-editor course-builder review-delivery-page">
+<main id="main-content" class="provider-editor course-builder">
   <?php if ($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
   <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
   <?php if ($entrega): ?>

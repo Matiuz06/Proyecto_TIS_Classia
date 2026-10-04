@@ -18,7 +18,7 @@ $jsPrefix = '..';
 $activePage = 'cuenta';
 include '../includes/header.php';
 ?>
-<main class="provider-editor provider-workspace requests-management-page">
+<main id="main-content" class="provider-editor provider-workspace requests-management-page">
     <header class="section-heading provider-page-heading">
         <h1>Mis solicitudes de servicios</h1>
         <p>Consultá el estado, las propuestas del proveedor y la conversación de cada solicitud.</p>

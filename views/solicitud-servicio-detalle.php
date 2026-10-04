@@ -34,7 +34,7 @@ $jsPrefix = '..';
 $activePage = 'panel-proveedor';
 include '../includes/header.php';
 ?>
-<main class="provider-editor provider-workspace">
+<main id="main-content" class="provider-editor provider-workspace">
     <?php if (!$solicitud): ?>
         <div class="alert alert-danger">Solicitud inexistente o sin permisos.</div>
     <?php else: ?>

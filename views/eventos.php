@@ -112,7 +112,7 @@ $activePage  = 'eventos';
 include '../includes/header.php';
 ?>
 
-  <main class="events-page-container motion-entry">
+  <main id="main-content" class="events-page-container motion-entry">
     <header class="news-page-header">
       <div class="news-page-header__inner">
         <div>

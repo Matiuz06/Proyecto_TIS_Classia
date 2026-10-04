@@ -14,7 +14,7 @@ $activePage = 'cuenta';
 include '../includes/header.php';
 ?>
 
-<main class="product-detail-container motion-entry">
+<main id="main-content" class="product-detail-container motion-entry">
   <div class="card-container payment-card card-narrow">
     <span class="brand-mark">Seguridad Classia</span>
     <h1>Autenticación en Dos Pasos (2FA)</h1>

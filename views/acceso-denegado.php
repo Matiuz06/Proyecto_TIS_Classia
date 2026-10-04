@@ -15,7 +15,7 @@ $activePage = 'cuenta';
 include '../includes/header.php';
 ?>
 
-<main class="card-container motion-entry">
+<main id="main-content" class="card-container motion-entry">
   <img style="width: 200px;" src="<?= $cssPrefix ?>/assets/images/logo-classia.png" alt="Classia" />
   <br>
   <h1>No tenes permisos para acceder a esta pagina.</h1>

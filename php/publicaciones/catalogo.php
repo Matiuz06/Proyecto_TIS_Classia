@@ -44,21 +44,39 @@ try {
     error_log("Error al consultar categorias: " . $e->getMessage());
 }
 
-// JOIN con valoraciones y contrataciones para soportar ordenamiento dinámico
+// Agregaciones desacopladas para evitar producto cartesiano y acelerar tiempo de respuesta (<3s)
 $sql = "SELECT
-            p.*,
+            p.id_publicacion,
+            p.id_usuario,
+            p.titulo,
+            p.descripcion,
+            p.precio,
+            p.tipo,
+            p.modalidad,
+            p.imagen,
+            p.id_categoria,
+            p.nivel_experiencia,
+            p.duracion_horas,
+            p.fecha_creacion,
+            p.estado,
             c.nombre_categoria,
             u.nombre  AS autor_nombre,
             u.apellido AS autor_apellido,
-            COALESCE(AVG(v.puntuacion), 0)     AS promedio_valoracion,
-            COUNT(DISTINCT dc.id_contratacion) AS total_contrataciones
+            COALESCE(v_agg.promedio_valoracion, 0) AS promedio_valoracion,
+            COALESCE(c_agg.total_contrataciones, 0) AS total_contrataciones
         FROM publicaciones p
         JOIN categorias c  ON p.id_categoria = c.id_categoria
         JOIN usuarios u    ON p.id_usuario   = u.id_usuario
-        LEFT JOIN valoraciones v
-            ON v.id_publicacion = p.id_publicacion
-        LEFT JOIN detalles_contratacion dc
-            ON dc.id_publicacion = p.id_publicacion
+        LEFT JOIN (
+            SELECT id_publicacion, AVG(puntuacion) AS promedio_valoracion
+            FROM valoraciones
+            GROUP BY id_publicacion
+        ) v_agg ON v_agg.id_publicacion = p.id_publicacion
+        LEFT JOIN (
+            SELECT id_publicacion, COUNT(DISTINCT id_contratacion) AS total_contrataciones
+            FROM detalles_contratacion
+            GROUP BY id_publicacion
+        ) c_agg ON c_agg.id_publicacion = p.id_publicacion
         WHERE p.estado = 'Activo'";
 $params = [];
 
@@ -82,9 +100,6 @@ if ($categoria_filtro > 0) {
     $sql .= " AND p.id_categoria = :categoria";
     $params['categoria'] = $categoria_filtro;
 }
-
-// GROUP BY necesario por los LEFT JOINs de agregación
-$sql .= " GROUP BY p.id_publicacion, c.nombre_categoria, u.nombre, u.apellido";
 
 // Ordenamiento dinámico
 $orden_sql = match ($orden) {

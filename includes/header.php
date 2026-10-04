@@ -58,8 +58,24 @@ $cartCount = count($cartItems);
   <link rel="stylesheet" href="<?= $cssPrefix ?>/css/style.css?v=<?= filemtime(__DIR__ . '/../css/style.css') ?>" />
   <link rel="stylesheet" href="<?= $cssPrefix ?>/css/header-footer.css?v=<?= filemtime(__DIR__ . '/../css/header-footer.css') ?>" />
   <link rel="icon" type="image/png" href="<?= $cssPrefix ?>/assets/images/favicon.png" />
+  <!-- Anti-FOUC: aplica el tema antes del primer paint -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('classia-theme');
+        if (saved === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (saved === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+        // Sin valor guardado: se usa prefers-color-scheme via CSS
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body<?= ($bodyClass ?? '') ? ' class="' . htmlspecialchars($bodyClass) . '"' : '' ?>>
+  <!-- Skip-link: acceso directo al contenido principal (WCAG 2.4.1) -->
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
   <header class="site-header">
     <div class="site-header__inner">
       <a class="site-brand" href="<?= $indexHref ?>">
@@ -160,6 +176,35 @@ $cartCount = count($cartItems);
             </div>
           </div>
         <?php endif; ?>
+        <!-- Botón de modo oscuro (RNF-17) -->
+        <button
+          class="btn-theme-toggle"
+          id="theme-toggle-btn"
+          type="button"
+          aria-label="Cambiar a modo oscuro"
+          title="Alternar modo claro/oscuro"
+        >
+          <!-- Sol (visible en modo oscuro) -->
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <!-- Luna (visible en modo claro) -->
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" focusable="false">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
       </nav>
     </div>
   </header>

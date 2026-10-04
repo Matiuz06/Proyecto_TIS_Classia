@@ -117,7 +117,7 @@ $activePage  = 'noticias';
 include '../includes/header.php';
 ?>
 
-  <main class="news-page-container motion-entry">
+  <main id="main-content" class="news-page-container motion-entry">
     <header class="news-page-header">
       <div class="news-page-header__inner">
         <div>
