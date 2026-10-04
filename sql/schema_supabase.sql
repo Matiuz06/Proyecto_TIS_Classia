@@ -284,10 +284,8 @@ CREATE INDEX IF NOT EXISTS idx_curso_recursos_unidad_orden ON curso_recursos (id
 CREATE TABLE IF NOT EXISTS curso_tareas (
     id_tarea SERIAL PRIMARY KEY,
     id_recurso INT NOT NULL REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
-    fecha_disponible TIMESTAMPTZ NULL,
-    fecha_limite TIMESTAMPTZ NULL,
+    fecha_apertura TIMESTAMPTZ NULL,
     fecha_cierre TIMESTAMPTZ NULL,
-    permite_entrega_tardia BOOLEAN NOT NULL DEFAULT FALSE,
     permite_archivos BOOLEAN NOT NULL DEFAULT TRUE,
     permite_texto BOOLEAN NOT NULL DEFAULT FALSE,
     permite_enlace BOOLEAN NOT NULL DEFAULT FALSE,

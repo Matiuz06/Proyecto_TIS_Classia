@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/Entrega.php';
 require_once __DIR__ . '/Tarea.php';
+require_once __DIR__ . '/../utils/file_upload_helper.php';
 
 /**
  * Responsabilidad: Persistencia de entregas, archivos, calificaciones y resumenes.
@@ -16,6 +17,7 @@ class EntregaRepository
     {
         $actual = $this->buscarPorTareaYUsuario((int)$tarea->getId(), $id_usuario);
         $idActual = $actual?->getId();
+        $feedbackAnterior = $actual?->toArray()['archivo_feedback'] ?? null;
         $reemplazados = [];
 
         $this->pdo->beginTransaction();
@@ -28,6 +30,11 @@ class EntregaRepository
                         comentario_entrega = :comentario,
                         estado_entrega = 'entregada',
                         estado = 'Entregada',
+                        calificacion = NULL,
+                        feedback_docente = NULL,
+                        archivo_feedback = NULL,
+                        fecha_calificacion = NULL,
+                        id_docente_calificador = NULL,
                         fecha_entrega = CURRENT_TIMESTAMP,
                         fecha_actualizacion = CURRENT_TIMESTAMP
                     WHERE id_entrega = :id
@@ -67,6 +74,7 @@ class EntregaRepository
             }
 
             $this->pdo->commit();
+            $this->eliminarFeedbackAnterior($feedbackAnterior);
             return ['id_entrega' => $idEntrega, 'archivos_reemplazados' => $reemplazados];
         } catch (Throwable $e) {
             if ($this->pdo->inTransaction()) $this->pdo->rollBack();
@@ -78,6 +86,7 @@ class EntregaRepository
     {
         $actual = $this->buscarPorTareaYUsuario((int)$tarea->getId(), $id_usuario);
         if ($actual) {
+            $feedbackAnterior = $actual->toArray()['archivo_feedback'] ?? null;
             $stmt = $this->pdo->prepare("
                 UPDATE curso_entregas
                 SET texto_entrega = :texto,
@@ -85,6 +94,11 @@ class EntregaRepository
                     comentario_entrega = :comentario,
                     estado_entrega = 'entregada',
                     estado = 'Entregada',
+                    calificacion = NULL,
+                    feedback_docente = NULL,
+                    archivo_feedback = NULL,
+                    fecha_calificacion = NULL,
+                    id_docente_calificador = NULL,
                     fecha_entrega = CURRENT_TIMESTAMP,
                     fecha_actualizacion = CURRENT_TIMESTAMP
                 WHERE id_entrega = :id
@@ -95,6 +109,7 @@ class EntregaRepository
                 'comentario' => $comentario,
                 'id' => (int)$actual->getId(),
             ]);
+            $this->eliminarFeedbackAnterior($feedbackAnterior);
             return (int)$actual->getId();
         }
 
@@ -153,7 +168,7 @@ class EntregaRepository
             SELECT e.*, t.id_recurso, r.titulo AS tarea_titulo, r.descripcion AS tarea_descripcion,
                    p.id_publicacion, p.titulo AS curso_titulo, p.id_usuario AS docente_id,
                    u.nombre, u.apellido, u.email,
-                   t.fecha_limite, t.fecha_cierre, t.puntaje_maximo, t.tipo_calificacion, t.permite_feedback_archivo
+                   t.fecha_apertura, t.fecha_cierre, t.puntaje_maximo, t.tipo_calificacion, t.permite_feedback_archivo
             FROM curso_entregas e
             JOIN curso_tareas t ON t.id_tarea = e.id_tarea
             JOIN curso_recursos r ON r.id_recurso = t.id_recurso
@@ -201,7 +216,7 @@ class EntregaRepository
         $stmt = $this->pdo->prepare("
             SELECT u.id_usuario, u.nombre, u.apellido, u.email,
                    e.id_entrega, e.id_tarea, e.archivo_entrega, e.texto_entrega, e.enlace_entrega, e.comentario_entrega,
-                   e.fecha_entrega, e.estado_entrega, e.calificacion, e.fecha_calificacion,
+                   e.fecha_entrega, e.estado, e.estado_entrega, e.calificacion, e.fecha_calificacion,
                    COUNT(a.id_archivo) AS cantidad_archivos
             FROM usuarios u
             JOIN contrataciones c ON c.id_usuario = u.id_usuario AND c.estado IN ('Completada', 'En Proceso')
@@ -211,7 +226,7 @@ class EntregaRepository
             LEFT JOIN curso_entrega_archivos a ON a.id_entrega = e.id_entrega
             GROUP BY u.id_usuario, u.nombre, u.apellido, u.email,
                      e.id_entrega, e.id_tarea, e.archivo_entrega, e.texto_entrega, e.enlace_entrega, e.comentario_entrega,
-                     e.fecha_entrega, e.estado_entrega, e.calificacion, e.fecha_calificacion
+                     e.fecha_entrega, e.estado, e.estado_entrega, e.calificacion, e.fecha_calificacion
             ORDER BY u.apellido, u.nombre
         ");
         $stmt->execute(['t' => $id_tarea, 'p' => $id_publicacion]);
@@ -225,11 +240,60 @@ class EntregaRepository
         return [
             'total' => count($filas),
             'entregaron' => count($entregadas),
-            'tardias' => count(array_filter($entregadas, fn($f) => $tarea ? Entrega::fromArray($f)->esTardia($tarea) : false)),
             'sin_entregar' => count($filas) - count($entregadas),
-            'calificadas' => count(array_filter($entregadas, fn($f) => !empty($f['fecha_calificacion']))),
-            'sin_calificar' => count(array_filter($entregadas, fn($f) => empty($f['fecha_calificacion']))),
+            'calificadas' => count(array_filter($entregadas, fn($f) => !empty($f['fecha_calificacion']) || (($f['estado'] ?? '') === 'Calificada'))),
+            'sin_calificar' => count(array_filter($entregadas, fn($f) => empty($f['fecha_calificacion']) && (($f['estado'] ?? '') !== 'Calificada'))),
         ];
+    }
+
+    public function obtenerResumenEntregasCurso(int $id_publicacion): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT t.id_tarea, t.id_recurso, t.puntaje_maximo, t.tipo_calificacion,
+                   r.titulo, u.id_unidad, u.titulo AS unidad_titulo,
+                   m.id_modulo, m.titulo AS modulo_titulo,
+                   COUNT(e.id_entrega) AS total_entregas,
+                   SUM(CASE WHEN e.id_entrega IS NOT NULL AND (e.fecha_calificacion IS NOT NULL OR e.estado = 'Calificada') THEN 1 ELSE 0 END) AS calificadas,
+                   SUM(CASE WHEN e.id_entrega IS NOT NULL AND (e.fecha_calificacion IS NULL AND (e.estado IS NULL OR e.estado <> 'Calificada')) THEN 1 ELSE 0 END) AS pendientes_correccion
+            FROM curso_tareas t
+            JOIN curso_recursos r ON r.id_recurso = t.id_recurso
+            JOIN curso_unidades u ON u.id_unidad = r.id_unidad
+            JOIN curso_modulos m ON m.id_modulo = u.id_modulo
+            LEFT JOIN curso_entregas e ON e.id_tarea = t.id_tarea
+            WHERE m.id_publicacion = :p AND r.tipo = 'Entrega de Tareas'
+            GROUP BY t.id_tarea, t.id_recurso, t.puntaje_maximo, t.tipo_calificacion,
+                     r.titulo, u.id_unidad, u.titulo, m.id_modulo, m.titulo, m.orden, u.orden, r.orden
+            ORDER BY m.orden, u.orden, r.orden, t.id_tarea
+        ");
+        $stmt->execute(['p' => $id_publicacion]);
+        $resumen = [];
+        foreach ($stmt->fetchAll() as $fila) {
+            $resumen[(int)$fila['id_tarea']] = $fila;
+        }
+        return $resumen;
+    }
+
+    public function listarEntregasCursoAgrupadas(int $id_publicacion): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT e.id_entrega, e.id_tarea, e.id_usuario, e.fecha_entrega, e.estado, e.calificacion, e.fecha_calificacion,
+                   t.puntaje_maximo, t.tipo_calificacion,
+                   u.nombre, u.apellido, u.email
+            FROM curso_entregas e
+            JOIN curso_tareas t ON t.id_tarea = e.id_tarea
+            JOIN curso_recursos r ON r.id_recurso = t.id_recurso
+            JOIN curso_unidades cu ON cu.id_unidad = r.id_unidad
+            JOIN curso_modulos m ON m.id_modulo = cu.id_modulo
+            JOIN usuarios u ON u.id_usuario = e.id_usuario
+            WHERE m.id_publicacion = :p AND r.tipo = 'Entrega de Tareas'
+            ORDER BY m.orden, cu.orden, r.orden, e.fecha_entrega DESC, u.apellido, u.nombre
+        ");
+        $stmt->execute(['p' => $id_publicacion]);
+        $entregas = [];
+        foreach ($stmt->fetchAll() as $fila) {
+            $entregas[(int)$fila['id_tarea']][] = $fila;
+        }
+        return $entregas;
     }
 
     public function listarEntregasUsuarioPorCurso(int $id_publicacion, int $id_usuario): array
@@ -251,6 +315,28 @@ class EntregaRepository
         return $entregas;
     }
 
+    public function obtenerTareasAlumnoCurso(int $id_publicacion, int $id_usuario): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT t.id_tarea, t.id_recurso, t.fecha_apertura, t.fecha_cierre,
+                   t.permite_archivos, t.permite_texto, t.permite_enlace,
+                   t.max_archivos, t.max_tamano_mb, t.formatos_permitidos, t.requisito_entrega,
+                   t.puntaje_maximo, t.tipo_calificacion, t.permite_feedback_archivo,
+                   r.titulo, r.descripcion, u.id_unidad, u.titulo AS unidad_titulo,
+                   m.id_modulo, m.titulo AS modulo_titulo,
+                   e.id_entrega, e.estado, e.estado_entrega, e.calificacion, e.fecha_entrega, e.fecha_calificacion
+            FROM curso_tareas t
+            JOIN curso_recursos r ON r.id_recurso = t.id_recurso
+            JOIN curso_unidades u ON u.id_unidad = r.id_unidad
+            JOIN curso_modulos m ON m.id_modulo = u.id_modulo
+            LEFT JOIN curso_entregas e ON e.id_tarea = t.id_tarea AND e.id_usuario = :u
+            WHERE m.id_publicacion = :p AND r.tipo = 'Entrega de Tareas'
+            ORDER BY m.orden, u.orden, r.orden, t.id_tarea
+        ");
+        $stmt->execute(['p' => $id_publicacion, 'u' => $id_usuario]);
+        return $stmt->fetchAll();
+    }
+
     public function guardarCalificacion(int $id_entrega, ?string $calificacion, ?string $feedback, ?string $archivoFeedback, int $id_docente): void
     {
         $stmt = $this->pdo->prepare("
@@ -260,6 +346,7 @@ class EntregaRepository
                 archivo_feedback = COALESCE(:archivo, archivo_feedback),
                 fecha_calificacion = CURRENT_TIMESTAMP,
                 id_docente_calificador = :docente,
+                estado = 'Calificada',
                 fecha_actualizacion = CURRENT_TIMESTAMP
             WHERE id_entrega = :id
         ");
@@ -275,6 +362,13 @@ class EntregaRepository
     private function driver(): string
     {
         return (string)$this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    }
+
+    private function eliminarFeedbackAnterior(?string $ruta): void
+    {
+        if ($ruta && !eliminar_archivo_storage($ruta)) {
+            error_log('No se pudo eliminar feedback invalidado por reentrega: ' . $ruta);
+        }
     }
 
     private function enriquecerTipos(array $fila): array

@@ -2,7 +2,7 @@
 
 /**
  * Responsabilidad: Representa la entrega de un estudiante para una tarea.
- * Objeto de dominio puro: la condicion tardia se calcula, no se persiste.
+ * Objeto de dominio puro.
  */
 class Entrega
 {
@@ -44,11 +44,6 @@ class Entrega
             $row['fecha_calificacion'] ?? null,
             isset($row['id_docente_calificador']) ? (int)$row['id_docente_calificador'] : null
         );
-    }
-
-    public function esTardia(Tarea $tarea): bool
-    {
-        return $this->fecha_entrega ? $tarea->esEntregaTardia(new DateTimeImmutable($this->fecha_entrega)) : false;
     }
 
     public function tieneTexto(): bool

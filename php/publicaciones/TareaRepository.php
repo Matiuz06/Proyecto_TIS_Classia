@@ -16,11 +16,11 @@ class TareaRepository
         $datos = $this->params($tarea);
         $returning = $this->driver() === 'pgsql';
         $sql = "INSERT INTO curso_tareas
-            (id_recurso, fecha_disponible, fecha_limite, fecha_cierre, permite_entrega_tardia,
+            (id_recurso, fecha_apertura, fecha_cierre,
              permite_archivos, permite_texto, permite_enlace, max_archivos, max_tamano_mb,
              formatos_permitidos, requisito_entrega, puntaje_maximo, tipo_calificacion, permite_feedback_archivo)
             VALUES
-            (:id_recurso, :fecha_disponible, :fecha_limite, :fecha_cierre, :permite_entrega_tardia,
+            (:id_recurso, :fecha_apertura, :fecha_cierre,
              :permite_archivos, :permite_texto, :permite_enlace, :max_archivos, :max_tamano_mb,
              :formatos_permitidos, :requisito_entrega, :puntaje_maximo, :tipo_calificacion, :permite_feedback_archivo)";
         if ($returning) $sql .= ' RETURNING id_tarea';
@@ -35,10 +35,8 @@ class TareaRepository
         $datos['id_tarea'] = $tarea->getId();
         $stmt = $this->pdo->prepare("
             UPDATE curso_tareas SET
-                fecha_disponible = :fecha_disponible,
-                fecha_limite = :fecha_limite,
+                fecha_apertura = :fecha_apertura,
                 fecha_cierre = :fecha_cierre,
-                permite_entrega_tardia = :permite_entrega_tardia,
                 permite_archivos = :permite_archivos,
                 permite_texto = :permite_texto,
                 permite_enlace = :permite_enlace,
@@ -153,8 +151,8 @@ class TareaRepository
 
         $tarea = Tarea::fromArray([
             'id_recurso' => (int)$recurso['id_recurso'],
-            'fecha_limite' => null,
-            'permite_entrega_tardia' => true,
+            'fecha_apertura' => null,
+            'fecha_cierre' => null,
             'permite_archivos' => true,
             'permite_texto' => false,
             'permite_enlace' => false,
@@ -175,10 +173,8 @@ class TareaRepository
         $d = $tarea->toArray();
         return [
             'id_recurso' => $d['id_recurso'],
-            'fecha_disponible' => $d['fecha_disponible'],
-            'fecha_limite' => $d['fecha_limite'],
+            'fecha_apertura' => $d['fecha_apertura'],
             'fecha_cierre' => $d['fecha_cierre'],
-            'permite_entrega_tardia' => (int)$d['permite_entrega_tardia'],
             'permite_archivos' => (int)$d['permite_archivos'],
             'permite_texto' => (int)$d['permite_texto'],
             'permite_enlace' => (int)$d['permite_enlace'],
