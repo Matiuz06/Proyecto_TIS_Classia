@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     cupos INT NULL,
     disponibilidad TEXT NULL,
     tipo_servicio VARCHAR(60) NULL,
-    estado ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado') NOT NULL DEFAULT 'Activo',
+    estado ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado', 'Archivado') NOT NULL DEFAULT 'Activo',
     imagen VARCHAR(255) NULL DEFAULT NULL,
     eliminado_en DATETIME NULL,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -279,6 +279,7 @@ CREATE TABLE IF NOT EXISTS curso_modulos (
     titulo VARCHAR(180) NOT NULL,
     descripcion TEXT NULL,
     orden INT NOT NULL DEFAULT 1,
+    visible_alumnos TINYINT(1) NOT NULL DEFAULT 1,
     CONSTRAINT fk_curso_modulos_publicacion FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_curso_modulos_publicacion_orden (id_publicacion,orden)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -302,6 +303,7 @@ CREATE TABLE IF NOT EXISTS curso_recursos (
     archivo VARCHAR(255) NULL,
     descripcion TEXT NULL,
     orden INT NOT NULL DEFAULT 1,
+    visible_alumnos TINYINT(1) NOT NULL DEFAULT 1,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_curso_recursos_unidad FOREIGN KEY (id_unidad) REFERENCES curso_unidades(id_unidad) ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_curso_recursos_unidad_orden (id_unidad,orden)

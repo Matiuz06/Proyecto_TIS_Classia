@@ -34,9 +34,23 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
 
     if (isset($_POST['cambiar_estado']) && empty($errores)) {
         $estado=$_POST['cambiar_estado'];
-        if (!in_array($estado,['Activo','Pausado','Inactivo','Eliminado'],true)) {
+        if (!in_array($estado,['Activo','Pausado','Inactivo','Eliminado','Archivado'],true)) {
             $errores[]='Estado no válido.';
         } else {
+
+            if ($estado === 'Activo' && $publicacion['tipo'] === 'Curso') {
+                $stmt_rd09 = $pdo->prepare("
+                    SELECT COUNT(DISTINCT r.id_recurso) AS total
+                    FROM curso_modulos m
+                    JOIN curso_unidades u ON u.id_modulo = m.id_modulo
+                    JOIN curso_recursos r ON r.id_unidad = u.id_unidad
+                    WHERE m.id_publicacion = :id
+                ");
+                $stmt_rd09->execute(['id' => $id_publicacion]);
+                if ((int)$stmt_rd09->fetchColumn() === 0) {
+                    $errores[] = 'No es posible publicar el curso: debe tener al menos un módulo con contenido. Agrega módulos y recursos antes de activarlo.';
+                }
+            }
             $publicacionObjeto->setEstado($estado);
             $publicacionObjeto->setEliminadoEn($estado==='Eliminado'?date('Y-m-d H:i:s'):null);
             $publicacionRepository->actualizar($publicacionObjeto, $admin ? null : $uid);
@@ -49,7 +63,21 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
         $errores=array_merge($errores,validar_datos_publicacion($datos));
 
         $estado=$_POST['estado'] ?? $publicacion['estado'];
-        if (!in_array($estado,['Activo','Pausado','Inactivo','Eliminado'],true)) $errores[]='Estado no válido.';
+        if (!in_array($estado,['Activo','Pausado','Inactivo','Eliminado','Archivado'],true)) $errores[]='Estado no válido.';
+
+        if ($estado === 'Activo' && $publicacion['tipo'] === 'Curso' && empty($errores)) {
+            $stmt_rd09b = $pdo->prepare("
+                SELECT COUNT(DISTINCT r.id_recurso) AS total
+                FROM curso_modulos m
+                JOIN curso_unidades u ON u.id_modulo = m.id_modulo
+                JOIN curso_recursos r ON r.id_unidad = u.id_unidad
+                WHERE m.id_publicacion = :id
+            ");
+            $stmt_rd09b->execute(['id' => $id_publicacion]);
+            if ((int)$stmt_rd09b->fetchColumn() === 0) {
+                $errores[] = 'No es posible publicar el curso: debe tener al menos un módulo con contenido antes de activarlo (RD-09).';
+            }
+        }
 
         $categoria=['ok'=>false,'id'=>0,'error'=>''];
         if (empty($errores)) {

@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     cupos INT NULL,
     disponibilidad TEXT NULL,
     tipo_servicio VARCHAR(60) NULL,
-    estado VARCHAR(20) NOT NULL DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Inactivo', 'Pausado', 'Eliminado')),
+    estado VARCHAR(20) NOT NULL DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Inactivo', 'Pausado', 'Eliminado', 'Archivado')),
     imagen VARCHAR(255) NULL DEFAULT NULL,
     eliminado_en TIMESTAMPTZ NULL,
     fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -255,7 +255,8 @@ CREATE TABLE IF NOT EXISTS curso_modulos (
     id_publicacion INT NOT NULL REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
     titulo VARCHAR(180) NOT NULL,
     descripcion TEXT NULL,
-    orden INT NOT NULL DEFAULT 1
+    orden INT NOT NULL DEFAULT 1,
+    visible_alumnos SMALLINT NOT NULL DEFAULT 1
 );
 CREATE INDEX IF NOT EXISTS idx_curso_modulos_publicacion_orden ON curso_modulos (id_publicacion, orden);
 
@@ -277,6 +278,7 @@ CREATE TABLE IF NOT EXISTS curso_recursos (
     archivo VARCHAR(255) NULL,
     descripcion TEXT NULL,
     orden INT NOT NULL DEFAULT 1,
+    visible_alumnos SMALLINT NOT NULL DEFAULT 1,
     fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_curso_recursos_unidad_orden ON curso_recursos (id_unidad, orden);
