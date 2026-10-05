@@ -26,6 +26,7 @@ class Recurso extends ElementoCurso
     private string $tipo;
     private ?string $url;
     private ?string $archivo;
+    private int    $visible_alumnos;
 
     public function __construct(
         int     $id_recurso,
@@ -35,23 +36,27 @@ class Recurso extends ElementoCurso
         ?string $url,
         ?string $archivo,
         ?string $descripcion,
-        int     $orden
+        int     $orden,
+        int     $visible_alumnos = 1
     ) {
         parent::__construct($id_recurso, $titulo, $descripcion, $orden);
-        $this->id_recurso = $id_recurso;
-        $this->id_unidad  = $id_unidad;
-        $this->tipo       = $tipo;
-        $this->url        = $url;
-        $this->archivo    = $archivo;
+        $this->id_recurso       = $id_recurso;
+        $this->id_unidad        = $id_unidad;
+        $this->tipo             = $tipo;
+        $this->url              = $url;
+        $this->archivo          = $archivo;
+        $this->visible_alumnos  = $visible_alumnos;
     }
 
     //Getters propios
 
-    public function getId(): int       { return $this->id_recurso; }
-    public function getIdUnidad(): int  { return $this->id_unidad; }
-    public function getTipo(): string   { return $this->tipo; }
-    public function getUrl(): ?string   { return $this->url; }
-    public function getArchivo(): ?string { return $this->archivo; }
+    public function getId(): int            { return $this->id_recurso; }
+    public function getIdUnidad(): int       { return $this->id_unidad; }
+    public function getTipo(): string        { return $this->tipo; }
+    public function getUrl(): ?string        { return $this->url; }
+    public function getArchivo(): ?string    { return $this->archivo; }
+    public function getVisibleAlumnos(): int { return $this->visible_alumnos; }
+    public function esVisible(): bool        { return $this->visible_alumnos === 1; }
 
     public function esTarea(): bool
     {
@@ -77,18 +82,18 @@ class Recurso extends ElementoCurso
     }
 
     /**
-     * Emoji representativo del tipo de recurso.
+     * Identificador corto del tipo de recurso.
      */
     public function getEmojiIcono(): string
     {
         return match ($this->tipo) {
-            'Video'             => '🎥',
-            'PDF'               => '📄',
-            'Entrega de Tareas' => '📝',
-            'Foro'              => '💬',
-            'Imagen'            => '🖼️',
-            'Enlace'            => '🔗',
-            default             => '📥',
+            'Video'             => '[Video]',
+            'PDF'               => '[PDF]',
+            'Entrega de Tareas' => '[Tarea]',
+            'Foro'              => '[Foro]',
+            'Imagen'            => '[Imagen]',
+            'Enlace'            => '[Enlace]',
+            default             => '[Archivo]',
         };
     }
 
@@ -144,12 +149,13 @@ class Recurso extends ElementoCurso
         return new static(
             (int) $row['id_recurso'],
             (int) $row['id_unidad'],
-            $row['titulo']      ?? '',
-            $row['tipo']        ?? 'Enlace',
-            $row['url']         ?? null,
-            $row['archivo']     ?? null,
-            $row['descripcion'] ?? null,
-            (int) ($row['orden'] ?? 0),
+            $row['titulo']          ?? '',
+            $row['tipo']            ?? 'Enlace',
+            $row['url']             ?? null,
+            $row['archivo']         ?? null,
+            $row['descripcion']     ?? null,
+            (int) ($row['orden']    ?? 0),
+            (int) ($row['visible_alumnos'] ?? 1)
         );
     }
 
@@ -160,11 +166,12 @@ class Recurso extends ElementoCurso
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [
-            'id_recurso' => $this->id_recurso,
-            'id_unidad'  => $this->id_unidad,
-            'tipo'       => $this->tipo,
-            'url'        => $this->url,
-            'archivo'    => $this->archivo,
+            'id_recurso'       => $this->id_recurso,
+            'id_unidad'        => $this->id_unidad,
+            'tipo'             => $this->tipo,
+            'url'              => $this->url,
+            'archivo'          => $this->archivo,
+            'visible_alumnos'  => $this->visible_alumnos,
         ]);
     }
 }

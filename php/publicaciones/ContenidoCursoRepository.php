@@ -60,14 +60,20 @@ class ContenidoCursoRepository
      * Carga los módulos de un curso con sus unidades y recursos,
      * devuelve un array de objetos Modulo (jerarquía completa).
      *
+     * @param int  $id_publicacion
+     * @param bool $solo_visibles   Si true, filtra módulos y recursos ocultos para alumnos (REQ-CON-04).
      * @return Modulo[]
      */
-    public function obtenerPorCurso(int $id_publicacion): array
+    public function obtenerPorCurso(int $id_publicacion, bool $solo_visibles = false): array
     {
         // 1. Módulos
-        $s = $this->pdo->prepare(
-            'SELECT * FROM curso_modulos WHERE id_publicacion = :id ORDER BY orden, id_modulo'
-        );
+        $sql_mods = 'SELECT * FROM curso_modulos WHERE id_publicacion = :id';
+        if ($solo_visibles) {
+            $sql_mods .= ' AND (visible_alumnos = 1 OR visible_alumnos IS NULL)';
+        }
+        $sql_mods .= ' ORDER BY orden, id_modulo';
+
+        $s = $this->pdo->prepare($sql_mods);
         $s->execute(['id' => $id_publicacion]);
         $rows_mods = $s->fetchAll();
 
@@ -87,14 +93,19 @@ class ContenidoCursoRepository
         $rows_uni = $s_uni->fetchAll();
 
         // 3. Recursos (todos los del curso en una sola consulta)
-        $s_rec = $this->pdo->prepare("
+        $sql_rec = "
             SELECT r.*
             FROM curso_recursos r
             JOIN curso_unidades u ON u.id_unidad = r.id_unidad
             JOIN curso_modulos m ON m.id_modulo = u.id_modulo
             WHERE m.id_publicacion = :id
-            ORDER BY r.orden, r.id_recurso
-        ");
+        ";
+        if ($solo_visibles) {
+            $sql_rec .= " AND (r.visible_alumnos = 1 OR r.visible_alumnos IS NULL)";
+        }
+        $sql_rec .= " ORDER BY r.orden, r.id_recurso";
+
+        $s_rec = $this->pdo->prepare($sql_rec);
         $s_rec->execute(['id' => $id_publicacion]);
         $rows_rec = $s_rec->fetchAll();
 
@@ -132,11 +143,13 @@ class ContenidoCursoRepository
      * Alias de obtenerPorCurso() que retorna arrays en lugar de objetos,
      * para compatibilidad con plantillas que iteran $modulo['unidades'].
      *
+     * @param int  $id_publicacion
+     * @param bool $solo_visibles
      * @return array[]
      */
-    public function obtenerPorCursoComoArray(int $id_publicacion): array
+    public function obtenerPorCursoComoArray(int $id_publicacion, bool $solo_visibles = false): array
     {
-        return array_map(fn(Modulo $m) => $m->toArray(), $this->obtenerPorCurso($id_publicacion));
+        return array_map(fn(Modulo $m) => $m->toArray(), $this->obtenerPorCurso($id_publicacion, $solo_visibles));
     }
 
     //MÓDULOS
@@ -350,6 +363,52 @@ class ContenidoCursoRepository
         $d->execute(['r' => $id_recurso, 'p' => $id_publicacion]);
 
         return $ruta; // El caller borra el archivo del storage si aplica
+    }
+
+    // VISIBILIDAD (REQ-CON-04)
+
+    /**
+     * Alterna la visibilidad de un módulo para los alumnos.
+     * Retorna el nuevo valor de visible_alumnos (0 o 1), o null si no existe.
+     */
+    public function togglearVisibilidadModulo(int $id_modulo, int $id_publicacion): ?int
+    {
+        $s = $this->pdo->prepare(
+            'SELECT visible_alumnos FROM curso_modulos WHERE id_modulo = :m AND id_publicacion = :p'
+        );
+        $s->execute(['m' => $id_modulo, 'p' => $id_publicacion]);
+        $row = $s->fetch();
+        if (!$row) return null;
+
+        $nuevo = $row['visible_alumnos'] ? 0 : 1;
+        $this->pdo->prepare(
+            'UPDATE curso_modulos SET visible_alumnos = :v WHERE id_modulo = :m AND id_publicacion = :p'
+        )->execute(['v' => $nuevo, 'm' => $id_modulo, 'p' => $id_publicacion]);
+        return $nuevo;
+    }
+
+    /**
+     * Alterna la visibilidad de un recurso para los alumnos.
+     * Retorna el nuevo valor de visible_alumnos (0 o 1), o null si no existe.
+     */
+    public function togglearVisibilidadRecurso(int $id_recurso, int $id_publicacion): ?int
+    {
+        $s = $this->pdo->prepare("
+            SELECT r.visible_alumnos
+            FROM curso_recursos r
+            JOIN curso_unidades u ON u.id_unidad = r.id_unidad
+            JOIN curso_modulos m ON m.id_modulo = u.id_modulo
+            WHERE r.id_recurso = :r AND m.id_publicacion = :p
+        ");
+        $s->execute(['r' => $id_recurso, 'p' => $id_publicacion]);
+        $row = $s->fetch();
+        if (!$row) return null;
+
+        $nuevo = $row['visible_alumnos'] ? 0 : 1;
+        $this->pdo->prepare(
+            'UPDATE curso_recursos SET visible_alumnos = :v WHERE id_recurso = :r'
+        )->execute(['v' => $nuevo, 'r' => $id_recurso]);
+        return $nuevo;
     }
 
     public function obtenerUnidadDelRecurso(int $id_recurso, int $id_publicacion): int

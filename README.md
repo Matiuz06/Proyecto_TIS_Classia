@@ -41,16 +41,18 @@ Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 ### Docentes / Proveedores (id_rol = 2)
 - Acceder a su **Panel de Proveedor** con estadísticas y métricas de actividad.
 - Crear nuevas publicaciones especificando título, descripción, precio, categoría, modalidad, duración, cupos y disponibilidad (curso o servicio).
-- Editar publicaciones existentes y gestionar su estado (`Activo`, `Inactivo`, `Pausado`).
+- Editar publicaciones existentes y gestionar su estado (`Activo`, `Inactivo`, `Pausado`, `Archivado`).
 - Administrar el contenido multimedia de sus cursos: módulos, unidades, archivos, PDFs, imágenes, videos (subidos o embebidos) y enlaces.
+- Ocultar o mostrar temporalmente módulos y recursos a los estudiantes matriculados (REQ-CON-04).
 - Recibir, gestionar y responder solicitudes de servicios personalizadas.
 - **Proponer Noticias y Eventos** que quedan en estado `Pendiente` hasta su aprobación por el administrador.
 - Administrar el contenido de sus cursos y calificaciones de entregas.
 
 ### Administradores (id_rol = 3)
 - Acceso al **Panel de Administrador** para la supervisión global de la plataforma.
-- Gestión y moderación de usuarios, roles y permisos.
-- Moderación de publicaciones, cursos y servicios ofertados.
+- Gestión y moderación de usuarios, roles y permisos, incluyendo suspensión y desactivación de cuentas conservando el histórico académico (REQ-USR-04, RD-12).
+- Moderación y supervisión de todos los cursos y publicaciones (REQ-CUR-05, RN-10), con acciones de pausar, activar, archivar y restaurar temarios.
+- Validación de requisitos mínimos de publicación: al menos un módulo con contenido y un docente asignado (RD-09).
 - **Aprobar, rechazar o eliminar Noticias y Eventos** propuestos por docentes o propios.
 - Administración de categorías institucionales y métricas globales.
 
@@ -76,7 +78,7 @@ Proyecto_TIS_Classia/
 │   ├── panel-administrador.php        # Panel de gestión y supervisión administrativa
 │   ├── crear-publicacion.php          # Creación de cursos y servicios
 │   ├── editar-publicacion.php         # Edición, cambio de estado y gestión de publicaciones
-│   ├── gestionar-contenido-curso.php  # Gestión de módulos, unidades y recursos de un curso
+│   ├── gestionar-contenido-curso.php  # Gestión y visibilidad de módulos, unidades y recursos
 │   ├── catalogo.php                   # Catálogo interactivo con filtros avanzados
 │   ├── curso.php                      # Aula virtual: contenido, entregas, foros y videos embebidos
 │   ├── servicio-detalle.php           # Detalle y paquetes de servicios
@@ -106,6 +108,9 @@ Proyecto_TIS_Classia/
 │   ├── institucional.php              # Página institucional / Sobre Nosotros
 │   └── politica-privacidad.php        # Política de privacidad (Ley 18.331 / URCDP)
 ├── php/                               # Lógica de backend organizada por módulo (snake_case)
+│   ├── admin/
+│   │   ├── acciones_admin.php         # Acciones de moderación, archivo/restauración y baja lógica
+│   │   └── estadisticas_admin.php     # Métricas y analíticas globales
 │   ├── auth/
 │   │   ├── sesion.php                 # Helper canónico de sesiones seguras y CSRF
 │   │   ├── roles.php                  # Funciones y constantes de control de roles (RBAC)
@@ -117,10 +122,14 @@ Proyecto_TIS_Classia/
 │   │   └── foto_perfil.php            # Subida y eliminación de foto de perfil
 │   ├── publicaciones/
 │   │   ├── crear_publicacion.php      # Alta de cursos y servicios (PDO + CSRF)
-│   │   ├── editar_publicacion.php     # Edición y cambio de estado de publicaciones
+│   │   ├── editar_publicacion.php     # Edición y cambio de estado con validación RD-09
 │   │   ├── obtener_publicaciones.php  # Helpers SELECT para vistas dinámicas
-│   │   ├── contenido_curso.php        # CRUD de módulos, unidades y recursos con soporte de video embebido
-│   │   └── detalle_curso.php          # Acceso al aula virtual condicionado a pago aprobado
+│   │   ├── ContenidoCursoRepository.php # Repositorio de módulos, unidades y recursos con visibilidad
+│   │   ├── contenido_curso.php        # Lógica de temario con switches de visibilidad
+│   │   ├── detalle_curso.php          # Acceso al aula virtual y control de cursos archivados
+│   │   ├── Modulo.php                 # Entidad de dominio Módulo
+│   │   ├── Unidad.php                 # Entidad de dominio Unidad
+│   │   └── Recurso.php                # Entidad de dominio Recurso
 │   ├── eventos/
 │   │   └── gestionar_eventos.php      # CRUD de eventos con moderación (Pendiente → Abierto / Rechazado)
 │   ├── noticias/
@@ -133,15 +142,17 @@ Proyecto_TIS_Classia/
 │   ├── contrataciones/                # Lógica de órdenes y flujo de contratación
 │   ├── valoraciones/                  # Reseñas y cálculo de promedios
 │   ├── inicio/
-│   │   └── obtener_datos_home.php     # Carga de datos para la página de inicio (publicaciones, eventos, noticias)
+│   │   └── obtener_datos_home.php     # Carga de datos para la página de inicio
 │   ├── utils/
 │   │   ├── i18n.php                   # Internacionalización y helper de traducción __t()
+│   │   ├── supabase_storage.php       # Integración con Supabase Storage
 │   │   └── cedula_uy.php              # Validación y enmascaramiento de cédula uruguaya
 │   └── lang/
 │       └── es.php                     # Traducciones en español de la plataforma
 ├── sql/
 │   ├── schema.sql                     # Esquema DDL completo para MySQL/MariaDB
-│   └── schema_supabase.sql            # Esquema DDL adaptado para PostgreSQL/Supabase
+│   ├── schema_supabase.sql            # Esquema DDL adaptado para PostgreSQL/Supabase
+│   └── migrations/                    # Migraciones incrementales numeradas
 ├── docs/                              # Documentación técnica, modelos y diagramas UML
 │   ├── estructura_php.md
 │   ├── estilo_y_nomenclatura.md
@@ -207,7 +218,7 @@ Mailpit (emails de prueba): [http://localhost:8025](http://localhost:8025)
 
 ### 3. Base de datos ya existente (migración)
 
-Si el volumen MySQL ya existe, ejecutar la migración de provider features:
+Si el volumen MySQL ya existe, ejecutar las migraciones correspondientes en `sql/migrations/`:
 ```bash
 docker exec classia_web php scripts/migrate_provider_features.php
 ```
@@ -234,41 +245,42 @@ El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SEC
 - **Autenticación en dos pasos (`2FA/TOTP`):** Implementada con Google/Microsoft Authenticator y Authy. El secreto TOTP se protege con cifrado AES-256-GCM.
 - **Sesiones seguras (`RNF-14`):** `session_regenerate_id(true)` tras autenticación, cookies `HttpOnly`, destrucción total en logout.
 - **Control de acceso al contenido:** El acceso al aula virtual está condicionado estrictamente a que el pago tenga `estado_pago = 'Aprobado'`. Salir de la pasarela sin pagar no otorga acceso.
+- **Cursos archivados (`RN-05`):** Conservan su histórico académico para consulta pero no admiten nuevas actividades (entregas de tareas ni mensajes en foros).
+- **Desactivación de cuentas (`REQ-USR-04`, `RD-12`):** Baja lógica que suspende el acceso pero preserva las calificaciones, entregas e información histórica.
 - **Protección de datos (`RNF-10`, `RNF-11`):** Cumplimiento con la **Ley N.º 18.331** (Uruguay) y derechos ARCO. Cédula enmascarada en la interfaz.
 - **SAST y Secret Detection:** Escaneo continuo en CI/CD con Semgrep y Gitleaks.
 
 ---
 
-## 📌 Estado actual del proyecto
+## Estado actual del proyecto
 
-### ✅ Completado — Segunda Entrega
+### Completado — Entregas e Iteraciones
 
 - [x] **Arquitectura PHP modular** con más de 50 vistas, includes reutilizables y backend organizado por dominio.
 - [x] **Base de datos relacional** en `sql/schema.sql` (MySQL) y `sql/schema_supabase.sql` (PostgreSQL), con 12+ tablas, 3FN e integridad referencial completa.
 - [x] **Conexión híbrida MySQL/PostgreSQL**: auto-detección de driver en `config/database.php`, compatible con Docker y Supabase.
 - [x] **Autenticación completa**: registro, login, logout, 2FA/TOTP (AES-256-GCM), recuperación de contraseña por email y verificación de correo.
-- [x] **CRUD de publicaciones** operativo: creación, edición, cambio de estado y visualización dinámica.
-- [x] **Aula Virtual (`views/curso.php`)**: módulos, unidades, entregas, foro, videos embebidos (YouTube, Vimeo, Dailymotion, Loom) y apertura en nueva pestaña.
-- [x] **Control de acceso al curso**: solo con `estado_pago = 'Aprobado'`. Cursos pendientes de pago aparecen en el perfil con enlace `Completar pago →`.
-- [x] **Pasarela de pago** con bloqueo de acceso sin orden activa: no se puede acceder directamente sin haber iniciado el flujo de compra.
+- [x] **CRUD de publicaciones y cursos**: creación, edición, cambio de estado, validación de requisitos mínimos previos a publicación (RD-09) y visualización dinámica.
+- [x] **Gestión modular de contenidos de cursos**: soporte para módulos, unidades y recursos con alternancia de visibilidad para alumnos (`visible_alumnos`, REQ-CON-04).
+- [x] **Aula Virtual (`views/curso.php`)**: módulos, unidades, entregas, foro, visor de documentos y videos embebidos (YouTube, Vimeo, Dailymotion, Loom).
+- [x] **Gestión de cursos archivados (`RN-05`)**: soporte del estado `Archivado`, modo solo lectura, histórico para alumnos y bloqueo de nuevas entregas/foros.
+- [x] **Panel de Administrador (`views/panel-administrador.php`)**: moderación de cursos (activar, pausar, archivar, restaurar, temario) y supervisión global (REQ-CUR-05, RN-10).
+- [x] **Desactivación de cuentas (`REQ-USR-04`, `RD-12`)**: baja lógica de usuarios preservando registros académicos y contrataciones.
+- [x] **Control de acceso al curso**: condicionado a pago aprobado (`estado_pago = 'Aprobado'`). Cursos pendientes aparecen en perfil con enlace de pago.
+- [x] **Pasarela de pago** con bloqueo de acceso sin orden activa.
 - [x] **Noticias y Eventos**: flujo completo de propuesta por docente (estado `Pendiente`) y aprobación/rechazo/eliminación por administrador.
 - [x] **Compartir e Invitar en Eventos**: WhatsApp, Twitter/X, Google Calendar y copiar enlace.
-- [x] **Formularios CSS externos**: eliminado CSS inline de `form-solicitar-servicio.php` y `confirmacion.php`; clases en `css/style.css`.
-- [x] **Panel de Proveedor** con métricas, solicitudes, valoraciones, contenido de cursos y accesos directos a eventos/noticias.
-- [x] **Panel de Administrador** con tarjetas para gestión de solicitudes docentes, eventos y noticias.
-- [x] **Navegación por rol**: docentes y admins tienen accesos directos a Eventos y Noticias en la barra de navegación y en el menú desplegable de usuario.
-- [x] **Perfil profesional** del docente: información pública, visibilidad configurable.
-- [x] **Foto de perfil**: subida, visualización y eliminación.
+- [x] **Panel de Proveedor**: métricas, solicitudes, valoraciones, temario de cursos y accesos directos.
+- [x] **Perfil profesional** del docente con visibilidad configurable y gestión de foto de perfil.
 - [x] **Sistema de valoraciones y reseñas** con cálculo de promedio.
 - [x] **Solicitudes de servicios** con mensajería, contraoferta y seguimiento de estado.
-- [x] **Gestión de contenido de cursos**: módulos, unidades, archivos (PDF, imágenes, videos), validación de tokens CSRF.
 - [x] **i18n (Internacionalización)**: sistema de traducciones `__t()` con archivo `php/lang/es.php`.
-- [x] **Modelado técnico UML completo** en `docs/diagramas/` (PNG, SVG, PlantUML): casos de uso, diagrama de clases, MER, modelo relacional, secuencia.
+- [x] **Modelado técnico UML completo** en `docs/diagramas/`: casos de uso, diagrama de clases, MER, modelo relacional, secuencia.
 - [x] **CI/CD automatizado**: linting (Stylelint, HTMLHint, ESLint), seguridad (Gitleaks, Semgrep SAST), verificación de trazabilidad SRS.
 
 ---
 
-## 📚 Documentación técnica adicional
+## Documentación técnica adicional
 
 En el directorio [`docs/`](docs/) se encuentran disponibles los documentos de especificación técnica:
 

@@ -155,9 +155,11 @@ if ($id_curso > 0) {
 
                     try {
                         if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-                            $_SESSION['curso_error'] = 'Token de seguridad invalido. Recarga la pagina e intenta nuevamente.';
+                            $_SESSION['curso_error'] = 'Token de seguridad inválido. Recarga la página e intenta nuevamente.';
+                        } elseif (($curso['estado'] ?? '') === 'Archivado') {
+                            $_SESSION['curso_error'] = 'Este curso se encuentra archivado y no admite nuevas entregas (RN-05).';
                         } elseif (!$contratacion_curso) {
-                            $_SESSION['curso_error'] = 'No tenes acceso para entregar en este curso.';
+                            $_SESSION['curso_error'] = 'No tenés acceso para entregar en este curso.';
                         } else {
                             $contenidoRepo = new ContenidoCursoRepository($pdo);
                             $recursoTarea = $contenidoRepo->obtenerRecurso($id_recurso_tarea, $id_curso);
@@ -259,9 +261,13 @@ if ($id_curso > 0) {
                     $mensaje = trim($_POST['mensaje_foro'] ?? '');
 
                     if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-                        $_SESSION['curso_error'] = 'Token de seguridad invÃ¡lido. Recarga la pÃ¡gina e intenta nuevamente.';
+                        $_SESSION['curso_error'] = 'Token de seguridad inválido. Recarga la página e intenta nuevamente.';
+                    } elseif (($curso['estado'] ?? '') === 'Archivado') {
+                        $_SESSION['curso_error'] = 'Este curso se encuentra archivado y no admite nuevos comentarios en el foro (RN-05).';
+                        header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
+                        exit;
                     } elseif ($id_recurso_foro <= 0 || empty($mensaje)) {
-                        $_SESSION['curso_error'] = 'El mensaje no puede estar vacÃ­o.';
+                        $_SESSION['curso_error'] = 'El mensaje no puede estar vacío.';
                     } else {
                         $contenidoRepo = new ContenidoCursoRepository($pdo);
                         $recursoForo = $contenidoRepo->obtenerRecurso($id_recurso_foro, $id_curso);
@@ -271,7 +277,7 @@ if ($id_curso > 0) {
                             exit;
                         }
                         $contenidoRepo->crearMensajeForo($id_recurso_foro, (int)$usuario_actual['id_usuario'], $mensaje);
-                        $_SESSION['curso_exito'] = 'Â¡Tu comentario fue publicado en el foro de debate!';
+                        $_SESSION['curso_exito'] = '¡Tu comentario fue publicado en el foro de debate!';
                         header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
                         exit;
                     }
@@ -284,9 +290,9 @@ if ($id_curso > 0) {
                     $id_unidad_foro = (int)($_POST['id_unidad'] ?? 0);
 
                     if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-                        $_SESSION['curso_error'] = 'Token de seguridad invÃ¡lido.';
+                        $_SESSION['curso_error'] = 'Token de seguridad inválido.';
                     } elseif ($id_msg <= 0) {
-                        $_SESSION['curso_error'] = 'Mensaje no vÃ¡lido.';
+                        $_SESSION['curso_error'] = 'Mensaje no válido.';
                     } else {
                         $borrado = (new ContenidoCursoRepository($pdo))->eliminarMensajeForoAutorizado(
                             $id_msg,
@@ -298,7 +304,7 @@ if ($id_curso > 0) {
                         if ($borrado) {
                             $_SESSION['curso_exito'] = 'Mensaje eliminado correctamente.';
                         } else {
-                            $_SESSION['curso_error'] = 'No tenÃ©s permisos para eliminar este mensaje.';
+                            $_SESSION['curso_error'] = 'No tenés permisos para eliminar este mensaje.';
                         }
                         header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
                         exit;
@@ -316,7 +322,8 @@ if ($id_curso > 0) {
                 return;
             }
 
-            $contenido_curso = obtener_contenido_curso($pdo, $id_curso);
+            $solo_visibles = !($es_propietario || es_admin());
+            $contenido_curso = obtener_contenido_curso($pdo, $id_curso, $solo_visibles);
             $puede_ver_recursos = $comprado || $es_propietario || es_admin();
 
             $mis_entregas = [];

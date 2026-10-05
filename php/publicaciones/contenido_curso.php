@@ -60,11 +60,14 @@ function obtener_curso_del_docente(PDO $pdo, int $id_publicacion, int $id_usuari
  * Para trabajar con objetos, usar directamente:
  *   (new ContenidoCursoRepository($pdo))->obtenerPorCurso($id)
  *
+ * @param PDO  $pdo
+ * @param int  $id_publicacion
+ * @param bool $solo_visibles   Si true, excluye módulos y recursos no visibles para alumnos (REQ-CON-04).
  * @return array[]
  */
-function obtener_contenido_curso(PDO $pdo, int $id_publicacion): array
+function obtener_contenido_curso(PDO $pdo, int $id_publicacion, bool $solo_visibles = false): array
 {
-    return _repo_contenido($pdo)->obtenerPorCursoComoArray($id_publicacion);
+    return _repo_contenido($pdo)->obtenerPorCursoComoArray($id_publicacion, $solo_visibles);
 }
 
 //HELPERS DE PRESENTACIÓN
@@ -168,6 +171,14 @@ function intercambiar_orden(PDO $pdo, string $tabla, string $id_col, int $id, st
 //PROCESAMIENTO DE ACCIONES (POST)
 //Delega la lógica de escritura al repositorio; mantiene la firma original.
 
+/**
+ * Valida que el curso no esté archivado antes de permitir modificaciones (RN-05).
+ */
+function curso_esta_archivado(?array $curso): bool
+{
+    return ($curso['estado'] ?? '') === 'Archivado';
+}
+
 function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_publicacion, int $id_usuario, bool $admin, string $csrf): array
 {
     if ($csrf === '' || !hash_equals($csrf, $post['csrf_token'] ?? '')) {
@@ -176,8 +187,14 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
 
     $repo = _repo_contenido($pdo);
 
-    if (!$repo->obtenerCursoDelDocente($id_publicacion, $id_usuario, $admin)) {
+    $curso_actual = $repo->obtenerCursoDelDocente($id_publicacion, $id_usuario, $admin);
+    if (!$curso_actual) {
         return ['ok' => false, 'mensaje' => 'No tenés permisos para gestionar este curso.'];
+    }
+
+    // RN-05: Los cursos archivados no admiten nuevas actividades
+    if (curso_esta_archivado($curso_actual)) {
+        return ['ok' => false, 'mensaje' => 'Este curso está archivado y no acepta modificaciones de contenido.'];
     }
 
     $a = $post['accion'] ?? '';
@@ -365,6 +382,17 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
             $uid = $repo->obtenerUnidadDelRecurso((int)$post['id_recurso'], $id_publicacion);
             if (!$uid) return ['ok' => false, 'mensaje' => 'El recurso no pertenece a este curso.'];
             $repo->intercambiarOrden('curso_recursos', 'id_recurso', (int)$post['id_recurso'], 'id_unidad', $uid, $a === 'subir_recurso' ? 'subir' : 'bajar');
+
+        // VISIBILIDAD (REQ-CON-04)
+        } elseif ($a === 'toggle_visible_modulo') {
+            $nuevo = $repo->togglearVisibilidadModulo((int)$post['id_modulo'], $id_publicacion);
+            if ($nuevo === null) return ['ok' => false, 'mensaje' => 'Módulo no encontrado.'];
+            return ['ok' => true, 'mensaje' => $nuevo ? 'Módulo visible para alumnos.' : 'Módulo ocultado a los alumnos.'];
+
+        } elseif ($a === 'toggle_visible_recurso') {
+            $nuevo = $repo->togglearVisibilidadRecurso((int)$post['id_recurso'], $id_publicacion);
+            if ($nuevo === null) return ['ok' => false, 'mensaje' => 'Recurso no encontrado.'];
+            return ['ok' => true, 'mensaje' => $nuevo ? 'Recurso visible para alumnos.' : 'Recurso ocultado a los alumnos.'];
 
         } else {
             return ['ok' => false, 'mensaje' => 'Acción no reconocida.'];
