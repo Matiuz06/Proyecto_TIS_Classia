@@ -17,6 +17,7 @@ require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/contenido_curso.php';   // carga ContenidoCursoRepository + clases de dominio
 require_once __DIR__ . '/EntregaRepository.php';
+require_once __DIR__ . '/../certificados/CursoProgresoRepository.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../admin/estadisticas_admin.php';
 require_once __DIR__ . '/../utils/toast.php';
@@ -38,6 +39,8 @@ $puede_gestionar_entregas = false;
 $resumen_entregas_docente = [];
 $entregas_docente_por_tarea = [];
 $archivos_entregas = [];
+$progreso_curso = null;
+$recursos_completados_ids = [];
 
 $usuario_actual = usuario_actual();
 
@@ -95,7 +98,7 @@ if ($id_curso > 0) {
         $stmt = $pdo->prepare("
             SELECT p.id_publicacion, p.id_usuario, p.titulo, p.descripcion, p.precio, p.tipo,
                    p.modalidad, p.imagen, p.id_categoria, p.nivel_experiencia, p.duracion_horas,
-                   p.fecha_creacion, p.estado,
+                   p.fecha_creacion, p.estado, COALESCE(p.porcentaje_minimo_aprobacion, 70) AS porcentaje_minimo_aprobacion,
                    c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido,
                    u.id_usuario AS autor_id, u.foto_perfil AS autor_foto
             FROM publicaciones p 
@@ -258,6 +261,33 @@ if ($id_curso > 0) {
                     }
                 }
 
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'marcar_recurso_completado') {
+                    $token = $_POST['csrf_token'] ?? '';
+                    $id_recurso = (int)($_POST['id_recurso'] ?? 0);
+                    $id_unidad = (int)($_POST['id_unidad'] ?? 0);
+                    $completado = ($_POST['completado'] ?? '') === '1';
+
+                    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+                        $_SESSION['curso_error'] = 'Token de seguridad invalido. Recarga la pagina e intenta nuevamente.';
+                    } elseif (!$contratacion_curso) {
+                        $_SESSION['curso_error'] = 'No tenes acceso para actualizar este recurso.';
+                    } else {
+                        $progresoRepo = new CursoProgresoRepository($pdo);
+                        if ($id_recurso > 0 && $progresoRepo->recursoPerteneceACurso($id_recurso, $id_curso)) {
+                            $progresoRepo->marcarRecurso((int)$usuario_actual['id_usuario'], $id_recurso, $completado);
+                            set_toast(
+                                $completado ? 'success' : 'info',
+                                $completado ? 'Recurso marcado como completado' : 'Recurso marcado como pendiente'
+                            );
+                        } else {
+                            $_SESSION['curso_error'] = 'Recurso invalido.';
+                        }
+                    }
+
+                    header("Location: curso.php?id=" . $id_curso . ($id_unidad ? "&unidad=" . $id_unidad : "") . ($id_recurso ? "#recurso-" . $id_recurso : ""));
+                    exit;
+                }
+
                 // Procesar nuevo mensaje en el foro de debate
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'publicar_mensaje_foro') {
                     $token = $_POST['csrf_token'] ?? '';
@@ -339,6 +369,9 @@ if ($id_curso > 0) {
                 }
                 if ($comprado) {
                     $tareas_alumno_curso = $entregaRepo->obtenerTareasAlumnoCurso($id_curso, (int)$usuario_actual['id_usuario']);
+                    $progresoRepo = new CursoProgresoRepository($pdo);
+                    $progreso_curso = $progresoRepo->obtenerProgresoAlumnoCurso((int)$usuario_actual['id_usuario'], $id_curso);
+                    $recursos_completados_ids = $progresoRepo->listarRecursosCompletadosCurso((int)$usuario_actual['id_usuario'], $id_curso);
                 }
 
                 if ($mis_entregas) {

@@ -184,7 +184,17 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
 
     try {
         //Módulos
-        if ($a === 'agregar_modulo') {
+        if ($a === 'actualizar_aprobacion') {
+            $porcentaje = filter_var($post['porcentaje_minimo_aprobacion'] ?? null, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 0, 'max_range' => 100],
+            ]);
+            if ($porcentaje === false) {
+                return ['ok' => false, 'mensaje' => 'El porcentaje minimo debe estar entre 0 y 100.'];
+            }
+            $stmt = $pdo->prepare('UPDATE publicaciones SET porcentaje_minimo_aprobacion = :porcentaje WHERE id_publicacion = :id AND tipo = \'Curso\'');
+            $stmt->execute(['porcentaje' => $porcentaje, 'id' => $id_publicacion]);
+
+        } elseif ($a === 'agregar_modulo') {
             $t = trim($post['titulo_modulo'] ?? '');
             if ($t === '') return ['ok' => false, 'mensaje' => 'El módulo necesita un título.'];
             $repo->crearModulo($id_publicacion, $t, trim($post['descripcion_modulo'] ?? '') ?: null, (int)($post['orden'] ?? 1));
