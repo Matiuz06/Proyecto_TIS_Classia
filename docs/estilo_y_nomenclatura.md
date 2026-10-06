@@ -1,8 +1,8 @@
-# Estándar de Estructura y Convenciones de Nomenclatura — Classia · Segunda Entrega
+# Estándar de Estructura y Convenciones de Nomenclatura — Classia · Sprint 4 (Octubre 2026)
 
 Este documento establece las convenciones de organización de archivos, estructura de carpetas y estándares de nombrado para el desarrollo de la plataforma **Classia**.
 
-> **Última actualización:** Segunda entrega funcional y técnica (Sprint 2)
+> **Última actualización:** Sprint 4 — Octubre 2026
 
 ---
 
@@ -26,29 +26,51 @@ Proyecto_TIS_Classia/
 │   ├── diagrama_de_clases_classia.md# Diagrama de clases de dominio UML
 │   ├── casos_de_uso_classia.md      # Especificación y diagrama de casos de uso
 │   ├── diagramas_de_secuencia_classia.md # Diagramas de secuencia de flujos
-│   └── pruebas_classia.md           # Registro de pruebas funcionales realizadas
+│   ├── conexion_supabase.md         # Guía de conexión híbrida MySQL/PostgreSQL
+│   ├── credenciales-demo.md         # Cuentas de prueba para desarrollo local
+│   ├── configuracion_correo.md      # Configuración de Mailpit / Brevo
+│   └── diagramas/                   # Diagramas UML exportados (PNG, SVG, PlantUML)
 ├── includes/                        # Componentes comunes PHP
 │   ├── header.php                   # Encabezado modular con navegación y sesión
 │   └── footer.php                   # Pie de página institucional modular
 ├── js/                              # Scripts JavaScript del cliente
 │   └── script.js                    # Interacciones dinámicas y validaciones
 ├── php/                             # Lógica de negocio backend organizada por módulo (snake_case)
-│   ├── auth/                        # ✅ Sesiones y autenticación
-│   │   ├── session.php              # Helper de funciones de sesión seguras
+│   ├── auth/                        # ✅ Sesiones, autenticación y 2FA
+│   │   ├── sesion.php               # Helper de funciones de sesión seguras
+│   │   ├── roles.php                # Constantes y guards de control de roles
+│   │   ├── procesar_login.php       # Validación de credenciales y bifurcación 2FA
+│   │   ├── totp_helper.php          # TOTP nativo (RFC 6238 / Google Authenticator)
+│   │   ├── verificar_2fa.php        # Verificación de código 2FA en login
+│   │   ├── configurar_2fa.php       # Activación y backup de 2FA
 │   │   └── logout.php               # Cierre seguro de sesión
-│   ├── publicaciones/               # ✅ CRUD de publicaciones
-│   │   ├── crear_publicacion.php    # Alta de publicaciones (INSERT PDO + CSRF)
-│   │   ├── editar_publicacion.php   # Edición y cambio de estado (UPDATE PDO + CSRF)
-│   │   └── obtener_publicaciones.php# Helper SELECT para vistas dinámicas
-│   ├── usuarios/                    # ✅ Procesamiento de usuarios
-│   │   └── registro.php             # Registro con validaciones, unicidad, bcrypt
-│   ├── solicitudes/                 # 🔄 En desarrollo — lógica de solicitudes personalizadas
-│   ├── contrataciones/              # 🔄 En desarrollo — lógica de órdenes de compra
-│   ├── pagos/                       # 🔄 En desarrollo — simulación y registro de pagos
-│   └── valoraciones/                # 🔄 En desarrollo — reseñas y cálculo de promedios
+│   ├── publicaciones/               # ✅ CRUD de publicaciones y contenido de cursos
+│   │   ├── ContenidoCursoRepository.php # Repositorio PDO de módulos, unidades y recursos
+│   │   ├── Modulo.php               # Entidad de módulo
+│   │   ├── Unidad.php               # Entidad de clase/unidad
+│   │   ├── Recurso.php              # Entidad de recurso multimedia
+│   │   ├── contenido_curso.php      # Wrappers de compatibilidad y gestión de temario
+│   │   ├── detalle_curso.php        # Carga del aula virtual
+│   │   ├── crear_publicacion.php    # Alta de publicaciones
+│   │   ├── editar_publicacion.php   # Edición y cambio de estado
+│   │   └── obtener_publicaciones.php# Helpers SELECT para vistas dinámicas
+│   ├── usuarios/                    # ✅ Gestión de usuarios y perfiles
+│   │   ├── registro.php             # Registro con validaciones, unicidad, bcrypt
+│   │   ├── perfil.php               # Consulta de perfil y contrataciones
+│   │   ├── perfil_profesional.php   # Gestión del perfil profesional del docente
+│   │   └── foto_perfil.php          # Subida y eliminación de foto de perfil
+│   ├── solicitudes/                 # ✅ Solicitudes de servicios y de rol docente
+│   ├── contrataciones/              # ✅ Lógica de órdenes de compra
+│   ├── pagos/                       # ✅ Pasarela simulada y comprobante
+│   ├── valoraciones/                # ✅ Reseñas y cálculo de promedios
+│   ├── noticias/                    # ✅ CRUD y moderación de noticias
+│   ├── eventos/                     # ✅ CRUD y moderación de eventos
+│   ├── admin/                       # ✅ Acciones administrativas globales
+│   └── utils/                       # Helpers transversales
 ├── scripts/                         # Scripts de utilidad CLI y diagnósticos de seguridad
 ├── sql/                             # Scripts DDL de base de datos
-│   └── schema.sql                   # Esquema relacional completo (9 tablas, 3FN, seeds)
+│   ├── schema.sql                   # Esquema relacional completo (MySQL/MariaDB)
+│   └── schema_supabase.sql          # Esquema adaptado para PostgreSQL/Supabase
 └── views/                           # Vistas y páginas accesibles al usuario (kebab-case .php)
     ├── login.php
     ├── registro.php
@@ -56,6 +78,7 @@ Proyecto_TIS_Classia/
     ├── panel-administrador.php
     ├── crear-publicacion.php
     ├── editar-publicacion.php
+    ├── gestionar-contenido-curso.php
     ├── catalogo.php
     ├── curso.php
     ├── servicio-detalle.php
@@ -64,11 +87,25 @@ Proyecto_TIS_Classia/
     ├── carrito.php
     ├── pasarela-pago.php
     ├── confirmacion.php
+    ├── comprobante.php
     ├── usuario.php
+    ├── eventos.php
+    ├── evento-detalle.php
+    ├── noticias.php
+    ├── noticia-detalle.php
     ├── valoracion.php
+    ├── editar-perfil.php
+    ├── editar-perfil-profesional.php
+    ├── perfil-profesional.php
     ├── cambiar-contrasena.php
     ├── restablecer-contrasena.php
+    ├── configurar-2fa.php
+    ├── verificar-2fa.php
     ├── primeros-pasos.php
+    ├── solicitudes-docente.php
+    ├── solicitudes-servicios.php
+    ├── mis-solicitudes-servicios.php
+    ├── institucional.php
     └── politica-privacidad.php
 ```
 

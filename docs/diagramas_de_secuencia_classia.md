@@ -1,6 +1,6 @@
-# Diagramas de Secuencia — Classia · Segunda Entrega (Sprint 3)
+# Diagramas de Secuencia — Classia · Sprint 4 (Octubre 2026)
 
-Este documento contiene los diagramas de secuencia representativos de los principales flujos del sistema en el **Sprint 3**.
+Este documento contiene los diagramas de secuencia representativos de los principales flujos del sistema en el **Sprint 4**.
 
 ---
 

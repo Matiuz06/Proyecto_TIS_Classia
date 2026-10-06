@@ -16,8 +16,8 @@ Este documento detalla la gestión operativa, flujo de trabajo en GitHub, vincul
 
 ```
 main (protegida)
- └── Dev-<NombreDesarrollador> (ej: Dev-Ezequel, Dev-Mateus)
-       └── Testing (integración previa para lógica JS o BD — cuando aplica)
+ └── Dev-<NombreDesarrollador> (ej: Dev-Ezequiel, Dev-Mateus, Dev-Rafael)
+       └── testing (integración previa para lógica JS o BD — cuando aplica)
              └── main
 ```
 
@@ -26,10 +26,10 @@ main (protegida)
 | Rama | Descripción |
 |---|---|
 | `main` | Código estable y entregable. Rama protegida; solo acepta cambios mediante Pull Request revisado y aprobado. |
-| `Testing` | Rama de integración para validar funcionalidades complejas (especialmente cambios de JavaScript, base de datos o lógica cliente/servidor) antes de mergear a `main`. |
+| `testing` | Rama de integración para validar funcionalidades complejas (especialmente cambios de JavaScript, base de datos o lógica cliente/servidor) antes de mergear a `main`. |
 | `Dev-<Nombre>` / `feature/*` / `hotfix/*` | Ramas de desarrollo individual por desarrollador o funcionalidad. |
 
-> ⚠️ **Sin commits directos a `main`:** Todos los cambios deben ingresar por Pull Request con al menos 1 revisión aprobada de un compañero de equipo.
+> ⚠️ **Sin commits directos a `main` ni a `testing`:** Todos los cambios deben ingresar por Pull Request con al menos 1 revisión aprobada de un compañero de equipo.
 
 ---
 
@@ -112,14 +112,14 @@ Todo PR debe completar la plantilla predefinida en `.github/pull_request_templat
 ## 6. Nomenclatura del SRS de Classia
 
 ### Funcionales (`REQ-XXX-NN`)
-`REQ-AUT` (Autenticación) · `REQ-USR` (Usuarios) · `REQ-CUR` (Cursos) · `REQ-CON` (Contenidos) · `REQ-BUS` (Búsqueda) · `REQ-INS` (Inscripción) · `REQ-ACT` (Actividades) · `REQ-EVA` (Evaluaciones) · `REQ-CAL` (Calificaciones) · `REQ-COM` (Comunicación) · `REQ-PAN` (Panel/Calendario) · `REQ-SER` (Servicios) · `REQ-PAG` (Pagos) · `REQ-VAL` (Valoraciones) · `REQ-ADM` (Administración).
+`REQ-AUT` (Autenticación) · `REQ-USR` (Usuarios) · `REQ-CUR` (Cursos) · `REQ-CON` (Contenidos) · `REQ-BUS` (Búsqueda) · `REQ-INS` (Inscripción) · `REQ-ACT` (Actividades) · `REQ-CAL` (Calificaciones) · `REQ-COM` (Comunicación) · `REQ-PAN` (Panel/Calendario) · `REQ-SER` (Servicios) · `REQ-PAG` (Pagos) · `REQ-VAL` (Valoraciones) · `REQ-ADM` (Administración).
 
 ### No funcionales (`RNF-NN`)
-`RNF-01` a `RNF-09` (Seguridad) · `RNF-10` a `RNF-14` (Privacidad/Ley 18.331) · `RNF-15` a `RNF-16` (Rendimiento) · `RNF-17` a `RNF-18` (Usabilidad/WCAG) · `RNF-19` a `RNF-20` (Compatibilidad) · `RNF-21` a `RNF-24` (Mantenibilidad).
+`RNF-01` a `RNF-09` (Seguridad) · `RNF-10` a `RNF-14` (Privacidad/Ley 18.331) · `RNF-15` a `RNF-16` (Rendimiento) · `RNF-17` a `RNF-18` (Usabilidad/WCAG) · `RNF-19` a `RNF-20` (Compatibilidad) · `RNF-21` a `RNF-23` (Mantenibilidad).
 
 ### Dominio / Reglas de negocio (`RN-NN`)
-`RN-01` a `RN-14`.
+`RN-01` a `RN-14` (sin `RN-09`).
 
 ---
 
-*Documento configurado para la Etapa 2 del Proyecto Taller — AniTech / Classia.*
+*Documento actualizado en Sprint 4 — Octubre 2026 — AniTech / Classia.*

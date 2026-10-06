@@ -254,6 +254,16 @@ El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SEC
 
 ## Estado actual del proyecto
 
+> **Matriz de trazabilidad (Sprint 4) — Octubre 2026**
+> 122 requerimientos totales · ✅ 99 verificados · 🔵 10 implementados · ⏳ 13 pendientes
+
+| Categoría | Total | Estado |
+|---|---|---|
+| Funcionales (REQ) | 74 | 61 verificados, 13 pendientes |
+| No funcionales (RNF-01–23) | 23 | 16 verificados, 6 implementados, 1 pendiente |
+| Reglas de negocio (RN) | 13 | 11 verificados, 2 pendientes |
+| Dominio educativo/legal (RD) | 12 | 11 verificados, 1 pendiente |
+
 ### Completado — Entregas e Iteraciones
 
 - [x] **Arquitectura PHP modular** con más de 50 vistas, includes reutilizables y backend organizado por dominio.
