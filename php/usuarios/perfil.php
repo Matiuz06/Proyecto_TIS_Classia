@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../valoraciones/obtener_contrataciones_valorables.php';
+require_once __DIR__ . '/../utils/toast.php';
 
 requerir_autenticacion('login.php');
 
@@ -26,9 +27,13 @@ unset($_SESSION['error_perfil']);
 
 $mensaje_exito = $_SESSION['exito_perfil'] ?? '';
 unset($_SESSION['exito_perfil']);
+if ($mensaje_exito !== '') {
+    set_toast('success', 'Perfil actualizado', $mensaje_exito);
+    $mensaje_exito = '';
+}
 
 if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'valoracion_guardada') {
-    $mensaje_exito = '¡Tu valoración fue registrada correctamente! Gracias por compartir tu opinión.';
+    set_toast('success', 'Valoracion enviada');
 }
 
 try {
