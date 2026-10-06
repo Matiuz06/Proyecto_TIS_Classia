@@ -191,13 +191,14 @@ Proyecto_TIS_Classia/
 
 ### 1. Requisitos previos
 - **Docker** y **Docker Compose** (recomendado).
-- O bien **PHP 8.0+** con extensión `pdo_mysql`, y **MySQL 8.0+** de forma local.
+- O bien **PHP 8.0+** con extension `pdo_mysql`, **Composer** y **MySQL 8.0+** de forma local.
 
 ### 2. Configuración con Docker (recomendado)
 
 ```bash
 # Clonar el repositorio y posicionarse en la raíz
 cp .env.example .env        # Configurar variables de entorno
+composer install            # Instalar dependencias PHP, incluido PHPMailer
 docker compose up -d        # Levantar contenedores
 ```
 
