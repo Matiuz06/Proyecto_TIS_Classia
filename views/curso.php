@@ -92,6 +92,11 @@ function curso_estado_tarea_alumno(array $fila, DateTimeImmutable $ahora): array
     return ['clave' => 'pendiente', 'texto' => 'Pendiente', 'badge' => 'badge-warning-soft'];
 }
 
+function curso_formatear_porcentaje(float $valor): string
+{
+    return rtrim(rtrim(number_format($valor, 2, '.', ''), '0'), '.');
+}
+
 $filas_calificaciones = [];
 if ($comprado && !empty($tareas_alumno_curso)) {
     $ahora = new DateTimeImmutable();
@@ -360,6 +365,31 @@ include '../includes/header.php';
       <?php endif; ?>
 
       <article class="course-content" aria-live="polite">
+        <?php if ($comprado && $progreso_curso): ?>
+          <?php $porcentajeProgreso = (float)$progreso_curso['porcentaje']; ?>
+          <section class="course-progress-card" aria-label="Progreso del curso">
+            <div class="course-progress-card__head">
+              <div>
+                <strong>Progreso del curso</strong>
+                <span><?= (int)$progreso_curso['completados'] ?> de <?= (int)$progreso_curso['total'] ?> elementos completados</span>
+              </div>
+              <span class="badge <?= !empty($progreso_curso['aprobado']) ? 'badge-success-soft' : 'badge-info-soft' ?>"><?= htmlspecialchars($progreso_curso['estado']) ?></span>
+            </div>
+            <div class="course-progress-bar" aria-hidden="true">
+              <span style="width: <?= max(0, min(100, $porcentajeProgreso)) ?>%;"></span>
+            </div>
+            <div class="course-progress-card__foot">
+              <span><?= curso_formatear_porcentaje($porcentajeProgreso) ?>%</span>
+              <span>Minimo para aprobar: <?= (int)$progreso_curso['porcentaje_minimo'] ?>%</span>
+            </div>
+            <?php if (!empty($progreso_curso['aprobado'])): ?>
+              <p><a class="btn btn-sm btn-primary-action" href="../php/certificados/descargar.php?id_curso=<?= (int)$curso['id_publicacion'] ?>">Descargar certificado</a></p>
+            <?php else: ?>
+              <p class="text-muted">El certificado estara disponible al aprobar el curso.</p>
+            <?php endif; ?>
+          </section>
+        <?php endif; ?>
+
         <?php if (!$item_actual): ?>
           <section class="course-overview">
             <h2>Información del curso</h2>
@@ -531,6 +561,19 @@ include '../includes/header.php';
                           <?php else: ?>
                             <span class="badge badge-warning-soft">No acepta entregas ahora</span>
                           <?php endif; ?>
+                        <?php endif; ?>
+                        <?php if ($comprado && !$esTareaEntregable): ?>
+                          <?php $recursoCompletado = in_array((int)$recurso['id_recurso'], $recursos_completados_ids, true); ?>
+                          <form method="POST" class="inline-form">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                            <input type="hidden" name="accion" value="marcar_recurso_completado">
+                            <input type="hidden" name="id_recurso" value="<?= (int)$recurso['id_recurso'] ?>">
+                            <input type="hidden" name="id_unidad" value="<?= (int)($unidad['id_unidad'] ?? 0) ?>">
+                            <input type="hidden" name="completado" value="<?= $recursoCompletado ? '0' : '1' ?>">
+                            <button class="btn btn-sm <?= $recursoCompletado ? 'btn-outline' : 'btn-primary-action' ?>" type="submit">
+                              <?= $recursoCompletado ? 'Completado' : 'Marcar como completado' ?>
+                            </button>
+                          </form>
                         <?php endif; ?>
                       </div>
                     </div>

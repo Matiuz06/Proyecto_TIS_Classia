@@ -148,6 +148,20 @@ include '../includes/header.php';
       <a class="btn" href="panel-proveedor.php">Volver al panel</a>
     </nav>
 
+    <section class="course-approval-settings" aria-labelledby="criterio-aprobacion">
+      <h2 id="criterio-aprobacion">Criterio de aprobacion</h2>
+      <form method="POST" class="course-approval-form">
+        <?php campo_base_curso($id_publicacion); ?>
+        <input type="hidden" name="accion" value="actualizar_aprobacion">
+        <label>
+          Porcentaje minimo de aprobacion
+          <input type="number" name="porcentaje_minimo_aprobacion" min="0" max="100" value="<?= (int)($curso['porcentaje_minimo_aprobacion'] ?? 70) ?>">
+        </label>
+        <span class="text-muted">El alumno debera alcanzar al menos este porcentaje de progreso para aprobar el curso.</span>
+        <button class="btn btn-sm btn-primary-action" type="submit">Guardar</button>
+      </form>
+    </section>
+
     <button class="btn btn-secondary course-structure-toggle" type="button" data-course-sidebar-toggle aria-expanded="false">Contenido del curso</button>
 
     <div class="course-editor-shell">

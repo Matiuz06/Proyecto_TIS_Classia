@@ -17,6 +17,7 @@ $privacidadHref    = ($cssPrefix === '.') ? 'views/politica-privacidad.php' : 'p
 $terminosHref      = ($cssPrefix === '.') ? 'views/terminos-de-servicio.php' : 'terminos-de-servicio.php';
 $divulgHref        = ($cssPrefix === '.') ? 'views/divulgacion-responsable.php' : 'divulgacion-responsable.php';
 $institucionalHref = ($cssPrefix === '.') ? 'views/institucional.php' : 'institucional.php';
+$verificarCertificadoHref = ($cssPrefix === '.') ? 'views/verificar-certificado.php' : 'verificar-certificado.php';
 $calidadHref       = ($cssPrefix === '.') ? 'views/politica-calidad.php' : 'politica-calidad.php';
 $seguridadHref     = ($cssPrefix === '.') ? 'views/politica-seguridad.php' : 'politica-seguridad.php';
 $cookiesHref       = ($cssPrefix === '.') ? 'views/politica-cookies.php' : 'politica-cookies.php';
@@ -37,6 +38,7 @@ $accesibilidadHref = ($cssPrefix === '.') ? 'views/politica-accesibilidad.php' :
         <ul class="site-footer__list">
           <li><a href="<?= $institucionalHref ?>"><?= __t('footer_about_us') ?></a></li>
           <li><a href="<?= $primerosPasosHref ?>"><?= __t('footer_first_steps') ?></a></li>
+          <li><a href="<?= $verificarCertificadoHref ?>">Verificar certificado</a></li>
           <li><a href="<?= $contactoHref ?>"><?= __t('footer_contact') ?></a></li>
           <li><a href="<?= $reglamentoHref ?>"><?= __t('footer_rules') ?></a></li>
         </ul>

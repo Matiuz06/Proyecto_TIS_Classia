@@ -159,9 +159,20 @@ include '../includes/header.php';
         <p>Cursos en los que estás inscripto:</p>
         <ul>
           <?php foreach ($cursos_contratados as $curso): ?>
+            <?php $progresoPerfil = $progresos_cursos[(int)$curso['id_publicacion']] ?? null; ?>
             <li class="account-item">
               <strong><?php echo htmlspecialchars($curso['titulo']); ?></strong>
               — Estado: <em><?php echo $curso['estado'] === 'Pendiente' ? 'Pendiente de pago' : htmlspecialchars($curso['estado']); ?></em>
+              <?php if ($progresoPerfil): ?>
+                <?php $porcentajePerfil = rtrim(rtrim(number_format((float)$progresoPerfil['porcentaje'], 2, '.', ''), '0'), '.'); ?>
+                <div class="account-course-progress">
+                  <span>Progreso: <?php echo htmlspecialchars($porcentajePerfil); ?>%</span>
+                  <span>Estado: <?php echo htmlspecialchars($progresoPerfil['estado']); ?></span>
+                  <?php if (!empty($progresoPerfil['aprobado'])): ?>
+                    <a href="../php/certificados/descargar.php?id_curso=<?php echo (int)$curso['id_publicacion']; ?>">Certificado</a>
+                  <?php endif; ?>
+                </div>
+              <?php endif; ?>
               <?php if ($curso['estado'] === 'Pendiente'): ?>
                 [<a href="pasarela-pago.php?id_contratacion=<?php echo (int)$curso['id_contratacion']; ?>" class="link u-font-bold u-text-brand-primary">Completar pago →</a>]
               <?php else: ?>
