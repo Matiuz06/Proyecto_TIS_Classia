@@ -8,6 +8,7 @@ require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 require_once '../php/publicaciones/contenido_curso.php';
 require_once '../php/publicaciones/EntregaRepository.php';
+require_once '../php/utils/toast.php';
 
 if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 $usuario = usuario_actual();
@@ -22,7 +23,11 @@ if (!$curso) {
     $error = 'Curso no encontrado o sin permisos.';
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $r = procesar_contenido_curso($pdo, $_POST, $_FILES, $id_publicacion, $id_usuario, es_admin(), $_SESSION['csrf_token']);
-    if ($r['ok']) $mensaje = $r['mensaje']; else $error = $r['mensaje'];
+    if ($r['ok']) set_toast('success', 'Contenido actualizado'); else $error = $r['mensaje'];
+}
+
+if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'creada') {
+    set_toast('success', 'Curso creado', 'Ahora podes cargar su contenido.');
 }
 
 $contenido = $curso ? obtener_contenido_curso($pdo, $id_publicacion) : [];
@@ -134,8 +139,6 @@ include '../includes/header.php';
     <?php endif; ?>
   </header>
 
-  <?php if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'creada'): ?><div class="alert alert-success">Curso creado. Ahora podes cargar su contenido.</div><?php endif; ?>
-  <?php if ($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
   <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
   <?php if ($curso): ?>

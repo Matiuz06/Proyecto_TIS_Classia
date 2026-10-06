@@ -19,6 +19,7 @@ require_once __DIR__ . '/contenido_curso.php';   // carga ContenidoCursoReposito
 require_once __DIR__ . '/EntregaRepository.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../admin/estadisticas_admin.php';
+require_once __DIR__ . '/../utils/toast.php';
 
 iniciar_sesion();
 
@@ -239,7 +240,13 @@ if ($id_curso > 0) {
                                         throw $e;
                                     }
                                     foreach ($resultado['archivos_reemplazados'] as $reemplazado) eliminar_ruta_entrega($reemplazado['ruta'] ?? null);
-                                    $_SESSION['curso_exito'] = 'Tu entrega fue enviada correctamente.';
+                                    set_toast(
+                                        'success',
+                                        $entregaActual ? 'Entrega actualizada' : 'Entrega enviada',
+                                        $entregaActual
+                                            ? 'Tu nueva entrega fue registrada correctamente.'
+                                            : 'Tu entrega fue registrada correctamente.'
+                                    );
                                     header("Location: curso.php?id=" . $id_curso . ($id_unidad_tarea ? "&unidad=" . $id_unidad_tarea : ""));
                                     exit;
                                 }
@@ -271,7 +278,7 @@ if ($id_curso > 0) {
                             exit;
                         }
                         $contenidoRepo->crearMensajeForo($id_recurso_foro, (int)$usuario_actual['id_usuario'], $mensaje);
-                        $_SESSION['curso_exito'] = 'Â¡Tu comentario fue publicado en el foro de debate!';
+                        set_toast('success', 'Comentario publicado');
                         header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
                         exit;
                     }
@@ -296,7 +303,7 @@ if ($id_curso > 0) {
                             (int)$usuario_actual['id_usuario'] === (int)$curso['id_usuario']
                         );
                         if ($borrado) {
-                            $_SESSION['curso_exito'] = 'Mensaje eliminado correctamente.';
+                            set_toast('success', 'Mensaje eliminado');
                         } else {
                             $_SESSION['curso_error'] = 'No tenÃ©s permisos para eliminar este mensaje.';
                         }
