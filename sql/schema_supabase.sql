@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     modalidad VARCHAR(30) NULL,
     nivel_experiencia VARCHAR(30) NULL,
     duracion_horas SMALLINT NULL,
+    porcentaje_minimo_aprobacion SMALLINT NOT NULL DEFAULT 70,
     cupos INT NULL,
     disponibilidad TEXT NULL,
     tipo_servicio VARCHAR(60) NULL,
@@ -336,6 +337,27 @@ CREATE TABLE IF NOT EXISTS curso_entrega_archivos (
     fecha_subida TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_curso_entrega_archivos_entrega ON curso_entrega_archivos (id_entrega);
+
+CREATE TABLE IF NOT EXISTS curso_recursos_completados (
+    id_completado SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_recurso INT NOT NULL REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    fecha_completado TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_recurso_completado_usuario UNIQUE (id_usuario, id_recurso)
+);
+CREATE INDEX IF NOT EXISTS idx_recursos_completados_recurso ON curso_recursos_completados (id_recurso);
+
+CREATE TABLE IF NOT EXISTS certificados (
+    id_certificado SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_curso INT NOT NULL REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
+    codigo_verificacion VARCHAR(32) NOT NULL,
+    fecha_emision TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    porcentaje_aprobacion NUMERIC(5,2) NOT NULL,
+    CONSTRAINT uq_certificado_usuario_curso UNIQUE (id_usuario, id_curso),
+    CONSTRAINT uq_certificado_codigo UNIQUE (codigo_verificacion)
+);
+CREATE INDEX IF NOT EXISTS idx_certificados_curso ON certificados (id_curso);
 
 CREATE TABLE IF NOT EXISTS curso_foro_mensajes (
     id_mensaje SERIAL PRIMARY KEY,

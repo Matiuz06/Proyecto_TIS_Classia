@@ -17,7 +17,7 @@ require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/file_upload_helper.php';
 require_once __DIR__ . '/../utils/supabase_storage.php';
-require_once __DIR__ . '/ContenidoCursoRepository.php';   // incluye Modulo, Unidad, Recurso
+require_once __DIR__ . '/ContenidoCursoRepository.php';
 require_once __DIR__ . '/TareaRepository.php';
 
 //Instancia del repositorio
@@ -29,9 +29,11 @@ require_once __DIR__ . '/TareaRepository.php';
 function _repo_contenido(PDO $pdo): ContenidoCursoRepository
 {
     static $repo = null;
+
     if ($repo === null) {
         $repo = new ContenidoCursoRepository($pdo);
     }
+
     return $repo;
 }
 
@@ -48,9 +50,17 @@ function _repo_contenido(PDO $pdo): ContenidoCursoRepository
  * @param bool $admin
  * @return array|null
  */
-function obtener_curso_del_docente(PDO $pdo, int $id_publicacion, int $id_usuario, bool $admin = false): ?array
-{
-    return _repo_contenido($pdo)->obtenerCursoDelDocente($id_publicacion, $id_usuario, $admin);
+function obtener_curso_del_docente(
+    PDO $pdo,
+    int $id_publicacion,
+    int $id_usuario,
+    bool $admin = false
+): ?array {
+    return _repo_contenido($pdo)->obtenerCursoDelDocente(
+        $id_publicacion,
+        $id_usuario,
+        $admin
+    );
 }
 
 /**
@@ -62,12 +72,18 @@ function obtener_curso_del_docente(PDO $pdo, int $id_publicacion, int $id_usuari
  *
  * @param PDO  $pdo
  * @param int  $id_publicacion
- * @param bool $solo_visibles   Si true, excluye módulos y recursos no visibles para alumnos (REQ-CON-04).
+ * @param bool $solo_visibles Si true, excluye módulos y recursos no visibles para alumnos (REQ-CON-04).
  * @return array[]
  */
-function obtener_contenido_curso(PDO $pdo, int $id_publicacion, bool $solo_visibles = false): array
-{
-    return _repo_contenido($pdo)->obtenerPorCursoComoArray($id_publicacion, $solo_visibles);
+function obtener_contenido_curso(
+    PDO $pdo,
+    int $id_publicacion,
+    bool $solo_visibles = false
+): array {
+    return _repo_contenido($pdo)->obtenerPorCursoComoArray(
+        $id_publicacion,
+        $solo_visibles
+    );
 }
 
 //HELPERS DE PRESENTACIÓN
@@ -78,9 +94,15 @@ function obtener_contenido_curso(PDO $pdo, int $id_publicacion, bool $solo_visib
  */
 function url_recurso_valida(?string $url): bool
 {
-    if (!$url) return false;
+    if (!$url) {
+        return false;
+    }
+
     $p = parse_url($url);
-    return is_array($p) && isset($p['scheme']) && in_array(strtolower($p['scheme']), ['http', 'https'], true);
+
+    return is_array($p)
+        && isset($p['scheme'])
+        && in_array(strtolower($p['scheme']), ['http', 'https'], true);
 }
 
 /**
@@ -88,8 +110,21 @@ function url_recurso_valida(?string $url): bool
  */
 function obtener_video_embed_url(?string $url): ?string
 {
-    if (!$url) return null;
-    $r = Recurso::fromArray(['id_recurso' => 0, 'id_unidad' => 0, 'titulo' => '', 'tipo' => 'Video', 'url' => $url, 'archivo' => null, 'descripcion' => null, 'orden' => 0]);
+    if (!$url) {
+        return null;
+    }
+
+    $r = Recurso::fromArray([
+        'id_recurso' => 0,
+        'id_unidad' => 0,
+        'titulo' => '',
+        'tipo' => 'Video',
+        'url' => $url,
+        'archivo' => null,
+        'descripcion' => null,
+        'orden' => 0
+    ]);
+
     return $r->getVideoEmbedUrl();
 }
 
@@ -112,16 +147,28 @@ function tipos_recurso_curso(): array
  */
 function icono_recurso_curso(string $tipo): string
 {
-    $r = Recurso::fromArray(['id_recurso' => 0, 'id_unidad' => 0, 'titulo' => '', 'tipo' => $tipo, 'url' => null, 'archivo' => null, 'descripcion' => null, 'orden' => 0]);
+    $r = Recurso::fromArray([
+        'id_recurso' => 0,
+        'id_unidad' => 0,
+        'titulo' => '',
+        'tipo' => $tipo,
+        'url' => null,
+        'archivo' => null,
+        'descripcion' => null,
+        'orden' => 0
+    ]);
+
     return $r->getIcono();
 }
 
 function tarea_repo(PDO $pdo): TareaRepository
 {
     static $repo = null;
+
     if ($repo === null) {
         $repo = new TareaRepository($pdo);
     }
+
     return $repo;
 }
 
@@ -135,37 +182,121 @@ function obtener_tarea_por_recurso(PDO $pdo, int $id_recurso): ?Tarea
  */
 function icono_emoji_recurso(string $tipo): string
 {
-    $r = Recurso::fromArray(['id_recurso' => 0, 'id_unidad' => 0, 'titulo' => '', 'tipo' => $tipo, 'url' => null, 'archivo' => null, 'descripcion' => null, 'orden' => 0]);
+    $r = Recurso::fromArray([
+        'id_recurso' => 0,
+        'id_unidad' => 0,
+        'titulo' => '',
+        'tipo' => $tipo,
+        'url' => null,
+        'archivo' => null,
+        'descripcion' => null,
+        'orden' => 0
+    ]);
+
     return $r->getEmojiIcono();
 }
 
 function recurso_archivo_permite_tipo(string $tipo, string $nombre): bool
 {
     $ext = strtolower(pathinfo($nombre, PATHINFO_EXTENSION));
-    if ($tipo === 'PDF')    return $ext === 'pdf';
-    if ($tipo === 'Imagen') return in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true);
-    if ($tipo === 'Video')  return in_array($ext, ['mp4', 'webm'], true);
-    if (in_array($tipo, ['Archivo', 'Foro', 'Entrega de Tareas'], true)) {
-        return in_array($ext, ['pdf', 'zip', 'rar', '7z', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'csv', 'json', 'xml', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'webm', 'stl', 'obj', '3mf'], true);
+
+    if ($tipo === 'PDF') {
+        return $ext === 'pdf';
     }
+
+    if ($tipo === 'Imagen') {
+        return in_array(
+            $ext,
+            ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+            true
+        );
+    }
+
+    if ($tipo === 'Video') {
+        return in_array(
+            $ext,
+            ['mp4', 'webm'],
+            true
+        );
+    }
+
+    if (in_array($tipo, ['Archivo', 'Foro', 'Entrega de Tareas'], true)) {
+        return in_array(
+            $ext,
+            [
+                'pdf',
+                'zip',
+                'rar',
+                '7z',
+                'doc',
+                'docx',
+                'ppt',
+                'pptx',
+                'xls',
+                'xlsx',
+                'txt',
+                'csv',
+                'json',
+                'xml',
+                'jpg',
+                'jpeg',
+                'png',
+                'webp',
+                'gif',
+                'mp4',
+                'webm',
+                'stl',
+                'obj',
+                '3mf'
+            ],
+            true
+        );
+    }
+
     return true;
 }
 
 /**
  * @deprecated Usar Recurso->esVisualizableNativamente().
  */
-function recurso_es_visualizable_nativamente(string $tipo, ?string $archivo = null): bool
-{
-    $r = Recurso::fromArray(['id_recurso' => 0, 'id_unidad' => 0, 'titulo' => '', 'tipo' => $tipo, 'url' => null, 'archivo' => $archivo, 'descripcion' => null, 'orden' => 0]);
+function recurso_es_visualizable_nativamente(
+    string $tipo,
+    ?string $archivo = null
+): bool {
+    $r = Recurso::fromArray([
+        'id_recurso' => 0,
+        'id_unidad' => 0,
+        'titulo' => '',
+        'tipo' => $tipo,
+        'url' => null,
+        'archivo' => $archivo,
+        'descripcion' => null,
+        'orden' => 0
+    ]);
+
     return $r->esVisualizableNativamente();
 }
 
 /**
  * @deprecated Usar ContenidoCursoRepository->intercambiarOrden().
  */
-function intercambiar_orden(PDO $pdo, string $tabla, string $id_col, int $id, string $scope_col, int $scope_id, string $direccion): bool
-{
-    return _repo_contenido($pdo)->intercambiarOrden($tabla, $id_col, $id, $scope_col, $scope_id, $direccion);
+function intercambiar_orden(
+    PDO $pdo,
+    string $tabla,
+    string $id_col,
+    int $id,
+    string $scope_col,
+    int $scope_id,
+    string $direccion
+): bool {
+    return _repo_contenido($pdo)->intercambiarOrden(
+        $tabla,
+        $id_col,
+        $id,
+        $scope_col,
+        $scope_id,
+        $direccion
+    );
 }
 
 //PROCESAMIENTO DE ACCIONES (POST)
@@ -179,111 +310,326 @@ function curso_esta_archivado(?array $curso): bool
     return ($curso['estado'] ?? '') === 'Archivado';
 }
 
-function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_publicacion, int $id_usuario, bool $admin, string $csrf): array
-{
+function procesar_contenido_curso(
+    PDO $pdo,
+    array $post,
+    array $files,
+    int $id_publicacion,
+    int $id_usuario,
+    bool $admin,
+    string $csrf
+): array {
     if ($csrf === '' || !hash_equals($csrf, $post['csrf_token'] ?? '')) {
-        return ['ok' => false, 'mensaje' => 'La sesión del formulario expiró.'];
+        return [
+            'ok' => false,
+            'mensaje' => 'La sesión del formulario expiró.'
+        ];
     }
 
     $repo = _repo_contenido($pdo);
 
-    $curso_actual = $repo->obtenerCursoDelDocente($id_publicacion, $id_usuario, $admin);
+    $curso_actual = $repo->obtenerCursoDelDocente(
+        $id_publicacion,
+        $id_usuario,
+        $admin
+    );
+
     if (!$curso_actual) {
-        return ['ok' => false, 'mensaje' => 'No tenés permisos para gestionar este curso.'];
+        return [
+            'ok' => false,
+            'mensaje' => 'No tenés permisos para gestionar este curso.'
+        ];
     }
 
     // RN-05: Los cursos archivados no admiten nuevas actividades
     if (curso_esta_archivado($curso_actual)) {
-        return ['ok' => false, 'mensaje' => 'Este curso está archivado y no acepta modificaciones de contenido.'];
+        return [
+            'ok' => false,
+            'mensaje' => 'Este curso está archivado y no acepta modificaciones de contenido.'
+        ];
     }
 
     $a = $post['accion'] ?? '';
 
     try {
-        //Módulos
-        if ($a === 'agregar_modulo') {
+        // Criterio de aprobación del curso
+        if ($a === 'actualizar_aprobacion') {
+            $porcentaje = filter_var(
+                $post['porcentaje_minimo_aprobacion'] ?? null,
+                FILTER_VALIDATE_INT,
+                [
+                    'options' => [
+                        'min_range' => 0,
+                        'max_range' => 100
+                    ]
+                ]
+            );
+
+            if ($porcentaje === false) {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'El porcentaje mínimo debe estar entre 0 y 100.'
+                ];
+            }
+
+            $stmt = $pdo->prepare(
+                "UPDATE publicaciones
+                 SET porcentaje_minimo_aprobacion = :porcentaje
+                 WHERE id_publicacion = :id
+                   AND tipo = 'Curso'"
+            );
+
+            $stmt->execute([
+                'porcentaje' => $porcentaje,
+                'id' => $id_publicacion
+            ]);
+
+        // Módulos
+        } elseif ($a === 'agregar_modulo') {
             $t = trim($post['titulo_modulo'] ?? '');
-            if ($t === '') return ['ok' => false, 'mensaje' => 'El módulo necesita un título.'];
-            $repo->crearModulo($id_publicacion, $t, trim($post['descripcion_modulo'] ?? '') ?: null, (int)($post['orden'] ?? 1));
+
+            if ($t === '') {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'El módulo necesita un título.'
+                ];
+            }
+
+            $repo->crearModulo(
+                $id_publicacion,
+                $t,
+                trim($post['descripcion_modulo'] ?? '') ?: null,
+                (int)($post['orden'] ?? 1)
+            );
 
         } elseif ($a === 'editar_modulo') {
             $t = trim($post['titulo'] ?? '');
-            if ($t === '') return ['ok' => false, 'mensaje' => 'El módulo necesita un título.'];
-            $repo->editarModulo((int)$post['id_modulo'], $id_publicacion, $t, trim($post['descripcion'] ?? '') ?: null, (int)($post['orden'] ?? 1));
+
+            if ($t === '') {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'El módulo necesita un título.'
+                ];
+            }
+
+            $repo->editarModulo(
+                (int)$post['id_modulo'],
+                $id_publicacion,
+                $t,
+                trim($post['descripcion'] ?? '') ?: null,
+                (int)($post['orden'] ?? 1)
+            );
 
         } elseif ($a === 'eliminar_modulo') {
-            $repo->eliminarModulo((int)$post['id_modulo'], $id_publicacion);
+            $repo->eliminarModulo(
+                (int)$post['id_modulo'],
+                $id_publicacion
+            );
 
         } elseif (in_array($a, ['subir_modulo', 'bajar_modulo'], true)) {
-            $repo->intercambiarOrden('curso_modulos', 'id_modulo', (int)$post['id_modulo'], 'id_publicacion', $id_publicacion, $a === 'subir_modulo' ? 'subir' : 'bajar');
+            $repo->intercambiarOrden(
+                'curso_modulos',
+                'id_modulo',
+                (int)$post['id_modulo'],
+                'id_publicacion',
+                $id_publicacion,
+                $a === 'subir_modulo' ? 'subir' : 'bajar'
+            );
 
-        //Unidades
+        // Unidades
         } elseif ($a === 'agregar_unidad') {
             $m = (int)($post['id_modulo'] ?? 0);
+
             if (!$repo->verificarModuloPerteneceACurso($m, $id_publicacion)) {
-                return ['ok' => false, 'mensaje' => 'El módulo no pertenece a este curso.'];
+                return [
+                    'ok' => false,
+                    'mensaje' => 'El módulo no pertenece a este curso.'
+                ];
             }
+
             $t = trim($post['titulo_unidad'] ?? '');
-            if ($t === '') return ['ok' => false, 'mensaje' => 'La clase necesita un título.'];
-            $repo->crearUnidad($m, $t, trim($post['descripcion_unidad'] ?? '') ?: null, (int)($post['orden'] ?? 1));
+
+            if ($t === '') {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'La clase necesita un título.'
+                ];
+            }
+
+            $repo->crearUnidad(
+                $m,
+                $t,
+                trim($post['descripcion_unidad'] ?? '') ?: null,
+                (int)($post['orden'] ?? 1)
+            );
 
         } elseif ($a === 'editar_unidad') {
             $t = trim($post['titulo'] ?? '');
-            if ($t === '') return ['ok' => false, 'mensaje' => 'La clase necesita un título.'];
-            $repo->editarUnidad((int)$post['id_unidad'], $id_publicacion, $t, trim($post['descripcion'] ?? '') ?: null, (int)($post['orden'] ?? 1));
+
+            if ($t === '') {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'La clase necesita un título.'
+                ];
+            }
+
+            $repo->editarUnidad(
+                (int)$post['id_unidad'],
+                $id_publicacion,
+                $t,
+                trim($post['descripcion'] ?? '') ?: null,
+                (int)($post['orden'] ?? 1)
+            );
 
         } elseif ($a === 'eliminar_unidad') {
-            $repo->eliminarUnidad((int)$post['id_unidad'], $id_publicacion);
+            $repo->eliminarUnidad(
+                (int)$post['id_unidad'],
+                $id_publicacion
+            );
 
         } elseif (in_array($a, ['subir_unidad', 'bajar_unidad'], true)) {
-            $mid = $repo->obtenerModuloDeLaUnidad((int)$post['id_unidad'], $id_publicacion);
-            if (!$mid) return ['ok' => false, 'mensaje' => 'La clase no pertenece a este curso.'];
-            $repo->intercambiarOrden('curso_unidades', 'id_unidad', (int)$post['id_unidad'], 'id_modulo', $mid, $a === 'subir_unidad' ? 'subir' : 'bajar');
+            $mid = $repo->obtenerModuloDeLaUnidad(
+                (int)$post['id_unidad'],
+                $id_publicacion
+            );
 
-        //Recursos
+            if (!$mid) {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'La clase no pertenece a este curso.'
+                ];
+            }
+
+            $repo->intercambiarOrden(
+                'curso_unidades',
+                'id_unidad',
+                (int)$post['id_unidad'],
+                'id_modulo',
+                $mid,
+                $a === 'subir_unidad' ? 'subir' : 'bajar'
+            );
+
+        // Recursos
         } elseif (in_array($a, ['agregar_recurso', 'editar_recurso'], true)) {
-            $rid    = (int)($post['id_recurso'] ?? 0);
+            $rid = (int)($post['id_recurso'] ?? 0);
             $unidad = (int)($post['id_unidad'] ?? 0);
             $actual = null;
 
             if ($a === 'editar_recurso') {
-                $actual = $repo->obtenerRecurso($rid, $id_publicacion);
-                if (!$actual) return ['ok' => false, 'mensaje' => 'Recurso inexistente o sin permisos.'];
+                $actual = $repo->obtenerRecurso(
+                    $rid,
+                    $id_publicacion
+                );
+
+                if (!$actual) {
+                    return [
+                        'ok' => false,
+                        'mensaje' => 'Recurso inexistente o sin permisos.'
+                    ];
+                }
+
                 $unidad = (int)$actual['id_unidad'];
             }
 
             if (!$repo->verificarUnidadPerteneceACurso($unidad, $id_publicacion)) {
-                return ['ok' => false, 'mensaje' => 'La clase no pertenece a este curso.'];
+                return [
+                    'ok' => false,
+                    'mensaje' => 'La clase no pertenece a este curso.'
+                ];
             }
 
             $tipo = $post['tipo_recurso'] ?? ($actual['tipo'] ?? 'Enlace');
+
             if (!in_array($tipo, Recurso::TIPOS, true)) {
-                return ['ok' => false, 'mensaje' => 'Tipo de recurso no válido.'];
+                return [
+                    'ok' => false,
+                    'mensaje' => 'Tipo de recurso no válido.'
+                ];
             }
 
             $url = trim($post['url_recurso'] ?? '') ?: null;
+
             if ($url && !url_recurso_valida($url)) {
-                return ['ok' => false, 'mensaje' => 'La URL debe comenzar con http:// o https://.'];
+                return [
+                    'ok' => false,
+                    'mensaje' => 'La URL debe comenzar con http:// o https://.'
+                ];
             }
 
             $archivo = $actual['archivo'] ?? null;
-            $nuevo   = null;
+            $nuevo = null;
 
             // Subida de archivo
-            if ($tipo !== 'Enlace' && isset($files['archivo_recurso']) && ($files['archivo_recurso']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            if (
+                $tipo !== 'Enlace'
+                && isset($files['archivo_recurso'])
+                && ($files['archivo_recurso']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE
+            ) {
                 if (supabase_esta_activo()) {
-                    $val = supabase_validar_archivo_subido($files['archivo_recurso'], $tipo, 50);
-                    if (!$val['ok']) return ['ok' => false, 'mensaje' => $val['error']];
-                    $remotePath = 'cursos/' . $id_publicacion . '/' . bin2hex(random_bytes(8)) . '_' . time() . '.' . $val['ext'];
-                    $subida     = supabase_subir_archivo($files['archivo_recurso']['tmp_name'], $remotePath, $val['mime']);
-                    if (!$subida['ok']) return ['ok' => false, 'mensaje' => 'Error al subir a la nube (Supabase): ' . $subida['error']];
-                    $nuevo = $archivo = 'supabase:' . $remotePath;
-                } else {
-                    if (!recurso_archivo_permite_tipo($tipo, (string)($files['archivo_recurso']['name'] ?? ''))) {
-                        return ['ok' => false, 'mensaje' => 'El archivo no coincide con el tipo de recurso seleccionado.'];
+                    $val = supabase_validar_archivo_subido(
+                        $files['archivo_recurso'],
+                        $tipo,
+                        50
+                    );
+
+                    if (!$val['ok']) {
+                        return [
+                            'ok' => false,
+                            'mensaje' => $val['error']
+                        ];
                     }
-                    $res = guardar_archivo_subido($files['archivo_recurso'], 'cursos', 50);
-                    if (!$res['ok']) return ['ok' => false, 'mensaje' => $res['error']];
+
+                    $remotePath =
+                        'cursos/' .
+                        $id_publicacion .
+                        '/' .
+                        bin2hex(random_bytes(8)) .
+                        '_' .
+                        time() .
+                        '.' .
+                        $val['ext'];
+
+                    $subida = supabase_subir_archivo(
+                        $files['archivo_recurso']['tmp_name'],
+                        $remotePath,
+                        $val['mime']
+                    );
+
+                    if (!$subida['ok']) {
+                        return [
+                            'ok' => false,
+                            'mensaje' => 'Error al subir a la nube (Supabase): ' . $subida['error']
+                        ];
+                    }
+
+                    $nuevo = $archivo = 'supabase:' . $remotePath;
+
+                } else {
+                    if (
+                        !recurso_archivo_permite_tipo(
+                            $tipo,
+                            (string)($files['archivo_recurso']['name'] ?? '')
+                        )
+                    ) {
+                        return [
+                            'ok' => false,
+                            'mensaje' => 'El archivo no coincide con el tipo de recurso seleccionado.'
+                        ];
+                    }
+
+                    $res = guardar_archivo_subido(
+                        $files['archivo_recurso'],
+                        'cursos',
+                        50
+                    );
+
+                    if (!$res['ok']) {
+                        return [
+                            'ok' => false,
+                            'mensaje' => $res['error']
+                        ];
+                    }
+
                     $nuevo = $archivo = $res['ruta'];
                 }
             }
@@ -291,119 +637,260 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
             // Exclusión mutua URL / archivo
             if ($nuevo !== null) {
                 $url = null;
-            } elseif ($url !== null && !in_array($tipo, ['Foro', 'Entrega de Tareas'], true)) {
+
+            } elseif (
+                $url !== null
+                && !in_array($tipo, ['Foro', 'Entrega de Tareas'], true)
+            ) {
                 if (!empty($actual['archivo'])) {
                     _eliminar_archivo_storage($actual['archivo']);
                 }
+
                 $archivo = null;
             }
 
             // Validaciones de tipo
             if ($tipo === 'Enlace') {
                 $archivo = null;
-                if (!$url) return ['ok' => false, 'mensaje' => 'Indicá una URL http/https válida para el enlace.'];
-            }
-            if ($tipo === 'Video' && !$url && !$archivo) {
-                return ['ok' => false, 'mensaje' => 'Indicá el enlace del video (YouTube/Vimeo) o subí un archivo de video.'];
-            }
-            if ($tipo === 'Archivo' && !$archivo && !$url) {
-                return ['ok' => false, 'mensaje' => 'Subí un archivo o indicá un enlace al material.'];
-            }
-            if (in_array($tipo, ['Foro', 'Entrega de Tareas'], true)) {
-                $desc = trim($post['descripcion_recurso'] ?? '');
-                if (!$desc && !$url && !$archivo) {
-                    return ['ok' => false, 'mensaje' => 'Indicá una consigna o descripción para ' . strtolower($tipo) . '.'];
+
+                if (!$url) {
+                    return [
+                        'ok' => false,
+                        'mensaje' => 'Indicá una URL http/https válida para el enlace.'
+                    ];
                 }
             }
-            if (!in_array($tipo, ['Enlace', 'Foro', 'Entrega de Tareas'], true) && !$archivo && !$url) {
-                return ['ok' => false, 'mensaje' => 'Subí un archivo o indicá una URL.'];
+
+            if ($tipo === 'Video' && !$url && !$archivo) {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'Indicá el enlace del video (YouTube/Vimeo) o subí un archivo de video.'
+                ];
+            }
+
+            if ($tipo === 'Archivo' && !$archivo && !$url) {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'Subí un archivo o indicá un enlace al material.'
+                ];
+            }
+
+            if (in_array($tipo, ['Foro', 'Entrega de Tareas'], true)) {
+                $desc = trim($post['descripcion_recurso'] ?? '');
+
+                if (!$desc && !$url && !$archivo) {
+                    return [
+                        'ok' => false,
+                        'mensaje' => 'Indicá una consigna o descripción para ' . strtolower($tipo) . '.'
+                    ];
+                }
+            }
+
+            if (
+                !in_array($tipo, ['Enlace', 'Foro', 'Entrega de Tareas'], true)
+                && !$archivo
+                && !$url
+            ) {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'Subí un archivo o indicá una URL.'
+                ];
             }
 
             $data = [
-                'u'   => $unidad,
-                't'   => trim($post['titulo_recurso'] ?? '') ?: 'Recurso',
-                'tipo'=> $tipo,
+                'u' => $unidad,
+                't' => trim($post['titulo_recurso'] ?? '') ?: 'Recurso',
+                'tipo' => $tipo,
                 'url' => $url,
-                'a'   => $archivo,
-                'd'   => trim($post['descripcion_recurso'] ?? '') ?: null,
-                'o'   => max(1, (int)($post['orden'] ?? 1)),
+                'a' => $archivo,
+                'd' => trim($post['descripcion_recurso'] ?? '') ?: null,
+                'o' => max(1, (int)($post['orden'] ?? 1))
             ];
 
             $tareaRepo = tarea_repo($pdo);
             $tareaPendiente = null;
+
             if ($tipo === 'Entrega de Tareas') {
                 $tareaPendiente = Tarea::desdeFormulario($rid, $post);
                 $erroresTarea = $tareaPendiente->validar();
+
                 if ($erroresTarea) {
-                    return ['ok' => false, 'mensaje' => $erroresTarea[0]];
+                    return [
+                        'ok' => false,
+                        'mensaje' => $erroresTarea[0]
+                    ];
                 }
             }
 
             if ($a === 'agregar_recurso') {
                 if ($tipo === 'Entrega de Tareas') {
                     $pdo->beginTransaction();
+
                     $ridNuevo = $repo->crearRecurso($data);
+
                     $datosTarea = $tareaPendiente->toArray();
                     $datosTarea['id_recurso'] = $ridNuevo;
-                    $tareaRepo->crear(Tarea::fromArray($datosTarea));
+
+                    $tareaRepo->crear(
+                        Tarea::fromArray($datosTarea)
+                    );
+
                     $pdo->commit();
+
                 } else {
                     $repo->crearRecurso($data);
                 }
+
             } else {
                 if ($tipo === 'Entrega de Tareas') {
                     $pdo->beginTransaction();
-                    $repo->editarRecurso($rid, $data);
+
+                    $repo->editarRecurso(
+                        $rid,
+                        $data
+                    );
+
                     $datosTarea = $tareaPendiente->toArray();
                     $datosTarea['id_recurso'] = $rid;
-                    $datosTarea['id_tarea'] = $tareaRepo->buscarPorRecurso($rid)?->getId();
-                    $tareaRepo->guardar(Tarea::fromArray($datosTarea));
+                    $datosTarea['id_tarea'] =
+                        $tareaRepo->buscarPorRecurso($rid)?->getId();
+
+                    $tareaRepo->guardar(
+                        Tarea::fromArray($datosTarea)
+                    );
+
                     $pdo->commit();
+
                 } else {
-                    $repo->editarRecurso($rid, $data);
+                    $repo->editarRecurso(
+                        $rid,
+                        $data
+                    );
+
                     if (($actual['tipo'] ?? '') === 'Entrega de Tareas') {
                         $tareaRepo->eliminarPorRecurso($rid);
                     }
                 }
+
                 // Limpiar archivo anterior si se reemplazó
-                if ($nuevo && !empty($actual['archivo']) && $actual['archivo'] !== $nuevo) {
-                    _eliminar_archivo_storage($actual['archivo']);
+                if (
+                    $nuevo
+                    && !empty($actual['archivo'])
+                    && $actual['archivo'] !== $nuevo
+                ) {
+                    _eliminar_archivo_storage(
+                        $actual['archivo']
+                    );
                 }
-                if ($tipo === 'Enlace' && !empty($actual['archivo'])) {
-                    _eliminar_archivo_storage($actual['archivo']);
+
+                if (
+                    $tipo === 'Enlace'
+                    && !empty($actual['archivo'])
+                ) {
+                    _eliminar_archivo_storage(
+                        $actual['archivo']
+                    );
                 }
             }
 
         } elseif ($a === 'eliminar_recurso') {
-            $ruta = $repo->eliminarRecurso((int)$post['id_recurso'], $id_publicacion);
-            if ($ruta) _eliminar_archivo_storage($ruta);
+            $ruta = $repo->eliminarRecurso(
+                (int)$post['id_recurso'],
+                $id_publicacion
+            );
+
+            if ($ruta) {
+                _eliminar_archivo_storage($ruta);
+            }
 
         } elseif (in_array($a, ['subir_recurso', 'bajar_recurso'], true)) {
-            $uid = $repo->obtenerUnidadDelRecurso((int)$post['id_recurso'], $id_publicacion);
-            if (!$uid) return ['ok' => false, 'mensaje' => 'El recurso no pertenece a este curso.'];
-            $repo->intercambiarOrden('curso_recursos', 'id_recurso', (int)$post['id_recurso'], 'id_unidad', $uid, $a === 'subir_recurso' ? 'subir' : 'bajar');
+            $uid = $repo->obtenerUnidadDelRecurso(
+                (int)$post['id_recurso'],
+                $id_publicacion
+            );
+
+            if (!$uid) {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'El recurso no pertenece a este curso.'
+                ];
+            }
+
+            $repo->intercambiarOrden(
+                'curso_recursos',
+                'id_recurso',
+                (int)$post['id_recurso'],
+                'id_unidad',
+                $uid,
+                $a === 'subir_recurso' ? 'subir' : 'bajar'
+            );
 
         // VISIBILIDAD (REQ-CON-04)
         } elseif ($a === 'toggle_visible_modulo') {
-            $nuevo = $repo->togglearVisibilidadModulo((int)$post['id_modulo'], $id_publicacion);
-            if ($nuevo === null) return ['ok' => false, 'mensaje' => 'Módulo no encontrado.'];
-            return ['ok' => true, 'mensaje' => $nuevo ? 'Módulo visible para alumnos.' : 'Módulo ocultado a los alumnos.'];
+            $nuevo = $repo->togglearVisibilidadModulo(
+                (int)$post['id_modulo'],
+                $id_publicacion
+            );
+
+            if ($nuevo === null) {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'Módulo no encontrado.'
+                ];
+            }
+
+            return [
+                'ok' => true,
+                'mensaje' => $nuevo
+                    ? 'Módulo visible para alumnos.'
+                    : 'Módulo ocultado a los alumnos.'
+            ];
 
         } elseif ($a === 'toggle_visible_recurso') {
-            $nuevo = $repo->togglearVisibilidadRecurso((int)$post['id_recurso'], $id_publicacion);
-            if ($nuevo === null) return ['ok' => false, 'mensaje' => 'Recurso no encontrado.'];
-            return ['ok' => true, 'mensaje' => $nuevo ? 'Recurso visible para alumnos.' : 'Recurso ocultado a los alumnos.'];
+            $nuevo = $repo->togglearVisibilidadRecurso(
+                (int)$post['id_recurso'],
+                $id_publicacion
+            );
+
+            if ($nuevo === null) {
+                return [
+                    'ok' => false,
+                    'mensaje' => 'Recurso no encontrado.'
+                ];
+            }
+
+            return [
+                'ok' => true,
+                'mensaje' => $nuevo
+                    ? 'Recurso visible para alumnos.'
+                    : 'Recurso ocultado a los alumnos.'
+            ];
 
         } else {
-            return ['ok' => false, 'mensaje' => 'Acción no reconocida.'];
+            return [
+                'ok' => false,
+                'mensaje' => 'Acción no reconocida.'
+            ];
         }
 
-        return ['ok' => true, 'mensaje' => 'Contenido actualizado correctamente.'];
+        return [
+            'ok' => true,
+            'mensaje' => 'Contenido actualizado correctamente.'
+        ];
 
     } catch (Throwable $e) {
-        if ($pdo->inTransaction()) $pdo->rollBack();
-        error_log('Contenido curso: ' . $e->getMessage());
-        return ['ok' => false, 'mensaje' => 'No se pudo actualizar el contenido del curso.'];
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        error_log(
+            'Contenido curso: ' . $e->getMessage()
+        );
+
+        return [
+            'ok' => false,
+            'mensaje' => 'No se pudo actualizar el contenido del curso.'
+        ];
     }
 }
 
@@ -416,7 +903,9 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
 function _eliminar_archivo_storage(string $ruta): void
 {
     if (str_starts_with($ruta, 'supabase:')) {
-        supabase_eliminar_archivo(substr($ruta, 9));
+        supabase_eliminar_archivo(
+            substr($ruta, 9)
+        );
     } else {
         eliminar_archivo_guardado($ruta);
     }

@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../valoraciones/obtener_contrataciones_valorables.php';
+require_once __DIR__ . '/../certificados/CursoProgresoRepository.php';
 require_once __DIR__ . '/../utils/toast.php';
 
 requerir_autenticacion('login.php');
@@ -54,9 +55,17 @@ try {
     $resumen_contrataciones = obtener_resumen_contrataciones_usuario($pdo, $id_usuario);
     $cursos_contratados     = $resumen_contrataciones['cursos'];
     $servicios_contratados  = $resumen_contrataciones['servicios'];
+    $progresos_cursos = [];
+    $progresoRepo = new CursoProgresoRepository($pdo);
+    foreach ($cursos_contratados as $cursoContratado) {
+        if (in_array($cursoContratado['estado'], ['Completada', 'En Proceso'], true)) {
+            $progresos_cursos[(int)$cursoContratado['id_publicacion']] = $progresoRepo->obtenerProgresoAlumnoCurso($id_usuario, (int)$cursoContratado['id_publicacion']);
+        }
+    }
 } catch (PDOException $e) {
     error_log("Error al consultar perfil de usuario: " . $e->getMessage());
     $userData = $usuario;
     $cursos_contratados = [];
     $servicios_contratados = [];
+    $progresos_cursos = [];
 }
