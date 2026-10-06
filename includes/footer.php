@@ -70,6 +70,8 @@ $accesibilidadHref = ($cssPrefix === '.') ? 'views/politica-accesibilidad.php' :
       <p>&copy; <?= date('Y') ?> Classia &middot; AniTech S.A. <?= __t('footer_rights') ?></p>
     </div>
   </footer>
+  <div id="classia-toast-container" class="classia-toast-container" aria-live="polite" aria-atomic="false"></div>
+  <script src="<?= $jsPrefix ?>/js/toast.js?v=<?= filemtime(__DIR__ . '/../js/toast.js') ?>" defer></script>
   <script src="<?= $jsPrefix ?>/js/script.js?v=<?= filemtime(__DIR__ . '/../js/script.js') ?>" defer></script>
 </body>
 </html>
