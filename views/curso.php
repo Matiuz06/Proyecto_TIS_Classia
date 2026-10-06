@@ -122,15 +122,16 @@ include '../includes/header.php';
     unset($_SESSION['curso_exito']);
     $mensaje_error_curso = $_SESSION['curso_error'] ?? '';
     unset($_SESSION['curso_error']);
+    if (!empty($mensaje_exito_curso)) {
+      set_toast('success', $mensaje_exito_curso);
+      $mensaje_exito_curso = '';
+    }
+    if (isset($_GET['completado'])) {
+      set_toast('success', 'Curso completado', 'Felicitaciones, completaste el curso exitosamente.');
+    }
   ?>
-  <?php if (!empty($mensaje_exito_curso)): ?>
-    <div class="alert alert-success u-mb-md"><?= htmlspecialchars($mensaje_exito_curso) ?></div>
-  <?php endif; ?>
   <?php if (!empty($mensaje_error_curso)): ?>
     <div class="alert alert-error u-mb-md"><?= htmlspecialchars($mensaje_error_curso) ?></div>
-  <?php endif; ?>
-  <?php if (isset($_GET['completado'])): ?>
-    <div class="alert alert-success u-mb-md">¡Felicitaciones! Has completado el curso exitosamente.</div>
   <?php endif; ?>
   <?php if (($curso['estado'] ?? '') === 'Archivado'): ?>
     <div class="alert alert-warning u-mb-md" role="status">

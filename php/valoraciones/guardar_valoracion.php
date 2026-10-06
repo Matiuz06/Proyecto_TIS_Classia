@@ -6,10 +6,11 @@
 
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../utils/toast.php';
 
 const LOGIN_URL = '../../views/login.php';
 const VALORACION_BASE_URL = '../../views/valoracion.php';
-const USUARIO_URL = '../../views/usuario.php?mensaje=valoracion_guardada';
+const USUARIO_URL = '../../views/usuario.php';
 
 iniciar_sesion();
 
@@ -108,6 +109,8 @@ try {
         'id_publicacion'  => (int) $contratacion['id_publicacion'],
         'id_contratacion' => $id_contratacion,
     ]);
+
+    set_toast('success', 'Valoracion enviada');
 
     header('Location: ' . USUARIO_URL);
     exit;
