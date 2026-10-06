@@ -1,10 +1,10 @@
-# Modelo Relacional — Classia · Segunda Entrega (Sprint 3)
+# Modelo Relacional — Classia · Sprint 4 (Octubre 2026)
 
 ## Especificación del Esquema Físico
 Este documento detalla el **Modelo Relacional Lógico y Físico** correspondiente a la base de datos MariaDB / MySQL de la plataforma **Classia**.
 
-> **Última actualización:** Segunda Entrega (Sprint 3)  
-> **Script físico asociado:** [`sql/schema.sql`](../sql/schema.sql)
+> **Última actualización:** Sprint 4 — Octubre 2026  
+> **Script físico asociado:** [`sql/schema.sql`](../sql/schema.sql) y [`sql/schema_supabase.sql`](../sql/schema_supabase.sql)
 
 ---
 
@@ -53,7 +53,7 @@ skinparam usecase {
     ActorBackgroundColor #EBF8FF
 }
 
-title Modelo Relacional Físico — Classia (MariaDB / MySQL)
+title Modelo Relacional Físico — Classia (MariaDB / MySQL) — Sprint 4
 
 class "roles" as roles {
   + **id_rol** : INT [PK, AI]
@@ -109,7 +109,7 @@ class "publicaciones" as publicaciones {
   modalidad : VARCHAR(30)
   duracion_horas : SMALLINT
   cupos : INT
-  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado') [NN]
+  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Archivado', 'Eliminado') [NN]
   imagen : VARCHAR(255)
   # **id_usuario** : INT [FK, NN]
   # **id_categoria** : INT [FK, NN]
@@ -193,6 +193,29 @@ class "pagos" as pagos {
   # **id_contratacion** : INT [FK, NN]
 }
 
+class "noticias" as noticias {
+  + **id_noticia** : INT [PK, AI]
+  --
+  titulo : VARCHAR(200) [NN]
+  contenido : TEXT [NN]
+  imagen : VARCHAR(255)
+  estado : ENUM('Pendiente', 'Publicada', 'Rechazada') [NN]
+  # **id_usuario** : INT [FK, NN]
+  fecha_publicacion : DATETIME
+}
+
+class "eventos" as eventos {
+  + **id_evento** : INT [PK, AI]
+  --
+  titulo : VARCHAR(200) [NN]
+  descripcion : TEXT [NN]
+  imagen : VARCHAR(255)
+  estado : ENUM('Pendiente', 'Abierto', 'Rechazado', 'Finalizado') [NN]
+  # **id_usuario** : INT [FK, NN]
+  fecha_inicio : DATETIME [NN]
+  fecha_fin : DATETIME
+}
+
 class "valoraciones" as valoraciones {
   + **id_valoracion** : INT [PK, AI]
   --
@@ -226,6 +249,9 @@ contrataciones "1" <-- "0..*" pagos : id_contratacion
 usuarios "1" <-- "0..*" valoraciones : id_usuario
 publicaciones "1" <-- "0..*" valoraciones : id_publicacion
 contrataciones "0..1" <-- "0..*" valoraciones : id_contratacion
+
+usuarios "1" <-- "0..*" noticias : id_usuario
+usuarios "1" <-- "0..*" eventos : id_usuario
 @enduml
 
 ```
@@ -249,3 +275,5 @@ contrataciones "0..1" <-- "0..*" valoraciones : id_contratacion
 13. `detalles_contratacion` (**id_detalle** [PK], `id_contratacion` [FK -> contrataciones], `id_publicacion` [FK -> publicaciones])
 14. `pagos` (**id_pago** [PK], `id_contratacion` [FK -> contrataciones])
 15. `valoraciones` (**id_valoracion** [PK], `id_usuario` [FK -> usuarios], `id_publicacion` [FK -> publicaciones], `id_contratacion` [FK -> contrataciones])
+16. `noticias` (**id_noticia** [PK], `id_usuario` [FK -> usuarios])
+17. `eventos` (**id_evento** [PK], `id_usuario` [FK -> usuarios])

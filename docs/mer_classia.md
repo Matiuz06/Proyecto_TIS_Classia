@@ -1,10 +1,10 @@
-# Modelo Entidad-Relación (MER) — Classia · Segunda Entrega (Sprint 3)
+# Modelo Entidad-Relación (MER) — Classia · Sprint 4 (Octubre 2026)
 
 ## Resumen del Modelo
-Este documento especifica el **Modelo Entidad-Relación (MER) actualizado** para la plataforma **Classia**, reflejando el estado real del sistema al cierre del **Sprint 3 (Segunda Entrega Funcional y Técnica)**. La nomenclatura de atributos coincide exactamente con el esquema físico definido en [`sql/schema.sql`](../sql/schema.sql) (convención `snake_case` de MariaDB/MySQL).
+Este documento especifica el **Modelo Entidad-Relación (MER) actualizado** para la plataforma **Classia**, reflejando el estado real del sistema al cierre del **Sprint 4 (Octubre 2026)**. La nomenclatura de atributos coincide exactamente con el esquema físico definido en [`sql/schema.sql`](../sql/schema.sql) y [`sql/schema_supabase.sql`](../sql/schema_supabase.sql) (convención `snake_case` de MariaDB/MySQL / PostgreSQL).
 
-> **Última actualización:** Segunda entrega funcional y técnica (Sprint 3)  
-> **Coherencia validada contra:** `sql/schema.sql`
+> **Última actualización:** Sprint 4 — Octubre 2026 — Tercera entrega  
+> **Coherencia validada contra:** `sql/schema.sql` y `sql/schema_supabase.sql`
 
 ---
 
@@ -53,7 +53,7 @@ skinparam usecase {
     ActorBackgroundColor #EBF8FF
 }
 
-title Modelo Entidad-Relación (MER) — Classia (Sprint 3)
+title Modelo Entidad-Relación (MER) — Classia (Sprint 4)
 
 entity "ROL" as roles {
   * id_rol : INT <<PK>>
@@ -109,7 +109,7 @@ entity "PUBLICACION" as publicaciones {
   modalidad : VARCHAR(30)
   duracion_horas : SMALLINT
   cupos : INT
-  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado')
+  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Archivado', 'Eliminado')
   imagen : VARCHAR(255)
   * id_usuario : INT <<FK>>
   * id_categoria : INT <<FK>>
@@ -172,6 +172,29 @@ entity "SOLICITUD_DOCENTE" as sol_doc {
   estado : ENUM('Pendiente', 'Aprobada', 'Rechazada')
   motivo : TEXT
   fecha_solicitud : DATETIME
+}
+
+entity "NOTICIA" as noticias {
+  * id_noticia : INT <<PK>>
+  --
+  titulo : VARCHAR(200)
+  contenido : TEXT
+  imagen : VARCHAR(255)
+  estado : ENUM('Pendiente', 'Publicada', 'Rechazada')
+  * id_usuario : INT <<FK>>
+  fecha_publicacion : DATETIME
+}
+
+entity "EVENTO" as eventos {
+  * id_evento : INT <<PK>>
+  --
+  titulo : VARCHAR(200)
+  descripcion : TEXT
+  imagen : VARCHAR(255)
+  estado : ENUM('Pendiente', 'Abierto', 'Rechazado', 'Finalizado')
+  * id_usuario : INT <<FK>>
+  fecha_inicio : DATETIME
+  fecha_fin : DATETIME
 }
 
 entity "CONTRATACION" as contrataciones {
@@ -237,6 +260,9 @@ contrataciones ||--o{ pagos : "abona"
 usuarios ||--o{ valoraciones : "emite opinión"
 publicaciones ||--o{ valoraciones : "recibe calificación"
 contrataciones ||--o{ valoraciones : "respalda"
+
+usuarios ||--o{ noticias : "propone/publica"
+usuarios ||--o{ eventos : "propone/organiza"
 @enduml
 
 ```
@@ -299,5 +325,8 @@ Organización modular de lecciones y recursos con soporte Supabase Cloud (`curso
 ### 7. Entidades de Servicios y Negociación: SOLICITUD, SOLICITUD_MENSAJE, SOLICITUD_DOCENTE
 Flujo interactivo de presupuestos y postulación docente (`solicitudes`, `solicitud_mensajes`, `solicitudes_docente`).
 
-### 8. Entidades Comerciales: CONTRATACION, DETALLE_CONTRATACION, PAGO, VALORACION
+### 8. Entidades de Contenido Editorial: NOTICIA, EVENTO
+Flujo de propuesta (docente) y moderación (administrador) de noticias y eventos (`noticias`, `eventos`).
+
+### 9. Entidades Comerciales: CONTRATACION, DETALLE_CONTRATACION, PAGO, VALORACION
 Gestión de compras, pasarela de pago y opiniones con puntuación 1-5 (`contrataciones`, `detalles_contratacion`, `pagos`, `valoraciones`).

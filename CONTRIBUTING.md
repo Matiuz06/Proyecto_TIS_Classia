@@ -16,8 +16,8 @@ Este documento detalla la gestión operativa, flujo de trabajo en GitHub, vincul
 
 ```
 main (protegida)
- └── Dev-<NombreDesarrollador> (ej: Dev-Ezequel, Dev-Mateus)
-       └── Testing (integración previa para lógica JS o BD — cuando aplica)
+ └── Dev-<NombreDesarrollador> (ej: Dev-Ezequiel, Dev-Mateus, Dev-Rafael)
+       └── testing (integración previa para lógica JS o BD — cuando aplica)
              └── main
 ```
 
@@ -26,10 +26,10 @@ main (protegida)
 | Rama | Descripción |
 |---|---|
 | `main` | Código estable y entregable. Rama protegida; solo acepta cambios mediante Pull Request revisado y aprobado. |
-| `Testing` | Rama de integración para validar funcionalidades complejas (especialmente cambios de JavaScript, base de datos o lógica cliente/servidor) antes de mergear a `main`. |
+| `testing` | Rama de integración para validar funcionalidades complejas (especialmente cambios de JavaScript, base de datos o lógica cliente/servidor) antes de mergear a `main`. |
 | `Dev-<Nombre>` / `feature/*` / `hotfix/*` | Ramas de desarrollo individual por desarrollador o funcionalidad. |
 
-> ⚠️ **Sin commits directos a `main`:** Todos los cambios deben ingresar por Pull Request con al menos 1 revisión aprobada de un compañero de equipo.
+> ⚠️ **Sin commits directos a `main` ni a `testing`:** Todos los cambios deben ingresar por Pull Request con al menos 1 revisión aprobada de un compañero de equipo.
 
 ---
 
@@ -122,4 +122,4 @@ Todo PR debe completar la plantilla predefinida en `.github/pull_request_templat
 
 ---
 
-*Documento actualizado en Sprint 4 — AniTech / Classia.*
+*Documento actualizado en Sprint 4 — Octubre 2026 — AniTech / Classia.*

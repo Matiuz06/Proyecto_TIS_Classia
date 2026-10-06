@@ -1,4 +1,4 @@
-# Diagramas de Casos de Uso — Classia · Segunda Entrega (Sprint 3)
+# Diagramas de Casos de Uso — Classia · Sprint 4 (Octubre 2026)
 
 ## 1. Diagrama General del Sistema
 
@@ -44,7 +44,7 @@ skinparam usecase {
     ActorBackgroundColor #EBF8FF
 }
 
-title Diagrama General de Casos de Uso — Classia (Sprint 3)
+title Diagrama General de Casos de Uso — Classia (Sprint 4)
 
 left to right direction
 
@@ -65,7 +65,9 @@ rectangle "Sistema Classia" {
   usecase "Gestionar Contenidos y Supabase" as UC_Cont
   usecase "Responder Solicitudes y Chat" as UC_RespSol
   usecase "Gestionar Perfil Profesional" as UC_Perf
+  usecase "Proponer Noticias y Eventos" as UC_Prop
   usecase "Supervisar Usuarios y Métricas" as UC_Adm
+  usecase "Aprobar/Rechazar Noticias y Eventos" as UC_ModNE
   usecase "Aprobar Solicitudes Docentes" as UC_ApprDoc
 }
 
@@ -84,9 +86,11 @@ Docente --> UC_Pub
 Docente --> UC_Cont
 Docente --> UC_RespSol
 Docente --> UC_Perf
+Docente --> UC_Prop
 
 Admin --|> Visitante
 Admin --> UC_Adm
+Admin --> UC_ModNE
 Admin --> UC_ApprDoc
 @enduml
 

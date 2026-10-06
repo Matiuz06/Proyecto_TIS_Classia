@@ -15,8 +15,8 @@ Esta actualización agrega:
 
 Si el volumen de MySQL ya existe, `schema.sql` no vuelve a ejecutarse automáticamente. Aplicá la migración después de levantar los contenedores:
 
-```powershell
-podman exec -it classia_web php /var/www/html/scripts/migrate_provider_features.php
+```bash
+docker exec classia_web php /var/www/html/scripts/migrate_provider_features.php
 ```
 
 El script verifica columnas y tablas antes de crearlas y puede ejecutarse nuevamente.
