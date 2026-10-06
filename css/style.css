@@ -934,6 +934,51 @@ input:hover {
   border-radius: 999px;
 }
 
+.course-progress-card {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.course-progress-card__head,
+.course-progress-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.course-progress-card__head div,
+.course-progress-card__foot {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.course-progress-card__head strong {
+  display: block;
+  color: var(--color-heading);
+  font-size: var(--text-base);
+}
+
+.course-progress-bar {
+  height: 0.6rem;
+  overflow: hidden;
+  background: var(--color-surface-elevated);
+  border-radius: 999px;
+}
+
+.course-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--color-brand-primary);
+  border-radius: inherit;
+}
+
 .auth-shell {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(20rem, 26rem);
@@ -2011,6 +2056,25 @@ th {
   margin-top: auto;
 }
 
+.onboarding-page .form-group {
+  min-width: 0;
+  height: auto;
+}
+
+.onboarding-page .form-group input,
+.onboarding-page .form-group select,
+.onboarding-page .form-group textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-top: 0;
+}
+
+.onboarding-page .form-group textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
 .options-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -2065,6 +2129,7 @@ th {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: var(--space-4);
   margin-top: var(--space-6);
 }
@@ -2283,6 +2348,49 @@ th {
 .account-item-rating .rating-stars {
   font-weight: 600;
   color: #b7791f;
+}
+
+.account-course-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  color: var(--color-text-muted, #4a5568);
+  font-size: var(--text-sm);
+}
+
+.course-approval-settings,
+.certificate-verify-card {
+  margin-bottom: var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.course-approval-form,
+.certificate-verify-form {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.course-approval-form label,
+.certificate-verify-form label {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.course-approval-form input {
+  max-width: 8rem;
+}
+
+.certificate-valid dl {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .valoracion-card {
