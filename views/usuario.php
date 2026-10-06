@@ -18,7 +18,7 @@ $jsPrefix    = '..';
 $activePage = 'cuenta';
 
 if (isset($_GET['2fa_desactivado'])) {
-    $mensaje_exito = 'La autenticación en dos pasos ha sido desactivada.';
+    set_toast('info', 'Autenticacion en dos pasos desactivada');
 }
 
 include '../includes/header.php';
@@ -34,12 +34,6 @@ include '../includes/header.php';
     <?php if (!empty($mensaje_error)): ?>
       <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($mensaje_error); ?>
-      </div>
-    <?php endif; ?>
-
-    <?php if (!empty($mensaje_exito)): ?>
-      <div class="alert alert-success" role="status">
-        <?php echo htmlspecialchars($mensaje_exito); ?>
       </div>
     <?php endif; ?>
 
