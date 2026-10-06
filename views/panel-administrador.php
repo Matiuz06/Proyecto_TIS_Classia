@@ -17,6 +17,7 @@ require_once '../php/admin/estadisticas_admin.php';
 require_once '../php/solicitudes/gestionar_solicitudes_docente.php';
 require_once '../php/noticias/gestionar_noticias.php';
 require_once '../php/eventos/gestionar_eventos.php';
+require_once '../php/utils/toast.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -123,6 +124,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+if ($mensaje_admin !== '') {
+    $toastData = is_array($resultado ?? null) ? $resultado : [];
+    set_toast(
+        $toastData['toast_tipo'] ?? 'success',
+        $mensaje_admin,
+        $toastData['toast_descripcion'] ?? null
+    );
+    $mensaje_admin = '';
+}
+
 // Carga de datos del panel
 
 $stats               = obtener_stats_plataforma($pdo);
@@ -159,12 +170,6 @@ include '../includes/header.php';
 ?>
 
 <main id="main-content" class="admin-panel">
-
-  <?php if ($mensaje_admin !== ''): ?>
-    <div class="alert alert-success motion-entry" role="alert">
-      <?= htmlspecialchars($mensaje_admin) ?>
-    </div>
-  <?php endif; ?>
 
   <?php if ($error_admin !== ''): ?>
     <div class="alert alert-danger motion-entry" role="alert">
