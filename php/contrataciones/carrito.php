@@ -7,7 +7,6 @@
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../utils/toast.php';
 
 iniciar_sesion();
 
@@ -47,11 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['carrito_publicaciones'] = $_SESSION['carrito_publicaciones'] ?? [];
         if (!in_array($id_publicacion, $_SESSION['carrito_publicaciones'], true)) {
             $_SESSION['carrito_publicaciones'][] = $id_publicacion;
-            set_toast('success', 'Agregado al carrito', null, [
-                'action' => ['label' => 'Ver carrito', 'href' => '../../views/carrito.php'],
-            ]);
-        } else {
-            set_toast('warning', 'Ya esta en el carrito', 'Este elemento ya habia sido agregado.');
         }
         $destinos_permitidos = [
             'catalogo' => '../../views/catalogo.php?carrito=agregado',
@@ -66,10 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['carrito_publicaciones'] ?? [],
             fn($id) => (int) $id !== $id_publicacion
         ));
-        set_toast('info', 'Eliminado del carrito');
     } elseif ($accion === 'vaciar') {
         unset($_SESSION['carrito_publicaciones']);
-        set_toast('info', 'Carrito vaciado');
     }
 }
 

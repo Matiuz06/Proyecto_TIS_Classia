@@ -6,7 +6,6 @@
 
 require_once '../php/auth/sesion.php';
 require_once '../php/utils/recaptcha.php';
-require_once '../php/utils/toast.php';
 
 iniciar_sesion();
 
@@ -27,19 +26,6 @@ $login_success = $_SESSION["login_success"] ?? "";
 unset($_SESSION["login_error"]);
 unset($_SESSION["login_email"]);
 unset($_SESSION["login_success"]);
-
-if (isset($_GET['registro']) && $_GET['registro'] === 'exitoso') {
-    set_toast('success', 'Cuenta creada', 'Ahora podes iniciar sesion.');
-}
-
-if ($login_success !== '') {
-    set_toast('success', $login_success);
-    $login_success = '';
-}
-
-if (isset($_GET['2fa_desactivado'])) {
-    set_toast('info', 'Autenticacion en dos pasos desactivada');
-}
 
 $title = 'Iniciar sesión';
 $description = 'Inicio de sesión en Classia.';
@@ -69,6 +55,24 @@ include '../includes/header.php';
     <section class="auth-card" aria-labelledby="titulo-login">
         <h2 id="titulo-login">Iniciar sesión</h2>
         <p>Usá tu correo y contraseña para continuar.</p>
+
+        <?php if (isset($_GET['registro']) && $_GET['registro'] === 'exitoso'): ?>
+            <div class="alert alert-success">
+                Registro completado con éxito. Ahora podés iniciar sesión.
+            </div>
+        <?php endif; ?>
+
+        <?php if ($login_success !== ""): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($login_success); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['2fa_desactivado'])): ?>
+            <div class="alert alert-success">
+                La autenticación en dos pasos ha sido desactivada.
+            </div>
+        <?php endif; ?>
 
         <?php if ($login_error !== ""): ?>
             <div class="alert alert-danger auth-error" role="alert">

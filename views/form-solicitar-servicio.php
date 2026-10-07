@@ -7,7 +7,6 @@
 require_once '../php/auth/roles.php';
 requerir_rol(ROL_ESTUDIANTE, 'usuario.php');
 require_once '../php/solicitudes/solicitudes_servicio.php';
-require_once '../php/utils/toast.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -23,7 +22,7 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $servicio && $plantilla) {
     $r = procesar_envio_solicitud_servicio($pdo, (int)$usuario['id_usuario'], $servicio, $_POST, $_FILES, $_SESSION['csrf_token']);
     if ($r['ok']) {
-        set_toast('success', 'Solicitud enviada', $r['mensaje']);
+        $mensaje = $r['mensaje'];
     } else {
         $error = $r['mensaje'];
     }
@@ -84,6 +83,12 @@ include '../includes/header.php';
     <?php else: ?>
       <div class="alert alert-danger u-mb-4">
         El servicio especificado no existe o no se encuentra activo. <a href="catalogo.php">Volver al catálogo</a>.
+      </div>
+    <?php endif; ?>
+
+    <?php if ($mensaje): ?>
+      <div class="alert alert-success u-mb-4">
+        ✓ <?= htmlspecialchars($mensaje) ?> · <a href="mis-solicitudes-servicios.php" class="u-font-bold">Ir a mis solicitudes de servicios</a>
       </div>
     <?php endif; ?>
 

@@ -487,15 +487,6 @@ function cambiar_estado_publicacion_admin(PDO $pdo, int $id_publicacion, string 
     try {
         $stmt = $pdo->prepare("UPDATE publicaciones SET estado = :estado WHERE id_publicacion = :id");
         $stmt->execute(['estado' => $nuevo_estado, 'id' => $id_publicacion]);
-        if ($stmt->rowCount() === 0) {
-            return [
-                'ok' => true,
-                'error' => '',
-                'mensaje' => 'Accion ya aplicada',
-                'toast_tipo' => 'warning',
-                'toast_descripcion' => 'El estado ya se encontraba actualizado.',
-            ];
-        }
         return ['ok' => true, 'error' => '', 'mensaje' => "Estado cambiado a «{$nuevo_estado}» correctamente."];
     } catch (PDOException $e) {
         error_log('Error al cambiar estado publicación admin: ' . $e->getMessage());

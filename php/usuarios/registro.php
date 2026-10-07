@@ -130,14 +130,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             $enlace = $config_correo['base_url'] . '/php/auth/confirmar_correo.php?token=' . urlencode($token_verificacion);
-                        $correo_enviado = enviar_correo(
+            $correo_enviado = enviar_correo(
                 $correo,
-                'Confirm� tu correo electr�nico - Classia',
-                render_email_template('verificar-email', [
-                    'nombre' => $nombre,
-                    'email' => $correo,
-                    'enlace' => $enlace,
-                ])
+                'Confirmá tu correo electrónico - Classia',
+                plantilla_correo('Confirmá tu cuenta de Classia', '<p>Hola ' . htmlspecialchars($nombre) . ',</p><p>Para activar tu cuenta, confirmá tu correo desde el siguiente enlace:</p><p><a href="' . htmlspecialchars($enlace) . '">Confirmar mi correo</a></p><p>El enlace vence en 24 horas.</p>')
             );
 
             establecer_usuario_sesion((int) $pdo->lastInsertId(), $nombre . ' ' . $apellido, $correo, $id_rol_cliente);

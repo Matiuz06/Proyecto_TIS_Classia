@@ -64,20 +64,6 @@ function obtener_datos_comprobante(PDO $pdo, int $id_contratacion, int $id_usuar
 
 function renderizar_html_comprobante_email(array $data): string
 {
-    return render_email_template('contratacion', [
-        'nombre_cliente' => trim($data['nombre'] . ' ' . $data['apellido']),
-        'referencia' => $data['transaccion_ref'] ?? ('ORD-' . $data['id_contratacion']),
-        'fecha' => date('d/m/Y H:i', strtotime($data['fecha_pago'] ?? $data['fecha_contratacion'])),
-        'metodo' => $data['metodo_pago'] ?? 'Tarjeta',
-        'total' => number_format((float) $data['monto_total'], 2, ',', '.'),
-        'items' => array_map(static fn(array $item): array => [
-            'titulo' => $item['titulo'] ?? '',
-            'tipo' => $item['tipo'] ?? '',
-            'cantidad' => (int) ($item['cantidad'] ?? 1),
-            'subtotal' => number_format((float) ($item['subtotal'] ?? 0), 2, ',', '.'),
-        ], $data['detalles'] ?? []),
-    ]);
-
     $nombreCliente = htmlspecialchars(trim($data['nombre'] . ' ' . $data['apellido']));
     $ref = htmlspecialchars($data['transaccion_ref'] ?? ('ORD-' . $data['id_contratacion']));
     $fecha = date('d/m/Y H:i', strtotime($data['fecha_pago'] ?? $data['fecha_contratacion']));

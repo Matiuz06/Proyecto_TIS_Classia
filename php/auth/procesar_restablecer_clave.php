@@ -102,11 +102,15 @@ try {
 
         $config = cargar_configuracion_correo();
         $enlace = rtrim($config['base_url'], '/') . '/views/restablecer-contrasena.php?token=' . rawurlencode($token_generado);
-                $contenido = render_email_template('restablecer-contrasena', [
-            'enlace' => $enlace,
-        ]);
+        $contenido = plantilla_correo(
+            'Restablecé tu contraseña de Classia',
+            '<p>Hacé clic en el siguiente enlace para definir una nueva contraseña:</p>'
+            . '<p><a href="' . htmlspecialchars($enlace, ENT_QUOTES, 'UTF-8') . '">Restablecer contraseña</a></p>'
+            . '<p>Este enlace vence en 1 hora.</p>'
+            . '<p>Si no solicitaste este cambio, podés ignorar este mensaje.</p>'
+        );
 
-        $correo_enviado = enviar_correo($email, 'Restablecer contrase�a - Classia', $contenido);
+        $correo_enviado = enviar_correo($email, 'Recuperá tu contraseña en Classia', $contenido);
         if (!$correo_enviado) {
             $_SESSION['error_restablecer'] = 'No pudimos enviar el correo de recuperación en este momento. Intentá nuevamente más tarde.';
             header('Location: ../../views/restablecer-contrasena.php');

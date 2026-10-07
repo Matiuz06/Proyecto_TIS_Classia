@@ -146,12 +146,14 @@ try {
         // Enviar correo de verificación al nuevo email
         $config = cargar_configuracion_correo();
         $enlace = rtrim($config['base_url'], '/') . '/php/auth/confirmar_nuevo_email.php?token=' . rawurlencode($token_nuevo_email);
-                $contenido = render_email_template('verificar-email', [
-            'nombre' => $nombre,
-            'email' => $email,
-            'enlace' => $enlace,
-        ]);
-        enviar_correo($email, 'Confirm� tu nuevo email - Classia', $contenido);
+        $contenido = plantilla_correo(
+            'Confirmá tu nuevo email en Classia',
+            '<p>Recibimos una solicitud para cambiar el email de tu cuenta de Classia.</p>'
+            . '<p>Hacé clic en el siguiente enlace para confirmar <strong>' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '</strong> como tu nuevo email:</p>'
+            . '<p><a href="' . htmlspecialchars($enlace, ENT_QUOTES, 'UTF-8') . '">Confirmar nuevo email</a></p>'
+            . '<p>Este enlace vence en 24 horas. Si no solicitaste este cambio, podés ignorar este mensaje.</p>'
+        );
+        enviar_correo($email, 'Confirmá tu nuevo email — Classia', $contenido);
 
         $pdo->commit();
         $_SESSION['exito_perfil'] = 'Se envió un enlace de confirmación a ' . htmlspecialchars($email) . '. Revisá tu bandeja de entrada.';
