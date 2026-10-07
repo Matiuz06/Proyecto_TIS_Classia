@@ -7,7 +7,6 @@
 require_once '../php/auth/roles.php';
 requerir_rol(ROL_DOCENTE, 'usuario.php');
 require_once '../php/solicitudes/solicitudes_servicio.php';
-require_once '../php/utils/toast.php';
 
 if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
@@ -19,7 +18,7 @@ $solicitud = obtener_solicitud_para_proveedor($pdo, $id, $uid);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $solicitud) {
     $r = procesar_solicitud_proveedor($pdo, $id, $uid, $uid, $_POST, $_SESSION['csrf_token']);
-    if ($r['ok']) set_toast('success', $r['mensaje']);
+    if ($r['ok']) $mensaje = $r['mensaje'];
     else $error = $r['mensaje'];
     $solicitud = obtener_solicitud_para_proveedor($pdo, $id, $uid);
 }
@@ -45,6 +44,7 @@ include '../includes/header.php';
             <p>Solicitud de <?= htmlspecialchars($solicitud['nombre'] . ' ' . $solicitud['apellido']) ?> &middot; Estado: <strong><?= htmlspecialchars($solicitud['estado']) ?></strong></p>
         </header>
 
+        <?php if ($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
         <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
         <div class="request-detail-layout">

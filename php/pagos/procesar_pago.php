@@ -7,7 +7,6 @@
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../utils/toast.php';
 
 iniciar_sesion();
 requerir_autenticacion('../../views/login.php');
@@ -129,8 +128,6 @@ try {
     } catch (Exception $e) {
         error_log("No se pudo enviar el correo del comprobante: " . $e->getMessage());
     }
-
-    set_toast('success', 'Pago procesado', 'Tu compra fue confirmada.');
 
     header("Location: ../../views/confirmacion.php?id_contratacion=$id_contratacion");
     exit;

@@ -7,7 +7,6 @@ require_once '../config/database.php';
 require_once '../php/publicaciones/EntregaRepository.php';
 require_once '../php/utils/file_upload_helper.php';
 require_once '../php/utils/supabase_storage.php';
-require_once '../php/utils/toast.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -62,13 +61,8 @@ if (!$entrega || (!es_admin() && (int)$entrega['docente_id'] !== $id_usuario)) {
         if ($archivoFeedback && $archivoFeedbackAnterior && $archivoFeedbackAnterior !== $archivoFeedback && !eliminar_archivo_storage($archivoFeedbackAnterior)) {
             error_log('No se pudo eliminar feedback anterior reemplazado: ' . $archivoFeedbackAnterior);
         }
-        set_toast(
-            'success',
-            'Calificacion guardada',
-            'La devolucion fue actualizada correctamente.'
-        );
-        header('Location: revisar-entrega.php?id=' . $id_entrega);
-        exit;
+        $mensaje = 'Entrega calificada correctamente.';
+        $entrega = $repo->obtenerDetalleParaRevision($id_entrega);
     } catch (Throwable $e) {
         error_log('Revisar entrega: ' . $e->getMessage());
         $error = $e instanceof RuntimeException ? $e->getMessage() : 'No se pudo guardar la calificacion.';
@@ -86,6 +80,7 @@ include '../includes/header.php';
 ?>
 <main class="provider-editor course-builder review-delivery-page">
 <main id="main-content" class="provider-editor course-builder">
+  <?php if ($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
   <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
   <?php if ($entrega): ?>
     <?php

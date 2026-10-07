@@ -41,6 +41,12 @@ $email_pendiente = $userData['nuevo_email_pendiente'] ?? null;
         </div>
       <?php endif; ?>
 
+      <?php if (!empty($mensaje_exito)): ?>
+        <div class="alert alert-success" role="alert">
+          <?= htmlspecialchars($mensaje_exito) ?>
+        </div>
+      <?php endif; ?>
+
       <?php if ($email_pendiente): ?>
         <div class="alert alert-info" role="alert">
           <strong>Verificación de nuevo email pendiente:</strong>

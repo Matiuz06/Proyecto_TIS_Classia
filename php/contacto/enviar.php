@@ -9,7 +9,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../utils/mailer.php';
-require_once __DIR__ . '/../utils/toast.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -52,8 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             && enviar_correo($email, 'Recibimos tu consulta - Classia', $respuesta);
         if (!$enviado) {
             $errores[] = 'No se pudo enviar el mensaje. Intentá nuevamente más tarde.';
-        } else {
-            set_toast('success', 'Mensaje enviado', 'Recibimos tu consulta correctamente.');
         }
     }
 }

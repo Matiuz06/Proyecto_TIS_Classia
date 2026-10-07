@@ -7,7 +7,6 @@
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/upload_helper.php';
-require_once __DIR__ . '/../utils/toast.php';
 require_once __DIR__ . '/publicacion_helpers.php';
 require_once __DIR__ . '/PublicacionRepository.php';
 
@@ -76,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ? new Servicio($datosPublicacion)
                 : new Curso($datosPublicacion);
             $id = $publicacionRepository->crear($publicacion);
-            set_toast('success', 'Publicacion creada');
             if ($_POST['tipo'] === 'Curso') {
                 header("Location: gestionar-contenido-curso.php?id={$id}&mensaje=creada");
             } else {

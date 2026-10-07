@@ -7,13 +7,12 @@
 require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 require_once '../php/usuarios/perfil_profesional.php';
-require_once '../php/utils/toast.php';
 if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token']=bin2hex(random_bytes(32));
 $usuario=usuario_actual(); $uid=(int)$usuario['id_usuario']; $mensaje=''; $error='';
 if ($_SERVER['REQUEST_METHOD']==='POST') {
     if (!hash_equals($_SESSION['csrf_token'],$_POST['csrf_token'] ?? '')) $error='La sesión del formulario expiró.';
     else {
-        try { guardar_perfil_profesional($pdo,$uid,$_POST); set_toast('success', 'Perfil profesional actualizado'); }
+        try { guardar_perfil_profesional($pdo,$uid,$_POST); $mensaje='Perfil profesional actualizado correctamente.'; }
         catch(PDOException $e){ error_log('Perfil profesional: '.$e->getMessage()); $error='No se pudo guardar el perfil profesional.'; }
     }
 }
@@ -22,6 +21,7 @@ $title='Editar perfil profesional'; $description='Configuración del perfil prof
 ?>
 <main id="main-content" class="provider-editor">
 <header class="section-heading"><h1>Perfil profesional</h1><p>Completá la información que ayuda a estudiantes y clientes a entender quién sos, tu experiencia y cómo trabajás.</p></header>
+<?php if($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
 <?php if($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 <form method="POST" class="provider-form"><input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
 <details open><summary>Presentación profesional</summary><div class="form-grid">
