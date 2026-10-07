@@ -14,6 +14,7 @@ class Modulo extends ElementoCurso
     private int $id_modulo;
     private int $id_publicacion;
 
+    private int $visible_alumnos = 1;
     /** @var Unidad[] */
     private array $unidades = [];
 
@@ -22,17 +23,21 @@ class Modulo extends ElementoCurso
         int     $id_publicacion,
         string  $titulo,
         ?string $descripcion,
-        int     $orden
+        int     $orden,
+        int     $visible_alumnos = 1
     ) {
         parent::__construct($id_modulo, $titulo, $descripcion, $orden);
-        $this->id_modulo      = $id_modulo;
-        $this->id_publicacion = $id_publicacion;
+        $this->id_modulo         = $id_modulo;
+        $this->id_publicacion    = $id_publicacion;
+        $this->visible_alumnos   = $visible_alumnos;
     }
 
     //Getters propios 
 
     public function getId(): int            { return $this->id_modulo; }
     public function getIdPublicacion(): int  { return $this->id_publicacion; }
+    public function getVisibleAlumnos(): int { return $this->visible_alumnos; }
+    public function esVisible(): bool        { return $this->visible_alumnos === 1; }
 
     //Composición: unidades 
 
@@ -66,9 +71,10 @@ class Modulo extends ElementoCurso
         return new static(
             (int) $row['id_modulo'],
             (int) $row['id_publicacion'],
-            $row['titulo']      ?? '',
-            $row['descripcion'] ?? null,
-            (int) ($row['orden'] ?? 0),
+            $row['titulo']          ?? '',
+            $row['descripcion']     ?? null,
+            (int) ($row['orden']    ?? 0),
+            (int) ($row['visible_alumnos'] ?? 1)
         );
     }
 
@@ -80,9 +86,10 @@ class Modulo extends ElementoCurso
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [
-            'id_modulo'      => $this->id_modulo,
-            'id_publicacion' => $this->id_publicacion,
-            'unidades'       => array_map(fn(Unidad $u) => $u->toArray(), $this->unidades),
+            'id_modulo'       => $this->id_modulo,
+            'id_publicacion'  => $this->id_publicacion,
+            'visible_alumnos' => $this->visible_alumnos,
+            'unidades'        => array_map(fn(Unidad $u) => $u->toArray(), $this->unidades),
         ]);
     }
 }

@@ -357,6 +357,101 @@ function inscribir_usuario_en_curso(PDO $pdo, int $id_usuario, int $id_publicaci
 }
 
 /**
+ * Archiva un curso: lo pasa a estado 'Archivado'.
+ * Los cursos archivados conservan todo su histórico pero no admiten
+ * nuevas actividades (RN-05). Se diferencia de 'Eliminado' en que
+ * el contenido sigue siendo accesible para consulta.
+ */
+function archivar_curso_admin(PDO $pdo, int $id_publicacion, string $token, string $csrf_session): array
+{
+    if (empty($csrf_session) || !hash_equals($csrf_session, $token)) {
+        return ['ok' => false, 'error' => 'Sesión de formulario inválida.', 'mensaje' => ''];
+    }
+    if ($id_publicacion <= 0) {
+        return ['ok' => false, 'error' => 'ID de publicación inválido.', 'mensaje' => ''];
+    }
+    try {
+        // Solo se puede archivar si es un Curso activo/pausado/inactivo (no si ya está eliminado)
+        $stmt = $pdo->prepare(
+            "SELECT tipo, estado FROM publicaciones WHERE id_publicacion = :id LIMIT 1"
+        );
+        $stmt->execute(['id' => $id_publicacion]);
+        $pub = $stmt->fetch();
+
+        if (!$pub) {
+            return ['ok' => false, 'error' => 'Publicación no encontrada.', 'mensaje' => ''];
+        }
+        if ($pub['tipo'] !== 'Curso') {
+            return ['ok' => false, 'error' => 'Solo se pueden archivar cursos.', 'mensaje' => ''];
+        }
+        if ($pub['estado'] === 'Archivado') {
+            return ['ok' => true, 'error' => '', 'mensaje' => 'El curso ya se encuentra archivado.'];
+        }
+        if ($pub['estado'] === 'Eliminado') {
+            return ['ok' => false, 'error' => 'No se puede archivar una publicación eliminada.', 'mensaje' => ''];
+        }
+
+        $stmt = $pdo->prepare("UPDATE publicaciones SET estado = 'Archivado' WHERE id_publicacion = :id");
+        $stmt->execute(['id' => $id_publicacion]);
+        return ['ok' => true, 'error' => '', 'mensaje' => 'Curso archivado correctamente. Conserva su histórico pero no admitirá nuevas actividades.'];
+    } catch (PDOException $e) {
+        error_log('Error al archivar curso: ' . $e->getMessage());
+        return ['ok' => false, 'error' => 'No se pudo archivar el curso.', 'mensaje' => ''];
+    }
+}
+
+/**
+ * Verifica si un curso cumple con los requisitos mínimos para ser publicado (RD-09):
+ * - Al menos un módulo con al menos un recurso (contenido).
+ * - Un docente asignado (la publicación tiene id_usuario != null).
+ * Retorna ['ok'=>bool, 'motivo'=>string].
+ */
+function verificar_requisitos_publicacion(PDO $pdo, int $id_publicacion): array
+{
+    try {
+        // Verificar que sea un Curso con docente asignado
+        $stmt = $pdo->prepare(
+            "SELECT tipo, id_usuario FROM publicaciones WHERE id_publicacion = :id LIMIT 1"
+        );
+        $stmt->execute(['id' => $id_publicacion]);
+        $pub = $stmt->fetch();
+
+        if (!$pub) {
+            return ['ok' => false, 'motivo' => 'Publicación no encontrada.'];
+        }
+        if ($pub['tipo'] !== 'Curso') {
+            return ['ok' => true, 'motivo' => '']; // Servicios no tienen esta restricción
+        }
+        if (empty($pub['id_usuario'])) {
+            return ['ok' => false, 'motivo' => 'El curso necesita un docente asignado (RD-09).'];
+        }
+
+        // Verificar que tenga al menos un módulo con al menos un recurso
+        $stmt = $pdo->prepare("
+            SELECT COUNT(DISTINCT r.id_recurso) AS total_recursos
+            FROM curso_modulos m
+            JOIN curso_unidades u ON u.id_modulo = m.id_modulo
+            JOIN curso_recursos r ON r.id_unidad = u.id_unidad
+            WHERE m.id_publicacion = :id
+        ");
+        $stmt->execute(['id' => $id_publicacion]);
+        $total = (int) $stmt->fetchColumn();
+
+        if ($total === 0) {
+            return [
+                'ok'     => false,
+                'motivo' => 'El curso debe tener al menos un módulo con contenido antes de publicarse (RD-09).',
+            ];
+        }
+
+        return ['ok' => true, 'motivo' => ''];
+    } catch (PDOException $e) {
+        error_log('Error verificar_requisitos_publicacion: ' . $e->getMessage());
+        return ['ok' => false, 'motivo' => 'Error al verificar requisitos del curso.'];
+    }
+}
+
+/**
  * Elimina lógicamente una publicación (estado = 'Eliminado') con validación CSRF.
  */
 function eliminar_publicacion_admin(PDO $pdo, int $id_publicacion, string $token, string $csrf_session): array
@@ -385,7 +480,7 @@ function cambiar_estado_publicacion_admin(PDO $pdo, int $id_publicacion, string 
     if (empty($csrf_session) || !hash_equals($csrf_session, $token)) {
         return ['ok' => false, 'error' => 'Sesión de formulario inválida.', 'mensaje' => ''];
     }
-    $estados_permitidos = ['Activo', 'Pausado', 'Inactivo', 'Eliminado'];
+    $estados_permitidos = ['Activo', 'Pausado', 'Inactivo', 'Eliminado', 'Archivado'];
     if ($id_publicacion <= 0 || !in_array($nuevo_estado, $estados_permitidos, true)) {
         return ['ok' => false, 'error' => 'Parámetros inválidos.', 'mensaje' => ''];
     }

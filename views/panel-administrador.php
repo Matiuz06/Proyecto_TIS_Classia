@@ -68,6 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje_admin = $resultado['mensaje'];
             break;
 
+        case 'archivar_curso':
+            $resultado     = archivar_curso_admin($pdo, (int)($_POST['id_publicacion'] ?? 0), $token_post, $csrf_session);
+            $error_admin   = $resultado['error'];
+            $mensaje_admin = $resultado['mensaje'];
+            break;
+
         case 'eliminar_pub':
             $resultado     = eliminar_publicacion_admin($pdo, (int)($_POST['id_publicacion'] ?? 0), $token_post, $csrf_session);
             $error_admin   = $resultado['error'];
@@ -812,7 +818,7 @@ include '../includes/header.php';
   <section id="publicaciones" class="admin-publications-section" aria-labelledby="titulo-publicaciones">
     <header>
       <h2 id="titulo-publicaciones">Publicaciones y Cursos</h2>
-      <p>Revisá, moderá contenidos, cambiá el estado o eliminá publicaciones de la plataforma.</p>
+      <p>Revisá, moderá contenidos, cambiá el estado o eliminá publicaciones de la plataforma. Los cursos archivados conservan su histórico pero no admiten nuevas actividades.</p>
       <a href="crear-publicacion.php" class="btn btn-primary-action">+ Crear publicación</a>
       <br>
     </header>
@@ -840,7 +846,19 @@ include '../includes/header.php';
             <dl class="pub-details">
               <div>
                 <dt><strong>Estado:</strong></dt>
-                <dd><span class="status-<?= strtolower(htmlspecialchars($pub['estado'])) ?>"><?= htmlspecialchars($pub['estado']) ?></span></dd>
+                <dd>
+                  <?php
+                    $badge_estado = match($pub['estado']) {
+                        'Activo'    => 'badge-course',
+                        'Pausado'   => 'badge-warning',
+                        'Inactivo'  => 'badge-muted',
+                        'Archivado' => 'badge-archived',
+                        'Eliminado' => 'badge-error',
+                        default     => ''
+                    };
+                  ?>
+                  <span class="badge <?= $badge_estado ?>"><?= htmlspecialchars($pub['estado']) ?></span>
+                </dd>
               </div>
               <div>
                 <dt><strong>Autor:</strong></dt>
@@ -859,11 +877,12 @@ include '../includes/header.php';
             <nav aria-label="Acciones de <?= htmlspecialchars($pub['titulo']) ?>">
               <ul class="pub-actions">
                 <?php if ($pub['tipo'] === 'Curso'): ?>
-                  <li><a href="contenido-curso.php?id=<?= (int) $pub['id_publicacion'] ?>" class="pub-actions-link" title="Moderar módulos, clases y recursos">Moderar temario</a></li>
+                  <li><a href="gestionar-contenido-curso.php?id=<?= (int) $pub['id_publicacion'] ?>" class="pub-actions-link" title="Moderar módulos, clases y recursos">Moderar temario</a></li>
                   <li><a href="curso.php?id=<?= (int) $pub['id_publicacion'] ?>" class="pub-actions-link" title="Supervisar aula y foro">Ver aula</a></li>
                 <?php endif; ?>
                 <li><a href="editar-publicacion.php?id=<?= (int) $pub['id_publicacion'] ?>" class="pub-actions-link">Editar</a></li>
                 <li><a href="vista-previa-publicacion.php?id=<?= (int) $pub['id_publicacion'] ?>" class="pub-actions-link">Vista previa</a></li>
+                <?php if ($pub['estado'] !== 'Eliminado'): ?>
                 <li>
                   <form method="POST" action="panel-administrador.php#publicaciones" class="admin-inline-form">
                     <input type="hidden" name="csrf_token"     value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
@@ -872,12 +891,30 @@ include '../includes/header.php';
                     <?php if ($pub['estado'] === 'Activo'): ?>
                       <input type="hidden" name="nuevo_estado" value="Pausado">
                       <button type="submit" class="btn-status btn-status-pause">Pausar</button>
+                    <?php elseif ($pub['estado'] === 'Archivado'): ?>
+                      <input type="hidden" name="nuevo_estado" value="Activo">
+                      <button type="submit" class="btn-status btn-status-activate" title="Restaurar curso archivado">Restaurar</button>
                     <?php else: ?>
                       <input type="hidden" name="nuevo_estado" value="Activo">
                       <button type="submit" class="btn-status btn-status-activate">Activar</button>
                     <?php endif; ?>
                   </form>
                 </li>
+                <?php endif; ?>
+                <?php if ($pub['tipo'] === 'Curso' && !in_array($pub['estado'], ['Archivado', 'Eliminado'], true)): ?>
+                <li>
+                  <form method="POST" action="panel-administrador.php#publicaciones" class="admin-inline-form">
+                    <input type="hidden" name="csrf_token"     value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                    <input type="hidden" name="accion"         value="archivar_curso">
+                    <input type="hidden" name="id_publicacion" value="<?= (int) $pub['id_publicacion'] ?>">
+                    <button type="submit" class="btn-status btn-status-archive"
+                      onclick="return confirm('¿Archivar el curso «<?= htmlspecialchars($pub['titulo'], ENT_QUOTES) ?>»? Conservará su histórico pero no admitirá nuevas actividades.')"
+                      title="Archivar: bloquea nuevas actividades, conserva histórico">
+                      Archivar
+                    </button>
+                  </form>
+                </li>
+                <?php endif; ?>
                 <li>
                   <form method="POST" action="panel-administrador.php#publicaciones" class="admin-inline-form">
                     <input type="hidden" name="csrf_token"     value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">

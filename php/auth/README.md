@@ -1,6 +1,6 @@
 # php/auth/
 
-Backend de autenticación, autorización y ciclo de vida de la sesión (Sprint 3 — Segunda Entrega).
+Backend de autenticación, autorización y ciclo de vida de la sesión (Sprint 4 — Octubre 2026).
 
 ## Archivos y responsabilidades
 

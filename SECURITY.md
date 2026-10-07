@@ -17,7 +17,7 @@ La arquitectura y desarrollo de Classia cumplen con los siguientes requerimiento
 - **`RNF-07` (Pagos y alcance PCI-DSS):** Delegación del procesamiento de pagos en una pasarela externa certificada (ej. MercadoPago / Stripe). El sistema no almacena ni procesa datos completos de tarjetas de crédito o débito, reduciendo el alcance normativo PCI-DSS.
 - **`RNF-08` (Revisión obligatoria de código):** Todo cambio en el código fuente debe someterse a una revisión de seguridad y pares antes de integrarse a las ramas principales (`main` / `Testing`).
 - **`RNF-09` (Seguridad ofensiva prudente):** Pruebas de simulación de ataques (pentesting) restringidas únicamente a entornos de prueba propios o autorizados expresamente.
-- **`RNF-24` (Auditoría de eventos):** Registro de eventos críticos (accesos, entregas, calificaciones y cambios administrativos) para trazabilidad ante incidentes.
+- **`RNF-23` (Auditoría de eventos):** Registro de eventos relevantes (accesos, entregas, calificaciones y cambios administrativos) para trazabilidad ante incidentes de seguridad.
 
 ---
 
@@ -94,4 +94,4 @@ Si descubrís alguna vulnerabilidad de seguridad en Classia, te pedimos que la r
 
 ---
 
-*Última actualización: Septiembre 2026 — AniTech DevSecOps Team.*
+*Última actualización: Octubre 2026 — AniTech DevSecOps Team.*
