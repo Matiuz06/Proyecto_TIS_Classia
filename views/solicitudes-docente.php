@@ -6,6 +6,7 @@
 
 require_once '../php/auth/roles.php';
 require_once '../php/solicitudes/gestionar_solicitudes_docente.php';
+require_once '../php/utils/toast.php';
 
 requerir_rol(ROL_ADMIN, 'usuario.php');
 
@@ -24,6 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $resultado = procesar_decision_solicitud_docente($id_solicitud, $accion, $token_recibido, $_SESSION['csrf_token'] ?? '');
     $error   = $resultado['error'];
     $mensaje = $resultado['mensaje'];
+    if ($mensaje !== '') {
+        set_toast('success', $mensaje);
+        $mensaje = '';
+    }
 }
 
 $solicitudes = obtener_solicitudes_docente_pendientes();
@@ -41,10 +46,6 @@ include '../includes/header.php';
 <main id="main-content">
   <section aria-labelledby="titulo-solicitudes-docente">
     <h1 id="titulo-solicitudes-docente">Solicitudes docentes pendientes</h1>
-
-    <?php if ($mensaje !== ''): ?>
-      <div class="alert alert-success"><?php echo htmlspecialchars($mensaje); ?></div>
-    <?php endif; ?>
 
     <?php if ($error !== ''): ?>
       <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>

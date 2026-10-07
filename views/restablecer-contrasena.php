@@ -5,11 +5,16 @@
  */
 
 require_once '../php/auth/sesion.php';
+require_once '../php/utils/toast.php';
 iniciar_sesion();
 
 $mensaje_error = $_SESSION['error_restablecer'] ?? '';
 $mensaje_exito = $_SESSION['success_restablecer'] ?? '';
 unset($_SESSION['error_restablecer'], $_SESSION['success_restablecer']);
+if ($mensaje_exito !== '') {
+  set_toast('success', $mensaje_exito);
+  $mensaje_exito = '';
+}
 
 $token_reset = trim($_GET['token'] ?? '');
 $mostrar_form_nueva = $token_reset !== '';
@@ -33,12 +38,6 @@ include '../includes/header.php';
       <?php if (!empty($mensaje_error)): ?>
         <div class="alert alert-danger" role="alert">
           <?= htmlspecialchars($mensaje_error) ?>
-        </div>
-      <?php endif; ?>
-
-      <?php if (!empty($mensaje_exito)): ?>
-        <div class="alert alert-success" role="alert">
-          <?= htmlspecialchars($mensaje_exito) ?>
         </div>
       <?php endif; ?>
 

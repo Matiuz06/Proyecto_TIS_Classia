@@ -60,6 +60,94 @@ function obtener_curso_del_docente(PDO $pdo, int $id_publicacion, int $id_usuari
  * Para trabajar con objetos, usar directamente:
  *   (new ContenidoCursoRepository($pdo))->obtenerPorCurso($id)
  *
+ * @return array[]
+ */
+function obtener_contenido_curso(PDO $pdo, int $id_publicacion): array
+{
+    return _repo_contenido($pdo)->obtenerPorCursoComoArray($id_publicacion);
+}
+
+//HELPERS DE PRESENTACIÓN
+//Delegados a la clase Recurso; mantenidos aquí por compatibilidad con vistas.
+
+/**
+ * Valida que una URL sea http/https.
+ */
+function url_recurso_valida(?string $url): bool
+{
+    if (!$url) return false;
+    $p = parse_url($url);
+    return is_array($p) && isset($p['scheme']) && in_array(strtolower($p['scheme']), ['http', 'https'], true);
+}
+
+/**
+ * @deprecated Usar Recurso::getVideoEmbedUrl().
+ */
+function obtener_video_embed_url(?string $url): ?string
+{
+    if (!$url) return null;
+    $r = Recurso::fromArray(['id_recurso' => 0, 'id_unidad' => 0, 'titulo' => '', 'tipo' => 'Video', 'url' => $url, 'archivo' => null, 'descripcion' => null, 'orden' => 0]);
+    return $r->getVideoEmbedUrl();
+}
+
+/**
+ * @deprecated Usar Recurso::getVideoEmbedUrl().
+ */
+function obtener_youtube_embed_url(?string $url): ?string
+{
+    return obtener_video_embed_url($url);
+}
+
+/** @deprecated Usar Recurso::TIPOS. */
+function tipos_recurso_curso(): array
+{
+    return Recurso::TIPOS;
+}
+
+/**
+ * @deprecated Usar (new Recurso(...))->getIcono() o instanciar desde array.
+ */
+
+//Instancia del repositorio
+
+/**
+ * Devuelve la instancia compartida del repositorio para el PDO global.
+ * Evita instanciar el repositorio en cada llamada a las funciones wrapper.
+ */
+function _repo_contenido(PDO $pdo): ContenidoCursoRepository
+{
+    static $repo = null;
+    if ($repo === null) {
+        $repo = new ContenidoCursoRepository($pdo);
+    }
+    return $repo;
+}
+
+// WRAPPERS DE COMPATIBILIDAD
+// Mantienen las firmas originales; delegan al repositorio y/o a las clases.
+
+/**
+ * Obtiene los datos del curso verificando que pertenezca al docente.
+ * Devuelve null si no existe o no tiene permisos.
+ *
+ * @param PDO  $pdo
+ * @param int  $id_publicacion
+ * @param int  $id_usuario
+ * @param bool $admin
+ * @return array|null
+ */
+function obtener_curso_del_docente(PDO $pdo, int $id_publicacion, int $id_usuario, bool $admin = false): ?array
+{
+    return _repo_contenido($pdo)->obtenerCursoDelDocente($id_publicacion, $id_usuario, $admin);
+}
+
+/**
+ * Devuelve el contenido completo de un curso como array multidimensional.
+ * Compatible con las vistas que iteran $modulo['unidades'][$i]['recursos'][$j].
+ *
+ * Para trabajar con objetos, usar directamente:
+ *   (new ContenidoCursoRepository($pdo))->obtenerPorCurso($id)
+ *
  * @param PDO  $pdo
  * @param int  $id_publicacion
  * @param bool $solo_visibles   Si true, excluye módulos y recursos no visibles para alumnos (REQ-CON-04).
@@ -171,6 +259,52 @@ function intercambiar_orden(PDO $pdo, string $tabla, string $id_col, int $id, st
 //PROCESAMIENTO DE ACCIONES (POST)
 //Delega la lógica de escritura al repositorio; mantiene la firma original.
 
+function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_publicacion, int $id_usuario, bool $admin, string $csrf): array
+{
+    if ($csrf === '' || !hash_equals($csrf, $post['csrf_token'] ?? '')) {
+        return ['ok' => false, 'mensaje' => 'La sesión del formulario expiró.'];
+    }
+
+    $repo = _repo_contenido($pdo);
+
+    if (!$repo->obtenerCursoDelDocente($id_publicacion, $id_usuario, $admin)) {
+        return ['ok' => false, 'mensaje' => 'No tenés permisos para gestionar este curso.'];
+    }
+
+    $a = $post['accion'] ?? '';
+
+    try {
+        //Módulos
+        if ($a === 'actualizar_aprobacion') {
+            $porcentaje = filter_var($post['porcentaje_minimo_aprobacion'] ?? null, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 0, 'max_range' => 100],
+            ]);
+            if ($porcentaje === false) {
+                return ['ok' => false, 'mensaje' => 'El porcentaje minimo debe estar entre 0 y 100.'];
+    }
+    return true;
+}
+
+/**
+ * @deprecated Usar Recurso->esVisualizableNativamente().
+ */
+function recurso_es_visualizable_nativamente(string $tipo, ?string $archivo = null): bool
+{
+    $r = Recurso::fromArray(['id_recurso' => 0, 'id_unidad' => 0, 'titulo' => '', 'tipo' => $tipo, 'url' => null, 'archivo' => $archivo, 'descripcion' => null, 'orden' => 0]);
+    return $r->esVisualizableNativamente();
+}
+
+/**
+ * @deprecated Usar ContenidoCursoRepository->intercambiarOrden().
+ */
+function intercambiar_orden(PDO $pdo, string $tabla, string $id_col, int $id, string $scope_col, int $scope_id, string $direccion): bool
+{
+    return _repo_contenido($pdo)->intercambiarOrden($tabla, $id_col, $id, $scope_col, $scope_id, $direccion);
+}
+
+//PROCESAMIENTO DE ACCIONES (POST)
+//Delega la lógica de escritura al repositorio; mantiene la firma original.
+
 /**
  * Valida que el curso no esté archivado antes de permitir modificaciones (RN-05).
  */
@@ -202,6 +336,59 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
     try {
         //Módulos
         if ($a === 'agregar_modulo') {
+            $t = trim($post['titulo_modulo'] ?? '');
+            if ($t === '') return ['ok' => false, 'mensaje' => 'El módulo necesita un título.'];
+            $repo->crearModulo($id_publicacion, $t, trim($post['descripcion_modulo'] ?? '') ?: null, (int)($post['orden'] ?? 1));
+
+        } elseif ($a === 'editar_modulo') {
+            $t = trim($post['titulo'] ?? '');
+            if ($t === '') return ['ok' => false, 'mensaje' => 'El módulo necesita un título.'];
+            $repo->editarModulo((int)$post['id_modulo'], $id_publicacion, $t, trim($post['descripcion'] ?? '') ?: null, (int)($post['orden'] ?? 1));
+
+        } elseif ($a === 'eliminar_modulo') {
+            $repo->eliminarModulo((int)$post['id_modulo'], $id_publicacion);
+
+        } elseif (in_array($a, ['subir_modulo', 'bajar_modulo'], true)) {
+            $repo->intercambiarOrden('curso_modulos', 'id_modulo', (int)$post['id_modulo'], 'id_publicacion', $id_publicacion, $a === 'subir_modulo' ? 'subir' : 'bajar');
+
+        //Unidades
+        } elseif ($a === 'agregar_unidad') {
+            $m = (int)($post['id_modulo'] ?? 0);
+            if (!$repo->verificarModuloPerteneceACurso($m, $id_publicacion)) {
+                return ['ok' => false, 'mensaje' => 'El módulo no pertenece a este curso.'];
+            }
+            $t = trim($post['titulo_unidad'] ?? '');
+            if ($t === '') return ['ok' => false, 'mensaje' => 'La clase necesita un título.'];
+            $repo->crearUnidad($m, $t, trim($post['descripcion_unidad'] ?? '') ?: null, (int)($post['orden'] ?? 1));
+
+        } elseif ($a === 'editar_unidad') {
+            $t = trim($post['titulo'] ?? '');
+            if ($t === '') return ['ok' => false, 'mensaje' => 'La clase necesita un título.'];
+            $repo->editarUnidad((int)$post['id_unidad'], $id_publicacion, $t, trim($post['descripcion'] ?? '') ?: null, (int)($post['orden'] ?? 1));
+
+        } elseif ($a === 'eliminar_unidad') {
+            $repo->eliminarUnidad((int)$post['id_unidad'], $id_publicacion);
+
+        } elseif (in_array($a, ['subir_unidad', 'bajar_unidad'], true)) {
+            $mid = $repo->obtenerModuloDeLaUnidad((int)$post['id_unidad'], $id_publicacion);
+            if (!$mid) return ['ok' => false, 'mensaje' => 'La clase no pertenece a este curso.'];
+            $repo->intercambiarOrden('curso_unidades', 'id_unidad', (int)$post['id_unidad'], 'id_modulo', $mid, $a === 'subir_unidad' ? 'subir' : 'bajar');
+
+        //Recursos
+        } elseif (in_array($a, ['agregar_recurso', 'editar_recurso'], true)) {
+            $rid    = (int)($post['id_recurso'] ?? 0);
+            $unidad = (int)($post['id_unidad'] ?? 0);
+            $actual = null;
+
+            if ($a === 'editar_recurso') {
+                $actual = $repo->obtenerRecurso($rid, $id_publicacion);
+                if (!$actual) return ['ok' => false, 'mensaje' => 'Recurso inexistente o sin permisos.'];
+                $unidad = (int)$actual['id_unidad'];
+            }
+            $stmt = $pdo->prepare('UPDATE publicaciones SET porcentaje_minimo_aprobacion = :porcentaje WHERE id_publicacion = :id AND tipo = \'Curso\'');
+            $stmt->execute(['porcentaje' => $porcentaje, 'id' => $id_publicacion]);
+
+        } elseif ($a === 'agregar_modulo') {
             $t = trim($post['titulo_modulo'] ?? '');
             if ($t === '') return ['ok' => false, 'mensaje' => 'El módulo necesita un título.'];
             $repo->crearModulo($id_publicacion, $t, trim($post['descripcion_modulo'] ?? '') ?: null, (int)($post['orden'] ?? 1));
@@ -365,6 +552,30 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
                         $tareaRepo->eliminarPorRecurso($rid);
                     }
                 }
+                // Limpiar archivo anterior si se reemplazó
+                if ($nuevo && !empty($actual['archivo']) && $actual['archivo'] !== $nuevo) {
+                    _eliminar_archivo_storage($actual['archivo']);
+                }
+                if ($tipo === 'Enlace' && !empty($actual['archivo'])) {
+                    _eliminar_archivo_storage($actual['archivo']);
+                }
+            }
+
+        } elseif ($a === 'eliminar_recurso') {
+            $ruta = $repo->eliminarRecurso((int)$post['id_recurso'], $id_publicacion);
+            if ($ruta) _eliminar_archivo_storage($ruta);
+
+        } elseif (in_array($a, ['subir_recurso', 'bajar_recurso'], true)) {
+            $uid = $repo->obtenerUnidadDelRecurso((int)$post['id_recurso'], $id_publicacion);
+            if (!$uid) return ['ok' => false, 'mensaje' => 'El recurso no pertenece a este curso.'];
+            $repo->intercambiarOrden('curso_recursos', 'id_recurso', (int)$post['id_recurso'], 'id_unidad', $uid, $a === 'subir_recurso' ? 'subir' : 'bajar');
+
+        } else {
+            return ['ok' => false, 'mensaje' => 'Acción no reconocida.'];
+        }
+
+        return ['ok' => true, 'mensaje' => 'Contenido actualizado correctamente.'];
+
                 // Limpiar archivo anterior si se reemplazó
                 if ($nuevo && !empty($actual['archivo']) && $actual['archivo'] !== $nuevo) {
                     _eliminar_archivo_storage($actual['archivo']);

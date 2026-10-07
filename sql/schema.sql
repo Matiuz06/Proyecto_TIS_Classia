@@ -85,7 +85,229 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     modalidad VARCHAR(30) NULL,
     nivel_experiencia VARCHAR(30) NULL,
     duracion_horas SMALLINT UNSIGNED NULL,
+    porcentaje_minimo_aprobacion TINYINT UNSIGNED NOT NULL DEFAULT 70,
     cupos INT NULL,
+    disponibilidad TEXT NULL,
+    tipo_servicio VARCHAR(60) NULL,
+    estado ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado') NOT NULL DEFAULT 'Activo',
+    imagen VARCHAR(255) NULL DEFAULT NULL,
+    eliminado_en DATETIME NULL,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id_usuario INT NOT NULL,
+    id_categoria INT NOT NULL,
+    CONSTRAINT fk_publicaciones_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_publicaciones_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_pub_usuario (id_usuario),
+    INDEX idx_pub_categoria (id_categoria),
+    INDEX idx_pub_estado_tipo (estado, tipo),
+    INDEX idx_pub_fecha (fecha_creacion),
+    INDEX idx_pub_precio (precio),
+    INDEX idx_pub_tipo_precio (tipo, precio)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- Solicitudes, contrataciones y pagos
+-- Vinculan pedidos personalizados, órdenes y comprobantes
+-- =========================================================
+CREATE TABLE IF NOT EXISTS solicitudes (
+    id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    descripcion TEXT NOT NULL,
+    estado ENUM('Pendiente', 'Aceptada', 'Rechazada', 'Contraoferta', 'En Proceso', 'Realizada', 'Cancelada') NOT NULL DEFAULT 'Pendiente',
+    detalles_json JSON NULL,
+    archivo_adjunto VARCHAR(255) NULL,
+    precio_propuesto DECIMAL(10,2) NULL,
+    fecha_hora_propuesta DATETIME NULL,
+    respuesta_proveedor TEXT NULL,
+    fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id_usuario INT NOT NULL,
+    id_publicacion INT NULL,
+    id_contratacion INT NULL,
+    CONSTRAINT fk_solicitudes_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_solicitudes_publicaciones FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_sol_usuario (id_usuario),
+    INDEX idx_sol_publicacion (id_publicacion),
+    INDEX idx_sol_estado (estado),
+    INDEX idx_sol_contratacion (id_contratacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- Solicitudes de rol docente
+-- Registra postulaciones y revisión administrativa de proveedores
+-- =========================================================
+CREATE TABLE IF NOT EXISTS solicitudes_docente (
+    id_solicitud_docente INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL DEFAULT 'Pendiente',
+    motivo TEXT NULL,
+    fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_respuesta DATETIME NULL,
+    CONSTRAINT fk_solicitudes_docente_usuarios
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_solicitudes_docente_estado (estado),
+    INDEX idx_solicitudes_docente_usuario_estado (id_usuario, estado)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS contrataciones (
+    id_contratacion INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_contratacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    monto_total DECIMAL(10,2) NOT NULL,
+    estado ENUM('Pendiente', 'En Proceso', 'Completada', 'Cancelada') NOT NULL DEFAULT 'Pendiente',
+    id_usuario INT NOT NULL,
+    CONSTRAINT fk_contrataciones_usuarios
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_cont_usuario (id_usuario),
+    INDEX idx_cont_estado (estado),
+    INDEX idx_cont_fecha (fecha_contratacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS detalles_contratacion (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    cantidad INT NOT NULL DEFAULT 1,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    id_contratacion INT NOT NULL,
+    id_publicacion INT NOT NULL,
+    CONSTRAINT fk_detalles_contrataciones
+        FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_detalles_publicaciones
+        FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_det_contratacion (id_contratacion),
+    INDEX idx_det_publicacion (id_publicacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS pagos (
+    id_pago INT AUTO_INCREMENT PRIMARY KEY,
+    monto DECIMAL(10,2) NOT NULL,
+    metodo_pago ENUM('Tarjeta', 'Transferencia', 'MercadoPago', 'Efectivo') NOT NULL,
+    estado_pago ENUM('Pendiente', 'Aprobado', 'Rechazado') NOT NULL DEFAULT 'Pendiente',
+    fecha_pago DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    transaccion_ref VARCHAR(100) NULL,
+    id_contratacion INT NOT NULL,
+    CONSTRAINT fk_pagos_contrataciones
+        FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_pagos_contratacion (id_contratacion),
+    INDEX idx_pagos_estado (estado_pago)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- Valoraciones y perfil profesional
+-- Relacionan reputación pública con usuarios y contrataciones
+-- =========================================================
+CREATE TABLE IF NOT EXISTS valoraciones (
+    id_valoracion INT AUTO_INCREMENT PRIMARY KEY,
+    puntuacion INT NOT NULL CHECK (puntuacion BETWEEN 1 AND 5),
+    comentario TEXT NULL,
+    fecha_valoracion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id_usuario INT NOT NULL,
+    id_publicacion INT NOT NULL,
+    id_contratacion INT NULL,
+    CONSTRAINT fk_valoraciones_usuarios
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_valoraciones_publicaciones
+        FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_valoraciones_contrataciones
+        FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT uq_valoraciones_contratacion_usuario
+        UNIQUE (id_contratacion, id_usuario),
+    INDEX idx_val_publicacion (id_publicacion),
+    INDEX idx_val_usuario (id_usuario),
+    INDEX idx_val_contratacion (id_contratacion),
+    INDEX idx_val_pub_puntuacion (id_publicacion, puntuacion)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- Estadísticas de visitas por publicación
+-- Métricas agregadas por fecha
+-- =========================================================
+CREATE TABLE IF NOT EXISTS publicacion_visitas (
+    id_visita INT AUTO_INCREMENT PRIMARY KEY,
+    id_publicacion INT NOT NULL,
+    fecha_visita DATE NOT NULL,
+    visitas INT UNSIGNED NOT NULL DEFAULT 1,
+    CONSTRAINT fk_visitas_publicaciones
+        FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uq_pub_visita_fecha (id_publicacion, fecha_visita),
+    INDEX idx_visitas_pub (id_publicacion),
+    INDEX idx_visitas_fecha (fecha_visita)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+-- =========================================================
+-- Perfiles profesionales
+-- Datos públicos ampliados para docentes y proveedores
+-- =========================================================
+CREATE TABLE IF NOT EXISTS perfiles_profesionales (
+    id_perfil INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL UNIQUE,
+    titulo_profesional VARCHAR(180) NULL,
+    presentacion TEXT NULL,
+    experiencia TEXT NULL,
+    formacion TEXT NULL,
+    certificaciones TEXT NULL,
+    habilidades TEXT NULL,
+    especialidades TEXT NULL,
+    idiomas VARCHAR(255) NULL,
+    ubicacion VARCHAR(150) NULL,
+    modalidad_trabajo VARCHAR(150) NULL,
+    portfolio_url VARCHAR(255) NULL,
+    linkedin_url VARCHAR(255) NULL,
+    tiempo_respuesta VARCHAR(100) NULL,
+    visibilidad ENUM('Registrados','Relacionados') NOT NULL DEFAULT 'Registrados',
+    actualizado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_perfiles_profesionales_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- Contenido de cursos
+-- Módulos, unidades, recursos, entregas y participación
+-- =========================================================
+CREATE TABLE IF NOT EXISTS curso_modulos (
+    id_modulo INT AUTO_INCREMENT PRIMARY KEY,
+    id_publicacion INT NOT NULL,
+    titulo VARCHAR(180) NOT NULL,
+    descripcion TEXT NULL,
+    orden INT NOT NULL DEFAULT 1,
+    CONSTRAINT fk_curso_modulos_publicacion FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_modulos_publicacion_orden (id_publicacion,orden)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_unidades (
+    id_unidad INT AUTO_INCREMENT PRIMARY KEY,
+    id_modulo INT NOT NULL,
+    titulo VARCHAR(180) NOT NULL,
+    descripcion TEXT NULL,
+    orden INT NOT NULL DEFAULT 1,
+    CONSTRAINT fk_curso_unidades_modulo FOREIGN KEY (id_modulo) REFERENCES curso_modulos(id_modulo) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_unidades_modulo_orden (id_modulo,orden)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_recursos (
+    id_recurso INT AUTO_INCREMENT PRIMARY KEY,
+    id_unidad INT NOT NULL,
+    titulo VARCHAR(180) NOT NULL,
+    tipo ENUM('Archivo','Foro','Entrega de Tareas','Video','PDF','Imagen','Enlace') NOT NULL,
+    url VARCHAR(500) NULL,
+    archivo VARCHAR(255) NULL,
+    descripcion TEXT NULL,
+    orden INT NOT NULL DEFAULT 1,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_curso_recursos_unidad FOREIGN KEY (id_unidad) REFERENCES curso_unidades(id_unidad) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_curso_recursos_unidad_orden (id_unidad,orden)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
     disponibilidad TEXT NULL,
     tipo_servicio VARCHAR(60) NULL,
     estado ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado', 'Archivado') NOT NULL DEFAULT 'Activo',
@@ -367,6 +589,31 @@ CREATE TABLE IF NOT EXISTS curso_entrega_archivos (
     fecha_subida DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_curso_entrega_archivos_entrega FOREIGN KEY (id_entrega) REFERENCES curso_entregas(id_entrega) ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_curso_entrega_archivos_entrega (id_entrega)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS curso_recursos_completados (
+    id_completado INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_recurso INT NOT NULL,
+    fecha_completado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_recursos_completados_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_recursos_completados_recurso FOREIGN KEY (id_recurso) REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uq_recurso_completado_usuario (id_usuario, id_recurso),
+    INDEX idx_recursos_completados_recurso (id_recurso)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS certificados (
+    id_certificado INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_curso INT NOT NULL,
+    codigo_verificacion VARCHAR(32) NOT NULL,
+    fecha_emision DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    porcentaje_aprobacion DECIMAL(5,2) NOT NULL,
+    CONSTRAINT fk_certificados_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_certificados_curso FOREIGN KEY (id_curso) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uq_certificado_usuario_curso (id_usuario, id_curso),
+    UNIQUE KEY uq_certificado_codigo (codigo_verificacion),
+    INDEX idx_certificados_curso (id_curso)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS curso_foro_mensajes (

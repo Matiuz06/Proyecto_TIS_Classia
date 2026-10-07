@@ -17,8 +17,10 @@ require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/contenido_curso.php';   // carga ContenidoCursoRepository + clases de dominio
 require_once __DIR__ . '/EntregaRepository.php';
+require_once __DIR__ . '/../certificados/CursoProgresoRepository.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../admin/estadisticas_admin.php';
+require_once __DIR__ . '/../utils/toast.php';
 
 iniciar_sesion();
 
@@ -37,6 +39,8 @@ $puede_gestionar_entregas = false;
 $resumen_entregas_docente = [];
 $entregas_docente_por_tarea = [];
 $archivos_entregas = [];
+$progreso_curso = null;
+$recursos_completados_ids = [];
 
 $usuario_actual = usuario_actual();
 
@@ -94,7 +98,7 @@ if ($id_curso > 0) {
         $stmt = $pdo->prepare("
             SELECT p.id_publicacion, p.id_usuario, p.titulo, p.descripcion, p.precio, p.tipo,
                    p.modalidad, p.imagen, p.id_categoria, p.nivel_experiencia, p.duracion_horas,
-                   p.fecha_creacion, p.estado,
+                   p.fecha_creacion, p.estado, COALESCE(p.porcentaje_minimo_aprobacion, 70) AS porcentaje_minimo_aprobacion,
                    c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido,
                    u.id_usuario AS autor_id, u.foto_perfil AS autor_foto
             FROM publicaciones p 
@@ -146,6 +150,115 @@ if ($id_curso > 0) {
 
                 // Procesar entrega de tarea por parte del estudiante
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'entregar_tarea') {
+                    $token = $_POST['csrf_token'] ?? '';
+                    $id_recurso_tarea = (int)($_POST['id_recurso'] ?? 0);
+                    $id_unidad_tarea = (int)($_POST['id_unidad'] ?? 0);
+                    $comentario = trim($_POST['comentario_entrega'] ?? '');
+                    $textoEntrega = trim($_POST['texto_entrega'] ?? '') ?: null;
+                    $enlaceEntrega = trim($_POST['enlace_entrega'] ?? '') ?: null;
+
+                    try {
+                        if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+                            $_SESSION['curso_error'] = 'Token de seguridad invalido. Recarga la pagina e intenta nuevamente.';
+                        } elseif (!$contratacion_curso) {
+                            $_SESSION['curso_error'] = 'No tenes acceso para entregar en este curso.';
+                        } else {
+                            $contenidoRepo = new ContenidoCursoRepository($pdo);
+                            $recursoTarea = $contenidoRepo->obtenerRecurso($id_recurso_tarea, $id_curso);
+                            $tareaRepo = new TareaRepository($pdo);
+                            $tarea = $recursoTarea && ($recursoTarea['tipo'] ?? '') === 'Entrega de Tareas'
+                                ? $tareaRepo->asegurarParaRecurso($recursoTarea)
+                                : null;
+                            $ahora = new DateTimeImmutable();
+
+                            if (!$tarea) {
+                                $_SESSION['curso_error'] = 'Recurso de tarea invalido.';
+                            } elseif (!$tarea->puedeEntregar($ahora)) {
+                                $_SESSION['curso_error'] = 'La tarea ya no acepta entregas.';
+                            } elseif ($enlaceEntrega && !filter_var($enlaceEntrega, FILTER_VALIDATE_URL)) {
+                                $_SESSION['curso_error'] = 'El enlace de entrega no es valido.';
+                            } elseif ($enlaceEntrega && !$tarea->permiteTipoEntrega('enlace')) {
+                                $_SESSION['curso_error'] = 'Esta tarea no acepta entrega por enlace.';
+                            } elseif ($textoEntrega && !$tarea->permiteTipoEntrega('texto')) {
+                                $_SESSION['curso_error'] = 'Esta tarea no acepta texto en linea.';
+                            } else {
+                                $entregaRepo = new EntregaRepository($pdo);
+                                $entregaActual = $entregaRepo->buscarPorTareaYUsuario((int)$tarea->getId(), (int)$usuario_actual['id_usuario']);
+                                $archivosActuales = $entregaActual ? $entregaRepo->listarArchivosIncluyeLegacy((int)$entregaActual->getId()) : [];
+                                $archivos = normalizar_archivos_multiples($_FILES, 'archivo_entrega');
+                                $archivosFinales = $archivos ?: $archivosActuales;
+
+                                if ($archivos && !$tarea->permiteTipoEntrega('archivos')) {
+                                    $_SESSION['curso_error'] = 'Esta tarea no acepta archivos.';
+                                } elseif (count($archivosFinales) > $tarea->getMaxArchivos()) {
+                                    $_SESSION['curso_error'] = 'Superaste la cantidad maxima de archivos permitidos.';
+                                }
+
+                                $tiposFinales = array_values(array_filter([
+                                    $archivosFinales ? 'archivos' : null,
+                                    $textoEntrega ? 'texto' : null,
+                                    $enlaceEntrega ? 'enlace' : null,
+                                ]));
+                                $tiposRequeridos = $tarea->tiposHabilitados();
+                                if (empty($_SESSION['curso_error']) && array_diff($tiposFinales, $tiposRequeridos)) {
+                                    $_SESSION['curso_error'] = 'La entrega contiene tipos no habilitados para esta tarea.';
+                                }
+                                if (empty($_SESSION['curso_error']) && (!$tiposFinales || ($tarea->requiereTodosLosTipos() && array_diff($tiposRequeridos, $tiposFinales)))) {
+                                    $_SESSION['curso_error'] = $tarea->requiereTodosLosTipos()
+                                        ? 'Esta tarea requiere completar todos los tipos de entrega habilitados.'
+                                        : 'Completa al menos un tipo de entrega.';
+                                }
+
+                                if (empty($_SESSION['curso_error'])) {
+                                    $subidos = [];
+                                    try {
+                                        $archivosValidados = [];
+                                        foreach ($archivos as $archivo) {
+                                            $val = validar_archivo_tarea($archivo, $tarea);
+                                            if (!$val['ok']) throw new RuntimeException($val['error']);
+                                            $archivosValidados[] = [$archivo, $val];
+                                        }
+                                        foreach ($archivosValidados as [$archivo, $val]) {
+                                            if (supabase_esta_activo()) {
+                                                $remotePath = 'entregas/tarea_' . (int)$tarea->getId() . '/usuario_' . (int)$usuario_actual['id_usuario'] . '/' . bin2hex(random_bytes(8)) . '_' . time() . '.' . $val['ext'];
+                                                $subida = supabase_subir_archivo($archivo['tmp_name'], $remotePath, $val['mime']);
+                                                if (!$subida['ok']) throw new RuntimeException('Error al subir archivo de entrega.');
+                                                $ruta = 'supabase:' . $remotePath;
+                                            } else {
+                                                $res = guardar_archivo_subido($archivo, 'entregas', $tarea->getMaxTamanoMb());
+                                                if (!$res['ok']) throw new RuntimeException($res['error']);
+                                                $ruta = $res['ruta'];
+                                            }
+                                            $subidos[] = [
+                                                'nombre_original' => (string)$archivo['name'],
+                                                'ruta' => $ruta,
+                                                'mime_type' => $val['mime'],
+                                                'extension' => $val['ext'],
+                                                'tamano' => (int)$archivo['size'],
+                                            ];
+                                        }
+                                        $resultado = $entregaRepo->guardarPresentacion($tarea, (int)$usuario_actual['id_usuario'], $textoEntrega, $enlaceEntrega, $comentario ?: null, $subidos);
+                                    } catch (Throwable $e) {
+                                        foreach ($subidos as $subido) eliminar_ruta_entrega($subido['ruta']);
+                                        throw $e;
+                                    }
+                                    foreach ($resultado['archivos_reemplazados'] as $reemplazado) eliminar_ruta_entrega($reemplazado['ruta'] ?? null);
+                                    set_toast(
+                                        'success',
+                                        $entregaActual ? 'Entrega actualizada' : 'Entrega enviada',
+                                        $entregaActual
+                                            ? 'Tu nueva entrega fue registrada correctamente.'
+                                            : 'Tu entrega fue registrada correctamente.'
+                                    );
+                                    header("Location: curso.php?id=" . $id_curso . ($id_unidad_tarea ? "&unidad=" . $id_unidad_tarea : ""));
+                                    exit;
+                                }
+                            }
+                        }
+                    } catch (Throwable $e) {
+                        error_log('Entrega tarea: ' . $e->getMessage());
+                        $_SESSION['curso_error'] = $e instanceof RuntimeException ? $e->getMessage() : 'No se pudo guardar la entrega.';
+                    }
                     $token = $_POST['csrf_token'] ?? '';
                     $id_recurso_tarea = (int)($_POST['id_recurso'] ?? 0);
                     $id_unidad_tarea = (int)($_POST['id_unidad'] ?? 0);
@@ -283,6 +396,77 @@ if ($id_curso > 0) {
                     }
                 }
 
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'marcar_recurso_completado') {
+                    $token = $_POST['csrf_token'] ?? '';
+                    $id_recurso = (int)($_POST['id_recurso'] ?? 0);
+                    $id_unidad = (int)($_POST['id_unidad'] ?? 0);
+                    $completado = ($_POST['completado'] ?? '') === '1';
+
+                    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+                        $_SESSION['curso_error'] = 'Token de seguridad invalido. Recarga la pagina e intenta nuevamente.';
+                    } elseif (!$contratacion_curso) {
+                        $_SESSION['curso_error'] = 'No tenes acceso para actualizar este recurso.';
+                        $_SESSION['curso_error'] = 'Token de seguridad inválido.';
+                    } elseif ($id_msg <= 0) {
+                        $_SESSION['curso_error'] = 'Mensaje no válido.';
+                    } else {
+                        $progresoRepo = new CursoProgresoRepository($pdo);
+                        if ($id_recurso > 0 && $progresoRepo->recursoPerteneceACurso($id_recurso, $id_curso)) {
+                            $progresoRepo->marcarRecurso((int)$usuario_actual['id_usuario'], $id_recurso, $completado);
+                            set_toast(
+                                $completado ? 'success' : 'info',
+                                $completado ? 'Recurso marcado como completado' : 'Recurso marcado como pendiente'
+                            );
+                        } else {
+                            $_SESSION['curso_error'] = 'Recurso invalido.';
+                            $_SESSION['curso_error'] = 'No tenés permisos para eliminar este mensaje.';
+                        }
+                    }
+
+                    header("Location: curso.php?id=" . $id_curso . ($id_unidad ? "&unidad=" . $id_unidad : "") . ($id_recurso ? "#recurso-" . $id_recurso : ""));
+                    exit;
+            $solo_visibles = !($es_propietario || es_admin());
+            $contenido_curso = obtener_contenido_curso($pdo, $id_curso, $solo_visibles);
+            $puede_ver_recursos = $comprado || $es_propietario || es_admin();
+
+            $mis_entregas = [];
+            $mensajes_foro = [];
+            if ($usuario_actual) {
+                $contenidoRepo = new ContenidoCursoRepository($pdo);
+                $entregaRepo = new EntregaRepository($pdo);
+                $tareas_curso = (new TareaRepository($pdo))->listarPorCurso($id_curso);
+                $mis_entregas = $entregaRepo->listarEntregasUsuarioPorCurso($id_curso, (int)$usuario_actual['id_usuario']);
+                if ($puede_gestionar_entregas) {
+                    $resumen_entregas_docente = $entregaRepo->obtenerResumenEntregasCurso($id_curso);
+                    $entregas_docente_por_tarea = $entregaRepo->listarEntregasCursoAgrupadas($id_curso);
+                }
+
+                // Procesar nuevo mensaje en el foro de debate
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'publicar_mensaje_foro') {
+                    $token = $_POST['csrf_token'] ?? '';
+                    $id_recurso_foro = (int)($_POST['id_recurso'] ?? 0);
+                    $id_unidad_foro = (int)($_POST['id_unidad'] ?? 0);
+                    $mensaje = trim($_POST['mensaje_foro'] ?? '');
+
+                    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+                        $_SESSION['curso_error'] = 'Token de seguridad invÃ¡lido. Recarga la pÃ¡gina e intenta nuevamente.';
+                    } elseif ($id_recurso_foro <= 0 || empty($mensaje)) {
+                        $_SESSION['curso_error'] = 'El mensaje no puede estar vacÃ­o.';
+                    } else {
+                        $contenidoRepo = new ContenidoCursoRepository($pdo);
+                        $recursoForo = $contenidoRepo->obtenerRecurso($id_recurso_foro, $id_curso);
+                        if (!$recursoForo || ($recursoForo['tipo'] ?? '') !== 'Foro' || !$contratacion_curso) {
+                            $_SESSION['curso_error'] = 'No tenes permisos para publicar en este foro.';
+                            header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
+                            exit;
+                        }
+                        $contenidoRepo->crearMensajeForo($id_recurso_foro, (int)$usuario_actual['id_usuario'], $mensaje);
+                        set_toast('success', 'Comentario publicado');
+                        header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
+                        exit;
+                    }
+                }
+
                 // Moderar o eliminar mensaje del foro
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'eliminar_mensaje_foro') {
                     $token = $_POST['csrf_token'] ?? '';
@@ -290,9 +474,9 @@ if ($id_curso > 0) {
                     $id_unidad_foro = (int)($_POST['id_unidad'] ?? 0);
 
                     if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-                        $_SESSION['curso_error'] = 'Token de seguridad inválido.';
+                        $_SESSION['curso_error'] = 'Token de seguridad invÃ¡lido.';
                     } elseif ($id_msg <= 0) {
-                        $_SESSION['curso_error'] = 'Mensaje no válido.';
+                        $_SESSION['curso_error'] = 'Mensaje no vÃ¡lido.';
                     } else {
                         $borrado = (new ContenidoCursoRepository($pdo))->eliminarMensajeForoAutorizado(
                             $id_msg,
@@ -302,9 +486,9 @@ if ($id_curso > 0) {
                             (int)$usuario_actual['id_usuario'] === (int)$curso['id_usuario']
                         );
                         if ($borrado) {
-                            $_SESSION['curso_exito'] = 'Mensaje eliminado correctamente.';
+                            set_toast('success', 'Mensaje eliminado');
                         } else {
-                            $_SESSION['curso_error'] = 'No tenés permisos para eliminar este mensaje.';
+                            $_SESSION['curso_error'] = 'No tenÃ©s permisos para eliminar este mensaje.';
                         }
                         header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
                         exit;
@@ -322,8 +506,7 @@ if ($id_curso > 0) {
                 return;
             }
 
-            $solo_visibles = !($es_propietario || es_admin());
-            $contenido_curso = obtener_contenido_curso($pdo, $id_curso, $solo_visibles);
+            $contenido_curso = obtener_contenido_curso($pdo, $id_curso);
             $puede_ver_recursos = $comprado || $es_propietario || es_admin();
 
             $mis_entregas = [];
@@ -339,6 +522,9 @@ if ($id_curso > 0) {
                 }
                 if ($comprado) {
                     $tareas_alumno_curso = $entregaRepo->obtenerTareasAlumnoCurso($id_curso, (int)$usuario_actual['id_usuario']);
+                    $progresoRepo = new CursoProgresoRepository($pdo);
+                    $progreso_curso = $progresoRepo->obtenerProgresoAlumnoCurso((int)$usuario_actual['id_usuario'], $id_curso);
+                    $recursos_completados_ids = $progresoRepo->listarRecursosCompletadosCurso((int)$usuario_actual['id_usuario'], $id_curso);
                 }
 
                 if ($mis_entregas) {
