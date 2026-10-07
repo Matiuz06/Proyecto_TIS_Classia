@@ -6,6 +6,7 @@
 
 require_once __DIR__ . "/sesion.php";
 require_once __DIR__ . "/../utils/recaptcha.php";
+require_once __DIR__ . "/../utils/toast.php";
 
 const LOGIN_URL = "../../views/login.php";
 const LOGIN_OK_URL = "../../views/usuario.php";
@@ -135,6 +136,8 @@ establecer_usuario_sesion(
     (int) $usuario["id_rol"],
     $usuario["foto_perfil"] ?? null
 );
+
+set_toast('success', 'Sesion iniciada');
 
 if ((int) $usuario["id_rol"] === 3) {
     header("Location: ../../views/panel-administrador.php");
