@@ -451,6 +451,28 @@ CREATE TABLE IF NOT EXISTS eventos (
     INDEX idx_eventos_fecha (fecha_evento)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =========================================================
+-- Auditoría y Trazabilidad de Eventos de Seguridad (RNF-23)
+-- Cumplimiento: ISO 27001 A.8.15, CIS 8.2, OWASP ASVS V10
+-- =========================================================
+CREATE TABLE IF NOT EXISTS auditoria_seguridad (
+    id_auditoria BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NULL,
+    tipo_evento VARCHAR(60) NOT NULL,
+    descripcion TEXT NOT NULL,
+    direccion_ip VARCHAR(45) NOT NULL,
+    user_agent VARCHAR(255) NULL,
+    nivel_severidad ENUM('INFO', 'WARNING', 'CRITICAL') NOT NULL DEFAULT 'INFO',
+    datos_adicionales JSON NULL,
+    fecha_evento DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_auditoria_usuario
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_auditoria_evento (tipo_evento),
+    INDEX idx_auditoria_fecha (fecha_evento),
+    INDEX idx_auditoria_usuario (id_usuario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 ALTER TABLE solicitudes
     ADD CONSTRAINT fk_solicitudes_contratacion
     FOREIGN KEY (id_contratacion) REFERENCES contrataciones(id_contratacion)

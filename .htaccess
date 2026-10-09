@@ -1,0 +1,38 @@
+# ==============================================================================
+# Classia - Endurecimiento de Seguridad Web (.htaccess)
+# Normas: OWASP Top 10, CIS Apache Benchmark, ISO/IEC 27001
+# ==============================================================================
+
+# 1. Deshabilitar listado de directorios
+Options -Indexes -MultiViews
+
+# 2. Bloquear acceso a archivos sensibles y de configuración
+<FilesMatch "^(\.env|\.git|\.dockerignore|\.containerignore|Dockerfile|docker-compose\.yml|package\.json|package-lock\.json|\.eslintrc\.json|\.stylelintrc\.json|\.htmlhintrc|composer\.json|composer\.lock)$">
+    Require all denied
+</FilesMatch>
+
+# 3. Bloquear acceso directo a scripts SQL, documentación y scripts bash
+<FilesMatch "\.(sql|sh|log|md|bak|swp|dist)$">
+    Require all denied
+</FilesMatch>
+
+# 4. Proteger directorios internos que no deben ser accedidos directamente por URL
+RedirectMatch 403 ^/sql/
+RedirectMatch 403 ^/scripts/
+RedirectMatch 403 ^/node_modules/
+RedirectMatch 403 ^/storage/private/
+
+# 5. Cabeceras HTTP de Seguridad Globales (OWASP Secure Headers)
+<IfModule mod_headers.c>
+    # Previene que la página sea incrustada en iframes externos (Clickjacking)
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Previene inferencias de tipos MIME (MIME-Sniffing)
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Control de referencia para proteger privacidad
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Política de permisos de APIs del navegador
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>

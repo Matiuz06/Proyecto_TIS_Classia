@@ -52,10 +52,10 @@ function verificar_recaptcha(?string $token, ?string $ip = null): array
 
     if ($response === false) {
         error_log("Error al contactar servicio reCAPTCHA de Google");
-        // Fallback en caso de timeout de red
+        // Enfoque Fail-Closed (OWASP A04/A07): No otorgar acceso si la verificación no pudo completarse
         return [
-            'exito' => true,
-            'mensaje' => 'Servicio reCAPTCHA no disponible temporalmente'
+            'exito' => false,
+            'mensaje' => 'No se pudo contactar el servicio de verificación de seguridad. Por favor, intentá nuevamente en unos momentos.'
         ];
     }
 
