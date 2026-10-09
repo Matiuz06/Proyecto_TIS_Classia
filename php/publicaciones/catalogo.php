@@ -203,6 +203,7 @@ if (!function_exists('puntaje_recomendacion')) {
 
         return $puntaje;
     }
+}
 
 $recomendaciones = [];
 $personalizacion_aceptada = ($preferencias_usuario['acepta_personalizacion'] ?? '') === 'si';

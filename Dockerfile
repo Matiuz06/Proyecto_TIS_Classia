@@ -4,10 +4,11 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && docker-php-ext-install pdo_mysql pdo_pgsql pgsql \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && a2enmod rewrite
+    && a2enmod rewrite headers
 
 RUN printf "ServerName localhost\n" > /etc/apache2/conf-available/servername.conf \
-    && a2enconf servername
+    && printf "ServerTokens Prod\nServerSignature Off\nTraceEnable Off\n" > /etc/apache2/conf-available/security.conf \
+    && a2enconf servername security
 
 RUN printf "upload_max_filesize = 64M\npost_max_size = 64M\nmemory_limit = 256M\nmax_execution_time = 300\n" > /usr/local/etc/php/conf.d/uploads.ini
 

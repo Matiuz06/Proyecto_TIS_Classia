@@ -53,11 +53,11 @@ function guardar_imagen_subida(array $archivo, string $subcarpeta, int $max_mega
     $base = __DIR__ . '/../../assets/uploads';
     $destino = $base . DIRECTORY_SEPARATOR . $subcarpeta;
     if (!is_dir($destino)) {
-        @mkdir($destino, 0777, true);
-        @chmod($destino, 0777);
+        @mkdir($destino, 0755, true);
+        @chmod($destino, 0755);
     }
     if (!is_writable($destino)) {
-        @chmod($destino, 0777);
+        @chmod($destino, 0755);
     }
     if (!is_writable($destino)) {
         return ['ok' => false, 'error' => 'El directorio de destino no tiene permisos de escritura.'];

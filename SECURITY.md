@@ -16,8 +16,8 @@ La arquitectura y desarrollo de Classia cumplen con los siguientes requerimiento
 - **`RNF-03` (Mitigación OWASP):** Aplicación de recomendaciones del **OWASP Top 10** para prevenir inyecciones, fallas criptográficas y control de acceso roto. Verificación referenciada en **OWASP ASVS** (*Application Security Verification Standard*).
 - **`RNF-07` (Pagos y alcance PCI-DSS):** Delegación del procesamiento de pagos en una pasarela externa certificada (ej. MercadoPago / Stripe). El sistema no almacena ni procesa datos completos de tarjetas de crédito o débito, reduciendo el alcance normativo PCI-DSS.
 - **`RNF-08` (Revisión obligatoria de código):** Todo cambio en el código fuente debe someterse a una revisión de seguridad y pares antes de integrarse a las ramas principales (`main` / `Testing`).
-- **`RNF-09` (Seguridad ofensiva prudente):** Pruebas de simulación de ataques (pentesting) restringidas únicamente a entornos de prueba propios o autorizados expresamente.
-- **`RNF-23` (Auditoría de eventos):** Registro de eventos relevantes (accesos, entregas, calificaciones y cambios administrativos) para trazabilidad ante incidentes de seguridad.
+- **`RNF-23` (Auditoría de eventos):** Registro de eventos de seguridad (accesos, fallos de autenticación, cambios de rol y administración de cuentas) en tabla `auditoria_seguridad` vía helper `php/utils/auditoria.php`.
+- **Auditoría Integral de Seguridad:** Informe completo y trazabilidad contra ISO 27001, CIS Controls, NIST y OWASP documentado en [docs/auditoria_seguridad_iso_cis_nist_owasp.md](file:///home/retrosys/Documents/Programación/TallerIntegradorDeSistemas/Proyecto_TIS_Classia/docs/auditoria_seguridad_iso_cis_nist_owasp.md).
 
 ---
 

@@ -19,7 +19,29 @@ class TOTP
      */
     private static function obtenerClaveCifrado(): string
     {
-        $key = getenv('APP_KEY') ?: getenv('CI_SECRET_KEY') ?: 'classia_ci_data_protection_key_2026_anitech_uy';
+        $key = getenv('APP_KEY') ?: ($_ENV['APP_KEY'] ?? (getenv('CI_SECRET_KEY') ?: ($_ENV['CI_SECRET_KEY'] ?? '')));
+        if (empty($key)) {
+            $envPath = __DIR__ . '/../../.env';
+            if (file_exists($envPath)) {
+                $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
+                    list($k, $v) = explode('=', $line, 2);
+                    $k = trim($k);
+                    $v = trim($v);
+                    if ($k === 'APP_KEY' || $k === 'CI_SECRET_KEY') {
+                        $key = $v;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (empty($key)) {
+            throw new RuntimeException("ERROR DE SEGURIDAD (OWASP A02 / ISO 27001 A.8.24): Debe definir APP_KEY en .env para habilitar el cifrado.");
+        }
+
         if (str_starts_with($key, 'base64:')) {
             $decoded = base64_decode(substr($key, 7), true);
             if ($decoded !== false) {
