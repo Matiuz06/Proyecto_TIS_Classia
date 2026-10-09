@@ -30,6 +30,7 @@ El objetivo principal de Classia es construir un Entorno Virtual de Aprendizaje 
 Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 
 ### Estudiantes / Clientes (id_rol = 1)
+
 - Explorar el catálogo de cursos y servicios con filtros avanzados.
 - Consultar detalles de publicaciones, programas formativos y paquetes.
 - Solicitar servicios personalizados (e.g. impresión 3D, tutorías, robótica).
@@ -39,6 +40,7 @@ Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 - Emitir valoraciones y comentarios sobre cursos y servicios completados.
 
 ### Docentes / Proveedores (id_rol = 2)
+
 - Acceder a su **Panel de Proveedor** con estadísticas y métricas de actividad.
 - Crear nuevas publicaciones especificando título, descripción, precio, categoría, modalidad, duración, cupos y disponibilidad (curso o servicio).
 - Editar publicaciones existentes y gestionar su estado (`Activo`, `Inactivo`, `Pausado`, `Archivado`).
@@ -49,6 +51,7 @@ Classia implementa un modelo de Control de Acceso Basado en Roles (RBAC):
 - Administrar el contenido de sus cursos y calificaciones de entregas.
 
 ### Administradores (id_rol = 3)
+
 - Acceso al **Panel de Administrador** para la supervisión global de la plataforma.
 - Gestión y moderación de usuarios, roles y permisos, incluyendo suspensión y desactivación de cuentas conservando el histórico académico (REQ-USR-04, RD-12).
 - Moderación y supervisión de todos los cursos y publicaciones (REQ-CUR-05, RN-10), con acciones de pausar, activar, archivar y restaurar temarios.
@@ -180,17 +183,20 @@ Proyecto_TIS_Classia/
 ## Tecnologías utilizadas
 
 ### Backend y Base de Datos
+
 - **PHP 8.3**: Lenguaje de servidor para controladores, helpers de sesión y endpoints modulares.
 - **PDO (PHP Data Objects)**: Capa de abstracción segura con sentencias preparadas y detección automática de driver (MySQL / PostgreSQL).
 - **MySQL 8.0 / MariaDB** (Docker local): Motor de base de datos relacional en tercera forma normal (3FN).
 - **PostgreSQL / Supabase** (producción): Soporte completo con consultas compatibles (sin sintaxis MySQL-específica).
 
 ### Frontend y Diseño
+
 - **HTML5 semántico**: Estructura accesible con atributos ARIA, breadcrumbs y optimización SEO.
 - **CSS3 / Vanilla CSS**: Sistema de diseño basado en Design Tokens, variables CSS, Flexbox/CSS Grid, soporte `@media (prefers-reduced-motion)` para accesibilidad WCAG AA.
 - **JavaScript (Vanilla)**: Interacciones del cliente, validaciones dinámicas, modales nativos (`<dialog>`) y portapapeles.
 
 ### Infraestructura y Herramientas
+
 - **Docker Compose**: Stack de desarrollo con `classia_web` (PHP+Apache), `classia_db` (MySQL), `classia_phpmyadmin` y `classia_mailpit`.
 - **Node.js & npm**: Herramientas de análisis estático (Stylelint, HTMLHint, ESLint, Lighthouse CI).
 - **GitHub Actions**: CI/CD con validación de seguridad (Gitleaks, Semgrep SAST, cabeceras CSP).
@@ -201,6 +207,7 @@ Proyecto_TIS_Classia/
 ## Instalación y ejecución local
 
 ### 1. Requisitos previos
+
 - **Docker** y **Docker Compose** (recomendado).
 - O bien **PHP 8.0+** con extensión `pdo_mysql`, y **MySQL 8.0+** de forma local.
 
@@ -219,17 +226,18 @@ Mailpit (emails de prueba): [http://localhost:8025](http://localhost:8025)
 ### 3. Base de datos ya existente (migración)
 
 Si el volumen MySQL ya existe, ejecutar las migraciones correspondientes en `sql/migrations/`:
+
 ```bash
 docker exec classia_web php scripts/migrate_provider_features.php
 ```
 
 ### 4. Cuentas de prueba
 
-| Rol | Email | Contraseña |
-|-----|-------|------------|
-| Estudiante | `estudiante@classia.com` | `12345678` |
-| Docente | `docente@classia.com` | `12345678` |
-| Administrador | `admin@classia.com` | `12345678` |
+| Rol           | Email                    | Contraseña |
+| ------------- | ------------------------ | ---------- |
+| Estudiante    | `estudiante@classia.com` | `12345678` |
+| Docente       | `docente@classia.com`    | `12345678` |
+| Administrador | `admin@classia.com`      | `12345678` |
 
 > Ver [`docs/credenciales-demo.md`](docs/credenciales-demo.md) para más detalles.
 
@@ -257,12 +265,12 @@ El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SEC
 > **Matriz de trazabilidad (Sprint 4) — Octubre 2026**
 > 122 requerimientos totales · ✅ 99 verificados · 🔵 10 implementados · ⏳ 13 pendientes
 
-| Categoría | Total | Estado |
-|---|---|---|
-| Funcionales (REQ) | 74 | 61 verificados, 13 pendientes |
-| No funcionales (RNF-01–23) | 23 | 16 verificados, 6 implementados, 1 pendiente |
-| Reglas de negocio (RN) | 13 | 11 verificados, 2 pendientes |
-| Dominio educativo/legal (RD) | 12 | 11 verificados, 1 pendiente |
+| Categoría                    | Total | Estado                                       |
+| ---------------------------- | ----- | -------------------------------------------- |
+| Funcionales (REQ)            | 74    | 61 verificados, 13 pendientes                |
+| No funcionales (RNF-01–23)   | 23    | 16 verificados, 6 implementados, 1 pendiente |
+| Reglas de negocio (RN)       | 13    | 11 verificados, 2 pendientes                 |
+| Dominio educativo/legal (RD) | 12    | 11 verificados, 1 pendiente                  |
 
 ### Completado — Entregas e Iteraciones
 

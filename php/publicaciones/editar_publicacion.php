@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/upload_helper.php';
+require_once __DIR__ . '/../utils/toast.php';
 require_once __DIR__ . '/publicacion_helpers.php';
 require_once __DIR__ . '/PublicacionRepository.php';
 
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
             $publicacionObjeto->setEstado($estado);
             $publicacionObjeto->setEliminadoEn($estado==='Eliminado'?date('Y-m-d H:i:s'):null);
             $publicacionRepository->actualizar($publicacionObjeto, $admin ? null : $uid);
+            set_toast('success', 'Estado actualizado', 'La publicacion fue actualizada correctamente.');
             header('Location: panel-proveedor.php?mensaje=estado_actualizado');
             exit;
         }
@@ -127,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
                     : new Curso($datosPublicacion);
                 $publicacionRepository->actualizar($publicacionActualizada, $admin ? null : $uid);
                 if ($rutaAnterior && $rutaAnterior!==$rutaNueva) eliminar_imagen_subida($rutaAnterior);
+                set_toast('success', 'Publicacion actualizada');
                 header('Location: panel-proveedor.php?mensaje=actualizada');
                 exit;
             } catch(PDOException $e) {

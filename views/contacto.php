@@ -83,9 +83,7 @@ include '../includes/header.php';
           aria-label="Formulario de contacto"
         >
           <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
-          <?php if ($enviado): ?>
-            <div class="alert alert-success">Tu mensaje fue enviado correctamente.</div>
-          <?php elseif ($errores): ?>
+          <?php if ($errores): ?>
             <div class="alert alert-danger"><ul><?php foreach ($errores as $error): ?><li><?= htmlspecialchars($error) ?></li><?php endforeach; ?></ul></div>
           <?php endif; ?>
           <div class="contact-form__row">
