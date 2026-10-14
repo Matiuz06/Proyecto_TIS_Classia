@@ -30,28 +30,52 @@ $description = $description ?? 'Classia conecta clientes, proveedores y administ
 $cssPrefix   = $cssPrefix   ?? '..';
 $jsPrefix    = $jsPrefix    ?? '..';
 $activePage  = $activePage  ?? '';
+$publicBase  = isset($publicBase) ? rtrim((string)$publicBase, '/') : null;
+$assetPrefix = $publicBase ?? $cssPrefix;
 
-$indexHref    = ($cssPrefix === '.') ? 'index.php'           : '../index.php';
-$catalogoHref = ($cssPrefix === '.') ? 'views/catalogo.php'  : 'catalogo.php';
-$carritoHref  = ($cssPrefix === '.') ? 'views/carrito.php'   : 'carrito.php';
-$loginHref    = ($cssPrefix === '.') ? 'views/login.php'     : 'login.php';
-$registroHref = ($cssPrefix === '.') ? 'views/registro.php'  : 'registro.php';
-$cuentaHref   = ($cssPrefix === '.') ? 'views/usuario.php'   : 'usuario.php';
-$logoutHref   = ($cssPrefix === '.') ? 'php/auth/logout.php' : '../php/auth/logout.php';
-$solicitarDocenteHref = ($cssPrefix === '.') ? 'views/solicitar-docente.php' : 'solicitar-docente.php';
-$panelProveedorHref   = ($cssPrefix === '.') ? 'views/panel-proveedor.php' : 'panel-proveedor.php';
-$panelAdminHref       = ($cssPrefix === '.') ? 'views/panel-administrador.php' : 'panel-administrador.php';
-$misSolicitudesHref = ($cssPrefix === '.') ? 'views/mis-solicitudes-servicios.php' : 'mis-solicitudes-servicios.php';
-$solicitudesProveedorHref = ($cssPrefix === '.') ? 'views/solicitudes-servicios.php' : 'solicitudes-servicios.php';
-$perfilProfesionalHref = ($cssPrefix === '.') ? 'views/perfil-profesional.php' : 'perfil-profesional.php';
-$eventosHref  = ($cssPrefix === '.') ? 'views/eventos.php'   : 'eventos.php';
-$noticiasHref = ($cssPrefix === '.') ? 'views/noticias.php'  : 'noticias.php';
+if ($publicBase !== null) {
+    $indexHref    = $publicBase . '/index.php';
+    $catalogoHref = $publicBase . '/views/catalogo.php';
+    $carritoHref  = $publicBase . '/views/carrito.php';
+    $loginHref    = $publicBase . '/views/login.php';
+    $registroHref = $publicBase . '/views/registro.php';
+    $cuentaHref   = $publicBase . '/views/usuario.php';
+    $logoutHref   = $publicBase . '/php/auth/logout.php';
+    $solicitarDocenteHref = $publicBase . '/views/solicitar-docente.php';
+    $panelProveedorHref   = $publicBase . '/views/panel-proveedor.php';
+    $panelAdminHref       = $publicBase . '/views/panel-administrador.php';
+    $misSolicitudesHref = $publicBase . '/views/mis-solicitudes-servicios.php';
+    $solicitudesProveedorHref = $publicBase . '/views/solicitudes-servicios.php';
+    $perfilProfesionalHref = $publicBase . '/views/perfil-profesional.php';
+    $eventosHref  = $publicBase . '/views/eventos.php';
+    $noticiasHref = $publicBase . '/views/noticias.php';
+} else {
+    $indexHref    = ($cssPrefix === '.') ? 'index.php'           : '../index.php';
+    $catalogoHref = ($cssPrefix === '.') ? 'views/catalogo.php'  : 'catalogo.php';
+    $carritoHref  = ($cssPrefix === '.') ? 'views/carrito.php'   : 'carrito.php';
+    $loginHref    = ($cssPrefix === '.') ? 'views/login.php'     : 'login.php';
+    $registroHref = ($cssPrefix === '.') ? 'views/registro.php'  : 'registro.php';
+    $cuentaHref   = ($cssPrefix === '.') ? 'views/usuario.php'   : 'usuario.php';
+    $logoutHref   = ($cssPrefix === '.') ? 'php/auth/logout.php' : '../php/auth/logout.php';
+    $solicitarDocenteHref = ($cssPrefix === '.') ? 'views/solicitar-docente.php' : 'solicitar-docente.php';
+    $panelProveedorHref   = ($cssPrefix === '.') ? 'views/panel-proveedor.php' : 'panel-proveedor.php';
+    $panelAdminHref       = ($cssPrefix === '.') ? 'views/panel-administrador.php' : 'panel-administrador.php';
+    $misSolicitudesHref = ($cssPrefix === '.') ? 'views/mis-solicitudes-servicios.php' : 'mis-solicitudes-servicios.php';
+    $solicitudesProveedorHref = ($cssPrefix === '.') ? 'views/solicitudes-servicios.php' : 'solicitudes-servicios.php';
+    $perfilProfesionalHref = ($cssPrefix === '.') ? 'views/perfil-profesional.php' : 'perfil-profesional.php';
+    $eventosHref  = ($cssPrefix === '.') ? 'views/eventos.php'   : 'eventos.php';
+    $noticiasHref = ($cssPrefix === '.') ? 'views/noticias.php'  : 'noticias.php';
+}
 
 $isAuth = esta_autenticado();
 $currentUser = usuario_actual();
-$defaultAvatarSrc = obtener_avatar_default($cssPrefix);
-$onboardingHref = ($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php';
-requerir_onboarding_completo($onboardingHref);
+$defaultAvatarSrc = $publicBase !== null
+    ? $publicBase . '/assets/images/default-avatar.svg'
+    : obtener_avatar_default($assetPrefix);
+$onboardingHref = $publicBase !== null ? $publicBase . '/views/primeros-pasos.php' : (($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php');
+if (empty($skipOnboardingGuard)) {
+    requerir_onboarding_completo($onboardingHref);
+}
 
 $cartItems = array_unique(array_filter($_SESSION['carrito_publicaciones'] ?? []));
 $cartCount = count($cartItems);
@@ -65,10 +89,10 @@ $cartCount = count($cartItems);
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="<?= htmlspecialchars($description) ?>" />
   <title><?= htmlspecialchars($title) ?></title>
-  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/animation.css?v=<?= filemtime(__DIR__ . '/../css/animation.css') ?>" />
-  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/style.css?v=<?= filemtime(__DIR__ . '/../css/style.css') ?>" />
-  <link rel="stylesheet" href="<?= $cssPrefix ?>/css/header-footer.css?v=<?= filemtime(__DIR__ . '/../css/header-footer.css') ?>" />
-  <link rel="icon" type="image/png" href="<?= $cssPrefix ?>/assets/images/favicon.png" />
+  <link rel="stylesheet" href="<?= $assetPrefix ?>/css/animation.css?v=<?= filemtime(__DIR__ . '/../css/animation.css') ?>" />
+  <link rel="stylesheet" href="<?= $assetPrefix ?>/css/style.css?v=<?= filemtime(__DIR__ . '/../css/style.css') ?>" />
+  <link rel="stylesheet" href="<?= $assetPrefix ?>/css/header-footer.css?v=<?= filemtime(__DIR__ . '/../css/header-footer.css') ?>" />
+  <link rel="icon" type="image/png" href="<?= $assetPrefix ?>/assets/images/favicon.png" />
   <!-- Anti-FOUC: aplica el tema antes del primer paint -->
   <script>
     (function () {
@@ -90,7 +114,7 @@ $cartCount = count($cartItems);
   <header class="site-header">
     <div class="site-header__inner">
       <a class="site-brand" href="<?= $indexHref ?>">
-        <img src="<?= $cssPrefix ?>/assets/images/logo-classia.png" alt="Classia" />
+        <img src="<?= $assetPrefix ?>/assets/images/logo-classia.png" alt="Classia" />
       </a>
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="<?= $indexHref ?>"<?= $activePage === 'inicio' ? ' aria-current="page"' : '' ?>><?= __t('nav_inicio') ?></a>
@@ -132,7 +156,12 @@ $cartCount = count($cartItems);
           </div>
         <?php else: ?>
           <?php
-            $navAvatarSrc = obtener_avatar_usuario($currentUser ?? [], $cssPrefix, 64);
+            $navAvatarSrc = $publicBase !== null
+                ? obtener_avatar_usuario($currentUser ?? [], $publicBase, 64)
+                : obtener_avatar_usuario($currentUser ?? [], $cssPrefix, 64);
+            if ($publicBase !== null && !preg_match('#^(?:https?://|/)#i', $navAvatarSrc)) {
+                $navAvatarSrc = '/' . $navAvatarSrc;
+            }
             $primerNombre = htmlspecialchars(explode(' ', trim($currentUser['nombre'] ?? 'Usuario'))[0]);
           ?>
           <div class="user-nav-dropdown">
