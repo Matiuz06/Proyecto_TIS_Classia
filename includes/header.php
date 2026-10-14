@@ -7,6 +7,17 @@
 require_once __DIR__ . '/../php/auth/sesion.php';
 iniciar_sesion();
 
+// Cabeceras HTTP de seguridad (OWASP Secure Headers Project / CIS Controls 4.8 / ISO 27001 A.8.20)
+if (!headers_sent()) {
+    header('X-Frame-Options: SAMEORIGIN');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+}
+
 require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../php/auth/guardia_onboarding.php';
 require_once __DIR__ . '/../php/utils/i18n.php';
