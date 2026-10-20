@@ -111,9 +111,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
                     'descripcion'=>trim($_POST['descripcion']),
                     'precio'=>(float)$_POST['precio'],
                     'modalidad'=>trim($_POST['modalidad'] ?? '') ?: null,
-                    'nivel_experiencia'=>trim($_POST['nivel_experiencia'] ?? '') ?: null,
+                    'nivel_experiencia'=>$publicacion['tipo']==='Curso'
+                        ? (trim($_POST['nivel_experiencia'] ?? '') ?: null)
+                        : ($publicacion['nivel_experiencia'] ?? null),
                     'duracion_horas'=>trim($_POST['duracion_horas'] ?? '') !== '' ? (int)$_POST['duracion_horas'] : null,
-                    'cupos'=>trim($_POST['cupos'] ?? '') !== '' ? (int)$_POST['cupos'] : null,
+                    'cupos'=>$publicacion['tipo']==='Curso'
+                        ? (trim($_POST['cupos'] ?? '') !== '' ? (int)$_POST['cupos'] : null)
+                        : ($publicacion['cupos'] ?? null),
                     'disponibilidad'=>trim($_POST['disponibilidad'] ?? '') ?: null,
                     'tipo_servicio'=>$publicacion['tipo']==='Servicio' ? (trim($_POST['tipo_servicio'] ?? '') ?: null) : null,
                     'id_categoria'=>$categoria['id'],
