@@ -137,6 +137,16 @@ if ($id_curso > 0) {
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'completar_curso' && $contratacion_curso) {
                     $token = $_POST['csrf_token'] ?? '';
                     if (hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+                        $progresoFinal = (new CursoProgresoRepository($pdo))->obtenerProgresoAlumnoCurso(
+                            (int)$usuario_actual['id_usuario'],
+                            $id_curso
+                        );
+                        if (empty($progresoFinal['completado'])) {
+                            $_SESSION['curso_error'] = 'Completá todos los recursos y entregá todas las tareas antes de finalizar el curso.';
+                            header("Location: curso.php?id=" . $id_curso);
+                            exit;
+                        }
+
                         $stmt_comp = $pdo->prepare("UPDATE contrataciones SET estado = 'Completada' WHERE id_contratacion = :id AND id_usuario = :u");
                         $stmt_comp->execute([
                             'id' => (int) $contratacion_curso['id_contratacion'],
@@ -150,115 +160,6 @@ if ($id_curso > 0) {
 
                 // Procesar entrega de tarea por parte del estudiante
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'entregar_tarea') {
-                    $token = $_POST['csrf_token'] ?? '';
-                    $id_recurso_tarea = (int)($_POST['id_recurso'] ?? 0);
-                    $id_unidad_tarea = (int)($_POST['id_unidad'] ?? 0);
-                    $comentario = trim($_POST['comentario_entrega'] ?? '');
-                    $textoEntrega = trim($_POST['texto_entrega'] ?? '') ?: null;
-                    $enlaceEntrega = trim($_POST['enlace_entrega'] ?? '') ?: null;
-
-                    try {
-                        if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-                            $_SESSION['curso_error'] = 'Token de seguridad invalido. Recarga la pagina e intenta nuevamente.';
-                        } elseif (!$contratacion_curso) {
-                            $_SESSION['curso_error'] = 'No tenes acceso para entregar en este curso.';
-                        } else {
-                            $contenidoRepo = new ContenidoCursoRepository($pdo);
-                            $recursoTarea = $contenidoRepo->obtenerRecurso($id_recurso_tarea, $id_curso);
-                            $tareaRepo = new TareaRepository($pdo);
-                            $tarea = $recursoTarea && ($recursoTarea['tipo'] ?? '') === 'Entrega de Tareas'
-                                ? $tareaRepo->asegurarParaRecurso($recursoTarea)
-                                : null;
-                            $ahora = new DateTimeImmutable();
-
-                            if (!$tarea) {
-                                $_SESSION['curso_error'] = 'Recurso de tarea invalido.';
-                            } elseif (!$tarea->puedeEntregar($ahora)) {
-                                $_SESSION['curso_error'] = 'La tarea ya no acepta entregas.';
-                            } elseif ($enlaceEntrega && !filter_var($enlaceEntrega, FILTER_VALIDATE_URL)) {
-                                $_SESSION['curso_error'] = 'El enlace de entrega no es valido.';
-                            } elseif ($enlaceEntrega && !$tarea->permiteTipoEntrega('enlace')) {
-                                $_SESSION['curso_error'] = 'Esta tarea no acepta entrega por enlace.';
-                            } elseif ($textoEntrega && !$tarea->permiteTipoEntrega('texto')) {
-                                $_SESSION['curso_error'] = 'Esta tarea no acepta texto en linea.';
-                            } else {
-                                $entregaRepo = new EntregaRepository($pdo);
-                                $entregaActual = $entregaRepo->buscarPorTareaYUsuario((int)$tarea->getId(), (int)$usuario_actual['id_usuario']);
-                                $archivosActuales = $entregaActual ? $entregaRepo->listarArchivosIncluyeLegacy((int)$entregaActual->getId()) : [];
-                                $archivos = normalizar_archivos_multiples($_FILES, 'archivo_entrega');
-                                $archivosFinales = $archivos ?: $archivosActuales;
-
-                                if ($archivos && !$tarea->permiteTipoEntrega('archivos')) {
-                                    $_SESSION['curso_error'] = 'Esta tarea no acepta archivos.';
-                                } elseif (count($archivosFinales) > $tarea->getMaxArchivos()) {
-                                    $_SESSION['curso_error'] = 'Superaste la cantidad maxima de archivos permitidos.';
-                                }
-
-                                $tiposFinales = array_values(array_filter([
-                                    $archivosFinales ? 'archivos' : null,
-                                    $textoEntrega ? 'texto' : null,
-                                    $enlaceEntrega ? 'enlace' : null,
-                                ]));
-                                $tiposRequeridos = $tarea->tiposHabilitados();
-                                if (empty($_SESSION['curso_error']) && array_diff($tiposFinales, $tiposRequeridos)) {
-                                    $_SESSION['curso_error'] = 'La entrega contiene tipos no habilitados para esta tarea.';
-                                }
-                                if (empty($_SESSION['curso_error']) && (!$tiposFinales || ($tarea->requiereTodosLosTipos() && array_diff($tiposRequeridos, $tiposFinales)))) {
-                                    $_SESSION['curso_error'] = $tarea->requiereTodosLosTipos()
-                                        ? 'Esta tarea requiere completar todos los tipos de entrega habilitados.'
-                                        : 'Completa al menos un tipo de entrega.';
-                                }
-
-                                if (empty($_SESSION['curso_error'])) {
-                                    $subidos = [];
-                                    try {
-                                        $archivosValidados = [];
-                                        foreach ($archivos as $archivo) {
-                                            $val = validar_archivo_tarea($archivo, $tarea);
-                                            if (!$val['ok']) throw new RuntimeException($val['error']);
-                                            $archivosValidados[] = [$archivo, $val];
-                                        }
-                                        foreach ($archivosValidados as [$archivo, $val]) {
-                                            if (supabase_esta_activo()) {
-                                                $remotePath = 'entregas/tarea_' . (int)$tarea->getId() . '/usuario_' . (int)$usuario_actual['id_usuario'] . '/' . bin2hex(random_bytes(8)) . '_' . time() . '.' . $val['ext'];
-                                                $subida = supabase_subir_archivo($archivo['tmp_name'], $remotePath, $val['mime']);
-                                                if (!$subida['ok']) throw new RuntimeException('Error al subir archivo de entrega.');
-                                                $ruta = 'supabase:' . $remotePath;
-                                            } else {
-                                                $res = guardar_archivo_subido($archivo, 'entregas', $tarea->getMaxTamanoMb());
-                                                if (!$res['ok']) throw new RuntimeException($res['error']);
-                                                $ruta = $res['ruta'];
-                                            }
-                                            $subidos[] = [
-                                                'nombre_original' => (string)$archivo['name'],
-                                                'ruta' => $ruta,
-                                                'mime_type' => $val['mime'],
-                                                'extension' => $val['ext'],
-                                                'tamano' => (int)$archivo['size'],
-                                            ];
-                                        }
-                                        $resultado = $entregaRepo->guardarPresentacion($tarea, (int)$usuario_actual['id_usuario'], $textoEntrega, $enlaceEntrega, $comentario ?: null, $subidos);
-                                    } catch (Throwable $e) {
-                                        foreach ($subidos as $subido) eliminar_ruta_entrega($subido['ruta']);
-                                        throw $e;
-                                    }
-                                    foreach ($resultado['archivos_reemplazados'] as $reemplazado) eliminar_ruta_entrega($reemplazado['ruta'] ?? null);
-                                    set_toast(
-                                        'success',
-                                        $entregaActual ? 'Entrega actualizada' : 'Entrega enviada',
-                                        $entregaActual
-                                            ? 'Tu nueva entrega fue registrada correctamente.'
-                                            : 'Tu entrega fue registrada correctamente.'
-                                    );
-                                    header("Location: curso.php?id=" . $id_curso . ($id_unidad_tarea ? "&unidad=" . $id_unidad_tarea : ""));
-                                    exit;
-                                }
-                            }
-                        }
-                    } catch (Throwable $e) {
-                        error_log('Entrega tarea: ' . $e->getMessage());
-                        $_SESSION['curso_error'] = $e instanceof RuntimeException ? $e->getMessage() : 'No se pudo guardar la entrega.';
-                    }
                     $token = $_POST['csrf_token'] ?? '';
                     $id_recurso_tarea = (int)($_POST['id_recurso'] ?? 0);
                     $id_unidad_tarea = (int)($_POST['id_unidad'] ?? 0);
@@ -326,18 +227,24 @@ if ($id_curso > 0) {
                                         $archivosValidados = [];
                                         foreach ($archivos as $archivo) {
                                             $val = validar_archivo_tarea($archivo, $tarea);
-                                            if (!$val['ok']) throw new RuntimeException($val['error']);
+                                            if (!$val['ok']) {
+                                                throw new RuntimeException($val['error']);
+                                            }
                                             $archivosValidados[] = [$archivo, $val];
                                         }
                                         foreach ($archivosValidados as [$archivo, $val]) {
                                             if (supabase_esta_activo()) {
                                                 $remotePath = 'entregas/tarea_' . (int)$tarea->getId() . '/usuario_' . (int)$usuario_actual['id_usuario'] . '/' . bin2hex(random_bytes(8)) . '_' . time() . '.' . $val['ext'];
                                                 $subida = supabase_subir_archivo($archivo['tmp_name'], $remotePath, $val['mime']);
-                                                if (!$subida['ok']) throw new RuntimeException('Error al subir archivo de entrega.');
+                                                if (!$subida['ok']) {
+                                                    throw new RuntimeException('Error al subir archivo de entrega.');
+                                                }
                                                 $ruta = 'supabase:' . $remotePath;
                                             } else {
                                                 $res = guardar_archivo_subido($archivo, 'entregas', $tarea->getMaxTamanoMb());
-                                                if (!$res['ok']) throw new RuntimeException($res['error']);
+                                                if (!$res['ok']) {
+                                                    throw new RuntimeException($res['error']);
+                                                }
                                                 $ruta = $res['ruta'];
                                             }
                                             $subidos[] = [
@@ -350,11 +257,17 @@ if ($id_curso > 0) {
                                         }
                                         $resultado = $entregaRepo->guardarPresentacion($tarea, (int)$usuario_actual['id_usuario'], $textoEntrega, $enlaceEntrega, $comentario ?: null, $subidos);
                                     } catch (Throwable $e) {
-                                        foreach ($subidos as $subido) eliminar_ruta_entrega($subido['ruta']);
+                                        foreach ($subidos as $subido) {
+                                            eliminar_ruta_entrega($subido['ruta']);
+                                        }
                                         throw $e;
                                     }
-                                    foreach ($resultado['archivos_reemplazados'] as $reemplazado) eliminar_ruta_entrega($reemplazado['ruta'] ?? null);
-                                    $_SESSION['curso_exito'] = 'Tu entrega fue enviada correctamente.';
+                                    foreach ($resultado['archivos_reemplazados'] as $reemplazado) {
+                                        eliminar_ruta_entrega($reemplazado['ruta'] ?? null);
+                                    }
+                                    $_SESSION['curso_exito'] = $entregaActual
+                                        ? 'Tu entrega fue actualizada correctamente.'
+                                        : 'Tu entrega fue enviada correctamente.';
                                     header("Location: curso.php?id=" . $id_curso . ($id_unidad_tarea ? "&unidad=" . $id_unidad_tarea : ""));
                                     exit;
                                 }
@@ -406,12 +319,11 @@ if ($id_curso > 0) {
                         $_SESSION['curso_error'] = 'Token de seguridad invalido. Recarga la pagina e intenta nuevamente.';
                     } elseif (!$contratacion_curso) {
                         $_SESSION['curso_error'] = 'No tenes acceso para actualizar este recurso.';
-                        $_SESSION['curso_error'] = 'Token de seguridad inválido.';
-                    } elseif ($id_msg <= 0) {
-                        $_SESSION['curso_error'] = 'Mensaje no válido.';
+                    } elseif ($id_recurso <= 0) {
+                        $_SESSION['curso_error'] = 'Recurso invalido.';
                     } else {
                         $progresoRepo = new CursoProgresoRepository($pdo);
-                        if ($id_recurso > 0 && $progresoRepo->recursoPerteneceACurso($id_recurso, $id_curso)) {
+                        if ($progresoRepo->recursoPerteneceACurso($id_recurso, $id_curso)) {
                             $progresoRepo->marcarRecurso((int)$usuario_actual['id_usuario'], $id_recurso, $completado);
                             set_toast(
                                 $completado ? 'success' : 'info',

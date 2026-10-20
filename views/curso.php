@@ -24,8 +24,13 @@ $indice_actual = null;
 foreach ($clases_planas as $i => $item) {
     if ((int)$item['unidad']['id_unidad'] === $id_unidad_actual) $indice_actual = $i;
 }
-if ($indice_actual === null && !empty($clases_planas) && $id_unidad_actual > 0) $indice_actual = 0;
+if ($indice_actual === null && !empty($clases_planas)) $indice_actual = 0;
 $item_actual = $indice_actual !== null ? $clases_planas[$indice_actual] : null;
+$porcentajeProgreso = (float)($progreso_curso['porcentaje'] ?? 0);
+$recurso_actual_id = (int)($_GET['recurso'] ?? 0);
+if ($recurso_actual_id <= 0 && $item_actual && !empty($item_actual['unidad']['recursos'])) {
+    $recurso_actual_id = (int)$item_actual['unidad']['recursos'][0]['id_recurso'];
+}
 $prev = $indice_actual !== null && isset($clases_planas[$indice_actual - 1]) ? $clases_planas[$indice_actual - 1]['unidad'] : null;
 $next = $indice_actual !== null && isset($clases_planas[$indice_actual + 1]) ? $clases_planas[$indice_actual + 1]['unidad'] : null;
 $puedeAgregar = esta_autenticado();
