@@ -9,6 +9,11 @@ require_once '../php/auth/roles.php';
 requerir_rol(ROL_DOCENTE, 'usuario.php');
 require_once '../php/publicaciones/crear_publicacion.php';
 
+$tipo_seleccionado = $_POST['tipo'] ?? $_GET['tipo'] ?? '';
+if (!in_array($tipo_seleccionado, ['Curso', 'Servicio'], true)) {
+  $tipo_seleccionado = '';
+}
+
 $title = 'Crear publicacion';
 $description = 'Publicacion de nuevos cursos o servicios en Classia.';
 $cssPrefix = '..';
@@ -22,7 +27,7 @@ include '../includes/header.php';
     <div>
       <p class="publication-editor__eyebrow">Editor de publicacion</p>
       <h1 id="publication-editor-title">Nueva publicacion</h1>
-      <p>Ingresa los datos necesarios para publicar un curso o servicio en Classia.</p>
+      <p><?= $tipo_seleccionado === '' ? 'Elegí qué tipo de publicación querés crear.' : 'Ingresa los datos necesarios para publicar tu propuesta en Classia.' ?></p>
     </div>
     <div class="publication-editor__header-actions">
       <a class="btn btn-secondary" href="panel-proveedor.php">Volver al panel</a>
@@ -35,18 +40,44 @@ include '../includes/header.php';
     </div>
   <?php endif; ?>
 
+  <?php if ($tipo_seleccionado === ''): ?>
+    <section class="publication-type-selector" aria-labelledby="publication-type-title">
+      <div class="publication-section__header">
+        <p class="publication-editor__eyebrow">Primer paso</p>
+        <h2 id="publication-type-title">¿Qué deseas crear?</h2>
+        <p>Seleccioná una opción para continuar con el formulario correspondiente.</p>
+      </div>
+      <div class="publication-type-selector__options">
+        <a class="publication-type-choice" href="crear-publicacion.php?tipo=Curso">
+          <span class="publication-type-choice__label">Crear curso</span>
+          <span>Publicá una propuesta educativa con módulos, recursos y actividades.</span>
+        </a>
+        <a class="publication-type-choice" href="crear-publicacion.php?tipo=Servicio">
+          <span class="publication-type-choice__label">Crear servicio</span>
+          <span>Ofrecé una prestación personalizada a través de Classia.</span>
+        </a>
+      </div>
+    </section>
+  <?php else: ?>
   <div class="publication-editor__layout">
     <aside class="publication-editor__nav" aria-label="Secciones de la publicacion">
       <strong>Configuracion</strong>
       <a href="#informacion-principal">Informacion principal</a>
       <a href="#configuracion">Configuracion</a>
       <a href="#categoria">Categoria</a>
-      <a href="#servicio">Servicio</a>
+      <?php if ($tipo_seleccionado === 'Servicio'): ?><a href="#servicio">Servicio</a><?php endif; ?>
       <a href="#portada">Portada</a>
     </aside>
 
-    <form action="crear-publicacion.php" method="POST" enctype="multipart/form-data" class="publication-form">
+    <form action="crear-publicacion.php" method="POST" enctype="multipart/form-data" class="publication-form" data-publication-type="<?= htmlspecialchars($tipo_seleccionado) ?>">
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+      <input type="hidden" name="tipo" value="<?= htmlspecialchars($tipo_seleccionado) ?>">
+
+      <div class="publication-form__context">
+        <span>Tipo de publicación</span>
+        <strong><?= $tipo_seleccionado === 'Curso' ? 'Curso' : 'Servicio' ?></strong>
+        <a href="crear-publicacion.php" data-publication-type-change>Cambiar tipo</a>
+      </div>
 
       <section class="publication-section" id="informacion-principal">
         <div class="publication-section__header">
@@ -57,13 +88,6 @@ include '../includes/header.php';
           <label class="publication-field">Titulo
             <input type="text" name="titulo" maxlength="200" required value="<?= htmlspecialchars($_POST['titulo'] ?? '') ?>">
           </label>
-          <label class="publication-field">Tipo
-            <select name="tipo" required>
-              <option value="">-- Selecciona --</option>
-              <option value="Curso" <?= ($_POST['tipo'] ?? '') === 'Curso' ? 'selected' : '' ?>>Curso</option>
-              <option value="Servicio" <?= ($_POST['tipo'] ?? '') === 'Servicio' ? 'selected' : '' ?>>Servicio</option>
-            </select>
-          </label>
           <label class="publication-field publication-field--full">Descripcion
             <textarea name="descripcion" rows="6" required><?= htmlspecialchars($_POST['descripcion'] ?? '') ?></textarea>
           </label>
@@ -72,14 +96,14 @@ include '../includes/header.php';
 
       <section class="publication-section" id="configuracion">
         <div class="publication-section__header">
-          <h2>Configuracion</h2>
-          <p>Define precio, modalidad y condiciones generales de la propuesta.</p>
+          <h2><?= $tipo_seleccionado === 'Curso' ? 'Información del curso' : 'Información del servicio' ?></h2>
+          <p><?= $tipo_seleccionado === 'Curso' ? 'Definí precio, modalidad y condiciones generales del curso.' : 'Definí precio, modalidad y disponibilidad del servicio.' ?></p>
         </div>
         <div class="publication-field-grid">
-          <label class="publication-field">Precio ($ UYU)
+          <label class="publication-field" data-publication-field="precio"><span class="publication-field__label">Precio ($ UYU)</span>
             <input type="number" step="0.01" min="1" name="precio" required value="<?= htmlspecialchars($_POST['precio'] ?? '') ?>">
           </label>
-          <label class="publication-field">Modalidad
+          <label class="publication-field" data-publication-field="modalidad"><span class="publication-field__label">Modalidad</span>
             <select name="modalidad">
               <option value="">Sin especificar</option>
               <?php foreach (['virtual' => 'Virtual', 'presencial' => 'Presencial', 'hibrida' => 'Hibrida', 'producto-entregable' => 'Producto entregable'] as $v => $e): ?>
@@ -87,7 +111,7 @@ include '../includes/header.php';
               <?php endforeach; ?>
             </select>
           </label>
-          <label class="publication-field">Nivel de experiencia
+          <label class="publication-field" data-publication-field="nivel_experiencia"><span class="publication-field__label">Nivel de experiencia</span>
             <select name="nivel_experiencia">
               <option value="">Sin especificar</option>
               <?php foreach (['inicial' => 'Inicial', 'intermedio' => 'Intermedio', 'avanzado' => 'Avanzado', 'depende-categoria' => 'Depende de la categoria'] as $v => $e): ?>
@@ -95,17 +119,17 @@ include '../includes/header.php';
               <?php endforeach; ?>
             </select>
           </label>
-          <label class="publication-field">Duracion aproximada
+          <label class="publication-field" data-publication-field="duracion_horas"><span class="publication-field__label">Duración del curso</span>
             <input type="number" min="1" max="10000" name="duracion_horas" value="<?= htmlspecialchars($_POST['duracion_horas'] ?? '') ?>">
-            <small>Cantidad estimada de horas del curso o servicio.</small>
+            <small data-publication-help="duracion_horas">Cantidad estimada de horas del curso.</small>
           </label>
-          <label class="publication-field">Cupos
+          <label class="publication-field" data-publication-field="cupos"><span class="publication-field__label">Cupos disponibles</span>
             <input type="number" min="1" name="cupos" value="<?= htmlspecialchars($_POST['cupos'] ?? '') ?>">
             <small>Deja vacio si no existe un limite.</small>
           </label>
-          <label class="publication-field">Disponibilidad
+          <label class="publication-field" data-publication-field="disponibilidad"><span class="publication-field__label">Disponibilidad del curso</span>
             <input type="text" name="disponibilidad" value="<?= htmlspecialchars($_POST['disponibilidad'] ?? '') ?>" placeholder="Ej: lunes y miercoles de 18 a 21">
-            <small>Indica horarios, frecuencia o coordinacion esperada.</small>
+            <small data-publication-help="disponibilidad">Indicá horarios, frecuencia o coordinación esperada.</small>
           </label>
         </div>
       </section>
@@ -139,6 +163,7 @@ include '../includes/header.php';
         </div>
       </section>
 
+      <?php if ($tipo_seleccionado === 'Servicio'): ?>
       <section class="publication-section" id="servicio">
         <div class="publication-section__header">
           <h2>Servicio</h2>
@@ -152,10 +177,11 @@ include '../includes/header.php';
                 <option value="<?= htmlspecialchars($clave) ?>" <?= ($_POST['tipo_servicio'] ?? '') === $clave ? 'selected' : '' ?>><?= htmlspecialchars($plantilla['nombre']) ?></option>
               <?php endforeach; ?>
             </select>
-            <small>Para cursos, el sistema ignora este campo al guardar.</small>
+            <small>Elegí una plantilla si querés recibir solicitudes personalizadas.</small>
           </label>
         </div>
       </section>
+      <?php endif; ?>
 
       <section class="publication-section" id="portada">
         <div class="publication-section__header">
@@ -175,5 +201,6 @@ include '../includes/header.php';
       </div>
     </form>
   </div>
+  <?php endif; ?>
 </main>
 <?php include '../includes/footer.php'; ?>
