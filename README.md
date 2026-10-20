@@ -16,7 +16,9 @@ El objetivo principal de Classia es construir un Entorno Virtual de Aprendizaje 
 - Gestión de perfiles y paneles dedicados por rol (Estudiante, Proveedor/Docente, Administrador).
 - Creación, edición, publicación y administración de publicaciones (cursos y servicios) con persistencia en base de datos.
 - Gestión de solicitudes personalizadas con mensajería y seguimiento.
-- Flujo de carrito, pasarela de pago simulada, confirmación y comprobante.
+- Flujo de carrito, pasarela de pago y servicio de cobro de servicios (MercadoPago), confirmación y comprobante descargable.
+- Sistema de notificaciones en tiempo real y alertas por correo para transacciones, contrataciones y actualizaciones de estado.
+- Política de cancelaciones y reembolsos institucional (RN-14) integrada en la plataforma y accesible desde el pie de página.
 - Sistema de valoraciones y reseñas.
 - Publicación y moderación de Noticias y Eventos por parte de docentes y administradores.
 - Soporte de embebido de videos (YouTube, Vimeo, Dailymotion, Loom) y archivos en el aula virtual.
@@ -109,7 +111,8 @@ Proyecto_TIS_Classia/
 │   ├── solicitudes-servicios.php      # Gestión de solicitudes de servicios (proveedor)
 │   ├── mis-solicitudes-servicios.php  # Mis solicitudes de servicios (estudiante)
 │   ├── institucional.php              # Página institucional / Sobre Nosotros
-│   └── politica-privacidad.php        # Política de privacidad (Ley 18.331 / URCDP)
+│   ├── politica-privacidad.php        # Política de privacidad (Ley 18.331 / URCDP)
+│   └── politica-cancelaciones.php      # Política de cancelaciones y reembolsos (Regla de negocio RN-14)
 ├── php/                               # Lógica de backend organizada por módulo (snake_case)
 │   ├── admin/
 │   │   ├── acciones_admin.php         # Acciones de moderación, archivo/restauración y baja lógica
@@ -255,6 +258,7 @@ El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SEC
 - **Control de acceso al contenido:** El acceso al aula virtual está condicionado estrictamente a que el pago tenga `estado_pago = 'Aprobado'`. Salir de la pasarela sin pagar no otorga acceso.
 - **Cursos archivados (`RN-05`):** Conservan su histórico académico para consulta pero no admiten nuevas actividades (entregas de tareas ni mensajes en foros).
 - **Desactivación de cuentas (`REQ-USR-04`, `RD-12`):** Baja lógica que suspende el acceso pero preserva las calificaciones, entregas e información histórica.
+- **Cancelaciones y reembolsos (`RN-14`):** Ajustados estrictamente a la política de cancelación definida por AniTech según el tipo de servicio, con procesamiento de reintegros automáticos a través de MercadoPago y acceso público desde el pie de página institucional.
 - **Protección de datos (`RNF-10`, `RNF-11`):** Cumplimiento con la **Ley N.º 18.331** (Uruguay) y derechos ARCO. Cédula enmascarada en la interfaz.
 - **SAST y Secret Detection:** Escaneo continuo en CI/CD con Semgrep y Gitleaks.
 
@@ -262,15 +266,15 @@ El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SEC
 
 ## Estado actual del proyecto
 
-> **Matriz de trazabilidad (Sprint 4) — Octubre 2026**
-> 122 requerimientos totales · ✅ 99 verificados · 🔵 10 implementados · ⏳ 13 pendientes
+> **Matriz de trazabilidad (Sprint 4) — Octubre 2026**  
+> 116 requerimientos totales · ✅ 100 verificados · 🔵 16 implementados · ⏳ 0 pendientes
 
 | Categoría                    | Total | Estado                                       |
 | ---------------------------- | ----- | -------------------------------------------- |
-| Funcionales (REQ)            | 74    | 61 verificados, 13 pendientes                |
-| No funcionales (RNF-01–23)   | 23    | 16 verificados, 6 implementados, 1 pendiente |
-| Reglas de negocio (RN)       | 13    | 11 verificados, 2 pendientes                 |
-| Dominio educativo/legal (RD) | 12    | 11 verificados, 1 pendiente                  |
+| Funcionales (REQ)            | 74    | 61 verificados, 13 implementados             |
+| No funcionales (RNF-01–23)   | 18    | 16 verificados, 2 implementados              |
+| Reglas de negocio (RN)       | 12    | 11 verificados, 1 implementado               |
+| Dominio educativo/legal (RD) | 12    | 12 verificados                               |
 
 ### Completado — Entregas e Iteraciones
 
@@ -283,9 +287,11 @@ El proyecto implementa un enfoque **DevSecOps** documentado en [SECURITY.md](SEC
 - [x] **Aula Virtual (`views/curso.php`)**: módulos, unidades, entregas, foro, visor de documentos y videos embebidos (YouTube, Vimeo, Dailymotion, Loom).
 - [x] **Gestión de cursos archivados (`RN-05`)**: soporte del estado `Archivado`, modo solo lectura, histórico para alumnos y bloqueo de nuevas entregas/foros.
 - [x] **Panel de Administrador (`views/panel-administrador.php`)**: moderación de cursos (activar, pausar, archivar, restaurar, temario) y supervisión global (REQ-CUR-05, RN-10).
-- [x] **Desactivación de cuentas (`REQ-USR-04`, `RD-12`)**: baja lógica de usuarios preservando registros académicos y contrataciones.
+- [x] **Desactivación de cuentas (`REQ-USR-04`, `RD-12`):** baja lógica de usuarios preservando registros académicos y contrataciones.
 - [x] **Control de acceso al curso**: condicionado a pago aprobado (`estado_pago = 'Aprobado'`). Cursos pendientes aparecen en perfil con enlace de pago.
-- [x] **Pasarela de pago** con bloqueo de acceso sin orden activa.
+- [x] **Servicio de cobro de servicios y pasarela de pago (MercadoPago)**: procesamiento de transacciones, órdenes de pago, confirmación y comprobantes descargables.
+- [x] **Servicio de notificaciones**: alertas en tiempo real y correos electrónicos informando confirmación de cobro, cambios de estado en contrataciones y solicitudes.
+- [x] **Política de cancelaciones y reembolsos (`RN-14`)**: reglamentación formal de cancelaciones por tipo de servicio integrada en `views/politica-cancelaciones.php` y pie de página institucional.
 - [x] **Noticias y Eventos**: flujo completo de propuesta por docente (estado `Pendiente`) y aprobación/rechazo/eliminación por administrador.
 - [x] **Compartir e Invitar en Eventos**: WhatsApp, Twitter/X, Google Calendar y copiar enlace.
 - [x] **Panel de Proveedor**: métricas, solicitudes, valoraciones, temario de cursos y accesos directos.
