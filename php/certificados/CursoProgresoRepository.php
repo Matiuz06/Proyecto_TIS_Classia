@@ -43,35 +43,99 @@ class CursoProgresoRepository
         $recursosCompletados = (int)$stmt->fetchColumn();
 
         $stmt = $this->pdo->prepare("
-            SELECT COUNT(DISTINCT e.id_tarea)
-            FROM curso_entregas e
-            JOIN curso_tareas t ON t.id_tarea = e.id_tarea
+            SELECT t.id_tarea, t.puntaje_maximo, t.tipo_calificacion,
+                   e.id_entrega, e.estado_entrega, e.calificacion, e.estado, e.fecha_calificacion
+            FROM curso_tareas t
             JOIN curso_recursos r ON r.id_recurso = t.id_recurso
             JOIN curso_unidades u ON u.id_unidad = r.id_unidad
             JOIN curso_modulos m ON m.id_modulo = u.id_modulo
-            WHERE e.id_usuario = :usuario
-              AND m.id_publicacion = :curso
-              AND (e.fecha_calificacion IS NOT NULL OR e.estado = 'Calificada')
+            LEFT JOIN curso_entregas e
+                ON e.id_tarea = t.id_tarea AND e.id_usuario = :usuario
+            WHERE m.id_publicacion = :curso
+            ORDER BY t.id_tarea
         ");
         $stmt->execute(['usuario' => $idAlumno, 'curso' => $idCurso]);
-        $tareasCompletadas = (int)$stmt->fetchColumn();
+        $tareas = $stmt->fetchAll() ?: [];
+
+        $tareasCompletadas = 0;
+        $tareasEvaluables = 0;
+        $tareasEvaluadas = 0;
+        $puntajeObtenido = 0.0;
+        $puntajeMaximo = 0.0;
+        foreach ($tareas as $tarea) {
+            $entregada = !empty($tarea['id_entrega'])
+                && ($tarea['estado_entrega'] ?? 'entregada') === 'entregada';
+            if ($entregada) {
+                $tareasCompletadas++;
+            }
+
+            if (($tarea['tipo_calificacion'] ?? 'numerica') === 'sin_calificacion') {
+                continue;
+            }
+
+            $tareasEvaluables++;
+            $evaluada = $entregada
+                && (!empty($tarea['fecha_calificacion']) || ($tarea['estado'] ?? '') === 'Calificada');
+            if (!$evaluada) {
+                continue;
+            }
+
+            $tareasEvaluadas++;
+            if (($tarea['tipo_calificacion'] ?? 'numerica') === 'aprobado_reprobado') {
+                $puntajeMaximo += 1.0;
+                $puntajeObtenido += strtolower(trim((string)($tarea['calificacion'] ?? ''))) === 'aprobado' ? 1.0 : 0.0;
+                continue;
+            }
+
+            $maximo = (float)($tarea['puntaje_maximo'] ?? 0);
+            if ($maximo <= 0) {
+                continue;
+            }
+            $puntajeMaximo += $maximo;
+            $nota = is_numeric($tarea['calificacion'] ?? null) ? (float)$tarea['calificacion'] : 0.0;
+            $puntajeObtenido += max(0.0, min($maximo, $nota));
+        }
 
         $total = $recursosTotal + $tareasTotal;
         $completados = $recursosCompletados + $tareasCompletadas;
         $porcentaje = $total > 0 ? round(($completados / $total) * 100, 2) : 0.0;
-        $aprobado = $total > 0 && $porcentaje >= $minimo;
+        $completado = $total > 0
+            && $recursosCompletados >= $recursosTotal
+            && $tareasCompletadas >= $tareasTotal;
+        $pendienteEvaluacion = $completado && $tareasEvaluadas < $tareasEvaluables;
+        $porcentajeAcademico = $tareasEvaluables > 0
+            ? ($puntajeMaximo > 0 ? round(($puntajeObtenido / $puntajeMaximo) * 100, 2) : 0.0)
+            : ($completado ? 100.0 : $porcentaje);
+        $aprobado = $completado
+            && !$pendienteEvaluacion
+            && $porcentajeAcademico >= $minimo;
+
+        if ($aprobado) {
+            $estado = 'Aprobado';
+        } elseif ($pendienteEvaluacion) {
+            $estado = 'Completado, pendiente de evaluación';
+        } elseif ($completado) {
+            $estado = 'Completado, no aprobado';
+        } else {
+            $estado = 'En curso';
+        }
 
         return [
             'total' => $total,
             'completados' => $completados,
             'porcentaje' => $porcentaje,
+            'porcentaje_academico' => $porcentajeAcademico,
             'porcentaje_minimo' => $minimo,
-            'estado' => $aprobado ? 'Aprobado' : 'En curso',
+            'estado' => $estado,
+            'completado' => $completado,
+            'pendiente_evaluacion' => $pendienteEvaluacion,
             'aprobado' => $aprobado,
             'recursos_total' => $recursosTotal,
             'recursos_completados' => $recursosCompletados,
             'tareas_total' => $tareasTotal,
             'tareas_completadas' => $tareasCompletadas,
+            'tareas_evaluables' => $tareasEvaluables,
+            'tareas_evaluadas' => $tareasEvaluadas,
         ];
     }
 
@@ -157,7 +221,7 @@ class CursoProgresoRepository
             'usuario' => $idAlumno,
             'curso' => $idCurso,
             'codigo' => $codigo,
-            'porcentaje' => $progreso['porcentaje'],
+            'porcentaje' => $progreso['porcentaje_academico'] ?? $progreso['porcentaje'],
         ]);
 
         return $this->obtenerCertificado($idAlumno, $idCurso);
