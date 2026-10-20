@@ -425,9 +425,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  const publicationForm = document.querySelector("form.publication-form");
+  if (publicationForm) {
+    const publicationType = publicationForm.dataset.publicationType || publicationForm.querySelector('[name="tipo"]')?.value || "";
+    const serviceType = publicationForm.querySelector('[name="tipo_servicio"]');
+    const serviceContexts = {
+      mentoria: { duration: "Duración de la sesión", durationHelp: "Tiempo estimado de cada sesión o del acompañamiento.", availability: "Disponibilidad para agendar", availabilityHelp: "Indicá días y horarios disponibles para coordinar." },
+      formacion_institucional: { duration: "Duración estimada de la formación", durationHelp: "Cantidad estimada de horas o jornadas de formación.", availability: "Disponibilidad para nuevas formaciones", availabilityHelp: "Indicá períodos o condiciones para recibir solicitudes." },
+      impresion_3d: { duration: "Tiempo estimado de producción", durationHelp: "Cantidad estimada de horas para producir el pedido.", availability: "Disponibilidad del servicio", availabilityHelp: "Indicá cuándo podés recibir nuevos pedidos." },
+      proyecto_educativo: { duration: "Duración estimada del trabajo", durationHelp: "Tiempo estimado para desarrollar el proyecto educativo.", availability: "Disponibilidad para nuevos proyectos", availabilityHelp: "Indicá cuándo podés comenzar nuevos proyectos." },
+      robotica_automatizacion: { duration: "Duración estimada del proyecto", durationHelp: "Tiempo estimado para desarrollar y entregar el proyecto.", availability: "Disponibilidad para nuevos proyectos", availabilityHelp: "Indicá cuándo podés comenzar nuevos proyectos." }
+    };
+
+    const setPublicationField = (name, visible) => {
+      const field = publicationForm.querySelector(`[data-publication-field="${name}"]`);
+      if (!field) return;
+      field.hidden = !visible;
+      field.querySelectorAll("input, select, textarea").forEach((control) => {
+        control.disabled = !visible;
+      });
+    };
+
+    const refreshPublicationContext = () => {
+      const isCourse = publicationType === "Curso";
+      const context = serviceContexts[serviceType?.value] || {};
+      setPublicationField("nivel_experiencia", isCourse);
+      setPublicationField("cupos", isCourse);
+      const priceLabel = publicationForm.querySelector('[data-publication-field="precio"] .publication-field__label');
+      const modalityLabel = publicationForm.querySelector('[data-publication-field="modalidad"] .publication-field__label');
+      const durationLabel = publicationForm.querySelector('[data-publication-field="duracion_horas"] .publication-field__label');
+      const durationHelp = publicationForm.querySelector('[data-publication-help="duracion_horas"]');
+      const availabilityLabel = publicationForm.querySelector('[data-publication-field="disponibilidad"] .publication-field__label');
+      const availabilityHelp = publicationForm.querySelector('[data-publication-help="disponibilidad"]');
+      if (priceLabel) priceLabel.textContent = isCourse ? "Precio del curso ($ UYU)" : "Precio del servicio ($ UYU)";
+      if (modalityLabel) modalityLabel.textContent = isCourse ? "Modalidad del curso" : "Modalidad del servicio";
+      if (durationLabel) durationLabel.textContent = isCourse ? "Duración del curso" : (context.duration || "Duración estimada");
+      if (durationHelp) durationHelp.textContent = isCourse ? "Cantidad estimada de horas del curso." : (context.durationHelp || "Cantidad estimada de horas del servicio.");
+      if (availabilityLabel) availabilityLabel.textContent = isCourse ? "Disponibilidad del curso" : (context.availability || "Disponibilidad del servicio");
+      if (availabilityHelp) availabilityHelp.textContent = isCourse ? "Indicá horarios, frecuencia o coordinación esperada." : (context.availabilityHelp || "Indicá cuándo podés recibir nuevas solicitudes.");
+    };
+
+    if (serviceType) serviceType.addEventListener("change", refreshPublicationContext);
+    refreshPublicationContext();
+  }
+
   const selectCat = document.querySelector('select[name="id_categoria"]');
   const inputNueva = document.querySelector('input[name="nueva_categoria"]');
   const txtDesc = document.querySelector('textarea[name="descripcion_categoria"]');
+
+  if (publicationForm) {
+    let hasUnsavedPublicationData = false;
+    publicationForm.addEventListener("input", () => {
+      hasUnsavedPublicationData = true;
+    });
+    publicationForm.addEventListener("change", () => {
+      hasUnsavedPublicationData = true;
+    });
+    document.querySelectorAll("[data-publication-type-change]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (hasUnsavedPublicationData && !window.confirm("Se perderán los datos no guardados. ¿Querés cambiar el tipo de publicación?")) {
+          event.preventDefault();
+        }
+      });
+    });
+  }
 
   if (selectCat && inputNueva) {
     const nuevaChoiceBox = inputNueva.closest(".publication-choice");
