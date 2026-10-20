@@ -250,9 +250,11 @@ $puedeAgregar = esta_autenticado();
                         <p class="catalog-actions">
                           <a class="btn" href="curso.php?id=<?= $curso->getId() ?>"><?= __t('btn_view_course') ?></a>
                           <?php if ($puedeAgregar): ?>
-                            <form action="../php/contrataciones/carrito.php" method="post">
+                            <form action="../php/contrataciones/carrito.php" method="post" data-add-to-cart-form>
                               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                               <input type="hidden" name="id_publicacion" value="<?= (int) $curso->getId() ?>">
+                              <input type="hidden" name="accion" value="agregar">
+                              <input type="hidden" name="ajax" value="1">
                               <button type="submit" name="accion" value="agregar"><?= __t('btn_add_cart') ?></button>
                             </form>
                           <?php else: ?>
@@ -323,9 +325,11 @@ $puedeAgregar = esta_autenticado();
                         <p class="catalog-actions">
                           <a class="btn" href="servicio-detalle.php?id=<?= $serv->getId() ?>"><?= __t('btn_request_service') ?></a>
                           <?php if ($puedeAgregar): ?>
-                            <form action="../php/contrataciones/carrito.php" method="post">
+                            <form action="../php/contrataciones/carrito.php" method="post" data-add-to-cart-form>
                               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                               <input type="hidden" name="id_publicacion" value="<?= (int) $serv->getId() ?>">
+                              <input type="hidden" name="accion" value="agregar">
+                              <input type="hidden" name="ajax" value="1">
                               <button type="submit" name="accion" value="agregar"><?= __t('btn_add_cart') ?></button>
                             </form>
                           <?php else: ?>
