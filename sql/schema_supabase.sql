@@ -159,6 +159,11 @@ CREATE TABLE IF NOT EXISTS solicitudes_docente (
     id_usuario INT NOT NULL REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
     estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente' CHECK (estado IN ('Pendiente', 'Aprobada', 'Rechazada')),
     motivo TEXT NULL,
+    documentacion_ruta VARCHAR(500),
+    documentacion_nombre VARCHAR(255),
+    documentacion_mime VARCHAR(100),
+    documentacion_tamano INTEGER,
+    documentacion_fecha TIMESTAMPTZ,
     fecha_solicitud TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_respuesta TIMESTAMPTZ NULL
 );
@@ -346,6 +351,11 @@ CREATE TABLE IF NOT EXISTS solicitudes_docente (
     id_usuario INT NOT NULL REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
     estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente' CHECK (estado IN ('Pendiente', 'Aprobada', 'Rechazada')),
     motivo TEXT NULL,
+    documentacion_ruta VARCHAR(500),
+    documentacion_nombre VARCHAR(255),
+    documentacion_mime VARCHAR(100),
+    documentacion_tamano INTEGER,
+    documentacion_fecha TIMESTAMPTZ,
     fecha_solicitud TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_respuesta TIMESTAMPTZ NULL
 );

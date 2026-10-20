@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../utils/file_upload_helper.php';
 
 function asegurar_tabla_solicitudes_docente(PDO $db): void
 {
@@ -15,6 +16,11 @@ function asegurar_tabla_solicitudes_docente(PDO $db): void
                 id_usuario INT NOT NULL,
                 estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL DEFAULT 'Pendiente',
                 motivo TEXT NULL,
+                documentacion_ruta VARCHAR(500) NULL,
+                documentacion_nombre VARCHAR(255) NULL,
+                documentacion_mime VARCHAR(100) NULL,
+                documentacion_tamano INT UNSIGNED NULL,
+                documentacion_fecha DATETIME NULL,
                 fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 fecha_respuesta DATETIME NULL,
                 CONSTRAINT fk_solicitudes_docente_usuarios
@@ -47,8 +53,31 @@ function tiene_solicitud_docente_pendiente(int $id_usuario, ?PDO $pdo_param = nu
     }
 }
 
+function obtener_solicitud_docente_usuario(int $id_usuario, ?PDO $pdo_param = null): ?array
+{
+    global $pdo;
+    $db = $pdo_param ?? $pdo;
+
+    try {
+        $stmt = $db->prepare(
+            'SELECT estado, motivo, documentacion_nombre, documentacion_mime,
+                    documentacion_tamano, documentacion_fecha, fecha_solicitud
+             FROM solicitudes_docente
+             WHERE id_usuario = :id_usuario
+             ORDER BY fecha_solicitud DESC
+             LIMIT 1'
+        );
+        $stmt->execute(['id_usuario' => $id_usuario]);
+        $solicitud = $stmt->fetch();
+        return $solicitud ?: null;
+    } catch (PDOException $e) {
+        error_log('Error al obtener solicitud docente del usuario: ' . $e->getMessage());
+        return null;
+    }
+}
+
 // Procesa el registro de una nueva solicitud docente
-function crear_solicitud_docente(int $id_usuario, string $motivo, string $token_recibido, string $csrf_session, ?PDO $pdo_param = null): array
+function crear_solicitud_docente(int $id_usuario, string $motivo, array $archivo, string $token_recibido, string $csrf_session, ?PDO $pdo_param = null): array
 {
     global $pdo;
     $db = $pdo_param ?? $pdo;
@@ -69,15 +98,59 @@ function crear_solicitud_docente(int $id_usuario, string $motivo, string $token_
         ];
     }
 
+    if (!isset($archivo['error']) || (int) $archivo['error'] === UPLOAD_ERR_NO_FILE) {
+        return ['error' => 'Debes adjuntar documentación que acredite tus conocimientos.', 'mensaje' => '', 'exito' => false];
+    }
+
+    $nombreOriginal = (string) ($archivo['name'] ?? '');
+    $extension = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+    $mimesPermitidos = [
+        'application/pdf' => ['pdf'],
+        'image/jpeg' => ['jpg', 'jpeg'],
+        'image/png' => ['png'],
+    ];
+
+    if ((int) ($archivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        return ['error' => 'No se pudo recibir la documentación adjunta.', 'mensaje' => '', 'exito' => false];
+    }
+    if (($archivo['size'] ?? 0) > 10 * 1024 * 1024) {
+        return ['error' => 'La documentación no puede superar los 10 MB.', 'mensaje' => '', 'exito' => false];
+    }
+    if (!in_array($extension, ['pdf', 'jpg', 'jpeg', 'png'], true) || empty($archivo['tmp_name']) || !is_uploaded_file($archivo['tmp_name'])) {
+        return ['error' => 'El archivo debe ser un PDF, JPG, JPEG o PNG válido.', 'mensaje' => '', 'exito' => false];
+    }
+
+    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($archivo['tmp_name']);
+    if (!$mime || !isset($mimesPermitidos[$mime]) || !in_array($extension, $mimesPermitidos[$mime], true)) {
+        return ['error' => 'El tipo real del archivo no coincide con un formato permitido.', 'mensaje' => '', 'exito' => false];
+    }
+
+    $rutaArchivo = null;
+
     try {
+        $db->beginTransaction();
+        $guardado = guardar_archivo_subido($archivo, 'solicitudes_docente', 10);
+        if (!$guardado['ok']) {
+            $db->rollBack();
+            return ['error' => $guardado['error'], 'mensaje' => '', 'exito' => false];
+        }
+        $rutaArchivo = $guardado['ruta'];
         $stmt = $db->prepare(
-            "INSERT INTO solicitudes_docente (id_usuario, estado, motivo)
-             VALUES (:id_usuario, 'Pendiente', :motivo)"
+            "INSERT INTO solicitudes_docente
+                (id_usuario, estado, motivo, documentacion_ruta, documentacion_nombre,
+                 documentacion_mime, documentacion_tamano, documentacion_fecha)
+             VALUES
+                (:id_usuario, 'Pendiente', :motivo, :ruta, :nombre, :mime, :tamano, CURRENT_TIMESTAMP)"
         );
         $stmt->execute([
             'id_usuario' => $id_usuario,
             'motivo'     => ($motivo !== '' ? $motivo : null),
+            'ruta'       => $rutaArchivo,
+            'nombre'     => $nombreOriginal,
+            'mime'       => $mime,
+            'tamano'     => (int) $archivo['size'],
         ]);
+        $db->commit();
 
         return [
             'error'   => '',
@@ -85,6 +158,12 @@ function crear_solicitud_docente(int $id_usuario, string $motivo, string $token_
             'exito'   => true,
         ];
     } catch (PDOException $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        if ($rutaArchivo !== null) {
+            eliminar_archivo_storage($rutaArchivo);
+        }
         error_log('Error al crear solicitud docente: ' . $e->getMessage());
         return [
             'error'   => 'No se pudo enviar la solicitud. Intentá nuevamente.',

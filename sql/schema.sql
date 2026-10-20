@@ -142,6 +142,11 @@ CREATE TABLE IF NOT EXISTS solicitudes_docente (
     id_usuario INT NOT NULL,
     estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL DEFAULT 'Pendiente',
     motivo TEXT NULL,
+    documentacion_ruta VARCHAR(500) NULL,
+    documentacion_nombre VARCHAR(255) NULL,
+    documentacion_mime VARCHAR(100) NULL,
+    documentacion_tamano INT UNSIGNED NULL,
+    documentacion_fecha DATETIME NULL,
     fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_respuesta DATETIME NULL,
     CONSTRAINT fk_solicitudes_docente_usuarios
@@ -363,6 +368,11 @@ CREATE TABLE IF NOT EXISTS solicitudes_docente (
     id_usuario INT NOT NULL,
     estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL DEFAULT 'Pendiente',
     motivo TEXT NULL,
+    documentacion_ruta VARCHAR(500) NULL,
+    documentacion_nombre VARCHAR(255) NULL,
+    documentacion_mime VARCHAR(100) NULL,
+    documentacion_tamano INT UNSIGNED NULL,
+    documentacion_fecha DATETIME NULL,
     fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_respuesta DATETIME NULL,
     CONSTRAINT fk_solicitudes_docente_usuarios
