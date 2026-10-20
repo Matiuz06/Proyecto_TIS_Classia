@@ -785,6 +785,15 @@ include '../includes/header.php';
       <p class="muted">No hay solicitudes docentes pendientes.</p>
     <?php else: ?>
       <?php foreach ($solicitudes_docente as $sol): ?>
+        <details class="course-deliveries-task teacher-request-embedded-details">
+          <summary aria-controls="detalle-solicitud-panel-<?= (int) $sol['id_solicitud_docente'] ?>" aria-expanded="false">
+            <span class="teacher-request-embedded-summary">
+              <strong><?= htmlspecialchars($sol['nombre'] . ' ' . $sol['apellido']) ?></strong>
+              <span><?= htmlspecialchars($sol['email']) ?></span>
+            </span>
+            <span class="course-deliveries-chevron" aria-hidden="true"></span>
+          </summary>
+          <div id="detalle-solicitud-panel-<?= (int) $sol['id_solicitud_docente'] ?>" class="accordion-panel">
         <article>
           <header>
             <h3><?= htmlspecialchars($sol['nombre'] . ' ' . $sol['apellido']) ?></h3>
@@ -798,6 +807,20 @@ include '../includes/header.php';
             <p><?= htmlspecialchars(mb_strimwidth($sol['motivo'], 0, 260, '…')) ?></p>
           <?php endif; ?>
 
+          <?php if (!empty($sol['documentacion_ruta'])): ?>
+            <p>
+              <strong>Documentación adjunta:</strong>
+              <?= htmlspecialchars($sol['documentacion_nombre'] ?? 'Archivo') ?>
+              (<?= htmlspecialchars($sol['documentacion_mime'] ?? 'tipo desconocido') ?>,
+              <?= number_format(((int) ($sol['documentacion_tamano'] ?? 0)) / 1048576, 2, ',', '.') ?> MB,
+              <?= htmlspecialchars($sol['documentacion_fecha'] ?? '') ?>)
+            </p>
+            <div class="teacher-request-actions">
+              <a class="btn btn-secondary" href="../php/solicitudes/descargar_documentacion_docente.php?id=<?= (int) $sol['id_solicitud_docente'] ?>&modo=inline" target="_blank" rel="noopener">Ver documentación</a>
+              <a class="btn btn-secondary" href="../php/solicitudes/descargar_documentacion_docente.php?id=<?= (int) $sol['id_solicitud_docente'] ?>">Descargar documentación</a>
+            </div>
+          <?php endif; ?>
+
           <form method="POST" action="panel-administrador.php#solicitudes" class="admin-decision-form">
             <input type="hidden" name="csrf_token"           value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
             <input type="hidden" name="accion"               value="decision_solicitud">
@@ -809,6 +832,8 @@ include '../includes/header.php';
             </button>
           </form>
         </article>
+          </div>
+        </details>
       <?php endforeach; ?>
     <?php endif; ?>
   </section>
