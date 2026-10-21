@@ -19,14 +19,14 @@ if (empty($_SESSION['csrf_token'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token_recibido = $_POST['csrf_token'] ?? '';
-    $accion         = $_POST['accion'] ?? '';
-    $id_solicitud   = (int) ($_POST['id_solicitud_docente'] ?? 0);
+    $accion = $_POST['accion'] ?? '';
+    $id_solicitud = (int) ($_POST['id_solicitud_docente'] ?? 0);
 
     $resultado = procesar_decision_solicitud_docente($id_solicitud, $accion, $token_recibido, $_SESSION['csrf_token'] ?? '');
-    $error   = $resultado['error'];
+    $error = $resultado['error'];
     $mensaje = $resultado['mensaje'];
     if ($mensaje !== '') {
-        set_toast('success', $mensaje);
+        set_toast($resultado['toast_tipo'] ?? 'success', $mensaje, $resultado['toast_descripcion'] ?? null);
         $mensaje = '';
     }
 }
@@ -54,8 +54,7 @@ foreach ($solicitudes as $solicitud) {
 $title = 'Solicitudes docentes';
 $description = 'Revision de solicitudes para rol docente en Classia.';
 $cssPrefix = '..';
-$jsPrefix    = '..';
-
+$jsPrefix = '..';
 $activePage = 'panel-administrador';
 include '../includes/header.php';
 ?>
