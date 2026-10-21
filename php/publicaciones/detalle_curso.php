@@ -21,6 +21,7 @@ require_once __DIR__ . '/../certificados/CursoProgresoRepository.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../admin/estadisticas_admin.php';
 require_once __DIR__ . '/../utils/toast.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
 
 iniciar_sesion();
 
@@ -271,6 +272,26 @@ if ($id_curso > 0) {
                                     foreach ($resultado['archivos_reemplazados'] as $reemplazado) {
                                         eliminar_ruta_entrega($reemplazado['ruta'] ?? null);
                                     }
+                                    $entregaPersistida = $entregaRepo->buscarPorId((int)$resultado['id_entrega']);
+                                    $fechaEntrega = $entregaPersistida?->toArray()['fecha_entrega'] ?? (string)time();
+                                    $docenteId = (int)($curso['id_usuario'] ?? 0);
+                                    if ($docenteId > 0 && $docenteId !== (int)$usuario_actual['id_usuario']) {
+                                        try {
+                                            $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+                                            $notificaciones->crear([
+                                                'id_usuario' => $docenteId,
+                                                'categoria' => 'tareas',
+                                                'titulo' => $entregaActual ? 'Reentrega recibida' : 'Nueva entrega',
+                                                'mensaje' => ($usuario_actual['nombre'] ?? 'Un estudiante') . ' entregó "' . ($recursoTarea['titulo'] ?? 'la tarea') . '" en "' . ($curso['titulo'] ?? 'tu curso') . '".',
+                                                'url_destino' => 'views/entregas-tarea.php?id=' . (int)$tarea->getId(),
+                                                'tipo_entidad' => 'entrega',
+                                                'id_entidad' => (int)$resultado['id_entrega'],
+                                                'clave_idempotencia' => 'entrega:' . substr(hash('sha256', (int)$resultado['id_entrega'] . '|' . $fechaEntrega), 0, 56),
+                                            ]);
+                                        } catch (Throwable $e) {
+                                            error_log('Notificacion academica: ' . $e->getMessage());
+                                        }
+                                    }
                                     $_SESSION['curso_exito'] = $entregaActual
                                         ? 'Tu entrega fue actualizada correctamente.'
                                         : 'Tu entrega fue enviada correctamente.';
@@ -308,7 +329,25 @@ if ($id_curso > 0) {
                             header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
                             exit;
                         }
-                        $contenidoRepo->crearMensajeForo($id_recurso_foro, (int)$usuario_actual['id_usuario'], $mensaje);
+                        $idMensajeForo = $contenidoRepo->crearMensajeForo($id_recurso_foro, (int)$usuario_actual['id_usuario'], $mensaje);
+                        $docenteId = (int)($curso['id_usuario'] ?? 0);
+                        if ($docenteId > 0 && $docenteId !== (int)$usuario_actual['id_usuario']) {
+                            try {
+                                $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+                                $notificaciones->crear([
+                                    'id_usuario' => $docenteId,
+                                    'categoria' => 'foro',
+                                    'titulo' => 'Nueva pregunta en el foro',
+                                    'mensaje' => ($usuario_actual['nombre'] ?? 'Un estudiante') . ' publicó una pregunta en "' . ($curso['titulo'] ?? 'tu curso') . '".',
+                                    'url_destino' => 'views/curso.php?id=' . $id_curso . '&recurso=' . $id_recurso_foro,
+                                    'tipo_entidad' => 'foro_mensaje',
+                                    'id_entidad' => $idMensajeForo,
+                                    'clave_idempotencia' => 'foro:' . $idMensajeForo,
+                                ]);
+                            } catch (Throwable $e) {
+                                error_log('Notificacion academica: ' . $e->getMessage());
+                            }
+                        }
                         $_SESSION['curso_exito'] = '¡Tu comentario fue publicado en el foro de debate!';
                         header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
                         exit;

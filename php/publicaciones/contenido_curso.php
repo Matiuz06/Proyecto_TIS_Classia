@@ -19,6 +19,7 @@ require_once __DIR__ . '/../utils/file_upload_helper.php';
 require_once __DIR__ . '/../utils/supabase_storage.php';
 require_once __DIR__ . '/ContenidoCursoRepository.php';   // incluye Modulo, Unidad, Recurso
 require_once __DIR__ . '/TareaRepository.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
 
 //Instancia del repositorio
 
@@ -349,6 +350,7 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
             }
 
             if ($a === 'agregar_recurso') {
+                $ridNuevo = 0;
                 if ($tipo === 'Entrega de Tareas') {
                     $pdo->beginTransaction();
                     $ridNuevo = $repo->crearRecurso($data);
@@ -357,7 +359,33 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
                     $tareaRepo->crear(Tarea::fromArray($datosTarea));
                     $pdo->commit();
                 } else {
-                    $repo->crearRecurso($data);
+                    $ridNuevo = $repo->crearRecurso($data);
+                }
+
+                if ($ridNuevo > 0) {
+                    $destinatarios = array_values(array_filter(
+                        $repo->obtenerEstudiantesInscritos($id_publicacion),
+                        static fn (int $id) => $id !== $id_usuario
+                    ));
+                    if ($destinatarios) {
+                        try {
+                            $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+                            $esTarea = $tipo === 'Entrega de Tareas';
+                            $notificaciones->crearParaUsuarios($destinatarios, [
+                                'categoria' => $esTarea ? 'tareas' : 'cursos',
+                                'titulo' => $esTarea ? 'Nueva tarea' : 'Nuevo recurso',
+                                'mensaje' => $esTarea
+                                    ? 'Se publicó la tarea "' . $data['t'] . '" en el curso "' . ($curso_actual['titulo'] ?? 'tu curso') . '".'
+                                    : 'Se publicó el recurso "' . $data['t'] . '" en el curso "' . ($curso_actual['titulo'] ?? 'tu curso') . '".',
+                                'url_destino' => 'views/curso.php?id=' . $id_publicacion . '&recurso=' . $ridNuevo,
+                                'tipo_entidad' => 'recurso',
+                                'id_entidad' => $ridNuevo,
+                                'clave_idempotencia' => 'curso-recurso:' . $ridNuevo . ':publicado',
+                            ]);
+                        } catch (Throwable $e) {
+                            error_log('Notificacion academica: ' . $e->getMessage());
+                        }
+                    }
                 }
             } else {
                 if ($tipo === 'Entrega de Tareas') {
