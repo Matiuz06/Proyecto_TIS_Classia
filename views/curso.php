@@ -137,246 +137,17 @@ include '../includes/header.php';
       $mensaje_exito_curso = '';
     }
     if (isset($_GET['completado'])) {
-      set_toast('success', 'Curso completado', 'Felicitaciones, completaste el curso exitosamente.');
+      if (!empty($progreso_curso['pendiente_evaluacion'])) {
+        set_toast('info', 'Curso completado', 'Tus entregas están siendo revisadas por el docente.');
+      } else {
+        set_toast('success', 'Curso completado', 'Felicitaciones, completaste el curso exitosamente.');
+      }
     }
   ?>
   <?php if (!empty($mensaje_error_curso)): ?>
     <div class="alert alert-error u-mb-md"><?= htmlspecialchars($mensaje_error_curso) ?></div>
   <?php endif; ?>
 
-  <?php if (!$curso): ?>
-    <section class="empty-state" aria-labelledby="sin-curso">
-      <h1 id="sin-curso">Curso no encontrado</h1>
-      <p>El curso que buscas no existe o no se encuentra disponible actualmente.</p>
-      <p><a href="catalogo.php?tipo=curso" class="btn">Explorar catálogo de cursos</a></p>
-    </section>
-  <?php elseif ($puede_ver_recursos): ?>
-    <?php if (!$item_actual): ?>
-      <section class="course-page-hero" aria-labelledby="course-page-title">
-        <div class="course-page-hero__body">
-          <span class="badge badge-course"><?= htmlspecialchars($curso['nombre_categoria']) ?></span>
-          <h1 id="course-page-title"><?= htmlspecialchars($curso['titulo']) ?></h1>
-          <p class="course-page-teacher">Curso de <a href="proveedor.php?id=<?= (int)$curso['autor_id'] ?>"><?= htmlspecialchars($curso['autor_nombre'] . ' ' . $curso['autor_apellido']) ?></a></p>
-          <p class="course-page-description"><?= htmlspecialchars(mb_strimwidth($curso['descripcion'], 0, 180, '...')) ?></p>
-          <dl class="course-page-summary-grid" aria-label="Resumen del curso">
-            <div><dt>Módulos</dt><dd><?= count($contenido_curso) ?></dd></div>
-            <div><dt>Clases</dt><dd><?= count($clases_planas) ?></dd></div>
-            <div><dt>Modalidad</dt><dd><?= htmlspecialchars($curso['modalidad'] ?: 'A definir') ?></dd></div>
-            <div><dt>Duración</dt><dd><?= !empty($curso['duracion_horas']) ? ((int)$curso['duracion_horas'] . ' h') : 'A definir' ?></dd></div>
-          </dl>
-        </div>
-        <figure class="course-page-cover">
-          <?php if (!empty($curso['imagen'])): ?>
-            <img src="../<?= htmlspecialchars($curso['imagen']) ?>" alt="<?= htmlspecialchars($curso['titulo']) ?>" loading="lazy">
-          <?php else: ?>
-            <div class="course-page-cover__placeholder">Classia</div>
-          <?php endif; ?>
-        </figure>
-      </section>
-    <?php endif; ?>
-    <button class="btn course-mobile-toggle" type="button" data-course-sidebar-toggle aria-controls="course-sidebar" aria-expanded="false">☰ Contenido del curso</button>
-    <div class="course-shell<?= !$item_actual ? ' course-shell--overview' : '' ?>">
-      <aside class="course-sidebar" id="course-sidebar" data-course-sidebar aria-label="Contenido del curso">
-        <div class="course-sidebar-title">Contenido del curso</div>
-        <?php if (!empty($puede_gestionar_entregas)): ?>
-          <div class="course-sidebar-actions">
-            <button class="course-sidebar-action" type="button" data-dialog-open="dialog-entregas">Entregas</button>
-          </div>
-        <?php elseif ($comprado): ?>
-          <div class="course-sidebar-actions">
-            <button class="course-sidebar-action" type="button" data-dialog-open="dialog-calificaciones">Calificaciones</button>
-          </div>
-        <?php endif; ?>
-        <?php foreach ($contenido_curso as $modulo): ?>
-          <details class="course-nav-module" open>
-            <summary>
-              <span><?= (int)$modulo['orden'] ?>. <?= htmlspecialchars($modulo['titulo']) ?></span>
-              <small><?= count($modulo['unidades']) ?> clases</small>
-            </summary>
-            <?php if (empty($modulo['unidades'])): ?>
-              <p class="course-empty-note">Este módulo todavía no tiene clases.</p>
-            <?php else: ?>
-              <ol class="course-lesson-list">
-                <?php foreach ($modulo['unidades'] as $unidad): ?>
-                  <?php $activa = $item_actual && (int)$item_actual['unidad']['id_unidad'] === (int)$unidad['id_unidad']; ?>
-                  <li class="course-lesson-item<?= $activa ? ' is-active' : '' ?>">
-                    <a class="course-lesson-link<?= $activa ? ' is-active' : '' ?>" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$unidad['id_unidad'] ?>" <?= $activa ? 'aria-current="page"' : '' ?>>
-                      <span class="course-lesson-code"><?= (int)$modulo['orden'] ?>.<?= (int)$unidad['orden'] ?></span>
-                      <span class="course-lesson-title"><?= htmlspecialchars($unidad['titulo']) ?></span>
-                    </a>
-                    <?php if (!empty($unidad['recursos'])): ?>
-                      <ul class="course-subresource-list" aria-label="Recursos de <?= htmlspecialchars($unidad['titulo']) ?>">
-                        <?php foreach ($unidad['recursos'] as $idxR => $rec): ?>
-                          <?php 
-                            $subCodigo = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($idxR + 1);
-                            $emoji = icono_emoji_recurso($rec['tipo']);
-                            $hrefRec = $activa ? ('#recurso-' . (int)$rec['id_recurso']) : ('curso.php?id=' . (int)$curso['id_publicacion'] . '&unidad=' . (int)$unidad['id_unidad'] . '#recurso-' . (int)$rec['id_recurso']);
-                          ?>
-                          <li class="course-subresource-item">
-                            <a class="course-subresource-link" href="<?= $hrefRec ?>" title="<?= htmlspecialchars($rec['titulo']) ?> (<?= htmlspecialchars($rec['tipo']) ?>)">
-                              <span class="course-subresource-code"><?= $subCodigo ?></span>
-                              <span class="course-subresource-icon" aria-hidden="true"><?= $emoji ?></span>
-                              <span class="course-subresource-text"><?= htmlspecialchars($rec['titulo']) ?></span>
-                            </a>
-                          </li>
-                        <?php endforeach; ?>
-                      </ul>
-                    <?php endif; ?>
-                  </li>
-                <?php endforeach; ?>
-              </ol>
-            <?php endif; ?>
-          </details>
-        <?php endforeach; ?>
-      </aside>
-
-      <?php if ($comprado): ?>
-        <dialog class="course-dialog course-grades-dialog" id="dialog-calificaciones" aria-labelledby="titulo-dialog-calificaciones">
-          <div class="course-dialog-header">
-            <div>
-              <h2 id="titulo-dialog-calificaciones">Calificaciones</h2>
-              <p class="course-dialog-context">Curso: <?= htmlspecialchars($curso['titulo']) ?></p>
-            </div>
-            <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
-          </div>
-          <div class="course-dialog-body">
-            <?php if (empty($tareas_alumno_curso)): ?>
-              <div class="course-empty-state course-empty-state-small">
-                <p>Este curso todavía no tiene tareas.</p>
-              </div>
-            <?php else: ?>
-              <p class="course-grades-intro">Estado de tus tareas del curso.</p>
-              <div class="course-grades-table-wrap">
-                <table class="course-grades-table">
-                  <thead>
-                    <tr>
-                      <th class="course-grades-cell">Actividad</th>
-                      <th class="course-grades-cell">Estado</th>
-                      <th class="course-grades-cell">Calificación</th>
-                      <th class="course-grades-cell">Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php foreach ($filas_calificaciones as [$filaTarea, $estadoAcademico, $calificacionFila]): ?>
-                      <?php
-                        $hrefTarea = 'curso.php?id=' . (int)$curso['id_publicacion'] . '&unidad=' . (int)$filaTarea['id_unidad'] . '#recurso-' . (int)$filaTarea['id_recurso'];
-                        $accionTarea = match ($estadoAcademico['clave']) {
-                            'calificada' => 'Ver devolución',
-                            'pendiente_correccion' => 'Ver entrega',
-                            default => 'Ir a la tarea',
-                        };
-                      ?>
-                      <tr>
-                        <td class="course-grades-cell course-grades-task" data-label="Actividad">
-                          <strong><?= htmlspecialchars($filaTarea['titulo']) ?></strong>
-                          <span class="course-grades-location"><?= htmlspecialchars($filaTarea['modulo_titulo']) ?> · <?= htmlspecialchars($filaTarea['unidad_titulo']) ?></span>
-                        </td>
-                        <td class="course-grades-cell" data-label="Estado"><span class="badge <?= htmlspecialchars($estadoAcademico['badge']) ?>"><?= htmlspecialchars($estadoAcademico['texto']) ?></span></td>
-                        <td class="course-grades-cell course-grades-score" data-label="Calificación"><?= $calificacionFila !== null ? htmlspecialchars($calificacionFila) : '—' ?></td>
-                        <td class="course-grades-cell" data-label="Acción"><a class="btn btn-sm btn-outline course-grades-action" href="<?= htmlspecialchars($hrefTarea) ?>"><?= htmlspecialchars($accionTarea) ?></a></td>
-                      </tr>
-                    <?php endforeach; ?>
-                  </tbody>
-                </table>
-              </div>
-            <?php endif; ?>
-          </div>
-        </dialog>
-      <?php endif; ?>
-
-      <?php if (!empty($puede_gestionar_entregas)): ?>
-        <dialog class="course-dialog course-deliveries-dialog" id="dialog-entregas" aria-labelledby="titulo-dialog-entregas">
-          <div class="course-dialog-header">
-            <div>
-              <h2 id="titulo-dialog-entregas">Entregas</h2>
-            </div>
-            <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
-          </div>
-          <div class="course-dialog-body">
-            <?php if (empty($resumen_entregas_docente)): ?>
-              <div class="course-empty-state course-empty-state-small">
-                <p>Este curso todavia no tiene tareas.</p>
-              </div>
-            <?php else: ?>
-              <div class="course-deliveries-list">
-                <?php foreach ($resumen_entregas_docente as $tareaEntrega): ?>
-                  <?php
-                    $idTareaEntrega = (int)$tareaEntrega['id_tarea'];
-                    $totalEntregas = (int)($tareaEntrega['total_entregas'] ?? 0);
-                    $calificadas = (int)($tareaEntrega['calificadas'] ?? 0);
-                    $pendientesCorreccion = (int)($tareaEntrega['pendientes_correccion'] ?? 0);
-                    $entregasTarea = $entregas_docente_por_tarea[$idTareaEntrega] ?? [];
-                    $textoEntregas = $totalEntregas === 1 ? '1 entrega' : $totalEntregas . ' entregas';
-                    $textoCalificadas = $calificadas === 1 ? '1 calificada' : $calificadas . ' calificadas';
-                    $textoPendientes = $pendientesCorreccion === 1 ? '1 pendiente' : $pendientesCorreccion . ' pendientes';
-                  ?>
-                  <details class="course-deliveries-task">
-                    <summary>
-                      <span class="course-deliveries-summary-main">
-                        <span class="course-deliveries-task-title"><?= htmlspecialchars($tareaEntrega['titulo']) ?></span>
-                        <span class="course-deliveries-meta">
-                          <?= $totalEntregas > 0 ? htmlspecialchars($textoEntregas) : 'Sin entregas' ?>
-                          <?php if ($totalEntregas > 0): ?>
-                            <span><?= htmlspecialchars($textoCalificadas) ?></span>
-                            <span><?= htmlspecialchars($textoPendientes) ?></span>
-                          <?php endif; ?>
-                        </span>
-                      </span>
-                      <span class="course-deliveries-chevron" aria-hidden="true"></span>
-                    </summary>
-                    <?php if ($totalEntregas === 0): ?>
-                      <p class="course-empty-note">Sin entregas para revisar.</p>
-                    <?php else: ?>
-                      <div class="course-grades-table-wrap">
-                        <table class="course-grades-table">
-                          <thead>
-                            <tr>
-                              <th class="course-grades-cell">Alumno</th>
-                              <th class="course-grades-cell">Fecha</th>
-                              <th class="course-grades-cell">Estado</th>
-                              <th class="course-grades-cell">Calificacion</th>
-                              <th class="course-grades-cell">Accion</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <?php foreach ($entregasTarea as $entregaDocente): ?>
-                              <?php
-                                $corregida = !empty($entregaDocente['fecha_calificacion']) || (($entregaDocente['estado'] ?? '') === 'Calificada');
-                                $estadoEntregaDocente = $corregida ? 'Calificada' : 'Pendiente de correccion';
-                                $badgeEntregaDocente = $corregida ? 'badge-success-soft' : 'badge-info-soft';
-                                $calificacionDocente = $corregida ? curso_formatear_calificacion_docente($entregaDocente) : null;
-                              ?>
-                              <tr>
-                                <td class="course-grades-cell course-grades-task" data-label="Alumno">
-                                  <strong><?= htmlspecialchars($entregaDocente['nombre'] . ' ' . $entregaDocente['apellido']) ?></strong>
-                                  <span class="course-grades-location"><?= htmlspecialchars($entregaDocente['email']) ?></span>
-                                </td>
-                                <td class="course-grades-cell" data-label="Fecha"><?= !empty($entregaDocente['fecha_entrega']) ? date('d/m/Y H:i', strtotime($entregaDocente['fecha_entrega'])) : '-' ?></td>
-                                <td class="course-grades-cell" data-label="Estado"><span class="badge <?= $badgeEntregaDocente ?>"><?= htmlspecialchars($estadoEntregaDocente) ?></span></td>
-                                <td class="course-grades-cell course-grades-score" data-label="Calificacion"><?= $calificacionDocente !== null ? htmlspecialchars($calificacionDocente) : '-' ?></td>
-                                <td class="course-grades-cell" data-label="Accion"><a class="btn btn-sm btn-outline course-grades-action" href="revisar-entrega.php?id=<?= (int)$entregaDocente['id_entrega'] ?>"><?= $corregida ? 'Ver correccion' : 'Revisar' ?></a></td>
-                              </tr>
-                            <?php endforeach; ?>
-                          </tbody>
-                        </table>
-                      </div>
-                    <?php endif; ?>
-                  </details>
-                <?php endforeach; ?>
-              </div>
-            <?php endif; ?>
-          </div>
-        </dialog>
-      <?php endif; ?>
-
-      <article class="course-content" aria-live="polite">
-        <?php if ($comprado && $progreso_curso): ?>
-          <?php $porcentajeProgreso = (float)$progreso_curso['porcentaje']; ?>
-          <section class="course-progress-card" aria-label="Progreso del curso">
-            <div class="course-progress-card__head">
-              <div>
-                <strong>Progreso del curso</strong>
-                <span><?= (int)$progreso_curso['completados'] ?> de <?= (int)$progreso_curso['total'] ?> elementos completados</span>
   <?php if (!empty($mensaje_exito_curso)): ?>
     <div class="alert alert-success u-mb-md"><?= htmlspecialchars($mensaje_exito_curso) ?></div>
   <?php endif; ?>
@@ -384,7 +155,11 @@ include '../includes/header.php';
     <div class="alert alert-error u-mb-md"><?= htmlspecialchars($mensaje_error_curso) ?></div>
   <?php endif; ?>
   <?php if (isset($_GET['completado'])): ?>
-    <div class="alert alert-success u-mb-md">¡Felicitaciones! Has completado el curso exitosamente.</div>
+    <div class="alert <?= !empty($progreso_curso['pendiente_evaluacion']) ? 'alert-info' : 'alert-success' ?> u-mb-md">
+      <?= !empty($progreso_curso['pendiente_evaluacion'])
+        ? 'Curso completado, pendiente de evaluación. Tus entregas están siendo revisadas por el docente.'
+        : '¡Felicitaciones! Has completado el curso exitosamente.' ?>
+    </div>
   <?php endif; ?>
   <?php if (($curso['estado'] ?? '') === 'Archivado'): ?>
     <div class="alert alert-warning u-mb-md" role="status">
@@ -422,9 +197,12 @@ include '../includes/header.php';
         </figure>
       </section>
     <?php endif; ?>
+    <?php if ($item_actual): ?>
+      <h1 class="course-page-title"><?= htmlspecialchars($curso['titulo']) ?></h1>
+    <?php endif; ?>
     <button class="btn course-mobile-toggle" type="button" data-course-sidebar-toggle aria-controls="course-sidebar" aria-expanded="false">Contenido del curso</button>
-    <div class="course-shell<?= !$item_actual ? ' course-shell--overview' : '' ?>">
-      <aside class="course-sidebar" id="course-sidebar" data-course-sidebar aria-label="Contenido del curso">
+    <section class="course-layout course-shell">
+      <aside class="course-structure-card course-sidebar" id="course-sidebar" data-course-sidebar aria-label="Contenido del curso">
         <div class="course-sidebar-title">Contenido del curso</div>
         <?php if (!empty($puede_gestionar_entregas)): ?>
           <div class="course-sidebar-actions">
@@ -455,13 +233,14 @@ include '../includes/header.php';
                     <?php if (!empty($unidad['recursos'])): ?>
                       <ul class="course-subresource-list" aria-label="Recursos de <?= htmlspecialchars($unidad['titulo']) ?>">
                         <?php foreach ($unidad['recursos'] as $idxR => $rec): ?>
-                          <?php 
+                          <?php
                             $subCodigo = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($idxR + 1);
                             $emoji = icono_emoji_recurso($rec['tipo']);
-                            $hrefRec = $activa ? ('#recurso-' . (int)$rec['id_recurso']) : ('curso.php?id=' . (int)$curso['id_publicacion'] . '&unidad=' . (int)$unidad['id_unidad'] . '#recurso-' . (int)$rec['id_recurso']);
+                            $recursoEsActivo = $recurso_actual_id === (int)$rec['id_recurso'];
+                            $hrefRec = 'curso.php?id=' . (int)$curso['id_publicacion'] . '&unidad=' . (int)$unidad['id_unidad'] . '&recurso=' . (int)$rec['id_recurso'] . '#recurso-' . (int)$rec['id_recurso'];
                           ?>
-                          <li class="course-subresource-item">
-                            <a class="course-subresource-link" href="<?= $hrefRec ?>" title="<?= htmlspecialchars($rec['titulo']) ?> (<?= htmlspecialchars($rec['tipo']) ?>)">
+                          <li class="course-subresource-item<?= $recursoEsActivo ? ' is-active' : '' ?>">
+                            <a class="course-subresource-link<?= $recursoEsActivo ? ' is-active' : '' ?>" href="<?= $hrefRec ?>" data-recurso-id="<?= (int)$rec['id_recurso'] ?>" title="<?= htmlspecialchars($rec['titulo']) ?> (<?= htmlspecialchars($rec['tipo']) ?>)"<?= $recursoEsActivo ? ' aria-current="location"' : '' ?>>
                               <span class="course-subresource-code"><?= $subCodigo ?></span>
                               <span class="course-subresource-icon" aria-hidden="true"><?= $emoji ?></span>
                               <span class="course-subresource-text"><?= htmlspecialchars($rec['titulo']) ?></span>
@@ -527,13 +306,14 @@ include '../includes/header.php';
                   </tbody>
                 </table>
               </div>
-              <span class="badge <?= !empty($progreso_curso['aprobado']) ? 'badge-success-soft' : 'badge-info-soft' ?>"><?= htmlspecialchars($progreso_curso['estado']) ?></span>
+              <span class="badge <?= !empty($progreso_curso['aprobado']) ? 'badge-success-soft' : (!empty($progreso_curso['completado']) ? 'badge-warning-soft' : 'badge-info-soft') ?>"><?= htmlspecialchars($progreso_curso['estado']) ?></span>
             </div>
             <div class="course-progress-bar" aria-hidden="true">
               <span style="width: <?= max(0, min(100, $porcentajeProgreso)) ?>%;"></span>
             </div>
             <div class="course-progress-card__foot">
-              <span><?= curso_formatear_porcentaje($porcentajeProgreso) ?>%</span>
+              <span>Progreso: <?= curso_formatear_porcentaje($porcentajeProgreso) ?>%</span>
+              <span>Rendimiento académico: <?= curso_formatear_porcentaje((float)($progreso_curso['porcentaje_academico'] ?? $porcentajeProgreso)) ?>%</span>
               <span>Minimo para aprobar: <?= (int)$progreso_curso['porcentaje_minimo'] ?>%</span>
             </div>
             <?php if (!empty($progreso_curso['aprobado'])): ?>
@@ -610,8 +390,9 @@ include '../includes/header.php';
           </div>
         </dialog>
       <?php endif; ?>
+      <?php endif; ?>
 
-      <article class="course-content" aria-live="polite">
+      <main class="course-content-card course-content" aria-live="polite" id="course-detail-panel">
         <?php if (!$item_actual): ?>
           <section class="course-overview">
             <h2>Información del curso</h2>
@@ -628,81 +409,6 @@ include '../includes/header.php';
         <?php else: ?>
           <?php $modulo = $item_actual['modulo']; $unidad = $item_actual['unidad']; ?>
           <header class="course-content-header">
-            <span class="course-kicker"><?= htmlspecialchars($curso['titulo']) ?></span>
-            <p><?= (int)$modulo['orden'] ?>. <?= htmlspecialchars($modulo['titulo']) ?></p>
-            <h1><?= htmlspecialchars($unidad['titulo']) ?></h1>
-
-          </header>
-          <section class="course-lesson-body">
-            <?php 
-              $videos_clase = array_filter($unidad['recursos'] ?? [], fn($r) => $r['tipo'] === 'Video');
-            ?>
-            <?php if (!empty($videos_clase)): ?>
-              <?php foreach ($videos_clase as $idxV => $vid): ?>
-                <?php 
-                  $posRecurso = array_search($vid['id_recurso'], array_column($unidad['recursos'], 'id_recurso'));
-                  $codVid = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($posRecurso !== false ? $posRecurso + 1 : $idxV + 1);
-                  $ytEmbed = !empty($vid['url']) ? obtener_youtube_embed_url($vid['url']) : null; 
-                ?>
-                <div class="course-video-wrapper u-mb-md" id="recurso-<?= (int)$vid['id_recurso'] ?>">
-                  <div class="course-video-header-row">
-                    <div>
-                      <span class="course-resource-code"><?= $codVid ?></span>
-                      <strong><?= htmlspecialchars($vid['titulo']) ?></strong>
-                    </div>
-                    <?php if (!empty($vid['url'])): ?>
-                      <a href="<?= htmlspecialchars($vid['url']) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
-                        Abrir en pestaña nueva ↗
-                      </a>
-                    <?php elseif (!empty($vid['archivo'])): ?>
-                      <a href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$vid['id_recurso'] ?>&modo=inline" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
-                        Abrir en pestaña nueva ↗
-                      </a>
-                    <?php endif; ?>
-                  </div>
-                  <?php if ($embedUrl = obtener_video_embed_url($vid['url'] ?? '')): ?>
-                    <div class="course-video-responsive-wrap">
-                      <iframe src="<?= htmlspecialchars($embedUrl) ?>" class="course-video-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
-                    </div>
-                  <?php elseif (!empty($vid['archivo'])): ?>
-                    <video controls class="course-video-player">
-                      <source src="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$vid['id_recurso'] ?>">
-                      Tu navegador no soporta la reproducción directa de video.
-                    </video>
-                  <?php elseif (!empty($vid['url'])): ?>
-                    <div class="course-video-responsive-wrap">
-                      <iframe src="<?= htmlspecialchars($vid['url']) ?>" class="course-video-iframe" allowfullscreen title="<?= htmlspecialchars($vid['titulo']) ?>"></iframe>
-                    </div>
-                  <?php endif; ?>
-                </div>
-              <?php endforeach; ?>
-            <?php endif; ?>
-
-            <?php if (!empty($unidad['descripcion'])): ?>
-              <p><?= nl2br(htmlspecialchars($unidad['descripcion'])) ?></p>
-            <?php elseif (empty($videos_clase)): ?>
-              <div class="course-empty-state"><p>Esta clase todavía no tiene contenido descriptivo.</p></div>
-            <?php endif; ?>
-          </section>
-        <?php endif; ?>
-
-        <?php if (!$item_actual): ?>
-          <section class="course-overview">
-            <h2>Información del curso</h2>
-            <p><?= nl2br(htmlspecialchars($curso['descripcion'])) ?></p>
-          </section>
-          <?php if (!empty($clases_planas)): ?>
-            <nav class="course-lesson-nav" aria-label="Navegación de clases">
-              <span></span>
-              <a class="btn" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$clases_planas[0]['unidad']['id_unidad'] ?>">Comienza ahora →</a>
-            </nav>
-          <?php else: ?>
-            <div class="course-empty-state"><p>Este curso todavía no tiene clases cargadas.</p></div>
-          <?php endif; ?>
-        <?php else: ?>
-          <?php $modulo = $item_actual['modulo']; $unidad = $item_actual['unidad']; ?>
-          <header class="course-content-header">
-            <span class="course-kicker"><?= htmlspecialchars($curso['titulo']) ?></span>
             <p><?= (int)$modulo['orden'] ?>. <?= htmlspecialchars($modulo['titulo']) ?></p>
             <h1><?= htmlspecialchars($unidad['titulo']) ?></h1>
 
@@ -788,78 +494,6 @@ include '../includes/header.php';
                         <?php if (!empty($recurso['url']) && $recurso['tipo'] !== 'Foro'): ?>
                           <a class="btn btn-sm" href="<?= htmlspecialchars($recurso['url']) ?>" target="_blank" rel="noopener">
                             <?= match($recurso['tipo']) {
-                              'Entrega de Tareas' => '🔗 Ver consigna externa',
-                              'Video' => '🎥 Ver video',
-                              default => '🔗 Abrir enlace'
-                            } ?>
-                          </a>
-                        <?php endif; ?>
-                        <?php if (!empty($recurso['archivo'])): ?>
-                          <?php $esVisualizable = recurso_es_visualizable_nativamente($recurso['tipo'], $recurso['archivo']); ?>
-                          <?php if ($esVisualizable): ?>
-                            <button class="btn btn-sm btn-primary-action" type="button" data-dialog-open="dialog-doc-<?= (int)$recurso['id_recurso'] ?>">
-                              <?= match($recurso['tipo']) {
-                                'PDF' => 'Leer documento PDF',
-                                'Imagen' => 'Ver imagen',
-                                'Entrega de Tareas' => 'Ver consigna',
-                                default => 'Leer documento'
-                              } ?>
-                            </button>
-                            <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=descargar">
-                              <?= match($recurso['tipo']) {
-                                'Entrega de Tareas' => '📥 Descargar consigna',
-                                'Video' => '🎥 Descargar video',
-                                default => '📥 Descargar'
-                              } ?>
-                            </a>
-                          <?php else: ?>
-                            <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=descargar">
-                              <?= match($recurso['tipo']) {
-                                'Entrega de Tareas' => '📥 Descargar consigna',
-                                'Video' => '🎥 Descargar video',
-                                default => '📥 Descargar archivo'
-                              } ?>
-                            </a>
-                          <?php endif; ?>
-                        <?php endif; ?>
-                        <?php if ($recurso['tipo'] === 'Foro'): ?>
-                          <?php $msgs = $mensajes_foro[$recurso['id_recurso']] ?? []; ?>
-                          <button class="btn btn-sm btn-primary-action" type="button" data-dialog-open="dialog-foro-<?= (int)$recurso['id_recurso'] ?>">
-                            💬 Participar en el foro (<?= count($msgs) ?> <?= count($msgs) === 1 ? 'mensaje' : 'mensajes' ?>)
-                          </button>
-                          <?php if (!empty($recurso['url'])): ?>
-                            <a class="btn btn-sm btn-outline" href="<?= htmlspecialchars($recurso['url']) ?>" target="_blank" rel="noopener">🔗 Enlace complementario</a>
-                          <?php endif; ?>
-                        <?php endif; ?>
-          <section class="course-materials" aria-labelledby="materiales-clase">
-            <h2 id="materiales-clase">Materiales y actividades de la clase</h2>
-            <?php if (empty($unidad['recursos'])): ?>
-              <div class="course-empty-state"><p>Esta clase todavía no tiene recursos.</p></div>
-            <?php else: ?>
-              <ul class="course-resource-list">
-                <?php foreach ($unidad['recursos'] as $idxRec => $recurso): ?>
-                  <?php 
-                    $codRec = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($idxRec + 1);
-                    $emoji = icono_emoji_recurso($recurso['tipo']);
-                    $esTareaEntregable = $recurso['tipo'] === 'Entrega de Tareas';
-                  ?>
-                  <li class="course-resource course-resource--<?= strtolower(str_replace(' ', '-', $recurso['tipo'])) ?>" id="recurso-<?= (int)$recurso['id_recurso'] ?>">
-                    <?php if (!$esTareaEntregable): ?>
-                      <span class="course-resource-icon" aria-hidden="true"><?= $emoji ?></span>
-                    <?php endif; ?>
-                    <div>
-                      <div class="course-resource-title-row">
-                        <span class="course-resource-code"><?= $codRec ?></span>
-                        <strong><?= htmlspecialchars($recurso['titulo']) ?></strong>
-                        <?php if (!$esTareaEntregable): ?>
-                          <span class="course-resource-tag"><?= htmlspecialchars($recurso['tipo']) ?></span>
-                        <?php endif; ?>
-                      </div>
-                      <?php if (!empty($recurso['descripcion'])): ?><p><?= nl2br(htmlspecialchars($recurso['descripcion'])) ?></p><?php endif; ?>
-                      <div class="course-resource-actions">
-                        <?php if (!empty($recurso['url']) && $recurso['tipo'] !== 'Foro'): ?>
-                          <a class="btn btn-sm" href="<?= htmlspecialchars($recurso['url']) ?>" target="_blank" rel="noopener">
-                            <?= match($recurso['tipo']) {
                               'Entrega de Tareas' => 'Ver consigna externa',
                               'Video' => 'Ver video',
                               default => 'Abrir enlace'
@@ -909,7 +543,8 @@ include '../includes/header.php';
                             $tarea = $tareas_curso[$recurso['id_recurso']] ?? null;
                             $entrega = $mis_entregas[$recurso['id_recurso']] ?? null;
                             $entregaCorregida = $entrega ? curso_entrega_esta_corregida($entrega) : false;
-                            $puedeEntregarTarea = !$tarea || $tarea->puedeEntregar(new DateTimeImmutable());
+                            $puedeEntregarTarea = !$es_archivado
+                                && (!$tarea || $tarea->puedeEntregar(new DateTimeImmutable()));
                           ?>
                           <?php if (!$entrega): ?>
                             <span class="badge badge-warning-soft">Pendiente de entrega</span>
@@ -927,24 +562,6 @@ include '../includes/header.php';
                             <button class="btn btn-sm btn-primary-action" type="button" data-dialog-open="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
                               📤 Entregar tarea
                             </button>
-                            $puedeEntregarTarea = !$es_archivado && (!$tarea || $tarea->puedeEntregar(new DateTimeImmutable()));
-                          ?>
-                          <?php if (!$entrega): ?>
-                            <span class="badge badge-warning-soft">Pendiente de entrega</span>
-                          <?php elseif ($entregaCorregida): ?>
-                            <span class="badge badge-success-soft">Corregida</span>
-                          <?php else: ?>
-                            <span class="badge badge-course">Entregada</span>
-                            <span class="badge badge-warning-soft">Pendiente de corrección</span>
-                          <?php endif; ?>
-                          <?php if ($entrega): ?>
-                            <button class="btn btn-sm btn-outline" type="button" data-dialog-open="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
-                              Ver <?= $es_archivado ? 'entrega' : '/ Actualizar entrega' ?>
-                            </button>
-                          <?php elseif ($puedeEntregarTarea): ?>
-                            <button class="btn btn-sm btn-primary-action" type="button" data-dialog-open="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
-                              Entregar tarea
-                            </button>
                           <?php else: ?>
                             <span class="badge badge-warning-soft"><?= $es_archivado ? 'Curso archivado' : 'No acepta entregas ahora' ?></span>
                           <?php endif; ?>
@@ -960,6 +577,8 @@ include '../includes/header.php';
                             <button class="btn btn-sm <?= $recursoCompletado ? 'btn-outline' : 'btn-primary-action' ?>" type="submit">
                               <?= $recursoCompletado ? 'Completado' : 'Marcar como completado' ?>
                             </button>
+                          </form>
+                          <?php endif; ?>
                       </div>
                     </div>
 
@@ -1294,8 +913,9 @@ include '../includes/header.php';
                         $entregaCorregida = $entrega ? curso_entrega_esta_corregida($entrega) : false;
                         $calificacionDocente = $entregaCorregida ? curso_formatear_calificacion_entrega($entrega, $tarea) : null;
                         $archivosEntrega = $entrega ? ($archivos_entregas[(int)$entrega['id_entrega']] ?? []) : [];
-                        $puedeEntregarTarea = !$tarea || $tarea->puedeEntregar(new DateTimeImmutable());
+                        $puedeEntregarTarea = !$es_archivado && (!$tarea || $tarea->puedeEntregar(new DateTimeImmutable()));
                       ?>
+                      <?php if (false): ?>
                       <dialog class="course-dialog" id="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
                         <div class="course-dialog-header">
                           <h2 id="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">Entrega de tarea: <?= htmlspecialchars($recurso['titulo']) ?></h2>
@@ -1411,6 +1031,7 @@ include '../includes/header.php';
                           </form>
                         </div>
                       </dialog>
+                      <?php endif; ?>
                     <?php endif; ?>
                   </li>
                 <?php endforeach; ?>
@@ -1422,19 +1043,21 @@ include '../includes/header.php';
             <?php if ($prev): ?><a class="btn" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$prev['id_unidad'] ?>">← Clase anterior</a><?php else: ?><span></span><?php endif; ?>
             <?php if ($next): ?>
               <a class="btn" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$next['id_unidad'] ?>">Siguiente clase →</a>
-            <?php elseif (!empty($contratacion_curso) && $contratacion_curso['estado'] === 'En Proceso'): ?>
+            <?php elseif (!empty($contratacion_curso) && $contratacion_curso['estado'] === 'En Proceso' && !empty($progreso_curso['completado'])): ?>
               <form method="POST" class="inline-form" onsubmit="return confirm('¿Deseas marcar este curso como completado?');">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
                 <input type="hidden" name="accion" value="completar_curso">
                 <button type="submit" class="btn btn-primary-action">Finalizar y completar curso</button>
               </form>
+            <?php elseif (!empty($contratacion_curso) && $contratacion_curso['estado'] === 'En Proceso'): ?>
+              <span class="badge badge-info-soft">Completá todos los recursos y entregá todas las tareas para finalizar el curso.</span>
             <?php elseif (!empty($contratacion_curso) && $contratacion_curso['estado'] === 'Completada'): ?>
-              <span class="badge badge-course">✓ Curso completado</span>
+              <span class="badge <?= !empty($progreso_curso['aprobado']) ? 'badge-success-soft' : 'badge-warning-soft' ?>">✓ <?= htmlspecialchars($progreso_curso['estado'] ?? 'Curso completado') ?></span>
             <?php endif; ?>
           </nav>
         <?php endif; ?>
-      </article>
-    </div>
+      </main>
+    </section>
   <?php else: ?>
     <div class="product-detail-layout">
       <article class="product-main-content">
@@ -1552,11 +1175,14 @@ include '../includes/header.php';
               <p class="badge u-mb-sm">Modo Administrador</p>
               <a class="btn btn-secondary product-card-pricing__btn" href="editar-publicacion.php?id=<?= (int)$curso['id_publicacion'] ?>">Editar curso</a>
             </div>
+          <?php elseif ($comprado): ?>
+            <p class="badge badge-success-soft">Ya estás inscripto en este curso</p>
           <?php elseif ($puedeAgregar): ?>
-            <form action="carrito.php" method="POST">
+            <form action="../php/contrataciones/carrito.php" method="POST" data-add-to-cart-form>
               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
               <input type="hidden" name="id_publicacion" value="<?= (int)$curso['id_publicacion'] ?>">
               <input type="hidden" name="accion" value="agregar">
+              <input type="hidden" name="ajax" value="1">
               <button type="submit" class="btn product-card-pricing__btn">Inscribirme al curso</button>
             </form>
           <?php else: ?>
