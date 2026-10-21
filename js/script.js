@@ -202,6 +202,98 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, true);
 
+  const teacherRequestDialog = document.getElementById("dialog-solicitud-docente");
+  const teacherRequestData = document.getElementById("teacher-request-dialog-data");
+
+  if (teacherRequestDialog && teacherRequestData) {
+    let requests = {};
+    let lastTeacherRequestTrigger = null;
+
+    try {
+      requests = JSON.parse(teacherRequestData.textContent || "{}");
+    } catch (error) {
+      console.error("No se pudieron cargar los datos de la solicitud docente.", error);
+    }
+
+    const setDialogText = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value || "-";
+    };
+
+    const renderTeacherRequest = (request) => {
+      setDialogText("dialog-solicitud-nombre", request.nombre);
+      setDialogText("dialog-solicitud-email", request.email);
+      setDialogText("dialog-solicitud-fecha", request.fecha_solicitud);
+      setDialogText("dialog-solicitud-motivo", request.motivo || "Sin motivo indicado.");
+      setDialogText("dialog-solicitud-estado", request.estado || "Pendiente");
+      setDialogText("dialog-documentacion-nombre", request.documentacion_nombre);
+      setDialogText("dialog-documentacion-mime", request.documentacion_mime);
+      setDialogText("dialog-documentacion-tamano", request.documentacion_tamano ? `${request.documentacion_tamano} MB` : "-");
+      setDialogText("dialog-documentacion-fecha", request.documentacion_fecha);
+
+      const id = Number(request.id);
+      const idInput = document.getElementById("dialog-solicitud-id");
+      if (idInput) idInput.value = String(id);
+
+      const status = document.getElementById("dialog-solicitud-estado");
+      if (status) {
+        status.classList.remove("teacher-request-status-badge--pending", "teacher-request-status-badge--approved", "teacher-request-status-badge--rejected");
+        const stateClass = String(request.estado || "Pendiente").toLowerCase() === "aprobada"
+          ? "teacher-request-status-badge--approved"
+          : String(request.estado || "Pendiente").toLowerCase() === "rechazada"
+            ? "teacher-request-status-badge--rejected"
+            : "teacher-request-status-badge--pending";
+        status.classList.add(stateClass);
+      }
+
+      const documentacion = document.getElementById("dialog-solicitud-documentacion");
+      const emptyDocumentation = document.getElementById("dialog-solicitud-documentacion-vacia");
+      const documentationActions = document.getElementById("dialog-documentacion-actions");
+      const hasDocumentation = Boolean(request.tiene_documentacion);
+      if (documentacion) documentacion.hidden = !hasDocumentation;
+      if (emptyDocumentation) emptyDocumentation.hidden = hasDocumentation;
+      if (documentationActions) documentationActions.hidden = !hasDocumentation;
+
+      if (hasDocumentation) {
+        const inlineLink = document.getElementById("dialog-documentacion-ver");
+        const downloadLink = document.getElementById("dialog-documentacion-descargar");
+        const baseUrl = `../php/solicitudes/descargar_documentacion_docente.php?id=${encodeURIComponent(id)}`;
+        if (inlineLink) inlineLink.href = `${baseUrl}&modo=inline`;
+        if (downloadLink) downloadLink.href = baseUrl;
+      }
+    };
+
+    document.querySelectorAll(".teacher-request-details-trigger").forEach((trigger) => {
+      if (trigger.dataset.dialogReady === "true") return;
+      trigger.dataset.dialogReady = "true";
+      trigger.addEventListener("click", () => {
+        const request = requests[String(trigger.dataset.solicitudId)];
+        if (!request || typeof teacherRequestDialog.showModal !== "function") {
+          console.error("No se pudo abrir el detalle de la solicitud docente.");
+          return;
+        }
+
+        lastTeacherRequestTrigger = trigger;
+        trigger.setAttribute("aria-expanded", "true");
+        renderTeacherRequest(request);
+        document.body.classList.add("course-dialog-open");
+        if (!teacherRequestDialog.open) teacherRequestDialog.showModal();
+        teacherRequestDialog.querySelector("[data-dialog-close]")?.focus();
+      });
+    });
+
+    teacherRequestDialog.addEventListener("close", () => {
+      if (lastTeacherRequestTrigger?.isConnected) {
+        lastTeacherRequestTrigger.setAttribute("aria-expanded", "false");
+        lastTeacherRequestTrigger.focus();
+      }
+      lastTeacherRequestTrigger = null;
+      setDialogText("dialog-solicitud-nombre", "");
+      setDialogText("dialog-solicitud-email", "");
+      setDialogText("dialog-solicitud-motivo", "");
+    });
+  }
+
   const HINTS_RECURSOS = {
     "Archivo": "Sube un documento, plantilla o archivo complementario para la clase.",
     "Foro": "Espacio de intercambio: detalla el tema o consigna de debate para los estudiantes.",
@@ -545,6 +637,142 @@ document.addEventListener("DOMContentLoaded", () => {
       selector.disabled = true;
     }
   }
+
+  // Tabs de perfil: un único comportamiento reutilizable, con fallback de contenido visible sin JS.
+  document.querySelectorAll(".profile-tabs").forEach((tablist) => {
+    if (tablist.dataset.tabsReady === "true") return;
+
+    const buttons = Array.from(tablist.querySelectorAll("button"));
+    const panels = Array.from(tablist.parentElement.querySelectorAll(":scope > .account-section"));
+    if (!buttons.length || buttons.length !== panels.length) return;
+
+    tablist.dataset.tabsReady = "true";
+    tablist.setAttribute("role", "tablist");
+
+    const activateTab = (index, moveFocus = false) => {
+      buttons.forEach((button, buttonIndex) => {
+        const active = buttonIndex === index;
+        const panel = panels[buttonIndex];
+        const panelId = panel.id || `profile-panel-${buttonIndex + 1}`;
+
+        panel.id = panelId;
+        panel.setAttribute("role", "tabpanel");
+        panel.setAttribute("aria-labelledby", button.id || `profile-tab-${buttonIndex + 1}`);
+        button.id = button.id || `profile-tab-${buttonIndex + 1}`;
+        button.setAttribute("role", "tab");
+        button.setAttribute("aria-controls", panelId);
+        button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
+        panel.hidden = !active;
+
+        if (active && moveFocus) button.focus();
+      });
+    };
+
+    buttons.forEach((button, index) => {
+      button.addEventListener("click", () => activateTab(index));
+      button.addEventListener("keydown", (event) => {
+        if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        let nextIndex = index;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % buttons.length;
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index - 1 + buttons.length) % buttons.length;
+        if (event.key === "Home") nextIndex = 0;
+        if (event.key === "End") nextIndex = buttons.length - 1;
+        activateTab(nextIndex, true);
+      });
+    });
+
+    const activeIndex = buttons.findIndex((button) => button.classList.contains("active"));
+    activateTab(activeIndex >= 0 ? activeIndex : 0);
+  });
+
+  // Acordeones nativos: conservan apertura sin JS y sincronizan su estado accesible.
+  document.querySelectorAll("details[data-accordion], details.course-nav-module, details.course-deliveries-task").forEach((accordion, index) => {
+    if (accordion.dataset.accordionReady === "true") return;
+
+    const summary = accordion.querySelector(":scope > summary");
+    if (!summary) return;
+
+    let panel = accordion.querySelector(":scope > .accordion-panel");
+    if (!panel && accordion.dataset.accordion === "true") {
+      panel = document.createElement("div");
+      panel.className = "accordion-panel";
+      Array.from(accordion.children).forEach((child) => {
+        if (child !== summary) panel.appendChild(child);
+      });
+      accordion.appendChild(panel);
+    }
+
+    if (!panel) return;
+    const panelId = panel.id || `accordion-panel-${index + 1}`;
+    panel.id = panelId;
+    summary.setAttribute("aria-controls", panelId);
+    summary.setAttribute("aria-expanded", String(accordion.open));
+    accordion.dataset.accordionReady = "true";
+    accordion.addEventListener("toggle", () => {
+      summary.setAttribute("aria-expanded", String(accordion.open));
+    });
+  });
+
+  document.querySelectorAll("form[data-add-to-cart-form]").forEach((form) => {
+    if (form.dataset.cartReady === "true") return;
+    form.dataset.cartReady = "true";
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = form.querySelector('button[type="submit"]');
+      if (!button || button.disabled) return;
+
+      button.disabled = true;
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+          credentials: "same-origin",
+        });
+        const rawResponse = await response.text();
+        let data;
+
+        try {
+          data = JSON.parse(rawResponse);
+        } catch (parseError) {
+          throw new Error(`El servidor devolvió una respuesta no válida (${response.status}).`);
+        }
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "No se pudo agregar el curso al carrito.");
+        }
+
+        const badge = document.getElementById("cart-item-count");
+        if (badge) {
+          badge.textContent = String(data.cart_count ?? 0);
+        } else if ((data.cart_count ?? 0) > 0) {
+          const cartLink = document.querySelector(".nav-cart-btn");
+          if (cartLink) {
+            const newBadge = document.createElement("span");
+            newBadge.id = "cart-item-count";
+            newBadge.className = "nav-cart-badge";
+            newBadge.textContent = String(data.cart_count);
+            cartLink.appendChild(newBadge);
+          }
+        }
+
+        if (window.ClassiaToast) {
+          window.ClassiaToast[data.already_exists ? "info" : "success"]({ title: data.message });
+        }
+        button.textContent = data.already_exists ? "Ya está en el carrito" : "Agregado al carrito";
+      } catch (error) {
+        console.error("Error al agregar el curso al carrito:", error);
+        if (window.ClassiaToast) {
+          window.ClassiaToast.error({ title: error.message || "No se pudo agregar el curso al carrito." });
+        }
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
 });
 
 /**
