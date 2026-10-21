@@ -28,7 +28,7 @@ if ($esAjax) {
     });
     set_exception_handler(static function (Throwable $error): void {
         error_log('Error en carrito AJAX: ' . $error->getMessage());
-        responder_carrito_json(['success' => false, 'message' => 'No se pudo agregar el curso al carrito.'], 500);
+        responder_carrito_json(['success' => false, 'message' => 'No se pudo agregar la publicación al carrito.'], 500);
     });
 }
 
@@ -39,7 +39,7 @@ if (empty($_SESSION['csrf_token'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST'
     && ($_POST['accion'] ?? '') === 'agregar') {
     if ($esAjax && !esta_autenticado()) {
-        responder_carrito_json(['success' => false, 'message' => 'Debes iniciar sesión para agregar cursos al carrito.'], 401);
+        responder_carrito_json(['success' => false, 'message' => 'Debes iniciar sesión para agregar publicaciones al carrito.'], 401);
     }
     requerir_autenticacion('../../views/login.php');
 }
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $publicacion = $stmtCheck->fetch();
         if (!$publicacion || ($publicacion['estado'] ?? '') !== 'Activo') {
             if ($esAjax) {
-                responder_carrito_json(['success' => false, 'message' => 'El curso no está disponible.'], 404);
+                responder_carrito_json(['success' => false, 'message' => 'La publicación no está disponible.'], 404);
             }
             $_SESSION['carrito_error'] = 'La publicación no está disponible.';
             header('Location: ../../views/catalogo.php');
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($esAjax) {
                 responder_carrito_json([
                     'success' => true,
-                    'message' => 'El curso se agregó al carrito.',
+                    'message' => 'La publicación se agregó al carrito.',
                     'cart_count' => count(array_unique(array_map('intval', $_SESSION['carrito_publicaciones']))),
                     'already_exists' => false,
                 ]);
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($esAjax) {
                 responder_carrito_json([
                     'success' => true,
-                    'message' => 'Este curso ya estaba en tu carrito.',
+                    'message' => 'Esta publicación ya estaba en tu carrito.',
                     'cart_count' => count(array_unique(array_map('intval', $_SESSION['carrito_publicaciones']))),
                     'already_exists' => true,
                 ]);
