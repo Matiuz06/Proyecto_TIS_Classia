@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/toast.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
 
 const LOGIN_URL = '../../views/login.php';
 const VALORACION_BASE_URL = '../../views/valoracion.php';
@@ -51,9 +52,10 @@ if ($puntuacion < 1 || $puntuacion > 5) {
 // Validaciones con la base de datos
 $contratacion = null;
 if (empty($errores)) {
-    $stmt = $pdo->prepare('SELECT c.*, dc.id_publicacion 
+    $stmt = $pdo->prepare('SELECT c.*, dc.id_publicacion, p.id_usuario AS propietario_id, p.titulo AS publicacion_titulo
                            FROM contrataciones c 
                            JOIN detalles_contratacion dc ON dc.id_contratacion = c.id_contratacion 
+                           JOIN publicaciones p ON p.id_publicacion = dc.id_publicacion
                            WHERE c.id_contratacion = :id_contratacion 
                            LIMIT 1');
     $stmt->execute(['id_contratacion' => $id_contratacion]);
@@ -109,6 +111,25 @@ try {
         'id_publicacion'  => (int) $contratacion['id_publicacion'],
         'id_contratacion' => $id_contratacion,
     ]);
+
+    $idValoracion = (int)$pdo->lastInsertId();
+    if ((int)($contratacion['propietario_id'] ?? 0) > 0 && (int)$contratacion['propietario_id'] !== $id_usuario) {
+        try {
+            $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+            $notificaciones->crear([
+                'id_usuario' => (int)$contratacion['propietario_id'],
+                'categoria' => 'valoraciones',
+                'titulo' => 'Nueva valoración recibida',
+                'mensaje' => 'Recibiste una nueva valoración sobre "' . ($contratacion['publicacion_titulo'] ?? 'tu publicación') . '".',
+                'url_destino' => 'views/panel-proveedor.php#valoraciones',
+                'tipo_entidad' => 'valoracion',
+                'id_entidad' => $idValoracion,
+                'clave_idempotencia' => 'valoracion:' . $idValoracion,
+            ]);
+        } catch (Throwable $e) {
+            error_log('Notificacion valoracion: ' . $e->getMessage());
+        }
+    }
 
     set_toast('success', 'Valoracion enviada');
 

@@ -7,6 +7,20 @@ require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/plantillas_servicio.php';
 require_once __DIR__ . '/../utils/file_upload_helper.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
+
+function notificar_solicitud_servicio(PDO $pdo, int $idUsuario, array $datos): void
+{
+    if ($idUsuario <= 0) {
+        return;
+    }
+    try {
+        $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+        $notificaciones->crear(array_merge($datos, ['id_usuario' => $idUsuario]));
+    } catch (Throwable $e) {
+        error_log('Notificacion solicitud servicio: ' . $e->getMessage());
+    }
+}
 
 function obtener_servicio_activo(PDO $pdo, int $id): ?array
 {
@@ -181,7 +195,21 @@ function crear_solicitud_servicio(PDO $pdo, int $uid, array $servicio, array $po
             'u' => $uid,
             'p' => $servicio['id_publicacion']
         ]);
-        return ['ok' => true, 'mensaje' => 'Solicitud enviada correctamente.', 'id' => (int)$pdo->lastInsertId()];
+        $idSolicitud = (int)$pdo->lastInsertId();
+        $cliente = $pdo->prepare('SELECT nombre, apellido FROM usuarios WHERE id_usuario = :id');
+        $cliente->execute(['id' => $uid]);
+        $clienteDatos = $cliente->fetch() ?: [];
+        $nombreCliente = trim(($clienteDatos['nombre'] ?? '') . ' ' . ($clienteDatos['apellido'] ?? '')) ?: 'Un cliente';
+        notificar_solicitud_servicio($pdo, (int)$servicio['id_usuario'], [
+            'categoria' => 'solicitudes',
+            'titulo' => 'Nueva solicitud de servicio',
+            'mensaje' => $nombreCliente . ' solicitó el servicio "' . $servicio['titulo'] . '".',
+            'url_destino' => 'views/solicitud-servicio-detalle.php?id=' . $idSolicitud,
+            'tipo_entidad' => 'solicitud_servicio',
+            'id_entidad' => $idSolicitud,
+            'clave_idempotencia' => 'solicitud-servicio:nueva:' . $idSolicitud,
+        ]);
+        return ['ok' => true, 'mensaje' => 'Solicitud enviada correctamente.', 'id' => $idSolicitud];
     } catch (PDOException $e) {
         error_log('Crear solicitud: ' . $e->getMessage());
         if ($archivo) {
@@ -210,7 +238,7 @@ function obtener_solicitudes_proveedor(PDO $pdo, int $docente, ?string $estado =
 
 function obtener_solicitud_para_proveedor(PDO $pdo, int $id, int $docente): ?array
 {
-    $q = $pdo->prepare("SELECT s.*, p.titulo AS servicio, p.tipo_servicio, p.precio AS precio_publicado, u.nombre, u.apellido, u.email 
+    $q = $pdo->prepare("SELECT s.*, p.titulo AS servicio, p.tipo_servicio, p.precio AS precio_publicado, p.id_usuario AS proveedor_id, u.nombre, u.apellido, u.email
                         FROM solicitudes s 
                         JOIN publicaciones p ON p.id_publicacion=s.id_publicacion 
                         JOIN usuarios u ON u.id_usuario=s.id_usuario 
@@ -249,6 +277,16 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
             }
             $q = $pdo->prepare("INSERT INTO solicitud_mensajes(id_solicitud, id_usuario, mensaje) VALUES(:s, :u, :m)");
             $q->execute(['s' => $id, 'u' => $uid, 'm' => $msg]);
+            $idMensaje = (int)$pdo->lastInsertId();
+            notificar_solicitud_servicio($pdo, (int)$sol['id_usuario'], [
+                'categoria' => 'solicitudes',
+                'titulo' => 'Nuevo mensaje sobre tu solicitud',
+                'mensaje' => 'El proveedor respondió a tu solicitud de "' . $sol['servicio'] . '".',
+                'url_destino' => 'views/mi-solicitud-servicio.php?id=' . $id,
+                'tipo_entidad' => 'solicitud_mensaje',
+                'id_entidad' => $idMensaje,
+                'clave_idempotencia' => 'solicitud-mensaje:' . $idMensaje,
+            ]);
             return ['ok' => true, 'mensaje' => 'Mensaje enviado.'];
         }
 
@@ -302,6 +340,23 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
         }
 
         $pdo->commit();
+        if ($sol['id_usuario'] !== $uid) {
+            $notificarEstado = [
+                'aceptar' => ['titulo' => 'Solicitud de servicio aceptada', 'mensaje' => 'El proveedor aceptó tu solicitud de "' . $sol['servicio'] . '".'],
+                'rechazar' => ['titulo' => 'Solicitud de servicio rechazada', 'mensaje' => 'El proveedor rechazó tu solicitud de "' . $sol['servicio'] . '".'],
+                'contraoferta' => ['titulo' => 'Nueva contraoferta de servicio', 'mensaje' => 'El proveedor envió una contraoferta para "' . $sol['servicio'] . '".'],
+                'realizada' => ['titulo' => 'Solicitud de servicio realizada', 'mensaje' => 'La solicitud de "' . $sol['servicio'] . '" fue marcada como realizada.'],
+            ][$accion];
+            notificar_solicitud_servicio($pdo, (int)$sol['id_usuario'], [
+                'categoria' => 'solicitudes',
+                'titulo' => $notificarEstado['titulo'],
+                'mensaje' => $notificarEstado['mensaje'],
+                'url_destino' => 'views/mi-solicitud-servicio.php?id=' . $id,
+                'tipo_entidad' => 'solicitud_servicio',
+                'id_entidad' => $id,
+                'clave_idempotencia' => 'solicitud-servicio:' . $id . ':estado:' . $nuevo_estado . ':' . substr(hash('sha256', $precioFinal . '|' . $fecha . '|' . $resp), 0, 32),
+            ]);
+        }
         return ['ok' => true, 'mensaje' => 'Solicitud actualizada a ' . $nuevo_estado . '.'];
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
@@ -333,7 +388,7 @@ function obtener_solicitudes_cliente(PDO $pdo, int $uid): array
 
 function obtener_solicitud_para_cliente(PDO $pdo, int $id, int $uid): ?array
 {
-    $q = $pdo->prepare("SELECT s.*, p.titulo AS servicio, p.tipo_servicio, p.precio AS precio_publicado, u.nombre AS proveedor_nombre, u.apellido AS proveedor_apellido 
+    $q = $pdo->prepare("SELECT s.*, p.titulo AS servicio, p.tipo_servicio, p.precio AS precio_publicado, p.id_usuario AS proveedor_id, u.nombre AS proveedor_nombre, u.apellido AS proveedor_apellido
                         FROM solicitudes s 
                         JOIN publicaciones p ON p.id_publicacion=s.id_publicacion 
                         JOIN usuarios u ON u.id_usuario=p.id_usuario 
@@ -357,6 +412,16 @@ function enviar_mensaje_solicitud_cliente(PDO $pdo, int $id, int $uid, string $m
     try {
         $q = $pdo->prepare("INSERT INTO solicitud_mensajes(id_solicitud, id_usuario, mensaje) VALUES(:s, :u, :m)");
         $q->execute(['s' => $id, 'u' => $uid, 'm' => $mensaje]);
+        $idMensaje = (int)$pdo->lastInsertId();
+        notificar_solicitud_servicio($pdo, (int)($s['proveedor_id'] ?? 0), [
+            'categoria' => 'solicitudes',
+            'titulo' => 'Nuevo mensaje sobre una solicitud',
+            'mensaje' => 'El cliente respondió a tu solicitud de "' . $s['servicio'] . '".',
+            'url_destino' => 'views/solicitud-servicio-detalle.php?id=' . $id,
+            'tipo_entidad' => 'solicitud_mensaje',
+            'id_entidad' => $idMensaje,
+            'clave_idempotencia' => 'solicitud-mensaje:' . $idMensaje,
+        ]);
         return ['ok' => true, 'mensaje' => 'Mensaje enviado.'];
     } catch (PDOException $e) {
         return ['ok' => false, 'mensaje' => 'No se pudo enviar el mensaje.'];
@@ -392,6 +457,15 @@ function accion_cliente_solicitud(PDO $pdo, int $id, int $uid, string $accion, s
             }
             $pdo->prepare("UPDATE solicitudes SET estado='Cancelada' WHERE id_solicitud=:s")->execute(['s' => $id]);
             $pdo->commit();
+            notificar_solicitud_servicio($pdo, (int)($s['proveedor_id'] ?? 0), [
+                'categoria' => 'solicitudes',
+                'titulo' => 'Solicitud de servicio cancelada',
+                'mensaje' => 'El cliente canceló la solicitud de "' . $s['servicio'] . '".',
+                'url_destino' => 'views/solicitud-servicio-detalle.php?id=' . $id,
+                'tipo_entidad' => 'solicitud_servicio',
+                'id_entidad' => $id,
+                'clave_idempotencia' => 'solicitud-servicio:' . $id . ':cancelada',
+            ]);
             return ['ok' => true, 'mensaje' => 'Solicitud cancelada.'];
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) {

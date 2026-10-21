@@ -5,7 +5,9 @@
  */
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../utils/file_upload_helper.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
 
 function asegurar_tabla_solicitudes_docente(PDO $db): void
 {
@@ -151,6 +153,31 @@ function crear_solicitud_docente(int $id_usuario, string $motivo, array $archivo
             'tamano'     => (int) $archivo['size'],
         ]);
         $db->commit();
+        $idSolicitud = (int)$db->lastInsertId();
+
+        try {
+            $solicitante = $db->prepare('SELECT nombre, apellido FROM usuarios WHERE id_usuario = :id');
+            $solicitante->execute(['id' => $id_usuario]);
+            $datosSolicitante = $solicitante->fetch() ?: [];
+            $nombreSolicitante = trim(($datosSolicitante['nombre'] ?? '') . ' ' . ($datosSolicitante['apellido'] ?? '')) ?: 'Un estudiante';
+            $administradores = $db->prepare('SELECT id_usuario FROM usuarios WHERE id_rol = :rol AND COALESCE(activo, 1) = 1');
+            $administradores->execute(['rol' => ROL_ADMIN]);
+            $idsAdministradores = array_map('intval', $administradores->fetchAll(PDO::FETCH_COLUMN));
+            if ($idsAdministradores) {
+                $notificaciones = new NotificacionService(new NotificacionRepository($db));
+                $notificaciones->crearParaUsuarios($idsAdministradores, [
+                    'categoria' => 'solicitudes',
+                    'titulo' => 'Nueva solicitud docente',
+                    'mensaje' => $nombreSolicitante . ' presentó una solicitud para convertirse en docente.',
+                    'url_destino' => 'views/solicitudes-docente.php',
+                    'tipo_entidad' => 'solicitud_docente',
+                    'id_entidad' => $idSolicitud,
+                    'clave_idempotencia' => 'solicitud-docente:nueva:' . $idSolicitud,
+                ]);
+            }
+        } catch (Throwable $e) {
+            error_log('Notificacion solicitud docente: ' . $e->getMessage());
+        }
 
         return [
             'error'   => '',

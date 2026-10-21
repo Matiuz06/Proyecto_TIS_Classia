@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/mailer.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
 
 function asegurar_tabla_solicitudes_docente(PDO $db): void
 {
@@ -142,6 +143,21 @@ function procesar_decision_solicitud_docente(int $id_solicitud, string $accion, 
             ]);
 
             $db->commit();
+            try {
+                $notificaciones = new NotificacionService(new NotificacionRepository($db));
+                $notificaciones->crear([
+                    'id_usuario' => (int)$solicitud['id_usuario'],
+                    'categoria' => 'solicitudes',
+                    'titulo' => 'Solicitud docente aprobada',
+                    'mensaje' => 'Tu solicitud para convertirte en docente fue aprobada.',
+                    'url_destino' => 'views/solicitar-docente.php',
+                    'tipo_entidad' => 'solicitud_docente',
+                    'id_entidad' => $id_solicitud,
+                    'clave_idempotencia' => 'solicitud-docente:' . $id_solicitud . ':aprobada',
+                ]);
+            } catch (Throwable $e) {
+                error_log('Notificacion decision docente: ' . $e->getMessage());
+            }
             $correoEnviado = notificar_decision_solicitud_docente($solicitud, 'aprobada');
             return [
                 'error'   => '',
@@ -186,6 +202,22 @@ function procesar_decision_solicitud_docente(int $id_solicitud, string $accion, 
             );
             $stmt->execute(['id_solicitud' => $id_solicitud]);
             $db->commit();
+
+            try {
+                $notificaciones = new NotificacionService(new NotificacionRepository($db));
+                $notificaciones->crear([
+                    'id_usuario' => (int)$solicitud['id_usuario'],
+                    'categoria' => 'solicitudes',
+                    'titulo' => 'Solicitud docente rechazada',
+                    'mensaje' => 'Tu solicitud para convertirte en docente fue rechazada. Revisá el estado de tu solicitud para conocer más detalles.',
+                    'url_destino' => 'views/solicitar-docente.php',
+                    'tipo_entidad' => 'solicitud_docente',
+                    'id_entidad' => $id_solicitud,
+                    'clave_idempotencia' => 'solicitud-docente:' . $id_solicitud . ':rechazada',
+                ]);
+            } catch (Throwable $e) {
+                error_log('Notificacion decision docente: ' . $e->getMessage());
+            }
 
             $correoEnviado = notificar_decision_solicitud_docente($solicitud, 'rechazada');
             return [
