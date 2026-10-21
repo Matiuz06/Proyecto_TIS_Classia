@@ -26,6 +26,7 @@ iniciar_sesion();
 
 $id_curso = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $curso = null;
+$es_propietario = false;
 $resenas = [];
 $promedio_calificacion = 0.0;
 $total_resenas = 0;
@@ -109,6 +110,11 @@ if ($id_curso > 0) {
         ");
         $stmt->execute(['id' => $id_curso]);
         $curso = $stmt->fetch();
+
+        if ($curso !== null && !empty($usuario_actual['id_usuario'])) {
+            $id_autor = $curso['id_usuario'] ?? $curso['autor_id'] ?? 0;
+            $es_propietario = (int) $usuario_actual['id_usuario'] === (int) $id_autor;
+        }
 
         if ($curso) {
             // Registrar visita
@@ -331,84 +337,25 @@ if ($id_curso > 0) {
                             );
                         } else {
                             $_SESSION['curso_error'] = 'Recurso invalido.';
-                            $_SESSION['curso_error'] = 'No tenés permisos para eliminar este mensaje.';
                         }
                     }
 
                     header("Location: curso.php?id=" . $id_curso . ($id_unidad ? "&unidad=" . $id_unidad : "") . ($id_recurso ? "#recurso-" . $id_recurso : ""));
                     exit;
-            $solo_visibles = !($es_propietario || es_admin());
-            $contenido_curso = obtener_contenido_curso($pdo, $id_curso, $solo_visibles);
-            $puede_ver_recursos = $comprado || $es_propietario || es_admin();
-
-            $mis_entregas = [];
-            $mensajes_foro = [];
-            if ($usuario_actual) {
-                $contenidoRepo = new ContenidoCursoRepository($pdo);
-                $entregaRepo = new EntregaRepository($pdo);
-                $tareas_curso = (new TareaRepository($pdo))->listarPorCurso($id_curso);
-                $mis_entregas = $entregaRepo->listarEntregasUsuarioPorCurso($id_curso, (int)$usuario_actual['id_usuario']);
-                if ($puede_gestionar_entregas) {
-                    $resumen_entregas_docente = $entregaRepo->obtenerResumenEntregasCurso($id_curso);
-                    $entregas_docente_por_tarea = $entregaRepo->listarEntregasCursoAgrupadas($id_curso);
-                }
-
-                // Procesar nuevo mensaje en el foro de debate
-                if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'publicar_mensaje_foro') {
-                    $token = $_POST['csrf_token'] ?? '';
-                    $id_recurso_foro = (int)($_POST['id_recurso'] ?? 0);
-                    $id_unidad_foro = (int)($_POST['id_unidad'] ?? 0);
-                    $mensaje = trim($_POST['mensaje_foro'] ?? '');
-
-                    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-                        $_SESSION['curso_error'] = 'Token de seguridad invÃ¡lido. Recarga la pÃ¡gina e intenta nuevamente.';
-                    } elseif ($id_recurso_foro <= 0 || empty($mensaje)) {
-                        $_SESSION['curso_error'] = 'El mensaje no puede estar vacÃ­o.';
-                    } else {
-                        $contenidoRepo = new ContenidoCursoRepository($pdo);
-                        $recursoForo = $contenidoRepo->obtenerRecurso($id_recurso_foro, $id_curso);
-                        if (!$recursoForo || ($recursoForo['tipo'] ?? '') !== 'Foro' || !$contratacion_curso) {
-                            $_SESSION['curso_error'] = 'No tenes permisos para publicar en este foro.';
-                            header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
-                            exit;
-                        }
-                        $contenidoRepo->crearMensajeForo($id_recurso_foro, (int)$usuario_actual['id_usuario'], $mensaje);
-                        set_toast('success', 'Comentario publicado');
-                        header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
-                        exit;
-                    }
-                }
-
-                // Moderar o eliminar mensaje del foro
-                if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'eliminar_mensaje_foro') {
-                    $token = $_POST['csrf_token'] ?? '';
-                    $id_msg = (int)($_POST['id_mensaje'] ?? 0);
-                    $id_unidad_foro = (int)($_POST['id_unidad'] ?? 0);
-
-                    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-                        $_SESSION['curso_error'] = 'Token de seguridad invÃ¡lido.';
-                    } elseif ($id_msg <= 0) {
-                        $_SESSION['curso_error'] = 'Mensaje no vÃ¡lido.';
-                    } else {
-                        $borrado = (new ContenidoCursoRepository($pdo))->eliminarMensajeForoAutorizado(
-                            $id_msg,
-                            $id_curso,
-                            (int)$usuario_actual['id_usuario'],
-                            es_admin(),
-                            (int)$usuario_actual['id_usuario'] === (int)$curso['id_usuario']
-                        );
-                        if ($borrado) {
-                            set_toast('success', 'Mensaje eliminado');
-                        } else {
-                            $_SESSION['curso_error'] = 'No tenÃ©s permisos para eliminar este mensaje.';
-                        }
-                        header("Location: curso.php?id=" . $id_curso . ($id_unidad_foro ? "&unidad=" . $id_unidad_foro : ""));
-                        exit;
-                    }
                 }
             }
-
-            $es_propietario = $usuario_actual && (int)$usuario_actual['id_usuario'] === (int)$curso['id_usuario'];
+            $solo_visibles = !($es_propietario || es_admin());
+            try {
+                $contenido_curso = obtener_contenido_curso($pdo, $id_curso, $solo_visibles);
+            } catch (PDOException $e) {
+                // Compatibilidad con instalaciones previas a la columna de visibilidad.
+                if (!$solo_visibles || stripos($e->getMessage(), 'visible_alumnos') === false) {
+                    throw $e;
+                }
+                error_log('Detalle de curso: columnas de visibilidad no disponibles; se muestran los recursos existentes.');
+                $contenido_curso = obtener_contenido_curso($pdo, $id_curso, false);
+            }
+            $puede_ver_recursos = $comprado || $es_propietario || es_admin();
             $puede_gestionar_entregas = $usuario_actual && ($es_propietario || es_admin());
             if ($curso['estado'] !== 'Activo' && !$comprado && !$es_propietario && !es_admin()) {
                 $curso = null;
@@ -417,9 +364,6 @@ if ($id_curso > 0) {
             if (!$curso) {
                 return;
             }
-
-            $contenido_curso = obtener_contenido_curso($pdo, $id_curso);
-            $puede_ver_recursos = $comprado || $es_propietario || es_admin();
 
             $mis_entregas = [];
             $mensajes_foro = [];
