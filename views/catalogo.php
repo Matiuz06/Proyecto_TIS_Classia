@@ -26,7 +26,6 @@ $puedeAgregar = esta_autenticado();
       </nav>
 
       <header>
-        <p><?= __t('catalog_title') ?></p>
         <h1><?= __t('catalog_heading') ?></h1>
         <p><?= __t('catalog_sub') ?></p>
         <form
@@ -204,6 +203,7 @@ $puedeAgregar = esta_autenticado();
                 <div class="catalog-grid catalog-grid--courses">
                   <?php foreach ($cursos as $curso): ?>
                     <article class="catalog-card" aria-labelledby="curso-<?= $curso->getId() ?>">
+                      <div class="catalog-card-side">
                       <?php if (!empty($curso->getImagen())): ?>
                         <div class="catalog-card-media">
                           <img class="catalog-card-image" src="../<?= htmlspecialchars($curso->getImagen()) ?>" alt="<?= htmlspecialchars($curso->getTitulo()) ?>" loading="lazy" />
@@ -211,42 +211,50 @@ $puedeAgregar = esta_autenticado();
                       <?php else: ?>
                         <div class="placeholder-visual" aria-hidden="true"><?= __t('label_course') ?></div>
                       <?php endif; ?>
-                      <div>
-                        <h3 id="curso-<?= $curso->getId() ?>"><?= htmlspecialchars($curso->getTitulo()) ?></h3>
-                        <p><?= htmlspecialchars($curso->getDescripcion()) ?></p>
-                        <dl>
+                        <dl class="catalog-card-side-meta">
                           <div>
-                            <dt><?= __t('label_category', 'Categoría') ?></dt>
+                            <dt><?= __t('label_category') ?>:</dt>
                             <dd><?= htmlspecialchars(__t_db(($curso->getNombreCategoria() ?? ''))) ?></dd>
                           </div>
                           <div>
-                            <dt><?= __t('label_instructor', 'Docente') ?></dt>
+                            <dt><?= __t('label_instructor', 'Docente') ?>:</dt>
                             <dd>
                               <a href="proveedor.php?id=<?= (int)$curso->getIdUsuario() ?>" class="provider-name-link">
                                 <?= htmlspecialchars(trim(($curso->getAutorNombre() ?? '') . ' ' . ($curso->getAutorApellido() ?? ''))) ?>
                               </a>
                             </dd>
                           </div>
+                        </dl>
+                      </div>
+                      <div class="catalog-card-content">
+                        <h3 id="curso-<?= $curso->getId() ?>"><?= htmlspecialchars($curso->getTitulo()) ?></h3>
+                        <p><?= htmlspecialchars($curso->getDescripcion()) ?></p>
+                        <dl class="catalog-card-commercial<?= (float)$curso->getPromedioValoracion() > 0 ? ' catalog-card-commercial--with-rating' : '' ?>">
                           <div>
                             <dt><?= __t('label_price', 'Precio') ?></dt>
                             <dd><strong>$<?= number_format($curso->getPrecio(), 2, ',', '.') ?></strong></dd>
                           </div>
+                          <?php if ((float)$curso->getPromedioValoracion() > 0): ?>
+                            <div class="catalog-rating-cell">
+                              <dt><?= __t('label_rating', 'Valoración') ?></dt>
+                              <dd>
+                                <p class="catalog-rating" aria-label="Valoración: <?= number_format((float)$curso->getPromedioValoracion(), 1) ?> de 5">
+                                  <span class="catalog-rating__stars" aria-hidden="true">
+                                    <?php
+                                      $prom = round((float)$curso->getPromedioValoracion());
+                                      for ($i = 1; $i <= 5; $i++): ?>
+                                        <span class="catalog-rating__star<?= $i <= $prom ? ' catalog-rating__star--filled' : '' ?>" aria-hidden="true">★</span>
+                                    <?php endfor; ?>
+                                  </span>
+                                  <span class="catalog-rating__value"><?= number_format((float)$curso->getPromedioValoracion(), 1) ?></span>
+                                  <?php if ((int)$curso->getTotalContrataciones() > 0): ?>
+                                    <span class="catalog-rating__count">(<?= (int)$curso->getTotalContrataciones() ?>)</span>
+                                  <?php endif; ?>
+                                </p>
+                              </dd>
+                            </div>
+                          <?php endif; ?>
                         </dl>
-                        <?php if ((float)$curso->getPromedioValoracion() > 0): ?>
-                          <p class="catalog-rating" aria-label="Valoración: <?= number_format((float)$curso->getPromedioValoracion(), 1) ?> de 5">
-                            <span class="catalog-rating__stars" aria-hidden="true">
-                              <?php
-                                $prom = round((float)$curso->getPromedioValoracion());
-                                for ($i = 1; $i <= 5; $i++): ?>
-                                  <span class="catalog-rating__star<?= $i <= $prom ? ' catalog-rating__star--filled' : '' ?>" aria-hidden="true">★</span>
-                              <?php endfor; ?>
-                            </span>
-                            <span class="catalog-rating__value"><?= number_format((float)$curso->getPromedioValoracion(), 1) ?></span>
-                            <?php if ((int)$curso->getTotalContrataciones() > 0): ?>
-                              <span class="catalog-rating__count">(<?= (int)$curso->getTotalContrataciones() ?>)</span>
-                            <?php endif; ?>
-                          </p>
-                        <?php endif; ?>
                         <p class="catalog-actions">
                           <a class="btn" href="curso.php?id=<?= $curso->getId() ?>"><?= __t('btn_view_course') ?></a>
                           <?php if ($puedeAgregar): ?>
@@ -279,6 +287,7 @@ $puedeAgregar = esta_autenticado();
                 <div class="catalog-grid">
                   <?php foreach ($servicios as $serv): ?>
                     <article class="catalog-card" aria-labelledby="servicio-<?= $serv->getId() ?>">
+                      <div class="catalog-card-side">
                       <?php if (!empty($serv->getImagen())): ?>
                         <div class="catalog-card-media">
                           <img class="catalog-card-image" src="../<?= htmlspecialchars($serv->getImagen()) ?>" alt="<?= htmlspecialchars($serv->getTitulo()) ?>" loading="lazy" />
@@ -286,42 +295,50 @@ $puedeAgregar = esta_autenticado();
                       <?php else: ?>
                         <div class="placeholder-visual" aria-hidden="true"><?= __t('label_service') ?></div>
                       <?php endif; ?>
-                      <div>
-                        <h3 id="servicio-<?= $serv->getId() ?>"><?= htmlspecialchars($serv->getTitulo()) ?></h3>
-                        <p><?= htmlspecialchars($serv->getDescripcion()) ?></p>
-                        <dl>
+                        <dl class="catalog-card-side-meta">
                           <div>
-                            <dt><?= __t('label_category', 'Categoría') ?></dt>
+                            <dt><?= __t('label_category') ?>:</dt>
                             <dd><?= htmlspecialchars(__t_db(($serv->getNombreCategoria() ?? ''))) ?></dd>
                           </div>
                           <div>
-                            <dt><?= __t('label_provider', 'Proveedor') ?></dt>
+                            <dt><?= __t('label_provider', 'Proveedor') ?>:</dt>
                             <dd>
                               <a href="proveedor.php?id=<?= (int)$serv->getIdUsuario() ?>" class="provider-name-link">
                                 <?= htmlspecialchars(trim(($serv->getAutorNombre() ?? '') . ' ' . ($serv->getAutorApellido() ?? ''))) ?>
                               </a>
                             </dd>
                           </div>
+                        </dl>
+                      </div>
+                      <div class="catalog-card-content">
+                        <h3 id="servicio-<?= $serv->getId() ?>"><?= htmlspecialchars($serv->getTitulo()) ?></h3>
+                        <p><?= htmlspecialchars($serv->getDescripcion()) ?></p>
+                        <dl class="catalog-card-commercial<?= (float)$serv->getPromedioValoracion() > 0 ? ' catalog-card-commercial--with-rating' : '' ?>">
                           <div>
                             <dt><?= __t('label_price', 'Precio') ?></dt>
                             <dd><strong>$<?= number_format($serv->getPrecio(), 2, ',', '.') ?></strong></dd>
                           </div>
+                          <?php if ((float)$serv->getPromedioValoracion() > 0): ?>
+                            <div class="catalog-rating-cell">
+                              <dt><?= __t('label_rating', 'Valoración') ?></dt>
+                              <dd>
+                                <p class="catalog-rating" aria-label="Valoración: <?= number_format((float)$serv->getPromedioValoracion(), 1) ?> de 5">
+                                  <span class="catalog-rating__stars" aria-hidden="true">
+                                    <?php
+                                      $prom = round((float)$serv->getPromedioValoracion());
+                                      for ($i = 1; $i <= 5; $i++): ?>
+                                        <span class="catalog-rating__star<?= $i <= $prom ? ' catalog-rating__star--filled' : '' ?>" aria-hidden="true">★</span>
+                                    <?php endfor; ?>
+                                  </span>
+                                  <span class="catalog-rating__value"><?= number_format((float)$serv->getPromedioValoracion(), 1) ?></span>
+                                  <?php if ((int)$serv->getTotalContrataciones() > 0): ?>
+                                    <span class="catalog-rating__count">(<?= (int)$serv->getTotalContrataciones() ?>)</span>
+                                  <?php endif; ?>
+                                </p>
+                              </dd>
+                            </div>
+                          <?php endif; ?>
                         </dl>
-                        <?php if ((float)$serv->getPromedioValoracion() > 0): ?>
-                          <p class="catalog-rating" aria-label="Valoración: <?= number_format((float)$serv->getPromedioValoracion(), 1) ?> de 5">
-                            <span class="catalog-rating__stars" aria-hidden="true">
-                              <?php
-                                $prom = round((float)$serv->getPromedioValoracion());
-                                for ($i = 1; $i <= 5; $i++): ?>
-                                  <span class="catalog-rating__star<?= $i <= $prom ? ' catalog-rating__star--filled' : '' ?>" aria-hidden="true">★</span>
-                              <?php endfor; ?>
-                            </span>
-                            <span class="catalog-rating__value"><?= number_format((float)$serv->getPromedioValoracion(), 1) ?></span>
-                            <?php if ((int)$serv->getTotalContrataciones() > 0): ?>
-                              <span class="catalog-rating__count">(<?= (int)$serv->getTotalContrataciones() ?>)</span>
-                            <?php endif; ?>
-                          </p>
-                        <?php endif; ?>
                         <p class="catalog-actions">
                           <a class="btn" href="servicio-detalle.php?id=<?= $serv->getId() ?>"><?= __t('btn_request_service') ?></a>
                           <?php if (!$puedeAgregar): ?>
