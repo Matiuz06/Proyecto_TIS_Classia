@@ -75,6 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: ../../views/catalogo.php');
             exit;
         }
+        if (($publicacion['tipo'] ?? '') === 'Servicio') {
+            if ($esAjax) {
+                responder_carrito_json(['success' => false, 'message' => 'Los servicios se solicitan mediante una propuesta personalizada.'], 422);
+            }
+            $_SESSION['carrito_error'] = 'Los servicios se solicitan mediante una propuesta personalizada.';
+            header('Location: ../../views/servicio-detalle.php?id=' . $id_publicacion);
+            exit;
+        }
         $autor_id = (int) $publicacion['id_usuario'];
         $currUser = usuario_actual();
         if ($currUser && (int)$currUser['id_usuario'] === $autor_id) {

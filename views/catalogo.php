@@ -324,15 +324,7 @@ $puedeAgregar = esta_autenticado();
                         <?php endif; ?>
                         <p class="catalog-actions">
                           <a class="btn" href="servicio-detalle.php?id=<?= $serv->getId() ?>"><?= __t('btn_request_service') ?></a>
-                          <?php if ($puedeAgregar): ?>
-                            <form action="../php/contrataciones/carrito.php" method="post" data-add-to-cart-form>
-                              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                              <input type="hidden" name="id_publicacion" value="<?= (int) $serv->getId() ?>">
-                              <input type="hidden" name="accion" value="agregar">
-                              <input type="hidden" name="ajax" value="1">
-                              <button type="submit" name="accion" value="agregar"><?= __t('btn_add_cart') ?></button>
-                            </form>
-                          <?php else: ?>
+                          <?php if (!$puedeAgregar): ?>
                             <a class="btn-ghost" href="login.php"><?= __t('catalog_login_hint') ?></a>
                           <?php endif; ?>
                         </p>

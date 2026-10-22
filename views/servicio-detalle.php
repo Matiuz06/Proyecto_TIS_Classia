@@ -171,10 +171,10 @@ $puedeAgregar = esta_autenticado() && (es_estudiante() || es_docente()) && !$es_
               <?php endif; ?>
               <div class="custom-request-box"><p>Este servicio utiliza la plantilla: <strong><?= htmlspecialchars($plantilla_servicio['nombre']) ?></strong>.</p></div>
             <?php else: ?>
-              <?php if ($puedeAgregar): ?>
-                <form action="../php/contrataciones/carrito.php" method="POST" data-add-to-cart-form><input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>"><input type="hidden" name="id_publicacion" value="<?= (int)$servicio['id_publicacion'] ?>"><input type="hidden" name="accion" value="agregar"><input type="hidden" name="ajax" value="1"><button type="submit" class="btn product-card-pricing__btn">Continuar con la contratación</button></form>
-              <?php elseif (!esta_autenticado()): ?>
+              <?php if (!esta_autenticado()): ?>
                 <div class="purchase-auth-actions"><a class="btn product-card-pricing__btn" href="login.php">Inicia sesión</a><a href="registro.php">Regístrate</a></div>
+              <?php elseif ($puedeAgregar): ?>
+                <div class="custom-request-box"><p>Este servicio todavía no está configurado para recibir solicitudes personalizadas.</p></div>
               <?php endif; ?>
             <?php endif; ?>
           </div>
