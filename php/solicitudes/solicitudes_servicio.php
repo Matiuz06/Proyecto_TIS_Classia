@@ -507,32 +507,64 @@ function accion_cliente_solicitud(PDO $pdo, int $id, int $uid, string $accion, s
             return ['ok' => false, 'mensaje' => 'No se pudo cancelar la solicitud.'];
         }
     }
-    if ($accion !== 'aceptar_propuesta' || !in_array($s['estado'], ['Aceptada', 'Contraoferta'], true)) {
+    if ($accion !== 'aceptar_propuesta') {
         return ['ok' => false, 'mensaje' => 'La propuesta no puede aceptarse en su estado actual.'];
     }
-    if (!empty($s['id_contratacion'])) {
-        return ['ok' => true, 'mensaje' => 'La contratación ya fue creada.', 'id_contratacion' => (int)$s['id_contratacion']];
-    }
-    $precio = $s['precio_propuesto'] !== null ? (float)$s['precio_propuesto'] : (float)$s['precio_publicado'];
-    if ($precio <= 0) {
-        return ['ok' => false, 'mensaje' => 'La propuesta no tiene un precio válido.'];
-    }
+
     try {
         $pdo->beginTransaction();
+
+        $bloqueo = $pdo->prepare(
+            "SELECT s.*, p.precio AS precio_publicado
+             FROM solicitudes s
+             JOIN publicaciones p ON p.id_publicacion=s.id_publicacion
+             WHERE s.id_solicitud=:s AND s.id_usuario=:u AND p.tipo='Servicio'
+             FOR UPDATE"
+        );
+        $bloqueo->execute(['s' => $id, 'u' => $uid]);
+        $s = $bloqueo->fetch();
+        if (!$s || !in_array($s['estado'], ['Aceptada', 'Contraoferta'], true)) {
+            $pdo->rollBack();
+            return ['ok' => false, 'mensaje' => 'La propuesta no puede aceptarse en su estado actual.'];
+        }
+
+        if (!empty($s['id_contratacion'])) {
+            $existente = $pdo->prepare(
+                'SELECT id_contratacion, estado
+                 FROM contrataciones
+                 WHERE id_contratacion=:c AND id_usuario=:u
+                 FOR UPDATE'
+            );
+            $existente->execute(['c' => (int)$s['id_contratacion'], 'u' => $uid]);
+            $contratacion = $existente->fetch();
+            if ($contratacion && $contratacion['estado'] === 'Pendiente') {
+                $pdo->commit();
+                return ['ok' => true, 'mensaje' => 'La contratacion ya fue creada.', 'id_contratacion' => (int)$contratacion['id_contratacion']];
+            }
+            $pdo->rollBack();
+            return ['ok' => false, 'mensaje' => 'La contratacion ya fue procesada.'];
+        }
+
+        $precio = $s['precio_propuesto'] !== null ? (float)$s['precio_propuesto'] : 0.0;
+        if ($precio <= 0) {
+            $pdo->rollBack();
+            return ['ok' => false, 'mensaje' => 'La propuesta no tiene un precio valido.'];
+        }
+
         $q = $pdo->prepare("INSERT INTO contrataciones(monto_total, estado, id_usuario) VALUES(:m, 'Pendiente', :u)");
         $q->execute(['m' => $precio, 'u' => $uid]);
         $cid = (int)$pdo->lastInsertId();
-        $d = $pdo->prepare("INSERT INTO detalles_contratacion(cantidad, precio_unitario, subtotal, id_contratacion, id_publicacion) VALUES(1, :p, :p, :c, :pub)");
-        $d->execute(['p' => $precio, 'c' => $cid, 'pub' => $s['id_publicacion']]);
+        $d = $pdo->prepare("INSERT INTO detalles_contratacion(cantidad, precio_unitario, subtotal, id_contratacion, id_publicacion) VALUES(1, :precio_unitario, :subtotal, :c, :pub)");
+        $d->execute(['precio_unitario' => $precio, 'subtotal' => $precio, 'c' => $cid, 'pub' => $s['id_publicacion']]);
         $u = $pdo->prepare("UPDATE solicitudes SET estado='Aceptada', id_contratacion=:c WHERE id_solicitud=:s");
         $u->execute(['c' => $cid, 's' => $id]);
         $pdo->commit();
-        return ['ok' => true, 'mensaje' => 'Propuesta aceptada. Continuá con el pago.', 'id_contratacion' => $cid];
+        return ['ok' => true, 'mensaje' => 'Propuesta aceptada. Continua con el pago.', 'id_contratacion' => $cid];
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
-        error_log('Aceptar propuesta: ' . $e->getMessage());
-        return ['ok' => false, 'mensaje' => 'No se pudo generar la contratación.'];
+        error_log('Aceptar propuesta solicitud ' . $id . ' usuario ' . $uid . ': ' . $e->getMessage());
+        return ['ok' => false, 'mensaje' => 'No se pudo generar la contratacion.'];
     }
 }
