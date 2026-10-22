@@ -94,6 +94,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        if (($publicacion['tipo'] ?? '') === 'Curso') {
+            $stmtAcceso = $pdo->prepare(
+                "SELECT 1
+                 FROM detalles_contratacion dc
+                 INNER JOIN contrataciones c ON c.id_contratacion = dc.id_contratacion
+                 INNER JOIN pagos pag ON pag.id_contratacion = c.id_contratacion
+                                      AND pag.estado_pago = 'Aprobado'
+                 WHERE c.id_usuario = :id_usuario
+                   AND dc.id_publicacion = :id_publicacion
+                   AND c.estado IN ('En Proceso', 'Completada')
+                 LIMIT 1"
+            );
+            $stmtAcceso->execute([
+                'id_usuario' => (int) $currUser['id_usuario'],
+                'id_publicacion' => $id_publicacion,
+            ]);
+
+            if ($stmtAcceso->fetchColumn() !== false) {
+                if ($esAjax) {
+                    responder_carrito_json([
+                        'success' => false,
+                        'message' => 'Ya tenés acceso a este curso.',
+                        'already_owned' => true,
+                    ], 409);
+                }
+                $_SESSION['carrito_error'] = 'Ya tenés acceso a este curso.';
+                header('Location: ../../views/curso.php?id=' . $id_publicacion);
+                exit;
+            }
+        }
+
         $_SESSION['carrito_publicaciones'] = $_SESSION['carrito_publicaciones'] ?? [];
         $yaExiste = in_array($id_publicacion, array_map('intval', $_SESSION['carrito_publicaciones']), true);
         if (!$yaExiste) {

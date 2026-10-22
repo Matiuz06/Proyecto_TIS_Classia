@@ -139,6 +139,68 @@ class CursoProgresoRepository
         ];
     }
 
+    public function obtenerProgresoAlumnoCursos(int $idAlumno, array $idsCursos): array
+    {
+        $idsCursos = array_values(array_unique(array_filter(array_map('intval', $idsCursos), static fn(int $id): bool => $id > 0)));
+        if (!$idsCursos) {
+            return [];
+        }
+
+        $placeholders = [];
+        $params = [
+            'usuario_recursos' => $idAlumno,
+            'usuario_entregas' => $idAlumno,
+        ];
+        foreach ($idsCursos as $indice => $idCurso) {
+            $nombre = 'curso_' . $indice;
+            $placeholders[] = ':' . $nombre;
+            $params[$nombre] = $idCurso;
+        }
+
+        $stmt = $this->pdo->prepare(
+            "SELECT m.id_publicacion AS id_curso,
+                    SUM(CASE WHEN r.tipo <> 'Entrega de Tareas' THEN 1 ELSE 0 END) AS recursos_total,
+                    SUM(CASE WHEN r.tipo <> 'Entrega de Tareas' AND crc.id_completado IS NOT NULL THEN 1 ELSE 0 END) AS recursos_completados,
+                    COUNT(t.id_tarea) AS tareas_total,
+                    SUM(CASE WHEN t.id_tarea IS NOT NULL
+                                  AND e.id_entrega IS NOT NULL
+                                  AND COALESCE(e.estado_entrega, 'entregada') = 'entregada'
+                             THEN 1 ELSE 0 END) AS tareas_completadas
+             FROM curso_modulos m
+             INNER JOIN curso_unidades u ON u.id_modulo = m.id_modulo
+             INNER JOIN curso_recursos r ON r.id_unidad = u.id_unidad
+             LEFT JOIN curso_tareas t ON t.id_recurso = r.id_recurso
+             LEFT JOIN curso_recursos_completados crc
+                    ON crc.id_recurso = r.id_recurso
+                   AND crc.id_usuario = :usuario_recursos
+             LEFT JOIN curso_entregas e
+                    ON e.id_tarea = t.id_tarea
+                   AND e.id_usuario = :usuario_entregas
+             WHERE m.id_publicacion IN (" . implode(', ', $placeholders) . ")
+             GROUP BY m.id_publicacion"
+        );
+        $stmt->execute($params);
+
+        $progresos = [];
+        foreach ($stmt->fetchAll() as $fila) {
+            $recursosTotal = (int)($fila['recursos_total'] ?? 0);
+            $recursosCompletados = (int)($fila['recursos_completados'] ?? 0);
+            $tareasTotal = (int)($fila['tareas_total'] ?? 0);
+            $tareasCompletadas = (int)($fila['tareas_completadas'] ?? 0);
+            $total = $recursosTotal + $tareasTotal;
+            $completados = $recursosCompletados + $tareasCompletadas;
+
+            $progresos[(int)$fila['id_curso']] = [
+                'porcentaje' => $total > 0 ? round(($completados / $total) * 100, 2) : 0.0,
+                'completado' => $total > 0
+                    && $recursosCompletados >= $recursosTotal
+                    && $tareasCompletadas >= $tareasTotal,
+            ];
+        }
+
+        return $progresos;
+    }
+
     public function listarRecursosCompletadosCurso(int $idAlumno, int $idCurso): array
     {
         $stmt = $this->pdo->prepare("

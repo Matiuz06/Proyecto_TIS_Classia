@@ -15,6 +15,7 @@ $bodyClass   = 'catalog-page';
 $activePage  = 'catalogo';
 include '../includes/header.php';
 $puedeAgregar = esta_autenticado();
+$idUsuarioCatalogo = (int) (usuario_actual()['id_usuario'] ?? 0);
 ?>
 
     <main id="main-content">
@@ -257,7 +258,25 @@ $puedeAgregar = esta_autenticado();
                         </dl>
                         <p class="catalog-actions">
                           <a class="btn" href="curso.php?id=<?= $curso->getId() ?>"><?= __t('btn_view_course') ?></a>
-                          <?php if ($puedeAgregar): ?>
+                          <?php if ($idUsuarioCatalogo > 0 && $idUsuarioCatalogo === $curso->getIdUsuario()): ?>
+                            <a class="btn" href="gestionar-contenido-curso.php?id=<?= (int) $curso->getId() ?>">Gestionar curso</a>
+                          <?php elseif (isset($cursos_con_acceso[(int) $curso->getId()])): ?>
+                            <?php $progreso = $progreso_cursos[(int) $curso->getId()] ?? null; ?>
+                            <?php if ($progreso !== null): ?>
+                              <?php $porcentaje = max(0, min(100, (float) $progreso['porcentaje'])); ?>
+                              <div role="group" aria-label="Progreso del curso">
+                                <div class="course-progress-card__foot">
+                                  <span>Progreso del curso</span>
+                                  <strong><?= $progreso['completado'] ? 'Curso completado &mdash; 100%' : number_format($porcentaje, 0) . '%' ?></strong>
+                                </div>
+                                <div class="course-progress-bar" role="progressbar" aria-label="Progreso del curso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= (int) round($porcentaje) ?>">
+                                  <span style="width: <?= $porcentaje ?>%;"></span>
+                                </div>
+                              </div>
+                            <?php else: ?>
+                              <span class="badge badge-info-soft">Progreso no disponible</span>
+                            <?php endif; ?>
+                          <?php elseif ($puedeAgregar): ?>
                             <form action="../php/contrataciones/carrito.php" method="post" data-add-to-cart-form>
                               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                               <input type="hidden" name="id_publicacion" value="<?= (int) $curso->getId() ?>">
