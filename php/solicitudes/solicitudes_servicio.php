@@ -263,9 +263,15 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
     if ($csrf === '' || !hash_equals($csrf, $post['csrf_token'] ?? '')) {
         return ['ok' => false, 'mensaje' => 'La sesión del formulario expiró.'];
     }
+    if ($uid !== $docente) {
+        return ['ok' => false, 'mensaje' => 'No tenes permisos para enviar mensajes en esta solicitud.'];
+    }
     $sol = obtener_solicitud_para_proveedor($pdo, $id, $docente);
     if (!$sol) {
         return ['ok' => false, 'mensaje' => 'Solicitud inexistente o sin permisos.'];
+    }
+    if (!in_array($sol['estado'], ['Pendiente', 'Aceptada', 'Contraoferta', 'En Proceso'], true) && ($post['accion'] ?? '') === 'mensaje') {
+        return ['ok' => false, 'mensaje' => 'Esta solicitud ya no admite mensajes.'];
     }
     $accion = $post['accion'] ?? '';
 
@@ -274,6 +280,9 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
             $msg = trim($post['mensaje'] ?? '');
             if ($msg === '') {
                 return ['ok' => false, 'mensaje' => 'Escribí un mensaje.'];
+            }
+            if (strlen($msg) > 5000) {
+                return ['ok' => false, 'mensaje' => 'El mensaje no puede superar los 5000 caracteres.'];
             }
             $q = $pdo->prepare("INSERT INTO solicitud_mensajes(id_solicitud, id_usuario, mensaje) VALUES(:s, :u, :m)");
             $q->execute(['s' => $id, 'u' => $uid, 'm' => $msg]);
@@ -367,9 +376,24 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
     }
 }
 
-function obtener_mensajes_solicitud(PDO $pdo, int $id): array
+function obtener_mensajes_solicitud(PDO $pdo, int $id, int $uid): array
 {
-    $q = $pdo->prepare("SELECT sm.*, u.nombre, u.apellido FROM solicitud_mensajes sm JOIN usuarios u ON u.id_usuario=sm.id_usuario WHERE sm.id_solicitud=:s ORDER BY sm.fecha_mensaje");
+    $acceso = $pdo->prepare("SELECT 1
+                             FROM solicitudes s
+                             JOIN publicaciones p ON p.id_publicacion=s.id_publicacion
+                             WHERE s.id_solicitud=:s AND p.tipo='Servicio'
+                               AND (s.id_usuario=:cliente OR p.id_usuario=:proveedor)
+                             LIMIT 1");
+    $acceso->execute(['s' => $id, 'cliente' => $uid, 'proveedor' => $uid]);
+    if (!$acceso->fetchColumn()) {
+        return [];
+    }
+
+    $q = $pdo->prepare("SELECT sm.*, u.nombre, u.apellido
+                        FROM solicitud_mensajes sm
+                        JOIN usuarios u ON u.id_usuario=sm.id_usuario
+                        WHERE sm.id_solicitud=:s
+                        ORDER BY sm.fecha_mensaje, sm.id_mensaje");
     $q->execute(['s' => $id]);
     return $q->fetchAll();
 }
@@ -402,18 +426,25 @@ function enviar_mensaje_solicitud_cliente(PDO $pdo, int $id, int $uid, string $m
     if ($csrf === '' || !hash_equals($csrf, $token)) {
         return ['ok' => false, 'mensaje' => 'La sesión del formulario expiró.'];
     }
-    if (!obtener_solicitud_para_cliente($pdo, $id, $uid)) {
+    $s = obtener_solicitud_para_cliente($pdo, $id, $uid);
+    if (!$s) {
         return ['ok' => false, 'mensaje' => 'Solicitud inexistente o sin permisos.'];
+    }
+    if (!in_array($s['estado'], ['Pendiente', 'Aceptada', 'Contraoferta', 'En Proceso'], true)) {
+        return ['ok' => false, 'mensaje' => 'Esta solicitud ya no admite mensajes.'];
     }
     $mensaje = trim($mensaje);
     if ($mensaje === '') {
         return ['ok' => false, 'mensaje' => 'Escribí un mensaje.'];
     }
     try {
+        if (strlen($mensaje) > 5000) {
+            return ['ok' => false, 'mensaje' => 'El mensaje no puede superar los 5000 caracteres.'];
+        }
         $q = $pdo->prepare("INSERT INTO solicitud_mensajes(id_solicitud, id_usuario, mensaje) VALUES(:s, :u, :m)");
         $q->execute(['s' => $id, 'u' => $uid, 'm' => $mensaje]);
         $idMensaje = (int)$pdo->lastInsertId();
-        notificar_solicitud_servicio($pdo, (int)($s['proveedor_id'] ?? 0), [
+        notificar_solicitud_servicio($pdo, (int)$s['proveedor_id'], [
             'categoria' => 'solicitudes',
             'titulo' => 'Nuevo mensaje sobre una solicitud',
             'mensaje' => 'El cliente respondió a tu solicitud de "' . $s['servicio'] . '".',
@@ -423,7 +454,8 @@ function enviar_mensaje_solicitud_cliente(PDO $pdo, int $id, int $uid, string $m
             'clave_idempotencia' => 'solicitud-mensaje:' . $idMensaje,
         ]);
         return ['ok' => true, 'mensaje' => 'Mensaje enviado.'];
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
+        error_log('Mensaje de cliente en solicitud: ' . $e->getMessage());
         return ['ok' => false, 'mensaje' => 'No se pudo enviar el mensaje.'];
     }
 }

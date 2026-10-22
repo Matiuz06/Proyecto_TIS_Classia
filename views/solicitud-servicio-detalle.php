@@ -19,12 +19,18 @@ $solicitud = obtener_solicitud_para_proveedor($pdo, $id, $uid);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $solicitud) {
     $r = procesar_solicitud_proveedor($pdo, $id, $uid, $uid, $_POST, $_SESSION['csrf_token']);
-    if ($r['ok']) set_toast('success', $r['mensaje']);
+    if ($r['ok']) {
+        set_toast('success', $r['mensaje']);
+        if (($_POST['accion'] ?? '') === 'mensaje') {
+            header('Location: solicitud-servicio-detalle.php?id=' . $id);
+            exit;
+        }
+    }
     else $error = $r['mensaje'];
     $solicitud = obtener_solicitud_para_proveedor($pdo, $id, $uid);
 }
 
-$mensajes = $solicitud ? obtener_mensajes_solicitud($pdo, $id) : [];
+$mensajes = $solicitud ? obtener_mensajes_solicitud($pdo, $id, $uid) : [];
 $detalles = $solicitud ? json_decode($solicitud['detalles_json'] ?? '{}', true) : [];
 $plantilla = $solicitud ? obtener_plantilla_servicio($solicitud['tipo_servicio'] ?? null) : null;
 
