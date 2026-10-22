@@ -5,6 +5,41 @@
  * No requiere agregar otra dependencia al proyecto.
  */
 
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
+
+function mercado_pago_notificar_servicio_contratado(PDO $pdo, int $idContratacion): void
+{
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT s.id_solicitud, p.id_usuario AS id_proveedor, p.titulo AS servicio
+             FROM solicitudes s
+             INNER JOIN publicaciones p ON p.id_publicacion = s.id_publicacion
+             WHERE s.id_contratacion = :id AND p.tipo = \'Servicio\'
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $idContratacion]);
+        $solicitud = $stmt->fetch();
+
+        if (!$solicitud || (int) $solicitud['id_proveedor'] <= 0) {
+            return;
+        }
+
+        $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+        $notificaciones->crear([
+            'id_usuario' => (int) $solicitud['id_proveedor'],
+            'categoria' => 'solicitudes',
+            'titulo' => 'Servicio contratado',
+            'mensaje' => 'Se confirmó el pago del servicio "' . $solicitud['servicio'] . '". Ya podés comenzar a gestionarlo.',
+            'url_destino' => 'views/solicitud-servicio-detalle.php?id=' . (int) $solicitud['id_solicitud'],
+            'tipo_entidad' => 'solicitud_servicio',
+            'id_entidad' => (int) $solicitud['id_solicitud'],
+            'clave_idempotencia' => 'servicio-contratado:' . $idContratacion,
+        ]);
+    } catch (Throwable $e) {
+        error_log('Notificacion de servicio contratado ' . $idContratacion . ': ' . $e->getMessage());
+    }
+}
+
 function mercado_pago_request(string $method, string $url, ?array $payload = null): array
 {
     $accessToken = getenv('MP_ACCESS_TOKEN') ?: '';
@@ -219,6 +254,10 @@ function mercado_pago_confirmar_pago(PDO $pdo, array $payment): array
             $pdo->rollBack();
         }
         throw $e;
+    }
+
+    if ($estadoPersistido === 'Aprobado') {
+        mercado_pago_notificar_servicio_contratado($pdo, $idContratacion);
     }
 
     return [
