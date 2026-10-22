@@ -55,10 +55,12 @@ include '../includes/header.php';
 
         <div class="request-detail-layout">
             <section class="content-card request-detail-card">
-                <div class="provider-section-head">
+                <details class="request-info-disclosure">
+                    <summary>Información de la solicitud</summary>
+                    <div class="provider-section-head">
                     <h2>Información solicitada</h2>
                     <p>Datos enviados por el usuario para definir el servicio.</p>
-                </div>
+                    </div>
                 <dl class="request-details">
                     <?php foreach ($detalles as $k => $v): ?>
                         <?php $label = $plantilla['campos'][$k]['label'] ?? str_replace('_', ' ', ucfirst($k)); ?>
@@ -72,6 +74,7 @@ include '../includes/header.php';
                 <?php if ($solicitud['archivo_adjunto']): ?>
                     <p><a class="btn" href="../php/descargas/descargar_archivo.php?tipo=solicitud&id=<?= (int)$solicitud['id_solicitud'] ?>">Descargar archivo adjunto</a></p>
                 <?php endif; ?>
+                </details>
             </section>
 
             <section class="content-card request-state-card">
