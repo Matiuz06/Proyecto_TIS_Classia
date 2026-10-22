@@ -329,6 +329,38 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
         $resp = trim($post['respuesta_proveedor'] ?? '');
 
         $pdo->beginTransaction();
+
+        if ($nuevo_estado === 'Realizada') {
+            if (empty($sol['id_contratacion'])) {
+                $pdo->rollBack();
+                return ['ok' => false, 'mensaje' => 'El servicio todavia no tiene una contratacion pagada.'];
+            }
+
+            $contratacion = $pdo->prepare(
+                'SELECT id_contratacion, estado
+                 FROM contrataciones
+                 WHERE id_contratacion = :c AND id_usuario = :u
+                 FOR UPDATE'
+            );
+            $contratacion->execute([
+                'c' => (int) $sol['id_contratacion'],
+                'u' => (int) $sol['id_usuario'],
+            ]);
+            $contratacionDatos = $contratacion->fetch();
+
+            $pago = $pdo->prepare(
+                "SELECT COUNT(*)
+                 FROM pagos
+                 WHERE id_contratacion = :c AND estado_pago = 'Aprobado'"
+            );
+            $pago->execute(['c' => (int) $sol['id_contratacion']]);
+
+            if (!$contratacionDatos || $contratacionDatos['estado'] !== 'En Proceso' || (int) $pago->fetchColumn() === 0) {
+                $pdo->rollBack();
+                return ['ok' => false, 'mensaje' => 'El servicio solo puede marcarse como realizado despues de confirmar el pago.'];
+            }
+        }
+
         $q = $pdo->prepare("UPDATE solicitudes SET estado=:e, precio_propuesto=:p, fecha_hora_propuesta=:f, respuesta_proveedor=:r WHERE id_solicitud=:s");
         $q->execute([
             'e' => $nuevo_estado,
