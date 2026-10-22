@@ -16,9 +16,15 @@
       try {
         data = JSON.parse(raw);
       } catch (error) {
-        throw new Error('Respuesta invalida del servidor.');
+        const parseError = new Error('Respuesta invalida del servidor.');
+        parseError.status = response.status;
+        throw parseError;
       }
-      if (!response.ok || !data.success) throw new Error(data.message || 'No se pudo completar la operacion.');
+      if (!response.ok || !data.success) {
+        const requestError = new Error(data.message || 'No se pudo completar la operacion.');
+        requestError.status = response.status;
+        throw requestError;
+      }
       return data;
     }
 
@@ -172,9 +178,16 @@
     const recentList = header?.querySelector('[data-notifications-list]');
     let recentItems = [];
     let recentLoading = false;
+    let countLoading = false;
+    let pollingTimer = null;
+    let pollingStopped = false;
+    let currentUnreadCount = null;
+    let stateRevision = 0;
+    let recentRequestId = 0;
 
     function setCount(value) {
       const total = Math.max(0, Number(value) || 0);
+      currentUnreadCount = total;
       if (count) {
         count.textContent = total > 99 ? '99+' : String(total);
         count.hidden = total === 0;
@@ -195,12 +208,17 @@
     async function loadRecent() {
       if (!recentList || recentLoading) return;
       recentLoading = true;
+      const requestId = ++recentRequestId;
+      const revision = stateRevision;
       try {
         const data = await api.getJson(`${api.endpoints.obtener}?limite=5&pagina=1`);
+        if (requestId !== recentRequestId || revision !== stateRevision) return;
         recentItems = Array.isArray(data.items) ? data.items : [];
         renderRecent();
         setCount(data.unread_count);
       } catch (error) {
+        if (error.status === 401 || error.status === 403) stopPolling();
+        if (requestId !== recentRequestId || revision !== stateRevision) return;
         console.error('No se pudieron cargar las notificaciones recientes:', error);
         showState(recentList, 'No se pudieron cargar las notificaciones.');
       } finally {
@@ -209,15 +227,35 @@
     }
 
     async function refreshCount() {
+      if (countLoading || pollingStopped) return;
+      countLoading = true;
+      const revision = stateRevision;
       try {
         const data = await api.getJson(api.endpoints.contador);
-        setCount(data.unread_count);
+        if (revision !== stateRevision) return;
+        const nextUnreadCount = Math.max(0, Number(data.unread_count) || 0);
+        const countChanged = currentUnreadCount !== null && nextUnreadCount !== currentUnreadCount;
+        setCount(nextUnreadCount);
+        if (countChanged && panel && !panel.hidden) loadRecent();
       } catch (error) {
+        if (error.status === 401 || error.status === 403) stopPolling();
         console.error('No se pudo actualizar el contador de notificaciones:', error);
+      } finally {
+        countLoading = false;
+      }
+    }
+
+    function stopPolling() {
+      pollingStopped = true;
+      if (pollingTimer !== null) {
+        window.clearInterval(pollingTimer);
+        pollingTimer = null;
       }
     }
 
     async function markAll() {
+      stateRevision += 1;
+      recentRequestId += 1;
       try {
         const data = await api.markAll();
         setCount(data.unread_count);
@@ -250,9 +288,12 @@
         }
       });
       refreshCount();
-      window.setInterval(function () {
+      pollingTimer = window.setInterval(function () {
         if (!document.hidden) refreshCount();
-      }, 60000);
+      }, 10000);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && !pollingStopped) refreshCount();
+      });
     }
 
   }
