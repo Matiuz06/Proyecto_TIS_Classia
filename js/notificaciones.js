@@ -76,26 +76,33 @@
     return date ? date.toLocaleString('es-UY', { dateStyle: 'medium', timeStyle: 'short' }) : '';
   }
 
-  function iconFor(category) {
-    const paths = {
-      tareas: 'M6 3h12v18H6z M9 7h6 M9 11h6 M9 15h4',
-      compras: 'M3 4h2l2.5 11h9L19 8H6 M10 19a1 1 0 1 0 0 .01 M17 19a1 1 0 1 0 0 .01',
-      solicitudes: 'M5 4h14v16H5z M8 8h8 M8 12h8 M8 16h5',
-      foro: 'M4 5h16v11H8l-4 4z',
-      sistema: 'M12 3l1.8 5.4H19l-4.2 3.1 1.6 5.5-4.4-3.2-4.4 3.2 1.6-5.5L5 8.4h5.2z',
-    };
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '1.8');
-    svg.setAttribute('stroke-linecap', 'round');
-    svg.setAttribute('stroke-linejoin', 'round');
-    svg.setAttribute('aria-hidden', 'true');
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', paths[category] || 'M12 3a9 9 0 1 0 9 9');
-    svg.appendChild(path);
-    return svg;
+  function notificationIconFile(category, title, entityType) {
+    const normalizedCategory = String(category || '').toLocaleLowerCase();
+    const normalizedTitle = String(title || '').toLocaleLowerCase();
+    const normalizedEntityType = String(entityType || '').toLocaleLowerCase();
+
+    if (normalizedCategory === 'valoraciones' || normalizedEntityType === 'valoracion') return 'valoraciones.svg';
+    if (normalizedEntityType === 'solicitud_docente' || normalizedTitle.includes('docente')) return 'solicitudes_docentes.svg';
+    if (normalizedEntityType === 'solicitud_mensaje' || normalizedEntityType === 'foro_mensaje' || normalizedCategory === 'foro' || normalizedTitle.includes('mensaje')) return 'mensajes.svg';
+    if (normalizedCategory === 'compras' || normalizedTitle.includes('servicio contratado') || normalizedTitle.includes('pago')) return 'pagos.svg';
+    if (normalizedCategory === 'tareas') {
+      return normalizedTitle.includes('correg') || normalizedTitle.includes('devoluc') || normalizedTitle.includes('calific')
+        ? 'correcciones.svg'
+        : 'tareas.svg';
+    }
+    if (normalizedEntityType === 'solicitud_servicio' || normalizedCategory === 'solicitudes') return 'solicitudes_servicios.svg';
+    if (normalizedCategory === 'cursos') return 'cursos.svg';
+
+    return 'cursos.svg';
+  }
+
+  function iconFor(category, title, entityType, base) {
+    const projectRoot = new URL('../..', `${new URL(`${base}/`, document.baseURI)}`);
+    const image = document.createElement('img');
+    image.src = new URL(`assets/images/icons/${notificationIconFile(category, title, entityType)}`, projectRoot).href;
+    image.alt = '';
+    image.setAttribute('aria-hidden', 'true');
+    return image;
   }
 
   function showState(container, message) {
@@ -126,7 +133,7 @@
 
     const icon = document.createElement('span');
     icon.className = 'notification-item__icon';
-    icon.appendChild(iconFor(item.categoria));
+    icon.appendChild(iconFor(item.categoria, item.titulo, item.tipo_entidad, base));
     const content = document.createElement('span');
     const title = document.createElement('strong');
     title.className = 'notification-item__title';

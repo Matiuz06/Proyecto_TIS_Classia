@@ -155,14 +155,14 @@
   place-items: center;
   width: 2rem;
   height: 2rem;
-  color: var(--color-brand-primary);
-  background: var(--color-brand-accent-soft);
-  border-radius: 50%;
+  flex: 0 0 2rem;
 }
 
+.notification-item__icon img,
 .notification-item__icon svg {
-  width: 1rem;
-  height: 1rem;
+  display: block;
+  width: 2rem;
+  height: 2rem;
 }
 
 .notification-item__title,

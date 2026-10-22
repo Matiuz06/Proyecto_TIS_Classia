@@ -68,7 +68,7 @@
 
       const icon = document.createElement('span');
       icon.className = 'notification-item__icon';
-      icon.appendChild(helpers.iconFor(item.categoria));
+      icon.appendChild(helpers.iconFor(item.categoria, item.titulo, item.tipo_entidad, base));
       const content = document.createElement('span');
       const title = document.createElement('strong');
       title.className = 'notification-item__title';
