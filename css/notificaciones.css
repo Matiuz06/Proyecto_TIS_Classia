@@ -210,7 +210,8 @@
 
 .notifications-page {
   width: min(var(--max-page), calc(100% - 2rem));
-  margin: var(--space-8) auto;
+  margin: 0 auto var(--space-8);
+  padding-top: 2.5rem;
 }
 
 .notifications-page__header {

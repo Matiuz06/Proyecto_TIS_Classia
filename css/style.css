@@ -4987,9 +4987,13 @@ a {
   }
 }
 
+.home-page main {
+  padding-top: 0;
+}
+
 .home-hero-centered {
   width: 100%;
-  padding: clamp(3rem, 6vw, 5.5rem) 1.5rem clamp(2.5rem, 5vw, 4rem);
+  padding: clamp(1.75rem, 3vw, 2.5rem) 1.5rem clamp(2.5rem, 5vw, 4rem);
   text-align: center;
   border-bottom: 1px solid var(--color-border);
   background: linear-gradient(
@@ -16025,7 +16029,7 @@ a {
 
 .home-hero-centered {
   width: 100%;
-  padding: clamp(3rem, 6vw, 5.5rem) 1.5rem clamp(2.5rem, 5vw, 4rem);
+  padding: clamp(1.75rem, 3vw, 2.5rem) 1.5rem clamp(2.5rem, 5vw, 4rem);
   text-align: center;
   border-bottom: 1px solid var(--color-border);
   background: linear-gradient(
