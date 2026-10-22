@@ -134,7 +134,6 @@ $cartCount = count($cartItems);
             class="notifications-nav"
             data-notifications-root
             data-notifications-base="<?= htmlspecialchars($notificacionesBase, ENT_QUOTES, 'UTF-8') ?>"
-            data-notifications-history="<?= htmlspecialchars($notificacionesHref, ENT_QUOTES, 'UTF-8') ?>"
             data-csrf-token="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
             <button
               class="notifications-toggle"

@@ -18,7 +18,13 @@ try {
     $idUsuario = id_usuario_actual();
     $limite = (int) ($_GET['limite'] ?? 10);
     $pagina = (int) ($_GET['pagina'] ?? 1);
-    $historial = $repository->historial($idUsuario, $pagina, $limite);
+    $filtro = (string) ($_GET['filtro'] ?? 'all');
+    if (!in_array($filtro, ['all', 'read', 'unread'], true)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Filtro de notificaciones inválido.'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    $historial = $repository->historial($idUsuario, $pagina, $limite, $filtro);
 
     echo json_encode([
         'success' => true,

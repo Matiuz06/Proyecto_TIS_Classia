@@ -100,26 +100,39 @@ class NotificacionRepository
         return (int) $stmt->fetchColumn();
     }
 
-    public function historial(int $idUsuario, int $pagina = 1, int $porPagina = 20): array
+    public function historial(int $idUsuario, int $pagina = 1, int $porPagina = 20, string $filtro = 'all'): array
     {
+        if (!in_array($filtro, ['all', 'read', 'unread'], true)) {
+            throw new InvalidArgumentException('Filtro de notificaciones inválido.');
+        }
+
         $pagina = max(1, $pagina);
         $porPagina = max(1, min($porPagina, 50));
         $offset = ($pagina - 1) * $porPagina;
+        $where = ['id_usuario = :usuario'];
+        $params = ['usuario' => $idUsuario];
+        if ($filtro !== 'all') {
+            $where[] = 'leida = :estado_leida';
+            $params['estado_leida'] = $filtro === 'read'
+                ? ($this->postgresql ? true : 1)
+                : ($this->postgresql ? false : 0);
+        }
+        $whereSql = implode(' AND ', $where);
 
         $stmt = $this->pdo->prepare(
             "SELECT id_notificacion, categoria, titulo, mensaje, url_destino,
                     tipo_entidad, id_entidad, leida, fecha_creacion, fecha_leida
              FROM notificaciones
-             WHERE id_usuario = :usuario
+             WHERE {$whereSql}
              ORDER BY fecha_creacion DESC, id_notificacion DESC
              LIMIT {$porPagina} OFFSET {$offset}"
         );
-        $stmt->execute(['usuario' => $idUsuario]);
+        $stmt->execute($params);
 
         $total = $this->pdo->prepare(
-            'SELECT COUNT(*) FROM notificaciones WHERE id_usuario = :usuario'
+            "SELECT COUNT(*) FROM notificaciones WHERE {$whereSql}"
         );
-        $total->execute(['usuario' => $idUsuario]);
+        $total->execute($params);
 
         return [
             'items' => $stmt->fetchAll(),

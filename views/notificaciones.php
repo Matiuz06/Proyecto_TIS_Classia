@@ -41,4 +41,5 @@ include '../includes/header.php';
   </nav>
 </main>
 
+<script src="../js/notificaciones-historial.js?v=<?= filemtime(__DIR__ . '/../js/notificaciones-historial.js') ?>" defer></script>
 <?php include '../includes/footer.php'; ?>
