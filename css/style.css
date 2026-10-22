@@ -7523,6 +7523,13 @@ dialog.course-dialog::backdrop {
   font-size: var(--text-lg);
 }
 
+.course-dialog-header.event-dialog-header,
+.course-dialog-header.news-dialog-header {
+  padding: var(--space-2) 0 0;
+  margin-bottom: var(--space-3);
+  border-bottom: 0;
+}
+
 .course-dialog-close {
   width: 2.25rem;
   height: 2.25rem;

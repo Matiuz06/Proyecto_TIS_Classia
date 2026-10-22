@@ -230,9 +230,9 @@ include '../includes/header.php';
   <?php if ($puedeCrear): ?>
     <dialog id="modal-crear-evento" class="modal">
       <div class="modal__card" style="max-width: 600px;">
-        <header class="modal__header">
+        <header class="course-dialog-header event-dialog-header">
           <h2 class="u-text-lg u-font-bold"><?= $esAdmin ? 'Publicar Nuevo Evento' : 'Proponer Nuevo Evento' ?></h2>
-          <button type="button" class="btn-close" onclick="document.getElementById('modal-crear-evento').close();" aria-label="Cerrar modal">&times;</button>
+          <button type="button" class="course-dialog-close" onclick="document.getElementById('modal-crear-evento').close();" aria-label="Cerrar modal">&times;</button>
         </header>
 
         <form action="eventos.php" method="post" enctype="multipart/form-data" class="service-req-stack u-mt-4">
