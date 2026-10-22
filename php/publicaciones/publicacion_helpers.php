@@ -37,7 +37,20 @@ function resolver_categoria_publicacion(PDO $pdo, int $id_usuario, int $id_categ
     return ['ok'=>true,'error'=>'','id'=>$id_categoria];
 }
 
-function validar_datos_publicacion(array $data): array
+function validar_tipo_servicio_publicacion(?string $tipoServicio, bool $obligatorio = true): array
+{
+    $tipoServicio = trim((string) $tipoServicio);
+    if ($tipoServicio === '') {
+        return $obligatorio ? ['Seleccioná una plantilla válida para el servicio.'] : [];
+    }
+
+    $plantillas = plantillas_servicio();
+    return isset($plantillas[$tipoServicio])
+        ? []
+        : ['La plantilla seleccionada para el servicio no es válida.'];
+}
+
+function validar_datos_publicacion(array $data, bool $exigirPlantillaServicio = true): array
 {
     $errores=[];
     $titulo=trim($data['titulo'] ?? '');
@@ -70,6 +83,9 @@ function validar_datos_publicacion(array $data): array
 
     if ($tipo==='Servicio') {
         $ts=trim((string)($data['tipo_servicio'] ?? ''));
+        if ($ts === '' && $exigirPlantillaServicio) {
+            $errores[]='Seleccioná una plantilla válida para el servicio.';
+        }
         if ($ts!=='') {
             $plantillas=plantillas_servicio();
             if (!isset($plantillas[$ts])) $errores[]='La plantilla seleccionada para el servicio no es válida.';

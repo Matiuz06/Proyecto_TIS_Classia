@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
         $errores[] = 'La sesión del formulario expiró. Recargá la página e intentá nuevamente.';
     }
-    $errores = array_merge($errores, validar_datos_publicacion($_POST));
+    $errores = array_merge($errores, validar_datos_publicacion($_POST, true));
 
     $categoria = ['ok'=>false,'id'=>0,'error'=>''];
     if (empty($errores)) {

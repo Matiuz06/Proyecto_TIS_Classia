@@ -171,8 +171,8 @@ include '../includes/header.php';
         </div>
         <div class="publication-field-grid">
           <label class="publication-field publication-field--full">Plantilla de servicio
-            <select name="tipo_servicio">
-              <option value="">Sin plantilla / contratacion directa</option>
+            <select name="tipo_servicio" required>
+              <option value="" disabled <?= empty($_POST['tipo_servicio']) ? 'selected' : '' ?>>Seleccioná una plantilla</option>
               <?php foreach ($plantillas_servicios as $clave => $plantilla): ?>
                 <option value="<?= htmlspecialchars($clave) ?>" <?= ($_POST['tipo_servicio'] ?? '') === $clave ? 'selected' : '' ?>><?= htmlspecialchars($plantilla['nombre']) ?></option>
               <?php endforeach; ?>

@@ -52,20 +52,30 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
                     $errores[] = 'No es posible publicar el curso: debe tener al menos un módulo con contenido. Agrega módulos y recursos antes de activarlo.';
                 }
             }
-            $publicacionObjeto->setEstado($estado);
-            $publicacionObjeto->setEliminadoEn($estado==='Eliminado'?date('Y-m-d H:i:s'):null);
-            $publicacionRepository->actualizar($publicacionObjeto, $admin ? null : $uid);
-            set_toast('success', 'Estado actualizado', 'La publicacion fue actualizada correctamente.');
-            header('Location: panel-proveedor.php?mensaje=estado_actualizado');
-            exit;
+            if ($estado === 'Activo' && $publicacion['tipo'] === 'Servicio') {
+                $errores = array_merge(
+                    $errores,
+                    validar_tipo_servicio_publicacion($publicacion['tipo_servicio'] ?? null)
+                );
+            }
+            if (empty($errores)) {
+                $publicacionObjeto->setEstado($estado);
+                $publicacionObjeto->setEliminadoEn($estado==='Eliminado'?date('Y-m-d H:i:s'):null);
+                $publicacionRepository->actualizar($publicacionObjeto, $admin ? null : $uid);
+                set_toast('success', 'Estado actualizado', 'La publicacion fue actualizada correctamente.');
+                header('Location: panel-proveedor.php?mensaje=estado_actualizado');
+                exit;
+            }
         }
     } elseif (empty($errores)) {
         $datos=$_POST;
         $datos['tipo']=$publicacion['tipo'];
-        $errores=array_merge($errores,validar_datos_publicacion($datos));
-
         $estado=$_POST['estado'] ?? $publicacion['estado'];
         if (!in_array($estado,['Activo','Pausado','Inactivo','Eliminado','Archivado'],true)) $errores[]='Estado no válido.';
+        $errores=array_merge(
+            $errores,
+            validar_datos_publicacion($datos, $publicacion['tipo'] !== 'Servicio' || $estado === 'Activo')
+        );
 
         if ($estado === 'Activo' && $publicacion['tipo'] === 'Curso' && empty($errores)) {
             $stmt_rd09b = $pdo->prepare("
