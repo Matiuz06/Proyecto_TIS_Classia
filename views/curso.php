@@ -307,15 +307,14 @@ include '../includes/header.php';
                 </table>
               </div>
               <span class="badge <?= !empty($progreso_curso['aprobado']) ? 'badge-success-soft' : (!empty($progreso_curso['completado']) ? 'badge-warning-soft' : 'badge-info-soft') ?>"><?= htmlspecialchars($progreso_curso['estado']) ?></span>
-            </div>
-            <div class="course-progress-bar" aria-hidden="true">
-              <span style="width: <?= max(0, min(100, $porcentajeProgreso)) ?>%;"></span>
-            </div>
             <div class="course-progress-card__foot">
               <span>Progreso: <?= curso_formatear_porcentaje($porcentajeProgreso) ?>%</span>
               <span>Rendimiento académico: <?= curso_formatear_porcentaje((float)($progreso_curso['porcentaje_academico'] ?? $porcentajeProgreso)) ?>%</span>
               <span>Minimo para aprobar: <?= (int)$progreso_curso['porcentaje_minimo'] ?>%</span>
             </div>
+                <div class="course-progress-bar" role="progressbar" aria-label="Progreso del curso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= max(0, min(100, $porcentajeProgreso)) ?>">
+                  <span style="width: <?= max(0, min(100, $porcentajeProgreso)) ?>%;"></span>
+                </div>
             <?php if (!empty($progreso_curso['aprobado'])): ?>
               <p><a class="btn btn-sm btn-primary-action" href="../php/certificados/descargar.php?id_curso=<?= (int)$curso['id_publicacion'] ?>">Descargar certificado</a></p>
             <?php else: ?>
