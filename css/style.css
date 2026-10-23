@@ -12989,54 +12989,6 @@ body.course-builder-page.course-dialog-open {
    Corrige el ancho de la sección y evita que los títulos se
    compriman verticalmente. No modifica otros módulos.
    ========================================================= */
-.provider-workspace > .provider-notifications-section {
-  grid-column: 1 / -1;
-}
-
-.provider-workspace .provider-notifications-section article {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2) var(--space-4);
-  align-items: start;
-  min-width: 0;
-}
-
-.provider-workspace .provider-notifications-section article h3 {
-  grid-column: 1;
-  min-width: 0;
-  margin: 0;
-  overflow-wrap: break-word;
-  word-break: normal;
-}
-
-.provider-workspace .provider-notifications-section article p {
-  grid-column: 2;
-  min-width: 0;
-  margin: 0;
-  overflow-wrap: break-word;
-  word-break: normal;
-}
-
-.provider-workspace .provider-notifications-section article > a {
-  grid-column: 1 / -1;
-  justify-self: start;
-  width: auto;
-  margin-top: var(--space-1);
-  white-space: normal;
-}
-
-@media (max-width: 760px) {
-  .provider-workspace .provider-notifications-section article {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .provider-workspace .provider-notifications-section article h3,
-  .provider-workspace .provider-notifications-section article p,
-  .provider-workspace .provider-notifications-section article > a {
-    grid-column: 1;
-  }
-}
-
 /* ════════════════════════════════════════════════════════
    PANEL DE ANALÍTICAS Y RENDIMIENTO
    Estadísticas de visitas, contrataciones, ingresos y gráficos
@@ -23932,54 +23884,6 @@ body.course-builder-page.course-dialog-open {
    Corrige el ancho de la sección y evita que los títulos se
    compriman verticalmente. No modifica otros módulos.
    ========================================================= */
-.provider-workspace > .provider-notifications-section {
-  grid-column: 1 / -1;
-}
-
-.provider-workspace .provider-notifications-section article {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2) var(--space-4);
-  align-items: start;
-  min-width: 0;
-}
-
-.provider-workspace .provider-notifications-section article h3 {
-  grid-column: 1;
-  min-width: 0;
-  margin: 0;
-  overflow-wrap: break-word;
-  word-break: normal;
-}
-
-.provider-workspace .provider-notifications-section article p {
-  grid-column: 2;
-  min-width: 0;
-  margin: 0;
-  overflow-wrap: break-word;
-  word-break: normal;
-}
-
-.provider-workspace .provider-notifications-section article > a {
-  grid-column: 1 / -1;
-  justify-self: start;
-  width: auto;
-  margin-top: var(--space-1);
-  white-space: normal;
-}
-
-@media (max-width: 760px) {
-  .provider-workspace .provider-notifications-section article {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .provider-workspace .provider-notifications-section article h3,
-  .provider-workspace .provider-notifications-section article p,
-  .provider-workspace .provider-notifications-section article > a {
-    grid-column: 1;
-  }
-}
-
 /* ════════════════════════════════════════════════════════
    PANEL DE ANALÍTICAS Y RENDIMIENTO
    Estadísticas de visitas, contrataciones, ingresos y gráficos
@@ -25847,6 +25751,10 @@ form.teacher-request-actions {
   border-bottom: 1px solid var(--color-border);
 }
 
+.provider-workspace > .provider-subnav {
+  position: static;
+}
+
 @media (max-width: 760px) {
   .provider-workspace .provider-subnav a {
     flex: 0 0 auto;
@@ -26478,4 +26386,88 @@ form.teacher-request-actions {
 
 .service-request-provider-page .request-proposal-content .provider-form {
   gap: var(--space-3);
+}
+/* Encabezado y resumen del proveedor en una sola franja compacta. */
+.provider-dashboard-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.provider-dashboard-overview > .provider-dashboard__header,
+.provider-dashboard-overview > .provider-summary-section {
+  min-width: 0;
+  margin: 0;
+}
+
+.provider-dashboard-overview > .provider-dashboard__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+}
+
+.provider-dashboard-overview .provider-dashboard__header h1,
+.provider-dashboard-overview .provider-dashboard__header p {
+  margin: 0;
+}
+
+.provider-dashboard-overview .provider-dashboard__header > nav {
+  margin-top: auto;
+}
+
+.provider-dashboard-overview .provider-summary-section {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.provider-dashboard-overview .provider-summary-section > h2 {
+  margin-bottom: var(--space-1);
+}
+
+.provider-dashboard-overview .provider-summary-section > article {
+  min-height: 0;
+  padding: var(--space-2);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.provider-dashboard-overview .provider-summary-section > article h3 {
+  min-height: 0;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-xs);
+}
+
+.provider-dashboard-overview .provider-summary-section > article p {
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .provider-dashboard-overview {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .provider-dashboard-overview .provider-summary-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .provider-dashboard-overview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .provider-dashboard-overview .provider-summary-section {
+    grid-template-columns: 1fr;
+  }
 }

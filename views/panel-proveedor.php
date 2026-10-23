@@ -123,22 +123,6 @@ $stmtValoraciones = $pdo->prepare(
 $stmtValoraciones->execute(['u' => $uid]);
 $valoraciones_recientes = $stmtValoraciones->fetchAll();
 
-$notificaciones = [];
-foreach (array_slice($solicitudes_recientes, 0, 3) as $sol) {
-    $notificaciones[] = [
-        'titulo' => 'Solicitud de ' . ($sol['servicio'] ?? 'servicio'),
-        'texto' => trim(($sol['nombre'] ?? '') . ' ' . ($sol['apellido'] ?? '')) . ' · Estado: ' . ($sol['estado'] ?? 'Pendiente'),
-        'href' => 'solicitud-servicio-detalle.php?id=' . (int)$sol['id_solicitud'],
-    ];
-}
-foreach (array_slice($valoraciones_recientes, 0, 2) as $v) {
-    $notificaciones[] = [
-        'titulo' => 'Nueva valoración recibida',
-        'texto' => ($v['nombre'] ?? '') . ' ' . ($v['apellido'] ?? '') . ' valoró ' . ($v['publicacion'] ?? 'una publicación') . ' con ' . (int)$v['puntuacion'] . ' / 5.',
-        'href' => '#valoraciones',
-    ];
-}
-
 $title = 'Panel proveedor';
 $description = 'Panel de gestión para proveedores de cursos y servicios en Classia.';
 $cssPrefix = '..';
@@ -148,10 +132,10 @@ include '../includes/header.php';
 ?>
 
 <main id="main-content" class="provider-dashboard provider-workspace">
+  <div class="provider-dashboard-overview">
     <header class="provider-dashboard__header">
         <h1>Panel del proveedor</h1>
         <p>Gestiona tus cursos, servicios, solicitudes, estudiantes y datos profesionales desde un único lugar.</p>
-        <p><span>Sesión iniciada como:</span> <strong><?= htmlspecialchars(trim(($usuario['nombre'] ?? '') . ' ' . ($usuario['apellido'] ?? ''))) ?></strong></p>
 
         <nav aria-label="Acciones rápidas del proveedor">
             <ul>
@@ -160,12 +144,22 @@ include '../includes/header.php';
                 <?php if (es_docente() || es_admin()): ?>
                     <li><a href="solicitudes-servicios.php">Ver solicitudes</a></li>
                     <li><a href="editar-perfil-profesional.php">Editar perfil profesional</a></li>
-                    <li><a href="eventos.php">Proponer o ver eventos</a></li>
-                    <li><a href="noticias.php">Proponer o ver noticias</a></li>
                 <?php endif; ?>
             </ul>
         </nav>
     </header>
+
+    <section class="provider-summary-section" aria-labelledby="titulo-resumen">
+        <h2 id="titulo-resumen">Resumen de actividad</h2>
+
+        <article><h3>Publicaciones activas</h3><p><strong><?= $activas ?></strong></p></article>
+        <article><h3>Estudiantes inscriptos</h3><p><strong><?= $estudiantes ?></strong></p></article>
+        <article><h3>Solicitudes pendientes</h3><p><strong><?= $pendientes ?></strong></p></article>
+        <article><h3>Servicios en proceso</h3><p><strong><?= $enProceso ?></strong></p></article>
+        <article><h3>Valoración promedio</h3><p><strong><?= $valoracion !== false && $valoracion !== null ? htmlspecialchars((string)$valoracion) . ' de 5' : 'Sin valoraciones' ?></strong></p></article>
+        <article><h3>Ingresos registrados</h3><p><strong>$<?= number_format($ingresos, 2, ',', '.') ?></strong></p></article>
+    </section>
+  </div>
 
     <nav class="provider-subnav" aria-label="Navegación del panel del proveedor">
         <a href="#publicaciones">Publicaciones</a>
@@ -177,36 +171,6 @@ include '../includes/header.php';
 
     <div class="provider-tab-panels">
     <section id="publicaciones" data-provider-section class="provider-tab-panel" aria-label="Publicaciones">
-    <section class="provider-summary-section" aria-labelledby="titulo-resumen">
-        <h2 id="titulo-resumen">Resumen de actividad</h2>
-
-        <article><h3>Publicaciones activas</h3><p><strong><?= $activas ?></strong></p><a href="#publicaciones">Ver publicaciones</a></article>
-        <article><h3>Estudiantes inscriptos</h3><p><strong><?= $estudiantes ?></strong></p><a href="#estudiantes">Ver estudiantes</a></article>
-        <article><h3>Solicitudes pendientes</h3><p><strong><?= $pendientes ?></strong></p><a href="#solicitudes">Revisar solicitudes</a></article>
-        <article><h3>Servicios en proceso</h3><p><strong><?= $enProceso ?></strong></p><a href="#solicitudes">Ver servicios</a></article>
-        <article><h3>Valoración promedio</h3><p><strong><?= $valoracion !== false && $valoracion !== null ? htmlspecialchars((string)$valoracion) . ' de 5' : 'Sin valoraciones' ?></strong></p><a href="#valoraciones">Ver valoraciones</a></article>
-        <article><h3>Ingresos registrados</h3><p><strong>$<?= number_format($ingresos, 2, ',', '.') ?></strong></p><p>Total correspondiente a pagos aprobados de tus contrataciones.</p></article>
-    </section>
-
-    <section class="provider-notifications-section" aria-labelledby="titulo-notificaciones">
-        <header>
-            <h2 id="titulo-notificaciones">Notificaciones</h2>
-            <p><?= count($notificaciones) ?> novedades recientes.</p>
-        </header>
-
-        <?php if (!$notificaciones): ?>
-            <p class="muted">No hay novedades recientes.</p>
-        <?php else: ?>
-            <?php foreach ($notificaciones as $notificacion): ?>
-                <article>
-                    <header><h3><?= htmlspecialchars($notificacion['titulo']) ?></h3></header>
-                    <p><?= htmlspecialchars($notificacion['texto']) ?></p>
-                    <a href="<?= htmlspecialchars($notificacion['href']) ?>">Ver detalle</a>
-                </article>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </section>
-
     <section class="provider-publications-section" aria-labelledby="titulo-publicaciones">
         <header>
             <h2 id="titulo-publicaciones">Mis cursos y servicios</h2>
