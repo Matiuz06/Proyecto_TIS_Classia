@@ -39,6 +39,18 @@ function iniciar_sesion(): void
     ) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
+
+    // Control de inactividad de sesión: 30 minutos (NIST SP 800-63B / CIS Controls 5.3 / ISO 27001 A.5.15)
+    $timeout_inactividad = 1800; // 30 minutos
+    if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['usuario'])) {
+        if (isset($_SESSION['ultimo_acceso']) && (time() - $_SESSION['ultimo_acceso']) > $timeout_inactividad) {
+            cerrar_sesion();
+            session_start();
+            $_SESSION['login_error'] = 'Tu sesión expiró por inactividad. Por favor, volvé a ingresar.';
+            return;
+        }
+        $_SESSION['ultimo_acceso'] = time();
+    }
 }
 
 function establecer_usuario_sesion(
@@ -61,6 +73,7 @@ function establecer_usuario_sesion(
     ];
 
     $_SESSION['id_usuario'] = $id_usuario;
+    $_SESSION['ultimo_acceso'] = time();
 }
 
 function actualizar_foto_sesion(?string $foto_perfil): void
