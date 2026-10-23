@@ -11813,6 +11813,174 @@ body.course-builder-page.course-dialog-open {
   font-weight: 700;
 }
 
+/* Navegación por secciones del panel administrativo. */
+.admin-panel > .admin-panel-header {
+  padding: var(--space-5) 0 0;
+  margin-bottom: var(--space-5);
+}
+
+.admin-panel > .admin-panel-header h1 {
+  margin-bottom: var(--space-2);
+}
+
+.admin-panel > .admin-panel-header > p:last-child {
+  max-width: none;
+  line-height: 1.5;
+}
+
+.admin-dashboard-layout {
+  display: block;
+}
+
+.admin-dashboard-layout > .admin-panel-navigation {
+  display: block;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.admin-panel-navigation > .admin-panel-kicker,
+.admin-panel-navigation > h2 {
+  display: none;
+}
+
+.admin-panel-navigation > .admin-panel-dropdown {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: var(--space-5, 1.5rem);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.admin-dashboard-layout .admin-panel-trigger {
+  display: none;
+}
+
+.admin-dashboard-layout .admin-panel-menu {
+  position: static;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0;
+  width: auto;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.admin-dashboard-layout .admin-panel-navigation .admin-panel-dropdown:hover .admin-panel-menu,
+.admin-dashboard-layout .admin-panel-navigation .admin-panel-dropdown:focus-within .admin-panel-menu {
+  flex-direction: row;
+}
+
+.admin-dashboard-layout .admin-panel-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: auto;
+  min-width: 0;
+  flex: 1 1 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-muted);
+  background: var(--color-brand-primary-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.admin-dashboard-layout .admin-panel-item:first-child {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.admin-dashboard-layout .admin-panel-item:last-child {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.admin-dashboard-layout .admin-panel-item:hover,
+.admin-dashboard-layout .admin-panel-item:focus {
+  color: var(--color-heading);
+  background: var(--color-surface-elevated);
+}
+
+.admin-dashboard-layout .admin-panel-item.active {
+  color: var(--color-text-inverse);
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.admin-dashboard-layout .admin-panel-item .admin-badge-count,
+.admin-dashboard-layout .admin-panel-item .admin-badge-muted {
+  margin-left: 0;
+}
+
+.admin-dashboard-layout > [data-admin-section] {
+  min-width: 0;
+  margin: 0;
+}
+
+.admin-dashboard-layout > [data-admin-section][hidden] {
+  display: none;
+}
+
+.admin-tab-panel[hidden],
+.admin-dashboard-layout > [data-admin-section][hidden] {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .admin-panel-navigation > .admin-panel-dropdown {
+    position: relative;
+    top: auto;
+  }
+
+  .admin-dashboard-layout .admin-panel-trigger {
+    display: inline-flex;
+    width: 100%;
+  }
+
+  .admin-dashboard-layout .admin-panel-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+    width: auto;
+    padding: 0.35rem 0;
+    background: var(--color-surface-elevated, #ffffff);
+    border: 1px solid var(--color-border, #cbd5e0);
+    border-radius: var(--radius-md, 8px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .admin-dashboard-layout .admin-panel-menu.is-open,
+  .admin-dashboard-layout .admin-panel-dropdown:focus-within .admin-panel-menu {
+    display: flex;
+    flex-direction: column;
+    overflow-x: visible;
+  }
+
+  .admin-dashboard-layout .admin-panel-navigation .admin-panel-dropdown:focus-within .admin-panel-menu,
+  .admin-dashboard-layout .admin-panel-navigation .admin-panel-menu.is-open {
+    flex-direction: column;
+  }
+
+  .admin-dashboard-layout .admin-panel-item {
+    width: 100%;
+  }
+}
+
 .admin-badge-muted {
   display: inline-flex;
   align-items: center;
