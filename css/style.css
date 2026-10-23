@@ -2021,10 +2021,6 @@ input:hover {
   height: 100%;
   transition: width var(--dur-medium) var(--ease-out);
   border-radius: 999px;
-  );
-  height: 100%;
-  transition: width var(--dur-medium) var(--ease-out);
-  border-radius: 999px;
 }
 
 .auth-shell {
