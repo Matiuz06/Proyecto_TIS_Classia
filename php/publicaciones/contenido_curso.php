@@ -420,6 +420,23 @@ function procesar_contenido_curso(PDO $pdo, array $post, array $files, int $id_p
             if (!$uid) return ['ok' => false, 'mensaje' => 'El recurso no pertenece a este curso.'];
             $repo->intercambiarOrden('curso_recursos', 'id_recurso', (int)$post['id_recurso'], 'id_unidad', $uid, $a === 'subir_recurso' ? 'subir' : 'bajar');
 
+        // Visibilidad del contenido para alumnos
+        } elseif ($a === 'toggle_visible_modulo') {
+            $nuevo = $repo->togglearVisibilidadModulo((int)$post['id_modulo'], $id_publicacion);
+            if ($nuevo === null) return ['ok' => false, 'mensaje' => 'Módulo no encontrado.'];
+            return [
+                'ok' => true,
+                'mensaje' => $nuevo ? 'Módulo visible para alumnos.' : 'Módulo ocultado a los alumnos.'
+            ];
+
+        } elseif ($a === 'toggle_visible_recurso') {
+            $nuevo = $repo->togglearVisibilidadRecurso((int)$post['id_recurso'], $id_publicacion);
+            if ($nuevo === null) return ['ok' => false, 'mensaje' => 'Recurso no encontrado.'];
+            return [
+                'ok' => true,
+                'mensaje' => $nuevo ? 'Recurso visible para alumnos.' : 'Recurso ocultado a los alumnos.'
+            ];
+
         } else {
             return ['ok' => false, 'mensaje' => 'Acción no reconocida.'];
         }

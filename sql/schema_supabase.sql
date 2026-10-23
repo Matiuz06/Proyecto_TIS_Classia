@@ -71,7 +71,27 @@ CREATE TABLE IF NOT EXISTS usuarios (
 );
 
 -- ----------------------------------------------------------------------------
--- 3. TABLA: categorias
+-- 3. TABLA: auditoria_seguridad
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS auditoria_seguridad (
+    id_auditoria BIGSERIAL PRIMARY KEY,
+    id_usuario INT NULL REFERENCES usuarios(id_usuario) ON DELETE SET NULL ON UPDATE CASCADE,
+    tipo_evento VARCHAR(60) NOT NULL,
+    descripcion TEXT NOT NULL,
+    direccion_ip VARCHAR(45) NOT NULL,
+    user_agent VARCHAR(255) NULL,
+    nivel_severidad VARCHAR(10) NOT NULL DEFAULT 'INFO'
+        CHECK (nivel_severidad IN ('INFO', 'WARNING', 'CRITICAL')),
+    datos_adicionales JSONB NULL,
+    fecha_evento TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_auditoria_evento ON auditoria_seguridad (tipo_evento);
+CREATE INDEX IF NOT EXISTS idx_auditoria_fecha ON auditoria_seguridad (fecha_evento);
+CREATE INDEX IF NOT EXISTS idx_auditoria_usuario ON auditoria_seguridad (id_usuario);
+
+-- ----------------------------------------------------------------------------
+-- 4. TABLA: categorias
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS categorias (
     id_categoria SERIAL PRIMARY KEY,

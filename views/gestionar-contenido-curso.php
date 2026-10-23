@@ -220,6 +220,7 @@ include '../includes/header.php';
                 <?php if (!empty($modulo['descripcion'])): ?><p><?= nl2br(htmlspecialchars($modulo['descripcion'])) ?></p><?php endif; ?>
               </div>
               <div class="course-actions" aria-label="Acciones del módulo">
+                <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
                 <?php foreach (['subir_modulo' => 'Subir', 'bajar_modulo' => 'Bajar'] as $accion => $texto): ?>
                   <form method="POST"><?php campo_base_curso($id_publicacion); ?><input type="hidden" name="accion" value="<?= $accion ?>"><input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>"><button class="btn btn-sm" type="submit"><?= $texto ?></button></form>
                 <?php endforeach; ?>
@@ -230,6 +231,20 @@ include '../includes/header.php';
                   <input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>">
                   <button class="btn-status btn-status-delete" type="submit">Eliminar</button>
                 </form>
+                <?php endif; ?>
+                <?php $vis_mod = (int)($modulo['visible_alumnos'] ?? 1); ?>
+                <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
+                <form method="POST" class="inline-form">
+                  <?php campo_base_curso($id_publicacion); ?>
+                  <input type="hidden" name="accion" value="toggle_visible_modulo">
+                  <input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>">
+                  <button type="submit" class="btn btn-sm <?= $vis_mod ? 'btn-visible-on' : 'btn-visible-off' ?>"
+                    title="<?= $vis_mod ? 'Módulo visible para alumnos — clic para ocultar' : 'Módulo oculto para alumnos — clic para mostrar' ?>"
+                    aria-label="<?= $vis_mod ? 'Ocultar módulo a alumnos' : 'Mostrar módulo a alumnos' ?>">
+                    <?= $vis_mod ? 'Visible' : 'Oculto' ?>
+                  </button>
+                </form>
+                <?php endif; ?>
               </div>
             </header>
 
@@ -297,6 +312,7 @@ include '../includes/header.php';
                               </div>
                             </div>
                             <div class="course-actions course-resource-controls">
+                              <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
                               <?php foreach (['subir_recurso' => 'Subir', 'bajar_recurso' => 'Bajar'] as $accion => $texto): ?>
                                 <form method="POST"><?php campo_base_curso($id_publicacion); ?><input type="hidden" name="accion" value="<?= $accion ?>"><input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>"><button class="btn btn-sm" type="submit"><?= $texto ?></button></form>
                               <?php endforeach; ?>
@@ -307,6 +323,20 @@ include '../includes/header.php';
                                 <input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>">
                                 <button class="btn-status btn-status-delete" type="submit">Eliminar</button>
                               </form>
+                              <?php endif; ?>
+                              <?php $vis_rec = (int)($r['visible_alumnos'] ?? 1); ?>
+                              <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
+                              <form method="POST" class="inline-form">
+                                <?php campo_base_curso($id_publicacion); ?>
+                                <input type="hidden" name="accion" value="toggle_visible_recurso">
+                                <input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>">
+                                <button type="submit" class="btn btn-sm <?= $vis_rec ? 'btn-visible-on' : 'btn-visible-off' ?>"
+                                  title="<?= $vis_rec ? 'Recurso visible para alumnos — clic para ocultar' : 'Recurso oculto para alumnos — clic para mostrar' ?>"
+                                  aria-label="<?= $vis_rec ? 'Ocultar recurso a alumnos' : 'Mostrar recurso a alumnos' ?>">
+                                  <?= $vis_rec ? 'Visible' : 'Oculto' ?>
+                                </button>
+                              </form>
+                              <?php endif; ?>
                             </div>
                             <dialog class="course-dialog" id="dialog-editar-recurso-<?= (int)$r['id_recurso'] ?>" aria-labelledby="titulo-editar-recurso-<?= (int)$r['id_recurso'] ?>">
                               <div class="course-dialog-header">
