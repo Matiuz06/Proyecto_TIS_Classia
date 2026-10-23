@@ -1,7 +1,11 @@
 {
   "ci": {
     "collect": {
-      "url": ["http://localhost:8080/index.html"],
+      "url": [
+        "http://localhost:8080/index.php",
+        "http://localhost:8080/views/catalogo.php",
+        "http://localhost:8080/views/primeros-pasos.php"
+      ],
       "numberOfRuns": 1
     },
     "assert": {

@@ -1,6 +1,10 @@
 <?php
 
-require_once __DIR__ . '/../auth/session.php';
+/**
+ * Responsabilidad: Consulta datos de una contratación para mostrar la confirmación al usuario.
+ */
+
+require_once __DIR__ . '/../auth/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 requerir_autenticacion('login.php');

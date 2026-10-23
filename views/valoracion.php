@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Formulario para valorar y reseñar cursos o servicios completados.
+ */
+
 require_once '../php/auth/roles.php';
 require_once '../php/valoraciones/obtener_contrataciones_valorables.php';
 
@@ -31,7 +36,7 @@ $activePage  = 'cuenta';
 include '../includes/header.php';
 ?>
 
-    <main class="page-container">
+    <main id="main-content" class="page-container">
       <header class="page-header">
         <span class="brand-mark">Classia</span>
         <h1>Dejá tu valoración</h1>

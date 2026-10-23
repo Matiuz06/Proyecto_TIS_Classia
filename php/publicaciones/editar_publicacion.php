@@ -1,135 +1,141 @@
 <?php
 
+/**
+ * Responsabilidad: Procesa edición y eliminación lógica de publicaciones existentes.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/upload_helper.php';
+require_once __DIR__ . '/../utils/toast.php';
+require_once __DIR__ . '/publicacion_helpers.php';
+require_once __DIR__ . '/PublicacionRepository.php';
 
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], '../../views/usuario.php');
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-$errores = [];
-$publicacion = null;
-$usuario = usuario_actual();
-$id_usuario_autenticado = (int) ($usuario['id_usuario'] ?? 0);
-$es_admin_usuario = es_admin();
+$errores=[];
+$usuario=usuario_actual();
+$uid=(int)($usuario['id_usuario'] ?? 0);
+$admin=es_admin();
+$categorias=obtener_categorias($pdo);
+$plantillas_servicios=plantillas_servicio();
+$id_publicacion=(int)($_GET['id'] ?? $_POST['id_publicacion'] ?? 0);
+$publicacionRepository=new PublicacionRepository($pdo);
 
-$id_publicacion = (int)($_GET['id'] ?? $_POST['id_publicacion'] ?? 0);
+$publicacionObjeto=$publicacionRepository->buscarPorId($id_publicacion, $admin ? null : $uid);
+$publicacion=$publicacionObjeto ? $publicacionObjeto->toArray() : null;
+if (!$publicacion) $errores[]='No tenés permisos para modificar esta publicación o no existe.';
 
-if ($id_publicacion > 0) {
-    if ($es_admin_usuario) {
-        $stmt_check = $pdo->prepare("SELECT * FROM publicaciones WHERE id_publicacion = :id_pub");
-        $stmt_check->execute(['id_pub' => $id_publicacion]);
-    } else {
-        $stmt_check = $pdo->prepare("SELECT * FROM publicaciones WHERE id_publicacion = :id_pub AND id_usuario = :id_user");
-        $stmt_check->execute([
-            'id_pub' => $id_publicacion,
-            'id_user' => $id_usuario_autenticado
-        ]);
-    }
-    $publicacion = $stmt_check->fetch();
-
-    if (!$publicacion) {
-        $errores[] = "No tenés permisos para modificar esta publicación o la misma no existe.";
-    }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $errores[] = "Publicación no especificada.";
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errores) && $publicacion) {
-    $token_recibido = $_POST['csrf_token'] ?? '';
-
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
-        $errores[] = "La sesión del formulario expiró. Por favor, recargá la página e intentá nuevamente.";
+if ($_SERVER['REQUEST_METHOD']==='POST' && $publicacion) {
+    if (!hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'] ?? '')) {
+        $errores[]='La sesión del formulario expiró.';
     }
 
-    if (isset($_POST['cambiar_estado'])) {
-        $nuevo_estado = $_POST['cambiar_estado'];
-        if (in_array($nuevo_estado, ['Activo', 'Inactivo', 'Pausado'], true)) {
-            try {
-                $stmt_estado = $pdo->prepare("UPDATE publicaciones SET estado = :estado WHERE id_publicacion = :id_pub");
-                $stmt_estado->execute([
-                    'estado' => $nuevo_estado,
-                    'id_pub' => $id_publicacion,
-                ]);
-                header("Location: panel-proveedor.php?mensaje=estado_actualizado");
-                exit;
-            } catch (PDOException $e) {
-                error_log("Error al cambiar estado de publicación: " . $e->getMessage());
-                $errores[] = "No se pudo cambiar el estado de la publicación.";
-            }
+    if (isset($_POST['cambiar_estado']) && empty($errores)) {
+        $estado=$_POST['cambiar_estado'];
+        if (!in_array($estado,['Activo','Pausado','Inactivo','Eliminado','Archivado'],true)) {
+            $errores[]='Estado no válido.';
         } else {
-            $errores[] = "El estado seleccionado no es válido.";
-        }
-    } else {
-        $titulo = trim($_POST['titulo'] ?? '');
-        $descripcion = trim($_POST['descripcion'] ?? '');
-        $precio = trim($_POST['precio'] ?? '');
-        $tipo = trim($_POST['tipo'] ?? '');
-        $id_categoria = (int)($_POST['id_categoria'] ?? 0);
-        $estado = trim($_POST['estado'] ?? 'Activo');
-        $eliminar_imagen = !empty($_POST['eliminar_imagen']);
 
-        if (empty($titulo) || empty($descripcion) || empty($precio) || empty($tipo) || $id_categoria <= 0) {
-            $errores[] = "Todos los campos obligatorios deben ser completados.";
-        }
-
-        if (!in_array($tipo, ['Curso', 'Servicio'], true)) {
-            $errores[] = "El tipo de publicación seleccionado no es válido.";
-        }
-
-        if (!in_array($estado, ['Activo', 'Inactivo', 'Pausado'], true)) {
-            $errores[] = "El estado seleccionado no es válido.";
-        }
-
-        if (!is_numeric($precio) || (float)$precio <= 0) {
-            $errores[] = "El precio debe ser un número mayor a cero.";
-        }
-
-        $ruta_imagen = $publicacion['imagen'];
-
-        if ($eliminar_imagen && $ruta_imagen) {
-            eliminar_imagen_subida($ruta_imagen);
-            $ruta_imagen = null;
-        }
-
-        if (empty($errores) && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $res_upload = guardar_imagen_subida($_FILES['imagen'], 'publicaciones', 5);
-            if ($res_upload['ok']) {
-                if ($ruta_imagen && $ruta_imagen !== $res_upload['ruta']) {
-                    eliminar_imagen_subida($ruta_imagen);
+            if ($estado === 'Activo' && $publicacion['tipo'] === 'Curso') {
+                $stmt_rd09 = $pdo->prepare("
+                    SELECT COUNT(DISTINCT r.id_recurso) AS total
+                    FROM curso_modulos m
+                    JOIN curso_unidades u ON u.id_modulo = m.id_modulo
+                    JOIN curso_recursos r ON r.id_unidad = u.id_unidad
+                    WHERE m.id_publicacion = :id
+                ");
+                $stmt_rd09->execute(['id' => $id_publicacion]);
+                if ((int)$stmt_rd09->fetchColumn() === 0) {
+                    $errores[] = 'No es posible publicar el curso: debe tener al menos un módulo con contenido. Agrega módulos y recursos antes de activarlo.';
                 }
-                $ruta_imagen = $res_upload['ruta'];
-            } else {
-                $errores[] = $res_upload['error'];
             }
+            $publicacionObjeto->setEstado($estado);
+            $publicacionObjeto->setEliminadoEn($estado==='Eliminado'?date('Y-m-d H:i:s'):null);
+            $publicacionRepository->actualizar($publicacionObjeto, $admin ? null : $uid);
+            set_toast('success', 'Estado actualizado', 'La publicacion fue actualizada correctamente.');
+            header('Location: panel-proveedor.php?mensaje=estado_actualizado');
+            exit;
+        }
+    } elseif (empty($errores)) {
+        $datos=$_POST;
+        $datos['tipo']=$publicacion['tipo'];
+        $errores=array_merge($errores,validar_datos_publicacion($datos));
+
+        $estado=$_POST['estado'] ?? $publicacion['estado'];
+        if (!in_array($estado,['Activo','Pausado','Inactivo','Eliminado','Archivado'],true)) $errores[]='Estado no válido.';
+
+        if ($estado === 'Activo' && $publicacion['tipo'] === 'Curso' && empty($errores)) {
+            $stmt_rd09b = $pdo->prepare("
+                SELECT COUNT(DISTINCT r.id_recurso) AS total
+                FROM curso_modulos m
+                JOIN curso_unidades u ON u.id_modulo = m.id_modulo
+                JOIN curso_recursos r ON r.id_unidad = u.id_unidad
+                WHERE m.id_publicacion = :id
+            ");
+            $stmt_rd09b->execute(['id' => $id_publicacion]);
+            if ((int)$stmt_rd09b->fetchColumn() === 0) {
+                $errores[] = 'No es posible publicar el curso: debe tener al menos un módulo con contenido antes de activarlo (RD-09).';
+            }
+        }
+
+        $categoria=['ok'=>false,'id'=>0,'error'=>''];
+        if (empty($errores)) {
+            try {
+                $categoria=resolver_categoria_publicacion($pdo,$uid,(int)($_POST['id_categoria'] ?? 0),$_POST['nueva_categoria'] ?? '',$_POST['descripcion_categoria'] ?? '');
+                if(!$categoria['ok']) $errores[]=$categoria['error'];
+            } catch(PDOException $e) {
+                error_log('Categoría publicación: '.$e->getMessage());
+                $errores[]='No se pudo procesar la categoría.';
+            }
+        }
+
+        $rutaAnterior=$publicacion['imagen'];
+        $rutaNueva=$rutaAnterior;
+        $archivoNuevo=null;
+        if (empty($errores) && isset($_FILES['imagen']) && ($_FILES['imagen']['error'] ?? UPLOAD_ERR_NO_FILE)!==UPLOAD_ERR_NO_FILE) {
+            $res=guardar_imagen_subida($_FILES['imagen'],'publicaciones',5);
+            if($res['ok']) { $archivoNuevo=$res['ruta']; $rutaNueva=$archivoNuevo; }
+            else $errores[]=$res['error'];
+        } elseif (!empty($_POST['eliminar_imagen'])) {
+            $rutaNueva=null;
         }
 
         if (empty($errores)) {
             try {
-                $sql = "UPDATE publicaciones 
-                        SET titulo = :titulo, descripcion = :descripcion, precio = :precio, tipo = :tipo, 
-                            id_categoria = :id_categoria, estado = :estado, imagen = :imagen 
-                        WHERE id_publicacion = :id_pub";
-                $stmt_update = $pdo->prepare($sql);
-                $stmt_update->execute([
-                    'titulo'       => $titulo,
-                    'descripcion'  => $descripcion,
-                    'precio'       => (float)$precio,
-                    'tipo'         => $tipo,
-                    'id_categoria' => $id_categoria,
-                    'estado'       => $estado,
-                    'imagen'       => $ruta_imagen,
-                    'id_pub'       => $id_publicacion,
-                ]);
-
-                header("Location: panel-proveedor.php?mensaje=actualizada");
+                $datosPublicacion=[
+                    'id_publicacion'=>$id_publicacion,
+                    'titulo'=>trim($_POST['titulo']),
+                    'descripcion'=>trim($_POST['descripcion']),
+                    'precio'=>(float)$_POST['precio'],
+                    'modalidad'=>trim($_POST['modalidad'] ?? '') ?: null,
+                    'nivel_experiencia'=>trim($_POST['nivel_experiencia'] ?? '') ?: null,
+                    'duracion_horas'=>trim($_POST['duracion_horas'] ?? '') !== '' ? (int)$_POST['duracion_horas'] : null,
+                    'cupos'=>trim($_POST['cupos'] ?? '') !== '' ? (int)$_POST['cupos'] : null,
+                    'disponibilidad'=>trim($_POST['disponibilidad'] ?? '') ?: null,
+                    'tipo_servicio'=>$publicacion['tipo']==='Servicio' ? (trim($_POST['tipo_servicio'] ?? '') ?: null) : null,
+                    'id_categoria'=>$categoria['id'],
+                    'estado'=>$estado,
+                    'imagen'=>$rutaNueva,
+                    'eliminado_en'=>$estado==='Eliminado' ? ($publicacion['eliminado_en'] ?: date('Y-m-d H:i:s')) : null,
+                    'id_usuario'=>(int)$publicacion['id_usuario'],
+                    'fecha_creacion'=>$publicacion['fecha_creacion'] ?? null,
+                    'fecha_actualizacion'=>$publicacion['fecha_actualizacion'] ?? null,
+                ];
+                $publicacionActualizada=$publicacion['tipo']==='Servicio'
+                    ? new Servicio($datosPublicacion)
+                    : new Curso($datosPublicacion);
+                $publicacionRepository->actualizar($publicacionActualizada, $admin ? null : $uid);
+                if ($rutaAnterior && $rutaAnterior!==$rutaNueva) eliminar_imagen_subida($rutaAnterior);
+                set_toast('success', 'Publicacion actualizada');
+                header('Location: panel-proveedor.php?mensaje=actualizada');
                 exit;
-            } catch (PDOException $e) {
-                error_log("Error SQL al actualizar publicación: " . $e->getMessage());
-                $errores[] = "Ocurrió un error al actualizar la publicación.";
+            } catch(PDOException $e) {
+                error_log('Editar publicación: '.$e->getMessage());
+                if($archivoNuevo) eliminar_imagen_subida($archivoNuevo);
+                $errores[]='No se pudo actualizar la publicación.';
             }
         }
     }

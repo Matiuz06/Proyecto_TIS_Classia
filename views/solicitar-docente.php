@@ -1,6 +1,12 @@
 <?php
+
+/**
+ * Responsabilidad: Postulación para habilitar el rol docente / proveedor en la cuenta.
+ */
+
 require_once '../php/auth/roles.php';
 require_once '../php/solicitudes/solicitar_docente.php';
+require_once '../php/utils/toast.php';
 
 requerir_rol(ROL_ESTUDIANTE, 'usuario.php');
 
@@ -23,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error   = $resultado['error'];
     $mensaje = $resultado['mensaje'];
     if ($resultado['exito']) {
+        set_toast('success', 'Solicitud enviada', $mensaje);
+        $mensaje = '';
         $tiene_pendiente = true;
     }
 }
@@ -37,13 +45,9 @@ $activePage = 'solicitar-docente';
 include '../includes/header.php';
 ?>
 
-<main class="auth-shell">
+<main id="main-content" class="auth-shell">
   <section class="auth-card" aria-labelledby="titulo-solicitud-docente">
     <h1 id="titulo-solicitud-docente">Solicitar ser docente</h1>
-
-    <?php if ($mensaje !== ''): ?>
-      <div class="alert alert-success"><?php echo htmlspecialchars($mensaje); ?></div>
-    <?php endif; ?>
 
     <?php if ($error !== ''): ?>
       <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>

@@ -1,10 +1,24 @@
 <?php
 
+/**
+ * Responsabilidad: Procesa altas de usuarios con validaciones, roles y confirmación de correo.
+ */
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../auth/sesion.php';
+require_once __DIR__ . '/../auth/password_policy.php';
+require_once __DIR__ . '/../utils/mailer.php';
+require_once __DIR__ . '/../utils/cedula_uy.php';
+require_once __DIR__ . '/../utils/recaptcha.php';
+
+if (esta_autenticado()) {
+    header('Location: ../../views/usuario.php');
+    exit;
+}
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -16,27 +30,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $nombre = trim($_POST['nombre'] ?? '');
     $apellido = trim($_POST['apellido'] ?? '');
+    $cedula = trim($_POST['cedula_identidad'] ?? '');
+    $fecha_nacimiento = trim($_POST['fecha_nacimiento'] ?? '');
     $correo = strtolower(trim($_POST['correo'] ?? ''));
+    $usuario = trim($_POST['usuario'] ?? '');
+    $genero = trim($_POST['genero'] ?? 'sin-especificar');
     $contrasena = $_POST['contrasenia'] ?? '';
     $confirmar_contrasena = $_POST['confirmar_contrasenia'] ?? '';
     $token_recibido = $_POST['csrf_token'] ?? '';
+    $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
 
     if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
         $errores[] = "La sesión del formulario expiró. Por favor, recargá la página e intentá nuevamente.";
     }
 
-    if (empty($nombre) || empty($apellido) || empty($correo) || empty($contrasena) || empty($confirmar_contrasena)) {
+    $res_recaptcha = verificar_recaptcha($recaptcha_response);
+    if (!$res_recaptcha['exito']) {
+        $errores[] = $res_recaptcha['mensaje'];
+    }
+
+    if (empty($nombre) || empty($apellido) || empty($fecha_nacimiento) || empty($cedula) || empty($usuario) || empty($correo) || empty($contrasena) || empty($confirmar_contrasena)) {
         $errores[] = "Todos los campos son obligatorios.";
     }
+
+    if (!empty($fecha_nacimiento)) {
+        $fn = DateTime::createFromFormat('Y-m-d', $fecha_nacimiento);
+        $hoy = new DateTime();
+        $min_fecha = (new DateTime())->modify('-120 years');
+        $max_fecha = (new DateTime())->modify('-13 years');
+
+        if (!$fn || $fn->format('Y-m-d') !== $fecha_nacimiento) {
+            $errores[] = "La fecha de nacimiento ingresada no es válida.";
+        } elseif ($fn < $min_fecha || $fn > $max_fecha) {
+            $errores[] = "Debés tener entre 13 y 120 años para registrarte en Classia.";
+        }
+    }
+
+    if (!empty($cedula)) {
+        if (!validar_cedula_uruguaya($cedula)) {
+            $errores[] = "La Cédula de Identidad ingresada no es válida (verificá el número y el dígito verificador).";
+        }
+    }
+
     if (!empty($correo) && !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
         $errores[] = "Ingresá un correo electrónico válido.";
     }
+    if ($usuario !== '' && !preg_match('/^[A-Za-z0-9_.-]{3,30}$/', $usuario)) {
+        $errores[] = "El nombre de usuario debe tener entre 3 y 30 caracteres y solo puede incluir letras, números, puntos, guiones y guiones bajos.";
+    }
 
     if (!empty($contrasena)) {
-        if (strlen($contrasena) < 8) {
-            $errores[] = "La contraseña debe tener al menos 8 caracteres.";
-        } elseif (!preg_match('/[A-Za-z]/', $contrasena) || !preg_match('/[0-9]/', $contrasena)) {
-            $errores[] = "La contraseña debe incluir al menos una letra y un número.";
+        $errores_password = validar_contrasena($contrasena);
+        foreach ($errores_password as $error_password) {
+            $errores[] = $error_password;
         }
 
         if ($contrasena !== $confirmar_contrasena) {
@@ -45,29 +91,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errores)) {
-        $stmt = $pdo->prepare("SELECT id_usuario FROM usuarios WHERE email = :email");
-        $stmt->execute(['email' => $correo]);
+        $ci_limpia = limpiar_ci($cedula);
+        $ci_hash = hash_ci($ci_limpia);
+        $stmt = $pdo->prepare("SELECT id_usuario FROM usuarios WHERE email = :email OR nombre_usuario = :nombre_usuario OR cedula_hash = :ci_hash OR cedula_identidad = :ci_plain");
+        $stmt->execute([
+            'email' => $correo,
+            'nombre_usuario' => $usuario,
+            'ci_hash' => $ci_hash,
+            'ci_plain' => $ci_limpia,
+        ]);
         if ($stmt->fetch()) {
-            $errores[] = "No es posible registrar este correo electrónico.";
+            $errores[] = "El correo electrónico, nombre de usuario o Cédula de Identidad ya se encuentran registrados.";
         }
     }
 
     if (empty($errores)) {
         $hash = password_hash($contrasena, PASSWORD_DEFAULT);
         $id_rol_cliente = 1;
+        $token_verificacion = bin2hex(random_bytes(32));
+        $config_correo = cargar_configuracion_correo();
+        $ci_cifrada = encriptar_ci($cedula);
+        $ci_hash = hash_ci($cedula);
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, apellido, email, password_hash, id_rol) VALUES (:nombre, :apellido, :email, :password_hash, :id_rol)");
+            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, apellido, cedula_identidad, cedula_hash, nombre_usuario, genero, fecha_nacimiento, email, password_hash, id_rol, email_verificado, email_verificacion_token, email_verificacion_expira) VALUES (:nombre, :apellido, :cedula, :cedula_hash, :nombre_usuario, :genero, :fecha_nacimiento, :email, :password_hash, :id_rol, 0, :token, DATE_ADD(NOW(), INTERVAL 24 HOUR))");
             $stmt->execute([
                 'nombre' => $nombre,
                 'apellido' => $apellido,
+                'cedula' => $ci_cifrada,
+                'cedula_hash' => $ci_hash,
+                'nombre_usuario' => $usuario,
+                'genero' => $genero,
+                'fecha_nacimiento' => $fecha_nacimiento,
                 'email' => $correo,
                 'password_hash' => $hash,
-                'id_rol' => $id_rol_cliente
+                'id_rol' => $id_rol_cliente,
+                'token' => hash('sha256', $token_verificacion)
             ]);
 
-            session_regenerate_id(true);
-            header("Location: login.php?registro=exitoso");
+            $enlace = $config_correo['base_url'] . '/php/auth/confirmar_correo.php?token=' . urlencode($token_verificacion);
+                        $correo_enviado = enviar_correo(
+                $correo,
+                'Confirm� tu correo electr�nico - Classia',
+                render_email_template('verificar-email', [
+                    'nombre' => $nombre,
+                    'email' => $correo,
+                    'enlace' => $enlace,
+                ])
+            );
+
+            establecer_usuario_sesion((int) $pdo->lastInsertId(), $nombre . ' ' . $apellido, $correo, $id_rol_cliente);
+            $_SESSION['registro_correo_enviado'] = $correo_enviado;
+            header("Location: ../views/confirmar-correo.php?resultado=pendiente");
             exit;
         } catch (PDOException $e) {
             error_log("Error SQL en registro: " . $e->getMessage());

@@ -1,9 +1,13 @@
 <?php
 
+/**
+ * Responsabilidad: Crea una contratación desde el carrito validando publicaciones y cupos.
+ */
+
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 
-requerir_rol(ROL_ESTUDIANTE, '../../views/usuario.php');
+requerir_cualquier_rol([ROL_ESTUDIANTE, ROL_DOCENTE], '../../views/usuario.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../../views/carrito.php');
@@ -13,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $token_recibido = $_POST['csrf_token'] ?? '';
 
 if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
-    $_SESSION['carrito_error'] = 'La sesion del formulario expiro. Recarga la pagina e intenta nuevamente.';
+    $_SESSION['carrito_error'] = 'La sesión del formulario expiró. Recarga la página e intenta nuevamente.';
     header('Location: ../../views/carrito.php');
     exit;
 }
@@ -23,14 +27,14 @@ $id_usuario = (int) $usuario['id_usuario'];
 $ids_carrito = array_values(array_unique(array_map('intval', $_SESSION['carrito_publicaciones'] ?? [])));
 
 if (empty($ids_carrito)) {
-    $_SESSION['carrito_error'] = 'El carrito esta vacio.';
+    $_SESSION['carrito_error'] = 'El carrito está vacío.';
     header('Location: ../../views/carrito.php');
     exit;
 }
 
 try {
     $stmt_publicacion = $pdo->prepare(
-        "SELECT id_publicacion, titulo, precio, estado
+        "SELECT id_publicacion, titulo, precio, estado, tipo, tipo_servicio, cupos, id_usuario
          FROM publicaciones
          WHERE id_publicacion = :id_publicacion
          LIMIT 1"
@@ -41,16 +45,35 @@ try {
 
     foreach ($ids_carrito as $id_publicacion) {
         if ($id_publicacion <= 0) {
-            throw new RuntimeException('Publicacion invalida.');
+            throw new RuntimeException('Publicación inválida.');
         }
 
         $stmt_publicacion->execute(['id_publicacion' => $id_publicacion]);
         $publicacion = $stmt_publicacion->fetch();
 
         if (!$publicacion || $publicacion['estado'] !== 'Activo' || (float) $publicacion['precio'] <= 0) {
-            $_SESSION['carrito_error'] = 'Una de las publicaciones seleccionadas no esta disponible.';
+            $_SESSION['carrito_error'] = 'Una de las publicaciones seleccionadas no está disponible.';
             header('Location: ../../views/carrito.php');
             exit;
+        }
+        if ((int)$publicacion['id_usuario'] === $id_usuario) {
+            $_SESSION['carrito_error'] = 'No puedes comprar tus propias publicaciones.';
+            header('Location: ../../views/carrito.php');
+            exit;
+        }
+        if ($publicacion['tipo'] === 'Servicio' && !empty($publicacion['tipo_servicio'])) {
+            $_SESSION['carrito_error'] = 'Este servicio requiere una solicitud personalizada antes de contratarse.';
+            header('Location: ../../views/servicio-detalle.php?id=' . (int)$publicacion['id_publicacion']);
+            exit;
+        }
+        if ($publicacion['tipo'] === 'Curso') {
+            $dup=$pdo->prepare("SELECT COUNT(*) FROM detalles_contratacion dc JOIN contrataciones c ON c.id_contratacion=dc.id_contratacion WHERE c.id_usuario=:u AND dc.id_publicacion=:p AND c.estado IN ('Pendiente','En Proceso','Completada')");
+            $dup->execute(['u'=>$id_usuario,'p'=>$publicacion['id_publicacion']]);
+            if((int)$dup->fetchColumn()>0){$_SESSION['carrito_error']='Ya tienes este curso contratado o pendiente de pago.';header('Location: ../../views/carrito.php');exit;}
+            if(!empty($publicacion['cupos'])){
+                $oc=$pdo->prepare("SELECT COALESCE(SUM(dc.cantidad),0) FROM detalles_contratacion dc JOIN contrataciones c ON c.id_contratacion=dc.id_contratacion WHERE dc.id_publicacion=:p AND c.estado<>'Cancelada'");$oc->execute(['p'=>$publicacion['id_publicacion']]);
+                if((int)$oc->fetchColumn()>=(int)$publicacion['cupos']){$_SESSION['carrito_error']='No quedan cupos disponibles para el curso ' . $publicacion['titulo'] . '.';header('Location: ../../views/carrito.php');exit;}
+            }
         }
 
         $cantidad = 1;
@@ -98,9 +121,7 @@ try {
 
     $pdo->commit();
 
-    unset($_SESSION['carrito_publicaciones']);
-
-    header('Location: ../../views/confirmacion.php?id_contratacion=' . $id_contratacion);
+    header('Location: ../../views/pasarela-pago.php?id_contratacion=' . $id_contratacion);
     exit;
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) {

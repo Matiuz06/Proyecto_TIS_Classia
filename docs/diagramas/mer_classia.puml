@@ -1,0 +1,222 @@
+@startuml mer_classia
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 12
+skinparam defaultFontColor #2D3748
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    ArrowColor #3182CE
+    BorderColor #2B6CB0
+    HeaderBackgroundColor #EBF8FF
+}
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+}
+skinparam sequence {
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+    ParticipantBorderColor #2B6CB0
+    ParticipantBackgroundColor #EBF8FF
+    LifeLineBorderColor #4A5568
+    LifeLineBackgroundColor #EDF2F7
+    ArrowColor #2B6CB0
+}
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+}
+
+title Modelo Entidad-Relación (MER) — Classia (Sprint 3)
+
+entity "ROL" as roles {
+  * id_rol : INT <<PK>>
+  --
+  nombre_rol : VARCHAR(50)
+  descripcion : VARCHAR(255)
+}
+
+entity "USUARIO" as usuarios {
+  * id_usuario : INT <<PK>>
+  --
+  nombre : VARCHAR(100)
+  apellido : VARCHAR(100)
+  email : VARCHAR(150)
+  password_hash : VARCHAR(255)
+  telefono : VARCHAR(30)
+  fecha_registro : DATETIME
+  * id_rol : INT <<FK>>
+  foto_perfil : VARCHAR(255)
+  dos_factores_activo : TINYINT(1)
+  activo : TINYINT(1)
+}
+
+entity "PERFIL_PROFESIONAL" as perfiles {
+  * id_perfil : INT <<PK>>
+  --
+  * id_usuario : INT <<FK, UNIQUE>>
+  titulo_profesional : VARCHAR(180)
+  presentacion : TEXT
+  experiencia : TEXT
+  formacion : TEXT
+  habilidades : TEXT
+  especialidades : TEXT
+  ubicacion : VARCHAR(150)
+  modalidad_trabajo : VARCHAR(150)
+}
+
+entity "CATEGORIA" as categorias {
+  * id_categoria : INT <<PK>>
+  --
+  nombre_categoria : VARCHAR(100)
+  descripcion : TEXT
+  creada_por : INT <<FK>>
+}
+
+entity "PUBLICACION" as publicaciones {
+  * id_publicacion : INT <<PK>>
+  --
+  titulo : VARCHAR(200)
+  descripcion : TEXT
+  precio : DECIMAL(10,2)
+  tipo : ENUM('Curso', 'Servicio')
+  modalidad : VARCHAR(30)
+  duracion_horas : SMALLINT
+  cupos : INT
+  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado')
+  imagen : VARCHAR(255)
+  * id_usuario : INT <<FK>>
+  * id_categoria : INT <<FK>>
+}
+
+entity "CURSO_MODULO" as modulos {
+  * id_modulo : INT <<PK>>
+  --
+  * id_publicacion : INT <<FK>>
+  titulo : VARCHAR(180)
+  descripcion : TEXT
+  orden : INT
+}
+
+entity "CURSO_UNIDAD" as unidades {
+  * id_unidad : INT <<PK>>
+  --
+  * id_modulo : INT <<FK>>
+  titulo : VARCHAR(180)
+  descripcion : TEXT
+  orden : INT
+}
+
+entity "CURSO_RECURSO" as recursos {
+  * id_recurso : INT <<PK>>
+  --
+  * id_unidad : INT <<FK>>
+  titulo : VARCHAR(180)
+  tipo : ENUM('Archivo', 'PDF', 'Imagen', 'Video', 'Enlace')
+  url : VARCHAR(500)
+  archivo : VARCHAR(255)
+  orden : INT
+}
+
+entity "SOLICITUD" as solicitudes {
+  * id_solicitud : INT <<PK>>
+  --
+  titulo : VARCHAR(200)
+  descripcion : TEXT
+  estado : ENUM('Pendiente', 'Aceptada', 'Rechazada', 'Contraoferta', 'En Proceso', 'Realizada', 'Cancelada')
+  precio_propuesto : DECIMAL(10,2)
+  archivo_adjunto : VARCHAR(255)
+  * id_usuario : INT <<FK>>
+  id_publicacion : INT <<FK>>
+}
+
+entity "SOLICITUD_MENSAJE" as mensajes {
+  * id_mensaje : INT <<PK>>
+  --
+  * id_solicitud : INT <<FK>>
+  * id_usuario : INT <<FK>>
+  mensaje : TEXT
+  fecha_mensaje : DATETIME
+}
+
+entity "SOLICITUD_DOCENTE" as sol_doc {
+  * id_solicitud_docente : INT <<PK>>
+  --
+  * id_usuario : INT <<FK>>
+  estado : ENUM('Pendiente', 'Aprobada', 'Rechazada')
+  motivo : TEXT
+  fecha_solicitud : DATETIME
+}
+
+entity "CONTRATACION" as contrataciones {
+  * id_contratacion : INT <<PK>>
+  --
+  fecha_contratacion : DATETIME
+  monto_total : DECIMAL(10,2)
+  estado : ENUM('Pendiente', 'En Proceso', 'Completada', 'Cancelada')
+  * id_usuario : INT <<FK>>
+}
+
+entity "DETALLE_CONTRATACION" as detalles {
+  * id_detalle : INT <<PK>>
+  --
+  cantidad : INT
+  precio_unitario : DECIMAL(10,2)
+  subtotal : DECIMAL(10,2)
+  * id_contratacion : INT <<FK>>
+  * id_publicacion : INT <<FK>>
+}
+
+entity "PAGO" as pagos {
+  * id_pago : INT <<PK>>
+  --
+  monto : DECIMAL(10,2)
+  metodo_pago : ENUM('Tarjeta', 'Transferencia', 'MercadoPago', 'Efectivo')
+  estado_pago : ENUM('Pendiente', 'Aprobado', 'Rechazado')
+  transaccion_ref : VARCHAR(100)
+  * id_contratacion : INT <<FK>>
+}
+
+entity "VALORACION" as valoraciones {
+  * id_valoracion : INT <<PK>>
+  --
+  puntuacion : INT
+  comentario : TEXT
+  * id_usuario : INT <<FK>>
+  * id_publicacion : INT <<FK>>
+  id_contratacion : INT <<FK>>
+}
+
+roles ||--o{ usuarios : "asigna rol"
+usuarios ||--o| perfiles : "perfil profesional"
+usuarios ||--o{ sol_doc : "solicita rol docente"
+usuarios ||--o{ categorias : "crea categoría"
+usuarios ||--o{ publicaciones : "publica"
+categorias ||--o{ publicaciones : "clasifica"
+
+publicaciones ||--o{ modulos : "contiene"
+modulos ||--o{ unidades : "organiza"
+unidades ||--o{ recursos : "incluye"
+
+usuarios ||--o{ solicitudes : "envía solicitud"
+publicaciones ||--o{ solicitudes : "referencia oferta"
+solicitudes ||--o{ mensajes : "intercambia"
+usuarios ||--o{ mensajes : "escribe"
+
+usuarios ||--o{ contrataciones : "realiza orden"
+contrataciones ||--|{ detalles : "desglosa"
+publicaciones ||--o{ detalles : "ítem contratado"
+contrataciones ||--o{ pagos : "abona"
+
+usuarios ||--o{ valoraciones : "emite opinión"
+publicaciones ||--o{ valoraciones : "recibe calificación"
+contrataciones ||--o{ valoraciones : "respalda"
+@enduml

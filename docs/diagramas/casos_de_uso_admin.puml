@@ -1,0 +1,56 @@
+@startuml casos_de_uso_admin
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 12
+skinparam defaultFontColor #2D3748
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    ArrowColor #3182CE
+    BorderColor #2B6CB0
+    HeaderBackgroundColor #EBF8FF
+}
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+}
+skinparam sequence {
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+    ParticipantBorderColor #2B6CB0
+    ParticipantBackgroundColor #EBF8FF
+    LifeLineBorderColor #4A5568
+    LifeLineBackgroundColor #EDF2F7
+    ArrowColor #2B6CB0
+}
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+}
+
+title Casos de Uso: Perfil Administrador — Classia
+
+left to right direction
+actor "Administrador" as Admin
+
+rectangle "Panel Administrativo" {
+  usecase "Ver Métricas Globales del Sistema" as UC1
+  usecase "Gestionar Usuarios y Roles" as UC2
+  usecase "Aprobar/Rechazar Postulaciones Docentes" as UC3
+  usecase "Supervisar Publicaciones y Moderación" as UC4
+  usecase "Auditar Registros y Transacciones" as UC5
+}
+
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+@enduml

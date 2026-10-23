@@ -1,0 +1,85 @@
+@startuml secuencia_crear_publicacion
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 12
+skinparam defaultFontColor #2D3748
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    ArrowColor #3182CE
+    BorderColor #2B6CB0
+    HeaderBackgroundColor #EBF8FF
+}
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+}
+skinparam sequence {
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+    ParticipantBorderColor #2B6CB0
+    ParticipantBackgroundColor #EBF8FF
+    LifeLineBorderColor #4A5568
+    LifeLineBackgroundColor #EDF2F7
+    ArrowColor #2B6CB0
+}
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+}
+
+title Diagrama de Secuencia: Crear Publicación y Exclusividad de Categoría
+
+autonumber
+actor "Docente / Proveedor" as Docente
+boundary "Vista: crear-publicacion.php" as View
+control "JS: sincronizarCategorias()" as JS
+control "php/publicaciones/crear_publicacion.php" as C_Pub
+control "php/utils/upload_helper.php" as Uploader
+entity "Base de Datos (MySQL)" as DB
+
+Docente -> View: Abre formulario de publicación
+View -> JS: Inicializa sincronización
+
+alt Docente selecciona categoría existente
+  Docente -> View: Selecciona "Programación y Desarrollo"
+  View -> JS: Evento change (id_categoria != '')
+  JS -> View: Deshabilita campos de "Nueva categoría" y limpia texto
+else Docente desea crear nueva categoría
+  Docente -> View: Deja "-- Selecciona --" (id_categoria == '')
+  JS -> View: Habilita input "nueva_categoria" y "descripcion_categoria"
+  Docente -> View: Escribe "Computación Cuántica"
+end
+
+Docente -> View: Completa título, descripción, precio, portada
+Docente -> View: Clic en "Guardar publicación"
+View -> C_Pub: POST (datos del formulario, archivo portada)
+activate C_Pub
+
+C_Pub -> C_Pub: validar_datos_publicacion(POST)
+alt Categoría existente seleccionada Y texto de nueva categoría presente
+  C_Pub --> View: Error ("Para crear nueva categoría deselecciona la existente")
+else Datos válidos
+  opt Sube imagen de portada
+    C_Pub -> Uploader: guardar_imagen_subida(FILE, 'publicaciones')
+    activate Uploader
+    Uploader -> Uploader: Validar MIME y crear carpeta con permisos 0777
+    Uploader --> C_Pub: Ruta relativa segura
+    deactivate Uploader
+  end
+
+  C_Pub -> DB: INSERT INTO categorias (si era nueva)
+  C_Pub -> DB: INSERT INTO publicaciones (...)
+  DB --> C_Pub: id_publicacion creado
+  C_Pub --> View: Redirige con mensaje de éxito a panel-proveedor.php
+  deactivate C_Pub
+  View --> Docente: Muestra publicación activa en el catálogo
+end
+@enduml

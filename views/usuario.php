@@ -1,29 +1,30 @@
 <?php
+
+/**
+ * Responsabilidad: Perfil del estudiante con cursos activos, historial y configuración.
+ */
+
+$userData = [];
+$rol_actual = 'Usuario';
+$cursos_contratados = [];
+$servicios_contratados = [];
 require_once '../php/usuarios/perfil.php';
+require_once '../php/utils/cedula_uy.php';
 
 $title      = 'Perfil de usuario';
 $cssPrefix  = '..';
 $jsPrefix    = '..';
 
 $activePage = 'cuenta';
+
+if (isset($_GET['2fa_desactivado'])) {
+    set_toast('info', 'Autenticacion en dos pasos desactivada');
+}
+
 include '../includes/header.php';
 ?>
 
-  <?php if (es_admin()): ?>
-    <div id="panel-admin" class="alert alert-info role-banner">
-      <strong>Modo Administrador Activo:</strong>
-      <a href="panel-administrador.php" class="banner-link">Ir al Panel de Administración</a> |
-      <a href="catalogo.php">Gestionar Catálogo</a>
-    </div>
-  <?php elseif (es_docente()): ?>
-    <div id="panel-docente" class="alert alert-info role-banner">
-      <strong>Modo Docente/Proveedor Activo:</strong>
-      <a href="panel-proveedor.php" class="banner-link">Ir a mi Panel de Proveedor</a> |
-      <a href="crear-publicacion.php">Publicar nuevo contenido</a>
-    </div>
-  <?php endif; ?>
-
-  <main class="motion-entry">
+  <main id="main-content" class="motion-entry">
     <?php if (!empty($mensaje_acceso)): ?>
       <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($mensaje_acceso); ?>
@@ -36,21 +37,14 @@ include '../includes/header.php';
       </div>
     <?php endif; ?>
 
-    <?php if (!empty($mensaje_exito)): ?>
-      <div class="alert alert-success" role="status">
-        <?php echo htmlspecialchars($mensaje_exito); ?>
-      </div>
-    <?php endif; ?>
-
     <section class="profile-hero" aria-labelledby="perfil-usuario">
       <div class="profile-hero-content">
         <div class="profile-avatar-wrapper">
-          <?php 
-            $fotoPerfilSrc = !empty($userData['foto_perfil']) 
-              ? ($cssPrefix . '/' . htmlspecialchars($userData['foto_perfil'])) 
-              : ($cssPrefix . '/assets/images/default-avatar.svg');
+          <?php
+            $fotoPerfilSrc = obtener_avatar_usuario($userData, $cssPrefix, 256);
+            $avatarFallback = obtener_avatar_default($cssPrefix);
           ?>
-          <img src="<?php echo $fotoPerfilSrc; ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre']); ?>" class="profile-avatar-img" />
+          <img src="<?php echo htmlspecialchars($fotoPerfilSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="Foto de perfil de <?php echo htmlspecialchars($userData['nombre'], ENT_QUOTES, 'UTF-8'); ?>" class="profile-avatar-img" onerror="this.onerror=null;this.src='<?php echo htmlspecialchars($avatarFallback, ENT_QUOTES, 'UTF-8'); ?>';" />
           
           <div class="profile-avatar-actions">
             <form action="../php/usuarios/foto_perfil.php" method="POST" enctype="multipart/form-data" class="profile-photo-form">
@@ -87,7 +81,7 @@ include '../includes/header.php';
     </section>
 
     <nav class="profile-tabs" aria-label="Secciones de la cuenta">
-      <button type="button">Perfil</button>
+      <button type="button" class="active">Perfil</button>
       <button type="button">Mis Cursos Comprados</button>
       <button type="button">Mis Servicios Contratados</button>
       <button type="button">Certificados</button>
@@ -98,35 +92,60 @@ include '../includes/header.php';
       <h2 id="informacion-cuenta">Información básica de la cuenta</h2>
       <p>
         <label for="nombre-cuenta">Nombre:</label><br />
-        <input type="text" id="nombre-cuenta" value="<?php echo htmlspecialchars($userData['nombre']); ?>" readonly />
+        <input type="text" id="nombre-cuenta" value="<?php echo htmlspecialchars($userData['nombre']); ?>" readonly disabled />
       </p>
       <p>
         <label for="apellido-cuenta">Apellido:</label><br />
-        <input type="text" id="apellido-cuenta" value="<?php echo htmlspecialchars($userData['apellido'] ?? ''); ?>" readonly />
+        <input type="text" id="apellido-cuenta" value="<?php echo htmlspecialchars($userData['apellido'] ?? ''); ?>" readonly disabled />
+      </p>
+      <p>
+        <label for="ci-cuenta">Cédula de Identidad Uruguaya:</label><br />
+        <input type="text" id="ci-cuenta" value="<?php echo !empty($userData['cedula_identidad']) ? htmlspecialchars(enmascarar_ci($userData['cedula_identidad'])) : 'No especificada'; ?>" readonly disabled />
       </p>
       <p>
         <label for="email-cuenta">Email:</label><br />
-        <input type="email" id="email-cuenta" value="<?php echo htmlspecialchars($userData['email']); ?>" readonly />
+        <input type="email" id="email-cuenta" value="<?php echo htmlspecialchars($userData['email']); ?>" readonly disabled />
+      </p>
+      <p>
+        <label for="telefono-cuenta">Número de teléfono:</label><br />
+        <input type="text" id="telefono-cuenta" value="<?php echo htmlspecialchars($userData['telefono'] ?? 'No especificado'); ?>" readonly disabled />
       </p>
       <p>
         <label for="fecha-cuenta">Fecha de registro:</label><br />
-        <input type="text" id="fecha-cuenta" value="<?php echo !empty($userData['fecha_registro']) ? date('d/m/Y H:i', strtotime($userData['fecha_registro'])) : '-'; ?>" readonly />
+        <input type="text" id="fecha-cuenta" value="<?php echo !empty($userData['fecha_registro']) ? date('d/m/Y H:i', strtotime($userData['fecha_registro'])) : '-'; ?>" readonly disabled />
       </p>
-      <p>Rol actual: <strong><?php echo htmlspecialchars($rol_actual); ?></strong></p>
-      <p>
-        <label for="idioma-cuenta">Idioma predeterminado:</label><br />
-        <select id="idioma-cuenta">
-          <option>Español (Spanish)</option>
-          <option>Inglés (English)</option>
-        </select>
+
+      <p class="mt-section">
+        <a href="editar-perfil.php" class="btn">Modificar datos personales</a>
       </p>
-      <p>
-        <label for="pais-cuenta">País o región:*</label><br />
-        <select id="pais-cuenta">
-          <option>Uruguay</option>
-          <option>Argentina</option>
-        </select>
-      </p>
+
+      <div class="account-security-card">
+        <h3>Seguridad y Autenticación</h3>
+        <p class="text-muted">Protegé tu cuenta administrando tu contraseña y la autenticación en dos pasos.</p>
+        
+        <div class="security-status-bar">
+          <div>
+            <strong>Autenticación en Dos Pasos (2FA / TOTP):</strong><br />
+            <span class="u-text-base">
+              <?php if (!empty($userData['dos_factores_activo'])): ?>
+                <span class="badge badge-success-soft">Activado ✅</span> (Google / Microsoft Authenticator / Authy)
+              <?php else: ?>
+                <span class="badge badge-warning-soft">Desactivado ⚠️</span>
+              <?php endif; ?>
+            </span>
+          </div>
+          <div>
+            <a href="configurar-2fa.php" class="btn <?= !empty($userData['dos_factores_activo']) ? 'btn-ghost' : '' ?>">
+              <?= !empty($userData['dos_factores_activo']) ? 'Administrar 2FA' : 'Activar 2FA' ?>
+            </a>
+          </div>
+        </div>
+
+        <div class="account-security-actions">
+          <a href="cambiar-contrasena.php" class="btn">Cambiar contraseña</a>
+          <a href="restablecer-contrasena.php" class="btn btn-ghost">Restablecer contraseña</a>
+        </div>
+      </div>
     </section>
 
     <hr />
@@ -140,10 +159,25 @@ include '../includes/header.php';
         <p>Cursos en los que estás inscripto:</p>
         <ul>
           <?php foreach ($cursos_contratados as $curso): ?>
+            <?php $progresoPerfil = $progresos_cursos[(int)$curso['id_publicacion']] ?? null; ?>
             <li class="account-item">
               <strong><?php echo htmlspecialchars($curso['titulo']); ?></strong>
-              — Estado: <em><?php echo htmlspecialchars($curso['estado']); ?></em>
-              [<a href="curso.php?id=<?php echo (int)$curso['id_publicacion']; ?>">Continuar curso</a>]
+              — Estado: <em><?php echo $curso['estado'] === 'Pendiente' ? 'Pendiente de pago' : htmlspecialchars($curso['estado']); ?></em>
+              <?php if ($progresoPerfil): ?>
+                <?php $porcentajePerfil = rtrim(rtrim(number_format((float)$progresoPerfil['porcentaje'], 2, '.', ''), '0'), '.'); ?>
+                <div class="account-course-progress">
+                  <span>Progreso: <?php echo htmlspecialchars($porcentajePerfil); ?>%</span>
+                  <span>Estado: <?php echo htmlspecialchars($progresoPerfil['estado']); ?></span>
+                  <?php if (!empty($progresoPerfil['aprobado'])): ?>
+                    <a href="../php/certificados/descargar.php?id_curso=<?php echo (int)$curso['id_publicacion']; ?>">Certificado</a>
+                  <?php endif; ?>
+                </div>
+              <?php endif; ?>
+              <?php if ($curso['estado'] === 'Pendiente'): ?>
+                [<a href="pasarela-pago.php?id_contratacion=<?php echo (int)$curso['id_contratacion']; ?>" class="link u-font-bold u-text-brand-primary">Completar pago →</a>]
+              <?php else: ?>
+                [<a href="curso.php?id=<?php echo (int)$curso['id_publicacion']; ?>"><?php echo $curso['estado'] === 'Completada' ? 'Ver curso' : 'Continuar curso'; ?></a>]
+              <?php endif; ?>
 
               <?php if (!empty($curso['id_valoracion'])): ?>
                 <div class="account-item-rating">

@@ -1,7 +1,15 @@
-FROM php:8.2-apache
+FROM php:8.3-apache
 
-# Instalar extensiones PDO MySQL y habilitar mod_rewrite
-RUN docker-php-ext-install pdo pdo_mysql \
-    && a2enmod rewrite
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && docker-php-ext-install pdo_mysql pdo_pgsql pgsql \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && a2enmod rewrite headers
+
+RUN printf "ServerName localhost\n" > /etc/apache2/conf-available/servername.conf \
+    && printf "ServerTokens Prod\nServerSignature Off\nTraceEnable Off\n" > /etc/apache2/conf-available/security.conf \
+    && a2enconf servername security
+
+RUN printf "upload_max_filesize = 64M\npost_max_size = 64M\nmemory_limit = 256M\nmax_execution_time = 300\n" > /usr/local/etc/php/conf.d/uploads.ini
 
 WORKDIR /var/www/html

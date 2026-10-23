@@ -1,27 +1,18 @@
 # php/auth/
 
-Logica de autenticacion y sesiones.
+Backend de autenticación, autorización y ciclo de vida de la sesión (Sprint 4 — Octubre 2026).
 
-## PHP-03: sesiones
+## Archivos y responsabilidades
 
-- `session.php`: helper reutilizable para iniciar sesion, guardar el usuario autenticado, verificar autenticacion, obtener el usuario actual, exigir autenticacion y cerrar sesion.
-- `logout.php`: cierre minimo de sesion y redireccion a `../../index.php`.
-
-`$_SESSION["usuario"]` guarda solo:
-
-- `id_usuario`
-- `nombre`
-- `email`
-- `id_rol`
-
-No guarda `password`, `password_hash`, datos de PDO ni otros datos sensibles.
-
-Ejemplo para proteger una pagina futura:
-
-```php
-require_once __DIR__ . "/../auth/session.php";
-
-requerir_autenticacion("../../html/login.php");
-```
-
-PHP-03 no implementa login real, registro ni consultas a la base de datos.
+| Archivo | Responsabilidad |
+|---|---|
+| `sesion.php` | Inicia sesiones, configura cookies seguras (HttpOnly, SameSite), regenera ID al autenticar y expone helpers de control de rol. |
+| `procesar_login.php` | Valida POST, CSRF, correo, hash bcrypt (`password_verify`) y bifurca al flujo de 2FA si está activo. |
+| `totp_helper.php` | Implementación nativa de TOTP (RFC 6238 / Google Authenticator) y generación de códigos QR de enrolamiento. |
+| `verificar_2fa.php` | Validación del código de 6 dígitos durante el login o consumo de código de respaldo único. |
+| `configurar_2fa.php` | Activación, verificación y generación de códigos de backup de dos factores. |
+| `inicio_oauth_google.php` / `callback_oauth_google.php` | Flujo OAuth 2.0 con Google. |
+| `inicio_oauth_github.php` / `callback_oauth_github.php` | Flujo OAuth 2.0 con GitHub. |
+| `procesar_restablecer_clave.php` | Recuperación de contraseñas mediante tokens seguros con expiración. |
+| `roles.php` | Constantes y comprobaciones de permisos por rol (`Estudiante`, `Docente`, `Administrador`). |
+| `logout.php` | Cierre seguro de sesión e invalidación de cookies de autenticación. |

@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Política de privacidad y protección de datos personales (Ley 18.331).
+ */
+
 $title       = 'Política de privacidad — Classia';
 $description = 'Política de privacidad de Classia. Conocé cómo recopilamos, usamos y protegemos tus datos personales conforme a la Ley 18.331 de Uruguay.';
 $cssPrefix   = '..';
@@ -8,7 +13,7 @@ $activePage  = '';
 include '../includes/header.php';
 ?>
 
-  <main class="privacy-page motion-entry">
+  <main id="main-content" class="privacy-page motion-entry">
 
     <header>
       <p>Información legal</p>
@@ -21,7 +26,7 @@ include '../includes/header.php';
     </header>
 
     <p class="update-banner">
-      <strong>Última actualización:</strong> agosto de 2026. Esta política puede actualizarse periódicamente.
+      <strong>Última actualización:</strong> septiembre de 2026. Esta política puede actualizarse periódicamente.
     </p>
 
     <div class="legal-highlight">
@@ -63,11 +68,12 @@ include '../includes/header.php';
           <tbody>
             <tr>
               <th scope="row">Nombre / Razón social</th>
-              <td>Classia (plataforma de comercialización de servicios educativos)</td>
+              <td>AniTech S.A</td>
             </tr>
             <tr>
               <th scope="row">Domicilio</th>
-              <td>República Oriental del Uruguay</td>
+              <td>Florencio Sánchez 389<br>
+                  Salto, Uruguay</td>
             </tr>
             <tr>
               <th scope="row">Correo electrónico de privacidad</th>
@@ -545,7 +551,8 @@ include '../includes/header.php';
       <p>
         Para cualquier consulta, duda o solicitud relacionada con el
         tratamiento de tus datos personales, podés comunicarte con nuestro
-        equipo de privacidad.
+        equipo de privacidad desde la
+        <a href="contacto.php">página de Contacto</a> o directamente por correo electrónico.
       </p>
     </section>
 

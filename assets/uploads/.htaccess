@@ -1,0 +1,6 @@
+# Prevenir ejecución de scripts en el directorio de subidas (OWASP Best Practice)
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|php8|phps|cgi|pl|sh|bash|exe|py|rb)$">
+    Require all denied
+</FilesMatch>
+
+Options -ExecCGI -Indexes

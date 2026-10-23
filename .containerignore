@@ -1,0 +1,6 @@
+.git
+.github
+node_modules
+*.log
+.env
+classia-db-data

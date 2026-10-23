@@ -1,29 +1,81 @@
-# php/publicaciones/
+# Módulo de publicaciones — PHP
 
-Módulo de gestión del ciclo de vida de cursos y servicios educativos para la plataforma Classia.
+Responsable de toda la lógica de negocio relacionada con publicaciones, cursos, servicios y su contenido estructurado.
 
 ---
 
-## 📚 PHP-12: CRUD de Publicaciones (Cursos y Servicios)
+## Arquitectura POO del contenido de cursos
 
-Este módulo gestiona la creación, edición, consulta y control de estados de las publicaciones ofertadas por docentes y proveedores de AniTech.
+### Jerarquía de composición
 
-### Componentes y scripts:
+```
+Curso (publicaciones)
+ └── Modulo          (curso_modulos)
+      └── Unidad     (curso_unidades)
+           └── Recurso (curso_recursos)
+```
 
-### 1. `crearPublicacion.php`
-- Procesa el alta de nuevos cursos o servicios (`html/crearPublicacion.php`).
-- **Validaciones:** Comprobación de token CSRF, campos requeridos (título, descripción, precio, tipo, categoría), tipos permitidos (`Curso`, `Servicio`), precios positivos y existencia previa de la categoría.
-- **Persistencia:** Inserción en la tabla `publicaciones` mediante PDO vinculando automáticamente el `id_usuario` del autor autenticado.
-- **Redirección:** Redirige al panel del proveedor con notificación (`panelProveedor.php?mensaje=creada`).
+### Clases de dominio (sin PDO)
 
-### 2. `editarPublicacion.php`
-- Gestiona la modificación y actualización de publicaciones existentes (`html/editarPublicacion.php`).
-- **Control de autorización y propiedad:** Valida que la publicación pertenezca al usuario en sesión (`WHERE id_publicacion = :id_pub AND id_usuario = :id_user`).
-- **Gestión de estados:** Permite alternar entre `Activo`, `Inactivo` y `Pausado`.
-- **Actualización segura:** Actualización de atributos (título, descripción, precio, tipo, categoría, estado) mediante sentencias preparadas PDO.
+| Clase | Archivo | Responsabilidad |
+|-------|---------|-----------------|
+| `Modulo` | `Modulo.php` | Representa un módulo; compone `Unidad[]` |
+| `Unidad` | `Unidad.php` | Representa una unidad/clase; compone `Recurso[]` |
+| `Recurso` | `Recurso.php` | Representa un recurso; contiene lógica de presentación (iconos, embed, visualización) |
 
-### 3. `obtenerPublicaciones.php`
-- Helper para consultas de datos del catálogo del proveedor.
-- Carga las categorías activas para los selectores de formularios.
-- Ejecuta la consulta de publicaciones del usuario autenticado con JOIN a la tabla `categorias` para alimentar dinámicamente las tarjetas en `html/panelProveedor.php`.
+Las clases de dominio **no tienen dependencias de PDO**. Son objetos puros que encapsulan datos y lógica de presentación.
 
+### Repositorio
+
+| Clase | Archivo | Responsabilidad |
+|-------|---------|-----------------|
+| `ContenidoCursoRepository` | `ContenidoCursoRepository.php` | Único punto de acceso a BD para contenido de cursos. Construye los objetos de dominio. Realiza todas las operaciones CRUD. |
+
+### Wrappers de compatibilidad (`contenido_curso.php`)
+
+Las funciones libres (globales) de `contenido_curso.php` son **wrappers delgados** que delegan al repositorio. Permiten que las vistas existentes sigan funcionando sin cambios de firma. Las funciones marcadas como `@deprecated` deben migrase a usar directamente la clase `Recurso`.
+
+### Cómo usar el repositorio directamente
+
+```php
+// Cargar módulos como objetos
+$repo    = new ContenidoCursoRepository($pdo);
+$modulos = $repo->obtenerPorCurso($id_curso); // Modulo[]
+
+foreach ($modulos as $modulo) {
+    echo $modulo->getTitulo();
+    foreach ($modulo->getUnidades() as $unidad) {
+        echo $unidad->getTitulo();
+        foreach ($unidad->getRecursos() as $recurso) {
+            echo $recurso->getEmojiIcono() . ' ' . $recurso->getTitulo();
+            echo $recurso->getVideoEmbedUrl(); // null si no es video
+        }
+    }
+}
+
+// Para plantillas que esperan arrays:
+$contenido = $repo->obtenerPorCursoComoArray($id_curso);
+// equivalente a: array_map(fn($m) => $m->toArray(), $modulos)
+```
+
+### Separación de responsabilidades
+
+- **Consultas SQL** → solo en `ContenidoCursoRepository`
+- **Lógica de presentación** (iconos, embed) → en `Recurso`
+- **Composición y conteo** → en `Modulo` y `Unidad`
+- **Validación y orquestación de POST** → en `procesar_contenido_curso()` (delega al repositorio)
+- **Subida de archivos** → en `file_upload_helper.php` y `supabase_storage.php`
+
+---
+
+## Otros archivos del módulo
+
+| Archivo | Responsabilidad |
+|---------|-----------------|
+| `catalogo.php` | Listado y filtrado de publicaciones |
+| `crear_publicacion.php` | Alta de publicaciones |
+| `editar_publicacion.php` | Modificación de publicaciones |
+| `detalle_curso.php` | Carga de datos del curso para la vista |
+| `detalle_servicio.php` | Carga de datos del servicio para la vista |
+| `obtener_publicaciones.php` | Consultas de publicaciones por usuario |
+| `publicacion_helpers.php` | Validaciones y utilidades compartidas |

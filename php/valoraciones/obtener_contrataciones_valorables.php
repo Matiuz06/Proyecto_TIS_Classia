@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Expone las contrataciones que el usuario puede valorar desde el frontend.
+ */
+
 require_once __DIR__ . '/../../config/database.php';
 
 // Obtiene las contrataciones del usuario con su titulo, estado y valoracion

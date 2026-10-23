@@ -1,6 +1,10 @@
 <?php
 
-require_once __DIR__ . '/session.php';
+/**
+ * Responsabilidad: Procesa login tradicional conservado para compatibilidad.
+ */
+
+require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
@@ -32,11 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = "Por favor, ingresá tu correo electrónico y contraseña.";
     } else {
         try {
-            $stmt = $pdo->prepare("SELECT id_usuario, nombre, apellido, email, password_hash, id_rol FROM usuarios WHERE email = :email LIMIT 1");
+            $stmt = $pdo->prepare("SELECT id_usuario, nombre, apellido, email, password_hash, id_rol, email_verificado, COALESCE(activo, 1) AS activo, motivo_bloqueo FROM usuarios WHERE email = :email LIMIT 1");
             $stmt->execute(['email' => $correo]);
             $usuario = $stmt->fetch();
 
             if ($usuario && password_verify($contrasena, $usuario['password_hash'])) {
+                if (isset($usuario['activo']) && (int) $usuario['activo'] === 0) {
+                    $motivo = !empty($usuario['motivo_bloqueo']) ? ' Motivo: ' . $usuario['motivo_bloqueo'] : '';
+                    $errores[] = "Tu cuenta se encuentra bloqueada o suspendida por la administración." . $motivo;
+                } elseif (!(int) $usuario['email_verificado']) {
+                    $errores[] = "Confirmá tu correo electrónico antes de iniciar sesión.";
+                }
+            }
+
+            if (!$errores && $usuario && password_verify($contrasena, $usuario['password_hash'])) {
                 establecer_usuario_sesion(
                     (int)$usuario['id_usuario'],
                     $usuario['nombre'] . ' ' . $usuario['apellido'],
@@ -53,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header("Location: usuario.php");
                 }
                 exit;
-            } else {
+            } elseif (!$usuario || !password_verify($contrasena, $usuario['password_hash'])) {
                 $errores[] = "El correo electrónico o la contraseña ingresada son incorrectos.";
             }
         } catch (PDOException $e) {

@@ -7,4 +7,10 @@ node_modules/
 # Docker personal setup
 Dockerfile
 docker-compose.yml
+docker-compose.override.yml
 .dockerignore
+
+# Entornos de BD (contienen credenciales — no subir)
+.env.local
+.env.supabase
+.env.active
