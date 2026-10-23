@@ -687,6 +687,50 @@ document.addEventListener("DOMContentLoaded", () => {
     activateTab(activeIndex >= 0 ? activeIndex : 0);
   });
 
+  document.querySelectorAll(".provider-workspace").forEach((workspace) => {
+    const tablist = workspace.querySelector(".provider-subnav");
+    const panels = Array.from(workspace.querySelectorAll("[data-provider-section]"));
+    const tabs = Array.from(tablist?.querySelectorAll("a[href^='#']") || []);
+    const validSections = new Set(panels.map((panel) => panel.id));
+
+    if (!tablist || !panels.length || tabs.length !== panels.length) return;
+
+    const getActiveSection = () => {
+      const requested = window.location.hash.slice(1);
+      return validSections.has(requested) ? requested : "publicaciones";
+    };
+
+    const renderProviderSection = (sectionId) => {
+      panels.forEach((panel) => {
+        const active = panel.id === sectionId;
+        panel.hidden = !active;
+        panel.setAttribute("aria-hidden", String(!active));
+      });
+
+      tabs.forEach((tab) => {
+        const active = tab.getAttribute("href") === `#${sectionId}`;
+        tab.classList.toggle("active", active);
+        if (active) tab.setAttribute("aria-current", "page");
+        else tab.removeAttribute("aria-current");
+      });
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", (event) => {
+        event.preventDefault();
+        const target = tab.getAttribute("href").slice(1);
+        if (window.location.hash !== `#${target}`) {
+          window.history.pushState({}, "", `#${target}`);
+        }
+        renderProviderSection(validSections.has(target) ? target : "publicaciones");
+      });
+    });
+
+    renderProviderSection(getActiveSection());
+    window.addEventListener("hashchange", () => renderProviderSection(getActiveSection()));
+    window.addEventListener("popstate", () => renderProviderSection(getActiveSection()));
+  });
+
   // Acordeones nativos: conservan apertura sin JS y sincronizan su estado accesible.
   document.querySelectorAll("details[data-accordion], details.course-nav-module, details.course-deliveries-task").forEach((accordion, index) => {
     if (accordion.dataset.accordionReady === "true") return;

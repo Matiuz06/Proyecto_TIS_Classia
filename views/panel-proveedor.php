@@ -175,6 +175,8 @@ include '../includes/header.php';
         <a href="#valoraciones">Valoraciones</a>
     </nav>
 
+    <div class="provider-tab-panels">
+    <section id="publicaciones" data-provider-section class="provider-tab-panel" aria-label="Publicaciones">
     <section class="provider-summary-section" aria-labelledby="titulo-resumen">
         <h2 id="titulo-resumen">Resumen de actividad</h2>
 
@@ -205,7 +207,7 @@ include '../includes/header.php';
         <?php endif; ?>
     </section>
 
-    <section id="publicaciones" class="provider-publications-section" aria-labelledby="titulo-publicaciones">
+    <section class="provider-publications-section" aria-labelledby="titulo-publicaciones">
         <header>
             <h2 id="titulo-publicaciones">Mis cursos y servicios</h2>
             <p>Consulta y administra las publicaciones asociadas a tu perfil.</p>
@@ -283,7 +285,10 @@ include '../includes/header.php';
         <?php endif; ?>
     </section>
 
-    <section id="solicitudes" class="provider-requests-section" aria-labelledby="titulo-solicitudes">
+    </section>
+
+    <section id="solicitudes" data-provider-section class="provider-tab-panel" aria-labelledby="titulo-solicitudes" hidden>
+    <section class="provider-requests-section" aria-labelledby="titulo-solicitudes">
         <header>
             <h2 id="titulo-solicitudes">Solicitudes recibidas</h2>
             <p>Gestiona las solicitudes de servicios de tus clientes.</p>
@@ -311,7 +316,10 @@ include '../includes/header.php';
         <?php endif; ?>
     </section>
 
-    <section id="estudiantes" class="provider-students-section" aria-labelledby="titulo-estudiantes">
+    </section>
+
+    <section id="estudiantes" data-provider-section class="provider-tab-panel" aria-labelledby="titulo-estudiantes" hidden>
+    <section class="provider-students-section" aria-labelledby="titulo-estudiantes">
         <header><h2 id="titulo-estudiantes">Estudiantes</h2><p>Consulta la cantidad de estudiantes inscriptos en tus cursos.</p></header>
         <?php if (!$cursos_estudiantes): ?>
             <p class="muted">Todavía no tenés cursos con estudiantes.</p>
@@ -329,6 +337,9 @@ include '../includes/header.php';
         <?php endif; ?>
     </section>
 
+    </section>
+
+    <section id="perfil" data-provider-section class="provider-tab-panel" aria-label="Perfil" hidden>
     <section class="provider-skills-section" aria-labelledby="titulo-habilidades">
         <header><h2 id="titulo-habilidades">Habilidades y especialidades</h2><p>Información profesional que ayuda a los usuarios a conocer tu experiencia.</p></header>
         <?php if (!empty($perfil_profesional['habilidades'])): ?><p><strong>Habilidades:</strong> <?= nl2br(htmlspecialchars($perfil_profesional['habilidades'])) ?></p><?php else: ?><p class="muted">Todavía no cargaste habilidades.</p><?php endif; ?>
@@ -336,7 +347,7 @@ include '../includes/header.php';
         <?php if (es_docente() || es_admin()): ?><a href="editar-perfil-profesional.php">Editar habilidades</a><?php endif; ?>
     </section>
 
-    <section id="perfil" class="provider-profile-section" aria-labelledby="titulo-perfil-profesional">
+    <section class="provider-profile-section" aria-labelledby="titulo-perfil-profesional">
         <br>
         <header><h2 id="titulo-perfil-profesional">Perfil profesional</h2><p>Información visible para posibles clientes y estudiantes según la privacidad elegida.</p></header>
         <?php if (!$perfil_profesional || empty($perfil_profesional['titulo_profesional'])): ?>
@@ -356,7 +367,23 @@ include '../includes/header.php';
         <?php if (es_docente() || es_admin()): ?><a href="perfil-profesional.php?id=<?= $uid ?>">Ver perfil público</a> <a href="editar-perfil-profesional.php">Editar información</a><?php endif; ?>
     </section>
 
-    <section id="valoraciones" class="provider-reviews-section" aria-labelledby="titulo-valoraciones">
+    <section class="provider-config-section" aria-labelledby="titulo-configuracion">
+        <h2 id="titulo-configuracion">Configuración del espacio de proveedor</h2>
+        <br>
+        <nav aria-label="Configuración del proveedor">
+            <ul>
+                <?php if (es_docente() || es_admin()): ?>
+                    <li><a href="editar-perfil-profesional.php">Datos profesionales</a></li>
+                    <li><a href="solicitudes-servicios.php">Gestión de solicitudes</a></li>
+                <?php endif; ?>
+                <li><a href="usuario.php">Seguridad y datos de la cuenta</a></li>
+            </ul>
+        </nav>
+    </section>
+    </section>
+
+    <section id="valoraciones" data-provider-section class="provider-tab-panel" aria-labelledby="titulo-valoraciones" hidden>
+    <section class="provider-reviews-section" aria-labelledby="titulo-valoraciones">
         <header><h2 id="titulo-valoraciones">Valoraciones recientes</h2><p>Opiniones recibidas en cursos y servicios.</p></header>
         <?php if (!$valoraciones_recientes): ?>
             <p class="muted">Todavía no recibiste valoraciones.</p>
@@ -374,21 +401,8 @@ include '../includes/header.php';
             <?php endforeach; ?>
         <?php endif; ?>
     </section>
-
-    <br>
-    <section class="provider-config-section" aria-labelledby="titulo-configuracion">
-        <h2 id="titulo-configuracion">Configuración del espacio de proveedor</h2>
-        <br>
-        <nav aria-label="Configuración del proveedor">
-            <ul>
-                <?php if (es_docente() || es_admin()): ?>
-                    <li><a href="editar-perfil-profesional.php">Datos profesionales</a></li>
-                    <li><a href="solicitudes-servicios.php">Gestión de solicitudes</a></li>
-                <?php endif; ?>
-                <li><a href="usuario.php">Seguridad y datos de la cuenta</a></li>
-            </ul>
-        </nav>
     </section>
+    </div>
 </main>
 
 <?php include '../includes/footer.php'; ?>
