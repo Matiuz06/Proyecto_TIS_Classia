@@ -59,7 +59,7 @@ if ($puedeCrear && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     'titulo'    => $titulo,
                     'subtitulo' => $subtitulo,
                     'cuerpo'    => $cuerpo,
-                    'imagen'    => $imagen !== '' ? $imagen : 'assets/images/cybersecurity_lab.jpg',
+                    'imagen'    => $imagen !== '' ? $imagen : 'assets/images/noticias-default.png',
                     'categoria' => $categoria,
                     'autor'     => $autor,
                     'orden'     => $orden,
@@ -153,7 +153,11 @@ include '../includes/header.php';
           <?php 
             $fechaTimestamp = strtotime($item['fecha_publicacion']);
             $fechaLegible = date('d/m/Y', $fechaTimestamp);
-            $imgSrc = htmlspecialchars($item['imagen'] ?: 'assets/images/cybersecurity_lab.jpg');
+            $imagenGuardada = trim((string)($item['imagen'] ?? ''));
+            if ($imagenGuardada === '' || ltrim($imagenGuardada, './') === 'assets/images/cybersecurity_lab.jpg') {
+                $imagenGuardada = 'assets/images/noticias-default.png';
+            }
+            $imgSrc = htmlspecialchars($imagenGuardada);
             if (strpos($imgSrc, 'http') !== 0 && strpos($imgSrc, '..') !== 0) {
                 $imgSrc = '../' . ltrim($imgSrc, '/');
             }

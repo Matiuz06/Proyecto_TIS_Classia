@@ -24,7 +24,11 @@ if (!$noticia) {
 }
 
 $urlActual = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-$imgSrc = htmlspecialchars($noticia['imagen'] ?: 'assets/images/cybersecurity_lab.jpg');
+$imagenGuardada = trim((string)($noticia['imagen'] ?? ''));
+if ($imagenGuardada === '' || ltrim($imagenGuardada, './') === 'assets/images/cybersecurity_lab.jpg') {
+    $imagenGuardada = 'assets/images/noticias-default.png';
+}
+$imgSrc = htmlspecialchars($imagenGuardada);
 if (strpos($imgSrc, 'http') !== 0 && strpos($imgSrc, '..') !== 0) {
     $imgSrc = '../' . ltrim($imgSrc, '/');
 }
@@ -68,11 +72,9 @@ include '../includes/header.php';
       </header>
 
       <!-- Imagen principal -->
-      <?php if (!empty($noticia['imagen'])): ?>
-        <div class="news-detail-media">
-          <img src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($noticia['titulo']) ?>" />
-        </div>
-      <?php endif; ?>
+      <div class="news-detail-media">
+        <img src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($noticia['titulo']) ?>" />
+      </div>
 
       <!-- Cuerpo de la noticia -->
       <div class="news-detail-body">
