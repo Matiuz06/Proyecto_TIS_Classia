@@ -59,6 +59,66 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Menú lateral del curso: en móvil se cierra al navegar a una unidad.
+  const PASSWORD_ICON_EYE = `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  `;
+  const PASSWORD_ICON_EYE_OFF = `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M3 3l18 18" />
+      <path d="M10.7 5.2A10.7 10.7 0 0 1 12 5c6 0 9.5 7 9.5 7a15.5 15.5 0 0 1-3.1 3.9" />
+      <path d="M6.4 6.5A16 16 0 0 0 2.5 12s3.5 7 9.5 7a10.4 10.4 0 0 0 4.1-.8" />
+      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+    </svg>
+  `;
+
+  const syncPasswordToggle = (input, button) => {
+    const visible = input.type === "text";
+    button.setAttribute("aria-label", visible ? "Ocultar contraseña" : "Mostrar contraseña");
+    button.innerHTML = visible ? PASSWORD_ICON_EYE_OFF : PASSWORD_ICON_EYE;
+    button.classList.toggle("is-visible", visible);
+  };
+
+  const initPasswordToggles = (root = document) => {
+    root.querySelectorAll('input[type="password"]').forEach((input) => {
+      if (input.dataset.passwordToggleReady === "true") return;
+
+      let wrapper = input.closest(".password-field");
+      if (!wrapper) {
+        wrapper = document.createElement("span");
+        wrapper.className = "password-field";
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+      }
+
+      let button = wrapper.querySelector(":scope > .password-toggle");
+      if (!button) {
+        button = document.createElement("button");
+        button.type = "button";
+        button.className = "password-toggle";
+        wrapper.appendChild(button);
+      }
+
+      input.dataset.passwordToggleReady = "true";
+      syncPasswordToggle(input, button);
+
+      button.addEventListener("click", () => {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        input.type = input.type === "password" ? "text" : "password";
+        syncPasswordToggle(input, button);
+        input.focus();
+        if (start !== null && end !== null) {
+          input.setSelectionRange(start, end);
+        }
+      });
+    });
+  };
+
+  initPasswordToggles();
+
   const sidebarToggle = document.querySelector("[data-course-sidebar-toggle]");
   const courseSidebar = document.querySelector("[data-course-sidebar]");
 

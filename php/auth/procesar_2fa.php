@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/totp.php';
+require_once __DIR__ . '/../utils/toast.php';
 require_once __DIR__ . '/../../config/database.php';
 
 iniciar_sesion();
@@ -94,6 +95,7 @@ try {
     );
 
     unset($_SESSION['2fa_pending']);
+    set_toast('success', 'Sesion iniciada');
 
     if ((int) $pending['id_rol'] === 3) {
         header('Location: ../../views/panel-administrador.php');

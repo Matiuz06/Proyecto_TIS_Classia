@@ -24,6 +24,10 @@ abstract class Publicacion
     protected int $id_usuario;
     protected int $id_categoria;
     protected ?string $nombre_categoria;
+    protected ?string $autor_nombre;
+    protected ?string $autor_apellido;
+    protected float $promedio_valoracion;
+    protected int $total_contrataciones;
 
     /**
      * @param array $datos Fila de publicaciones o datos validados del formulario.
@@ -48,6 +52,10 @@ abstract class Publicacion
         $this->id_usuario = (int) ($datos['id_usuario'] ?? 0);
         $this->id_categoria = (int) ($datos['id_categoria'] ?? 0);
         $this->nombre_categoria = self::textoOpcional($datos['nombre_categoria'] ?? null);
+        $this->autor_nombre = self::textoOpcional($datos['autor_nombre'] ?? null);
+        $this->autor_apellido = self::textoOpcional($datos['autor_apellido'] ?? null);
+        $this->promedio_valoracion = (float) ($datos['promedio_valoracion'] ?? 0);
+        $this->total_contrataciones = (int) ($datos['total_contrataciones'] ?? 0);
     }
 
     /** Devuelve el identificador de la publicacion, si ya fue persistida. */
@@ -55,6 +63,8 @@ abstract class Publicacion
 
     /** Devuelve el titulo visible de la publicacion. */
     public function getTitulo(): string { return $this->titulo; }
+
+    public function getDescripcion(): string { return $this->descripcion; }
 
     /** Devuelve el tipo discriminador usado por la base de datos. */
     public function getTipo(): string { return $this->tipo; }
@@ -77,6 +87,30 @@ abstract class Publicacion
 
     public function getNombreCategoria(): ?string {
         return $this->nombre_categoria;
+    }
+
+    public function getImagen(): ?string {
+        return $this->imagen;
+    }
+
+    public function getFechaCreacion(): ?string {
+        return $this->fecha_creacion;
+    }
+
+    public function getAutorNombre(): ?string {
+        return $this->autor_nombre;
+    }
+
+    public function getAutorApellido(): ?string {
+        return $this->autor_apellido;
+    }
+
+    public function getPromedioValoracion(): float {
+        return $this->promedio_valoracion;
+    }
+
+    public function getTotalContrataciones(): int {
+        return $this->total_contrataciones;
     }
 
     /** Devuelve el usuario propietario de la publicacion. */
@@ -133,6 +167,11 @@ abstract class Publicacion
             'fecha_actualizacion' => $this->fecha_actualizacion,
             'id_usuario' => $this->id_usuario,
             'id_categoria' => $this->id_categoria,
+            'nombre_categoria' => $this->nombre_categoria,
+            'autor_nombre' => $this->autor_nombre,
+            'autor_apellido' => $this->autor_apellido,
+            'promedio_valoracion' => $this->promedio_valoracion,
+            'total_contrataciones' => $this->total_contrataciones,
         ];
     }
 

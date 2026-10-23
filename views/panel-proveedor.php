@@ -148,18 +148,6 @@ include '../includes/header.php';
 ?>
 
 <main id="main-content" class="provider-dashboard provider-workspace">
-    <?php if (isset($_GET['mensaje'])): ?>
-        <div class="alert alert-success">
-            <?php
-            $mensaje = $_GET['mensaje'];
-            if ($mensaje === 'creada') echo 'Publicación creada exitosamente.';
-            elseif ($mensaje === 'actualizada') echo 'Publicación actualizada correctamente.';
-            elseif ($mensaje === 'estado_actualizado') echo 'El estado de la publicación se actualizó correctamente.';
-            else echo 'Operación realizada correctamente.';
-            ?>
-        </div>
-    <?php endif; ?>
-
     <header class="provider-dashboard__header">
         <h1>Panel del proveedor</h1>
         <p>Gestiona tus cursos, servicios, solicitudes, estudiantes y datos profesionales desde un único lugar.</p>

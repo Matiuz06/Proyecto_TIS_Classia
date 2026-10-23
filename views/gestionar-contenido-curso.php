@@ -8,6 +8,7 @@ require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 require_once '../php/publicaciones/contenido_curso.php';
 require_once '../php/publicaciones/EntregaRepository.php';
+require_once '../php/utils/toast.php';
 
 if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 $usuario = usuario_actual();
@@ -22,7 +23,11 @@ if (!$curso) {
     $error = 'Curso no encontrado o sin permisos.';
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $r = procesar_contenido_curso($pdo, $_POST, $_FILES, $id_publicacion, $id_usuario, es_admin(), $_SESSION['csrf_token']);
-    if ($r['ok']) $mensaje = $r['mensaje']; else $error = $r['mensaje'];
+    if ($r['ok']) set_toast('success', 'Contenido actualizado'); else $error = $r['mensaje'];
+}
+
+if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'creada') {
+    set_toast('success', 'Curso creado', 'Ahora podes cargar su contenido.');
 }
 
 $contenido = $curso ? obtener_contenido_curso($pdo, $id_publicacion) : [];
@@ -134,8 +139,6 @@ include '../includes/header.php';
     <?php endif; ?>
   </header>
 
-  <?php if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'creada'): ?><div class="alert alert-success">Curso creado. Ahora podes cargar su contenido.</div><?php endif; ?>
-  <?php if ($mensaje): ?><div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div><?php endif; ?>
   <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
   <?php if ($curso && ($curso['estado'] ?? '') === 'Archivado'): ?>
@@ -152,6 +155,31 @@ include '../includes/header.php';
       <a class="btn" href="vista-previa-publicacion.php?id=<?= $id_publicacion ?>">Vista previa</a>
       <a class="btn" href="panel-proveedor.php">Volver al panel</a>
     </nav>
+
+    <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
+    <section class="course-approval-settings" aria-labelledby="criterio-aprobacion">
+      <h2 id="criterio-aprobacion">Criterio de aprobación</h2>
+      <form method="POST" class="course-approval-form">
+        <?php campo_base_curso($id_publicacion); ?>
+        <input type="hidden" name="accion" value="actualizar_aprobacion">
+        <label>
+          Porcentaje mínimo de aprobación
+          <input
+            type="number"
+            name="porcentaje_minimo_aprobacion"
+            min="0"
+            max="100"
+            value="<?= (int)($curso['porcentaje_minimo_aprobacion'] ?? 70) ?>"
+          >
+        </label>
+        <span class="text-muted">
+          El alumno deberá alcanzar al menos este porcentaje de progreso para aprobar el curso.
+        </span>
+        <button class="btn btn-sm btn-primary-action" type="submit">Guardar</button>
+      </form>
+    </section>
+    <?php endif; ?>
+
 
     <button class="btn btn-secondary course-structure-toggle" type="button" data-course-sidebar-toggle aria-expanded="false">Contenido del curso</button>
 
@@ -507,6 +535,7 @@ include '../includes/header.php';
         <?php endforeach; ?>
       </section>
     </div>
+
 
     <dialog class="course-dialog" id="dialog-agregar-modulo" aria-labelledby="titulo-agregar-modulo">
       <div class="course-dialog-header">

@@ -203,18 +203,18 @@ if (!function_exists('puntaje_recomendacion')) {
 
         return $puntaje;
     }
-
+}
 $recomendaciones = [];
 $personalizacion_aceptada = ($preferencias_usuario['acepta_personalizacion'] ?? '') === 'si';
 if ($personalizacion_aceptada && empty($busqueda) && empty($tipo_filtro) && $categoria_filtro === 0) {
    $publicaciones_recomendadas = $publicaciones;
-   usort($publicaciones_recomendadas, function (array $a, array $b) use ($preferencias_usuario): int {
+   usort($publicaciones_recomendadas, function (Publicacion $a, Publicacion $b) use ($preferencias_usuario): int {
        $puntaje_a = puntaje_recomendacion($a, $preferencias_usuario);
        $puntaje_b = puntaje_recomendacion($b, $preferencias_usuario);
 
 
        if ($puntaje_a === $puntaje_b) {
-           return strcmp((string) $b['fecha_creacion'], (string) $a['fecha_creacion']);
+           return strcmp((string) $b->getFechaCreacion(), (string) $a->getFechaCreacion());
        }
 
 
@@ -222,6 +222,6 @@ if ($personalizacion_aceptada && empty($busqueda) && empty($tipo_filtro) && $cat
    });
    $recomendaciones = array_slice(array_filter(
        $publicaciones_recomendadas,
-       fn(array $publicacion): bool => puntaje_recomendacion($publicacion, $preferencias_usuario) > 0
+       fn(Publicacion $publicacion): bool => puntaje_recomendacion($publicacion, $preferencias_usuario) > 0
    ), 0, 6);
 }

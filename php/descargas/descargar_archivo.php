@@ -7,6 +7,7 @@ require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../utils/file_upload_helper.php';
 require_once __DIR__ . '/../utils/supabase_storage.php';
+require_once __DIR__ . '/../utils/auditoria.php';
 
 requerir_autenticacion('../../views/login.php');
 $usuario = usuario_actual();
@@ -64,9 +65,12 @@ if ($tipo === 'recurso' && $id > 0) {
 $modo = $_GET['modo'] ?? 'descargar';
 
 if (!$ruta) {
+    registrar_auditoria('DESCARGA_DENEGADA', "Intento no autorizado o archivo inexistente (tipo={$tipo}, id={$id})", 'WARNING', ['tipo' => $tipo, 'id' => $id], $uid);
     http_response_code(404);
     exit('Archivo no disponible.');
 }
+
+registrar_auditoria('DESCARGA_ARCHIVO', "Descarga autorizada de archivo (tipo={$tipo}, id={$id})", 'INFO', ['tipo' => $tipo, 'id' => $id, 'nombre' => $nombreDescarga], $uid);
 
 if (str_starts_with($ruta, 'supabase:')) {
     $supabasePath = substr($ruta, 9);

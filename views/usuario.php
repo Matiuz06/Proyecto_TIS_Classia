@@ -18,7 +18,7 @@ $jsPrefix    = '..';
 $activePage = 'cuenta';
 
 if (isset($_GET['2fa_desactivado'])) {
-    $mensaje_exito = 'La autenticación en dos pasos ha sido desactivada.';
+    set_toast('info', 'Autenticacion en dos pasos desactivada');
 }
 
 include '../includes/header.php';
@@ -34,12 +34,6 @@ include '../includes/header.php';
     <?php if (!empty($mensaje_error)): ?>
       <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($mensaje_error); ?>
-      </div>
-    <?php endif; ?>
-
-    <?php if (!empty($mensaje_exito)): ?>
-      <div class="alert alert-success" role="status">
-        <?php echo htmlspecialchars($mensaje_exito); ?>
       </div>
     <?php endif; ?>
 
@@ -165,9 +159,20 @@ include '../includes/header.php';
         <p>Cursos en los que estás inscripto:</p>
         <ul>
           <?php foreach ($cursos_contratados as $curso): ?>
+            <?php $progresoPerfil = $progresos_cursos[(int)$curso['id_publicacion']] ?? null; ?>
             <li class="account-item">
               <strong><?php echo htmlspecialchars($curso['titulo']); ?></strong>
               — Estado: <em><?php echo $curso['estado'] === 'Pendiente' ? 'Pendiente de pago' : htmlspecialchars($curso['estado']); ?></em>
+              <?php if ($progresoPerfil): ?>
+                <?php $porcentajePerfil = rtrim(rtrim(number_format((float)$progresoPerfil['porcentaje'], 2, '.', ''), '0'), '.'); ?>
+                <div class="account-course-progress">
+                  <span>Progreso: <?php echo htmlspecialchars($porcentajePerfil); ?>%</span>
+                  <span>Estado: <?php echo htmlspecialchars($progresoPerfil['estado']); ?></span>
+                  <?php if (!empty($progresoPerfil['aprobado'])): ?>
+                    <a href="../php/certificados/descargar.php?id_curso=<?php echo (int)$curso['id_publicacion']; ?>">Certificado</a>
+                  <?php endif; ?>
+                </div>
+              <?php endif; ?>
               <?php if ($curso['estado'] === 'Pendiente'): ?>
                 [<a href="pasarela-pago.php?id_contratacion=<?php echo (int)$curso['id_contratacion']; ?>" class="link u-font-bold u-text-brand-primary">Completar pago →</a>]
               <?php else: ?>

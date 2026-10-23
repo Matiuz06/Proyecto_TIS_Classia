@@ -12,6 +12,7 @@
 
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../utils/auditoria.php';
 
 
 // ESTADÍSTICAS
@@ -142,6 +143,7 @@ function cambiar_rol_usuario(PDO $pdo, int $id_usuario, int $nuevo_rol, string $
         if ($stmt->rowCount() === 0) {
             return ['ok' => true, 'error' => '', 'mensaje' => 'El usuario ya tenía ese rol o es administrador.'];
         }
+        registrar_auditoria('ADMIN_CAMBIO_ROL', "Rol cambiado para usuario #{$id_usuario} a nuevo rol {$nuevo_rol}", 'CRITICAL', ['id_usuario_afectado' => $id_usuario, 'nuevo_rol' => $nuevo_rol], null, $pdo);
         return ['ok' => true, 'error' => '', 'mensaje' => 'Rol actualizado correctamente.'];
     } catch (PDOException $e) {
         error_log('Error al cambiar rol: ' . $e->getMessage());
@@ -188,6 +190,7 @@ function bloquear_usuario(PDO $pdo, int $id_usuario, string $motivo, string $tok
         if ($stmt->rowCount() === 0) {
             return ['ok' => false, 'error' => 'No se pudo bloquear al usuario (usuario inexistente o administrador).', 'mensaje' => ''];
         }
+        registrar_auditoria('ADMIN_BLOQUEO_USUARIO', "Usuario #{$id_usuario} bloqueado. Motivo: {$motivo}", 'CRITICAL', ['id_usuario_afectado' => $id_usuario, 'motivo' => $motivo], null, $pdo);
         return ['ok' => true, 'error' => '', 'mensaje' => 'Usuario bloqueado correctamente con justificación registrada.'];
     } catch (PDOException $e) {
         error_log('Error al bloquear usuario: ' . $e->getMessage());
@@ -224,6 +227,7 @@ function desbloquear_usuario(PDO $pdo, int $id_usuario, string $token, string $c
             $stmt->execute(['id' => $id_usuario, 'admin' => ROL_ADMIN]);
         }
 
+        registrar_auditoria('ADMIN_DESBLOQUEO_USUARIO', "Usuario #{$id_usuario} reactivado y desbloqueado", 'WARNING', ['id_usuario_afectado' => $id_usuario], null, $pdo);
         return ['ok' => true, 'error' => '', 'mensaje' => 'Usuario reactivado y desbloqueado correctamente.'];
     } catch (PDOException $e) {
         error_log('Error al desbloquear usuario: ' . $e->getMessage());
@@ -487,6 +491,15 @@ function cambiar_estado_publicacion_admin(PDO $pdo, int $id_publicacion, string 
     try {
         $stmt = $pdo->prepare("UPDATE publicaciones SET estado = :estado WHERE id_publicacion = :id");
         $stmt->execute(['estado' => $nuevo_estado, 'id' => $id_publicacion]);
+        if ($stmt->rowCount() === 0) {
+            return [
+                'ok' => true,
+                'error' => '',
+                'mensaje' => 'Accion ya aplicada',
+                'toast_tipo' => 'warning',
+                'toast_descripcion' => 'El estado ya se encontraba actualizado.',
+            ];
+        }
         return ['ok' => true, 'error' => '', 'mensaje' => "Estado cambiado a «{$nuevo_estado}» correctamente."];
     } catch (PDOException $e) {
         error_log('Error al cambiar estado publicación admin: ' . $e->getMessage());

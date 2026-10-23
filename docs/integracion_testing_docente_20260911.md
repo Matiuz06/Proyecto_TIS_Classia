@@ -4,8 +4,8 @@ Esta versión toma `Proyecto_TIS_Classia-testing (7)` como base y conserva sus p
 
 Para una base existente ejecutar una vez:
 
-```powershell
-podman exec -it classia_web php /var/www/html/scripts/migrate_provider_features.php
+```bash
+docker exec classia_web php /var/www/html/scripts/migrate_provider_features.php
 ```
 
 No es necesario borrar el volumen de MySQL.

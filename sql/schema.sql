@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS publicaciones (
     modalidad VARCHAR(30) NULL,
     nivel_experiencia VARCHAR(30) NULL,
     duracion_horas SMALLINT UNSIGNED NULL,
+    porcentaje_minimo_aprobacion TINYINT UNSIGNED NOT NULL DEFAULT 70,
     cupos INT NULL,
     disponibilidad TEXT NULL,
     tipo_servicio VARCHAR(60) NULL,
@@ -369,6 +370,31 @@ CREATE TABLE IF NOT EXISTS curso_entrega_archivos (
     INDEX idx_curso_entrega_archivos_entrega (id_entrega)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS curso_recursos_completados (
+    id_completado INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_recurso INT NOT NULL,
+    fecha_completado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_recursos_completados_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_recursos_completados_recurso FOREIGN KEY (id_recurso) REFERENCES curso_recursos(id_recurso) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uq_recurso_completado_usuario (id_usuario, id_recurso),
+    INDEX idx_recursos_completados_recurso (id_recurso)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS certificados (
+    id_certificado INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_curso INT NOT NULL,
+    codigo_verificacion VARCHAR(32) NOT NULL,
+    fecha_emision DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    porcentaje_aprobacion DECIMAL(5,2) NOT NULL,
+    CONSTRAINT fk_certificados_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_certificados_curso FOREIGN KEY (id_curso) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY uq_certificado_usuario_curso (id_usuario, id_curso),
+    UNIQUE KEY uq_certificado_codigo (codigo_verificacion),
+    INDEX idx_certificados_curso (id_curso)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS curso_foro_mensajes (
     id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
     id_recurso INT NOT NULL,
@@ -423,6 +449,28 @@ CREATE TABLE IF NOT EXISTS eventos (
     CONSTRAINT fk_eventos_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL ON UPDATE CASCADE,
     INDEX idx_eventos_estado (estado),
     INDEX idx_eventos_fecha (fecha_evento)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================================
+-- Auditoría y Trazabilidad de Eventos de Seguridad (RNF-23)
+-- Cumplimiento: ISO 27001 A.8.15, CIS 8.2, OWASP ASVS V10
+-- =========================================================
+CREATE TABLE IF NOT EXISTS auditoria_seguridad (
+    id_auditoria BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NULL,
+    tipo_evento VARCHAR(60) NOT NULL,
+    descripcion TEXT NOT NULL,
+    direccion_ip VARCHAR(45) NOT NULL,
+    user_agent VARCHAR(255) NULL,
+    nivel_severidad ENUM('INFO', 'WARNING', 'CRITICAL') NOT NULL DEFAULT 'INFO',
+    datos_adicionales JSON NULL,
+    fecha_evento DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_auditoria_usuario
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    INDEX idx_auditoria_evento (tipo_evento),
+    INDEX idx_auditoria_fecha (fecha_evento),
+    INDEX idx_auditoria_usuario (id_usuario)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE solicitudes

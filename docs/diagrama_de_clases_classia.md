@@ -1,4 +1,4 @@
-# Diagrama de Clases — Classia · Segunda Entrega (Sprint 3)
+# Diagrama de Clases — Classia · Sprint 4 (Octubre 2026)
 
 ## Arquitectura de Clases y Servicios
 El diagrama de clases modela la arquitectura de entidades, controladores y servicios auxiliares en PHP 8.
@@ -50,7 +50,7 @@ skinparam usecase {
     ActorBackgroundColor #EBF8FF
 }
 
-title Diagrama de Clases del Sistema — Classia (Arquitectura PHP)
+title Diagrama de Clases del Sistema — Classia (Sprint 4 — Arquitectura PHP)
 
 package "Modelos / Entidades" {
   class Usuario {
@@ -155,6 +155,25 @@ package "Modelos / Entidades" {
     - comentario: string
     + registrar(): bool
   }
+
+  class Noticia {
+    - id_noticia: int
+    - titulo: string
+    - contenido: string
+    - estado: string
+    + publicar(): bool
+    + rechazar(): bool
+  }
+
+  class Evento {
+    - id_evento: int
+    - titulo: string
+    - descripcion: string
+    - estado: string
+    - fecha_inicio: DateTime
+    + aprobar(): bool
+    + rechazar(): bool
+  }
 }
 
 package "Servicios y Helpers" {
@@ -190,6 +209,8 @@ Contratacion "1" *-- "1..*" Publicacion : contiene
 Contratacion "1" *-- "0..*" Pago : liquida
 Usuario "1" o-- "0..*" Valoracion : emite
 Publicacion "1" o-- "0..*" Valoracion : calificada
+Usuario "1" o-- "0..*" Noticia : propone
+Usuario "1" o-- "0..*" Evento : organiza
 
 Publicacion ..> UploadHelper : usa
 CursoRecurso ..> SupabaseStorageService : almacena
