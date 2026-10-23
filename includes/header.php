@@ -223,13 +223,6 @@ $cartCount = count($cartItems);
                   class="user-dropdown-item<?= $activePage === 'solicitudes-docente' ? ' active' : '' ?>">
                   <?= __t('nav_solicitudes_docentes', 'Solicitudes docentes') ?>
                 </a>
-                <a href="<?= $eventosHref ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_admin_eventos', 'Gestión de Eventos') ?>
-                </a>
-                <a href="<?= $noticiasHref ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_admin_noticias', 'Gestión de Noticias') ?>
-                </a>
-
                 <?php endif; ?>
 
               <div class="user-dropdown-divider" role="separator"></div>
