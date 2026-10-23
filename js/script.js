@@ -642,49 +642,65 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".profile-tabs").forEach((tablist) => {
     if (tablist.dataset.tabsReady === "true") return;
 
-    const buttons = Array.from(tablist.querySelectorAll("button"));
-    const panels = Array.from(tablist.parentElement.querySelectorAll(":scope > .account-section"));
-    if (!buttons.length || buttons.length !== panels.length) return;
+    const tabs = Array.from(tablist.querySelectorAll("a[href^='#']"));
+    const panels = Array.from(tablist.parentElement.querySelectorAll(":scope > .profile-tab-panel"));
+    const validSections = new Set(panels.map((panel) => panel.id));
+    if (!tabs.length || tabs.length !== panels.length) return;
 
     tablist.dataset.tabsReady = "true";
     tablist.setAttribute("role", "tablist");
 
-    const activateTab = (index, moveFocus = false) => {
-      buttons.forEach((button, buttonIndex) => {
-        const active = buttonIndex === index;
-        const panel = panels[buttonIndex];
-        const panelId = panel.id || `profile-panel-${buttonIndex + 1}`;
+    const getActiveSection = () => {
+      const requested = window.location.hash.slice(1);
+      return validSections.has(requested) ? requested : "perfil";
+    };
 
-        panel.id = panelId;
-        panel.setAttribute("role", "tabpanel");
-        panel.setAttribute("aria-labelledby", button.id || `profile-tab-${buttonIndex + 1}`);
-        button.id = button.id || `profile-tab-${buttonIndex + 1}`;
-        button.setAttribute("role", "tab");
-        button.setAttribute("aria-controls", panelId);
-        button.setAttribute("aria-selected", String(active));
-        button.tabIndex = active ? 0 : -1;
+    const renderProfileSection = (sectionId, moveFocus = false) => {
+      panels.forEach((panel) => {
+        const active = panel.id === sectionId;
         panel.hidden = !active;
+        panel.setAttribute("role", "tabpanel");
+        panel.setAttribute("aria-hidden", String(!active));
+      });
 
-        if (active && moveFocus) button.focus();
+      tabs.forEach((tab) => {
+        const active = tab.getAttribute("href") === `#${sectionId}`;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("role", "tab");
+        tab.setAttribute("aria-selected", String(active));
+        tab.setAttribute("aria-controls", tab.getAttribute("href").slice(1));
+        tab.tabIndex = active ? 0 : -1;
+        if (active) tab.setAttribute("aria-current", "page");
+        else tab.removeAttribute("aria-current");
+        if (active && moveFocus) tab.focus();
       });
     };
 
-    buttons.forEach((button, index) => {
-      button.addEventListener("click", () => activateTab(index));
-      button.addEventListener("keydown", (event) => {
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", (event) => {
+        event.preventDefault();
+        const target = tab.getAttribute("href").slice(1);
+        if (window.location.hash !== `#${target}`) {
+          window.history.pushState({}, "", `#${target}`);
+        }
+        renderProfileSection(validSections.has(target) ? target : "perfil");
+      });
+      tab.addEventListener("keydown", (event) => {
         if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"].includes(event.key)) return;
         event.preventDefault();
         let nextIndex = index;
-        if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % buttons.length;
-        if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index - 1 + buttons.length) % buttons.length;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % tabs.length;
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index - 1 + tabs.length) % tabs.length;
         if (event.key === "Home") nextIndex = 0;
-        if (event.key === "End") nextIndex = buttons.length - 1;
-        activateTab(nextIndex, true);
+        if (event.key === "End") nextIndex = tabs.length - 1;
+        tabs[nextIndex].click();
+        tabs[nextIndex].focus();
       });
     });
 
-    const activeIndex = buttons.findIndex((button) => button.classList.contains("active"));
-    activateTab(activeIndex >= 0 ? activeIndex : 0);
+    renderProfileSection(getActiveSection());
+    window.addEventListener("hashchange", () => renderProfileSection(getActiveSection()));
+    window.addEventListener("popstate", () => renderProfileSection(getActiveSection()));
   });
 
   document.querySelectorAll(".provider-workspace").forEach((workspace) => {

@@ -25853,3 +25853,104 @@ form.teacher-request-actions {
     min-width: 10rem;
   }
 }
+.profile-page {
+  padding-top: var(--space-5);
+}
+
+.profile-page > .profile-hero {
+  margin-top: 0;
+}
+
+/* Pestañas del perfil de usuario: mismo lenguaje visual de los paneles. */
+.profile-page .profile-tabs {
+  gap: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.profile-page .profile-tabs a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  flex: 1 1 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-muted);
+  background: var(--color-brand-primary-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.profile-page .profile-tabs a:first-child {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.profile-page .profile-tabs a:last-child {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.profile-page .profile-tabs a.active,
+.profile-page .profile-tabs a.active:hover,
+.profile-page .profile-tabs a.active:focus-visible {
+  color: var(--color-text-inverse);
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.profile-page .profile-tab-panel[hidden] {
+  display: none !important;
+}
+
+.profile-certificates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.profile-certificate-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-certificate-icon {
+  display: grid;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  color: var(--color-text-inverse);
+  background: var(--color-brand-primary);
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.profile-certificate-content {
+  min-width: 0;
+}
+
+.profile-certificate-content h3 {
+  margin: 0 0 var(--space-2);
+  overflow-wrap: anywhere;
+}
+
+.profile-certificate-content p {
+  margin: 0 0 var(--space-2);
+}
+
+@media (max-width: 760px) {
+  .profile-page .profile-tabs a {
+    flex: 0 0 auto;
+    min-width: 11rem;
+  }
+}
