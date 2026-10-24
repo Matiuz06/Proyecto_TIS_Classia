@@ -8,6 +8,7 @@ require_once '../php/publicaciones/EntregaRepository.php';
 require_once '../php/utils/file_upload_helper.php';
 require_once '../php/utils/supabase_storage.php';
 require_once '../php/utils/toast.php';
+require_once '../php/notificaciones/NotificacionService.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -45,6 +46,9 @@ if (!$entrega || (!es_admin() && (int)$entrega['docente_id'] !== $id_usuario)) {
 
         $archivoFeedback = null;
         $archivoFeedbackAnterior = $entrega['archivo_feedback'] ?? null;
+        $feedbackAnterior = trim((string)($entrega['feedback_docente'] ?? ''));
+        $feedbackNuevo = trim($_POST['feedback_docente'] ?? '');
+        $calificacionAnterior = (string)($entrega['calificacion'] ?? '');
         if (!empty($_FILES['archivo_feedback']['name'])) {
             if (empty($entrega['permite_feedback_archivo'])) throw new RuntimeException('Esta tarea no permite archivo de devolucion.');
             $res = guardar_archivo_subido($_FILES['archivo_feedback'], 'feedback', 20);
@@ -61,6 +65,26 @@ if (!$entrega || (!es_admin() && (int)$entrega['docente_id'] !== $id_usuario)) {
         }
         if ($archivoFeedback && $archivoFeedbackAnterior && $archivoFeedbackAnterior !== $archivoFeedback && !eliminar_archivo_storage($archivoFeedbackAnterior)) {
             error_log('No se pudo eliminar feedback anterior reemplazado: ' . $archivoFeedbackAnterior);
+        }
+        $calificacionNueva = $calificacion === null ? '' : (string)$calificacion;
+        $cambioCalificacion = $calificacionAnterior !== $calificacionNueva;
+        $cambioFeedback = $feedbackAnterior !== $feedbackNuevo || $archivoFeedback !== null;
+        if (($cambioCalificacion || $cambioFeedback) && (int)($entrega['id_usuario'] ?? 0) > 0) {
+            try {
+                $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+                $notificaciones->crear([
+                    'id_usuario' => (int)$entrega['id_usuario'],
+                    'categoria' => 'tareas',
+                    'titulo' => $cambioCalificacion ? 'Tarea corregida' : 'Nueva devolución docente',
+                    'mensaje' => 'El docente actualizó la entrega de "' . ($entrega['tarea_titulo'] ?? 'tu tarea') . '" en "' . ($entrega['curso_titulo'] ?? 'tu curso') . '".',
+                    'url_destino' => 'views/curso.php?id=' . (int)$entrega['id_publicacion'] . '&recurso=' . (int)$entrega['id_recurso'],
+                    'tipo_entidad' => 'entrega',
+                    'id_entidad' => $id_entrega,
+                    'clave_idempotencia' => 'correccion:' . substr(hash('sha256', $id_entrega . '|' . $calificacionNueva . '|' . $feedbackNuevo . '|' . ($archivoFeedback ?? $archivoFeedbackAnterior ?? '')), 0, 53),
+                ]);
+            } catch (Throwable $e) {
+                error_log('Notificacion academica: ' . $e->getMessage());
+            }
         }
         set_toast(
             'success',

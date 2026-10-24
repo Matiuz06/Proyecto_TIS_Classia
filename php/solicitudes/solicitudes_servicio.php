@@ -7,6 +7,20 @@ require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/plantillas_servicio.php';
 require_once __DIR__ . '/../utils/file_upload_helper.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
+
+function notificar_solicitud_servicio(PDO $pdo, int $idUsuario, array $datos): void
+{
+    if ($idUsuario <= 0) {
+        return;
+    }
+    try {
+        $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+        $notificaciones->crear(array_merge($datos, ['id_usuario' => $idUsuario]));
+    } catch (Throwable $e) {
+        error_log('Notificacion solicitud servicio: ' . $e->getMessage());
+    }
+}
 
 function obtener_servicio_activo(PDO $pdo, int $id): ?array
 {
@@ -181,7 +195,21 @@ function crear_solicitud_servicio(PDO $pdo, int $uid, array $servicio, array $po
             'u' => $uid,
             'p' => $servicio['id_publicacion']
         ]);
-        return ['ok' => true, 'mensaje' => 'Solicitud enviada correctamente.', 'id' => (int)$pdo->lastInsertId()];
+        $idSolicitud = (int)$pdo->lastInsertId();
+        $cliente = $pdo->prepare('SELECT nombre, apellido FROM usuarios WHERE id_usuario = :id');
+        $cliente->execute(['id' => $uid]);
+        $clienteDatos = $cliente->fetch() ?: [];
+        $nombreCliente = trim(($clienteDatos['nombre'] ?? '') . ' ' . ($clienteDatos['apellido'] ?? '')) ?: 'Un cliente';
+        notificar_solicitud_servicio($pdo, (int)$servicio['id_usuario'], [
+            'categoria' => 'solicitudes',
+            'titulo' => 'Nueva solicitud de servicio',
+            'mensaje' => $nombreCliente . ' solicitó el servicio "' . $servicio['titulo'] . '".',
+            'url_destino' => 'views/solicitud-servicio-detalle.php?id=' . $idSolicitud,
+            'tipo_entidad' => 'solicitud_servicio',
+            'id_entidad' => $idSolicitud,
+            'clave_idempotencia' => 'solicitud-servicio:nueva:' . $idSolicitud,
+        ]);
+        return ['ok' => true, 'mensaje' => 'Solicitud enviada correctamente.', 'id' => $idSolicitud];
     } catch (PDOException $e) {
         error_log('Crear solicitud: ' . $e->getMessage());
         if ($archivo) {
@@ -210,7 +238,7 @@ function obtener_solicitudes_proveedor(PDO $pdo, int $docente, ?string $estado =
 
 function obtener_solicitud_para_proveedor(PDO $pdo, int $id, int $docente): ?array
 {
-    $q = $pdo->prepare("SELECT s.*, p.titulo AS servicio, p.tipo_servicio, p.precio AS precio_publicado, u.nombre, u.apellido, u.email 
+    $q = $pdo->prepare("SELECT s.*, p.titulo AS servicio, p.tipo_servicio, p.precio AS precio_publicado, p.id_usuario AS proveedor_id, u.nombre, u.apellido, u.email
                         FROM solicitudes s 
                         JOIN publicaciones p ON p.id_publicacion=s.id_publicacion 
                         JOIN usuarios u ON u.id_usuario=s.id_usuario 
@@ -235,9 +263,15 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
     if ($csrf === '' || !hash_equals($csrf, $post['csrf_token'] ?? '')) {
         return ['ok' => false, 'mensaje' => 'La sesión del formulario expiró.'];
     }
+    if ($uid !== $docente) {
+        return ['ok' => false, 'mensaje' => 'No tenes permisos para enviar mensajes en esta solicitud.'];
+    }
     $sol = obtener_solicitud_para_proveedor($pdo, $id, $docente);
     if (!$sol) {
         return ['ok' => false, 'mensaje' => 'Solicitud inexistente o sin permisos.'];
+    }
+    if (!in_array($sol['estado'], ['Pendiente', 'Aceptada', 'Contraoferta', 'En Proceso'], true) && ($post['accion'] ?? '') === 'mensaje') {
+        return ['ok' => false, 'mensaje' => 'Esta solicitud ya no admite mensajes.'];
     }
     $accion = $post['accion'] ?? '';
 
@@ -247,8 +281,21 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
             if ($msg === '') {
                 return ['ok' => false, 'mensaje' => 'Escribí un mensaje.'];
             }
+            if (strlen($msg) > 5000) {
+                return ['ok' => false, 'mensaje' => 'El mensaje no puede superar los 5000 caracteres.'];
+            }
             $q = $pdo->prepare("INSERT INTO solicitud_mensajes(id_solicitud, id_usuario, mensaje) VALUES(:s, :u, :m)");
             $q->execute(['s' => $id, 'u' => $uid, 'm' => $msg]);
+            $idMensaje = (int)$pdo->lastInsertId();
+            notificar_solicitud_servicio($pdo, (int)$sol['id_usuario'], [
+                'categoria' => 'solicitudes',
+                'titulo' => 'Nuevo mensaje sobre tu solicitud',
+                'mensaje' => 'El proveedor respondió a tu solicitud de "' . $sol['servicio'] . '".',
+                'url_destino' => 'views/mi-solicitud-servicio.php?id=' . $id,
+                'tipo_entidad' => 'solicitud_mensaje',
+                'id_entidad' => $idMensaje,
+                'clave_idempotencia' => 'solicitud-mensaje:' . $idMensaje,
+            ]);
             return ['ok' => true, 'mensaje' => 'Mensaje enviado.'];
         }
 
@@ -282,6 +329,38 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
         $resp = trim($post['respuesta_proveedor'] ?? '');
 
         $pdo->beginTransaction();
+
+        if ($nuevo_estado === 'Realizada') {
+            if (empty($sol['id_contratacion'])) {
+                $pdo->rollBack();
+                return ['ok' => false, 'mensaje' => 'El servicio todavia no tiene una contratacion pagada.'];
+            }
+
+            $contratacion = $pdo->prepare(
+                'SELECT id_contratacion, estado
+                 FROM contrataciones
+                 WHERE id_contratacion = :c AND id_usuario = :u
+                 FOR UPDATE'
+            );
+            $contratacion->execute([
+                'c' => (int) $sol['id_contratacion'],
+                'u' => (int) $sol['id_usuario'],
+            ]);
+            $contratacionDatos = $contratacion->fetch();
+
+            $pago = $pdo->prepare(
+                "SELECT COUNT(*)
+                 FROM pagos
+                 WHERE id_contratacion = :c AND estado_pago = 'Aprobado'"
+            );
+            $pago->execute(['c' => (int) $sol['id_contratacion']]);
+
+            if (!$contratacionDatos || $contratacionDatos['estado'] !== 'En Proceso' || (int) $pago->fetchColumn() === 0) {
+                $pdo->rollBack();
+                return ['ok' => false, 'mensaje' => 'El servicio solo puede marcarse como realizado despues de confirmar el pago.'];
+            }
+        }
+
         $q = $pdo->prepare("UPDATE solicitudes SET estado=:e, precio_propuesto=:p, fecha_hora_propuesta=:f, respuesta_proveedor=:r WHERE id_solicitud=:s");
         $q->execute([
             'e' => $nuevo_estado,
@@ -302,6 +381,23 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
         }
 
         $pdo->commit();
+        if ($sol['id_usuario'] !== $uid) {
+            $notificarEstado = [
+                'aceptar' => ['titulo' => 'Solicitud de servicio aceptada', 'mensaje' => 'El proveedor aceptó tu solicitud de "' . $sol['servicio'] . '".'],
+                'rechazar' => ['titulo' => 'Solicitud de servicio rechazada', 'mensaje' => 'El proveedor rechazó tu solicitud de "' . $sol['servicio'] . '".'],
+                'contraoferta' => ['titulo' => 'Nueva contraoferta de servicio', 'mensaje' => 'El proveedor envió una contraoferta para "' . $sol['servicio'] . '".'],
+                'realizada' => ['titulo' => 'Solicitud de servicio realizada', 'mensaje' => 'La solicitud de "' . $sol['servicio'] . '" fue marcada como realizada.'],
+            ][$accion];
+            notificar_solicitud_servicio($pdo, (int)$sol['id_usuario'], [
+                'categoria' => 'solicitudes',
+                'titulo' => $notificarEstado['titulo'],
+                'mensaje' => $notificarEstado['mensaje'],
+                'url_destino' => 'views/mi-solicitud-servicio.php?id=' . $id,
+                'tipo_entidad' => 'solicitud_servicio',
+                'id_entidad' => $id,
+                'clave_idempotencia' => 'solicitud-servicio:' . $id . ':estado:' . $nuevo_estado . ':' . substr(hash('sha256', $precioFinal . '|' . $fecha . '|' . $resp), 0, 32),
+            ]);
+        }
         return ['ok' => true, 'mensaje' => 'Solicitud actualizada a ' . $nuevo_estado . '.'];
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
@@ -312,9 +408,24 @@ function procesar_solicitud_proveedor(PDO $pdo, int $id, int $docente, int $uid,
     }
 }
 
-function obtener_mensajes_solicitud(PDO $pdo, int $id): array
+function obtener_mensajes_solicitud(PDO $pdo, int $id, int $uid): array
 {
-    $q = $pdo->prepare("SELECT sm.*, u.nombre, u.apellido FROM solicitud_mensajes sm JOIN usuarios u ON u.id_usuario=sm.id_usuario WHERE sm.id_solicitud=:s ORDER BY sm.fecha_mensaje");
+    $acceso = $pdo->prepare("SELECT 1
+                             FROM solicitudes s
+                             JOIN publicaciones p ON p.id_publicacion=s.id_publicacion
+                             WHERE s.id_solicitud=:s AND p.tipo='Servicio'
+                               AND (s.id_usuario=:cliente OR p.id_usuario=:proveedor)
+                             LIMIT 1");
+    $acceso->execute(['s' => $id, 'cliente' => $uid, 'proveedor' => $uid]);
+    if (!$acceso->fetchColumn()) {
+        return [];
+    }
+
+    $q = $pdo->prepare("SELECT sm.*, u.nombre, u.apellido
+                        FROM solicitud_mensajes sm
+                        JOIN usuarios u ON u.id_usuario=sm.id_usuario
+                        WHERE sm.id_solicitud=:s
+                        ORDER BY sm.fecha_mensaje, sm.id_mensaje");
     $q->execute(['s' => $id]);
     return $q->fetchAll();
 }
@@ -333,7 +444,7 @@ function obtener_solicitudes_cliente(PDO $pdo, int $uid): array
 
 function obtener_solicitud_para_cliente(PDO $pdo, int $id, int $uid): ?array
 {
-    $q = $pdo->prepare("SELECT s.*, p.titulo AS servicio, p.tipo_servicio, p.precio AS precio_publicado, u.nombre AS proveedor_nombre, u.apellido AS proveedor_apellido 
+    $q = $pdo->prepare("SELECT s.*, p.titulo AS servicio, p.tipo_servicio, p.precio AS precio_publicado, p.id_usuario AS proveedor_id, u.nombre AS proveedor_nombre, u.apellido AS proveedor_apellido
                         FROM solicitudes s 
                         JOIN publicaciones p ON p.id_publicacion=s.id_publicacion 
                         JOIN usuarios u ON u.id_usuario=p.id_usuario 
@@ -347,18 +458,36 @@ function enviar_mensaje_solicitud_cliente(PDO $pdo, int $id, int $uid, string $m
     if ($csrf === '' || !hash_equals($csrf, $token)) {
         return ['ok' => false, 'mensaje' => 'La sesión del formulario expiró.'];
     }
-    if (!obtener_solicitud_para_cliente($pdo, $id, $uid)) {
+    $s = obtener_solicitud_para_cliente($pdo, $id, $uid);
+    if (!$s) {
         return ['ok' => false, 'mensaje' => 'Solicitud inexistente o sin permisos.'];
+    }
+    if (!in_array($s['estado'], ['Pendiente', 'Aceptada', 'Contraoferta', 'En Proceso'], true)) {
+        return ['ok' => false, 'mensaje' => 'Esta solicitud ya no admite mensajes.'];
     }
     $mensaje = trim($mensaje);
     if ($mensaje === '') {
         return ['ok' => false, 'mensaje' => 'Escribí un mensaje.'];
     }
     try {
+        if (strlen($mensaje) > 5000) {
+            return ['ok' => false, 'mensaje' => 'El mensaje no puede superar los 5000 caracteres.'];
+        }
         $q = $pdo->prepare("INSERT INTO solicitud_mensajes(id_solicitud, id_usuario, mensaje) VALUES(:s, :u, :m)");
         $q->execute(['s' => $id, 'u' => $uid, 'm' => $mensaje]);
+        $idMensaje = (int)$pdo->lastInsertId();
+        notificar_solicitud_servicio($pdo, (int)$s['proveedor_id'], [
+            'categoria' => 'solicitudes',
+            'titulo' => 'Nuevo mensaje sobre una solicitud',
+            'mensaje' => 'El cliente respondió a tu solicitud de "' . $s['servicio'] . '".',
+            'url_destino' => 'views/solicitud-servicio-detalle.php?id=' . $id,
+            'tipo_entidad' => 'solicitud_mensaje',
+            'id_entidad' => $idMensaje,
+            'clave_idempotencia' => 'solicitud-mensaje:' . $idMensaje,
+        ]);
         return ['ok' => true, 'mensaje' => 'Mensaje enviado.'];
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
+        error_log('Mensaje de cliente en solicitud: ' . $e->getMessage());
         return ['ok' => false, 'mensaje' => 'No se pudo enviar el mensaje.'];
     }
 }
@@ -392,6 +521,15 @@ function accion_cliente_solicitud(PDO $pdo, int $id, int $uid, string $accion, s
             }
             $pdo->prepare("UPDATE solicitudes SET estado='Cancelada' WHERE id_solicitud=:s")->execute(['s' => $id]);
             $pdo->commit();
+            notificar_solicitud_servicio($pdo, (int)($s['proveedor_id'] ?? 0), [
+                'categoria' => 'solicitudes',
+                'titulo' => 'Solicitud de servicio cancelada',
+                'mensaje' => 'El cliente canceló la solicitud de "' . $s['servicio'] . '".',
+                'url_destino' => 'views/solicitud-servicio-detalle.php?id=' . $id,
+                'tipo_entidad' => 'solicitud_servicio',
+                'id_entidad' => $id,
+                'clave_idempotencia' => 'solicitud-servicio:' . $id . ':cancelada',
+            ]);
             return ['ok' => true, 'mensaje' => 'Solicitud cancelada.'];
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) {
@@ -401,32 +539,64 @@ function accion_cliente_solicitud(PDO $pdo, int $id, int $uid, string $accion, s
             return ['ok' => false, 'mensaje' => 'No se pudo cancelar la solicitud.'];
         }
     }
-    if ($accion !== 'aceptar_propuesta' || !in_array($s['estado'], ['Aceptada', 'Contraoferta'], true)) {
+    if ($accion !== 'aceptar_propuesta') {
         return ['ok' => false, 'mensaje' => 'La propuesta no puede aceptarse en su estado actual.'];
     }
-    if (!empty($s['id_contratacion'])) {
-        return ['ok' => true, 'mensaje' => 'La contratación ya fue creada.', 'id_contratacion' => (int)$s['id_contratacion']];
-    }
-    $precio = $s['precio_propuesto'] !== null ? (float)$s['precio_propuesto'] : (float)$s['precio_publicado'];
-    if ($precio <= 0) {
-        return ['ok' => false, 'mensaje' => 'La propuesta no tiene un precio válido.'];
-    }
+
     try {
         $pdo->beginTransaction();
+
+        $bloqueo = $pdo->prepare(
+            "SELECT s.*, p.precio AS precio_publicado
+             FROM solicitudes s
+             JOIN publicaciones p ON p.id_publicacion=s.id_publicacion
+             WHERE s.id_solicitud=:s AND s.id_usuario=:u AND p.tipo='Servicio'
+             FOR UPDATE"
+        );
+        $bloqueo->execute(['s' => $id, 'u' => $uid]);
+        $s = $bloqueo->fetch();
+        if (!$s || !in_array($s['estado'], ['Aceptada', 'Contraoferta'], true)) {
+            $pdo->rollBack();
+            return ['ok' => false, 'mensaje' => 'La propuesta no puede aceptarse en su estado actual.'];
+        }
+
+        if (!empty($s['id_contratacion'])) {
+            $existente = $pdo->prepare(
+                'SELECT id_contratacion, estado
+                 FROM contrataciones
+                 WHERE id_contratacion=:c AND id_usuario=:u
+                 FOR UPDATE'
+            );
+            $existente->execute(['c' => (int)$s['id_contratacion'], 'u' => $uid]);
+            $contratacion = $existente->fetch();
+            if ($contratacion && $contratacion['estado'] === 'Pendiente') {
+                $pdo->commit();
+                return ['ok' => true, 'mensaje' => 'La contratacion ya fue creada.', 'id_contratacion' => (int)$contratacion['id_contratacion']];
+            }
+            $pdo->rollBack();
+            return ['ok' => false, 'mensaje' => 'La contratacion ya fue procesada.'];
+        }
+
+        $precio = $s['precio_propuesto'] !== null ? (float)$s['precio_propuesto'] : 0.0;
+        if ($precio <= 0) {
+            $pdo->rollBack();
+            return ['ok' => false, 'mensaje' => 'La propuesta no tiene un precio valido.'];
+        }
+
         $q = $pdo->prepare("INSERT INTO contrataciones(monto_total, estado, id_usuario) VALUES(:m, 'Pendiente', :u)");
         $q->execute(['m' => $precio, 'u' => $uid]);
         $cid = (int)$pdo->lastInsertId();
-        $d = $pdo->prepare("INSERT INTO detalles_contratacion(cantidad, precio_unitario, subtotal, id_contratacion, id_publicacion) VALUES(1, :p, :p, :c, :pub)");
-        $d->execute(['p' => $precio, 'c' => $cid, 'pub' => $s['id_publicacion']]);
+        $d = $pdo->prepare("INSERT INTO detalles_contratacion(cantidad, precio_unitario, subtotal, id_contratacion, id_publicacion) VALUES(1, :precio_unitario, :subtotal, :c, :pub)");
+        $d->execute(['precio_unitario' => $precio, 'subtotal' => $precio, 'c' => $cid, 'pub' => $s['id_publicacion']]);
         $u = $pdo->prepare("UPDATE solicitudes SET estado='Aceptada', id_contratacion=:c WHERE id_solicitud=:s");
         $u->execute(['c' => $cid, 's' => $id]);
         $pdo->commit();
-        return ['ok' => true, 'mensaje' => 'Propuesta aceptada. Continuá con el pago.', 'id_contratacion' => $cid];
+        return ['ok' => true, 'mensaje' => 'Propuesta aceptada. Continua con el pago.', 'id_contratacion' => $cid];
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
-        error_log('Aceptar propuesta: ' . $e->getMessage());
-        return ['ok' => false, 'mensaje' => 'No se pudo generar la contratación.'];
+        error_log('Aceptar propuesta solicitud ' . $id . ' usuario ' . $uid . ': ' . $e->getMessage());
+        return ['ok' => false, 'mensaje' => 'No se pudo generar la contratacion.'];
     }
 }

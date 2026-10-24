@@ -11,12 +11,36 @@ require_once __DIR__ . '/../utils/toast.php';
 
 iniciar_sesion();
 
+$esAjax = ($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json'
+    || ($_POST['ajax'] ?? '') === '1';
+
+function responder_carrito_json(array $datos, int $estado = 200): void
+{
+    http_response_code($estado);
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode($datos, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+if ($esAjax) {
+    set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    });
+    set_exception_handler(static function (Throwable $error): void {
+        error_log('Error en carrito AJAX: ' . $error->getMessage());
+        responder_carrito_json(['success' => false, 'message' => 'No se pudo agregar la publicación al carrito.'], 500);
+    });
+}
+
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'
     && ($_POST['accion'] ?? '') === 'agregar') {
+    if ($esAjax && !esta_autenticado()) {
+        responder_carrito_json(['success' => false, 'message' => 'Debes iniciar sesión para agregar publicaciones al carrito.'], 401);
+    }
     requerir_autenticacion('../../views/login.php');
 }
 
@@ -26,31 +50,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_publicacion = (int) ($_POST['id_publicacion'] ?? 0);
 
     if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
+        if ($esAjax) {
+            responder_carrito_json(['success' => false, 'message' => 'La sesión del formulario expiró. Recarga la página e intenta nuevamente.'], 419);
+        }
         $_SESSION['carrito_error'] = 'La sesión del formulario expiró. Recarga la página e intenta nuevamente.';
     } elseif ($accion === 'agregar' && $id_publicacion > 0) {
         if (es_admin()) {
+            if ($esAjax) {
+                responder_carrito_json(['success' => false, 'message' => 'El administrador no realiza compras de cursos ni servicios.'], 403);
+            }
             $_SESSION['carrito_error'] = 'El administrador no realiza compras de cursos ni servicios.';
             header("Location: ../../views/catalogo.php");
             exit;
         }
 
-        $stmtCheck = $pdo->prepare("SELECT id_usuario FROM publicaciones WHERE id_publicacion = :id LIMIT 1");
+        $stmtCheck = $pdo->prepare("SELECT id_usuario, tipo, estado FROM publicaciones WHERE id_publicacion = :id LIMIT 1");
         $stmtCheck->execute(['id' => $id_publicacion]);
-        $autor_id = (int)$stmtCheck->fetchColumn();
+        $publicacion = $stmtCheck->fetch();
+        if (!$publicacion || ($publicacion['estado'] ?? '') !== 'Activo') {
+            if ($esAjax) {
+                responder_carrito_json(['success' => false, 'message' => 'La publicación no está disponible.'], 404);
+            }
+            $_SESSION['carrito_error'] = 'La publicación no está disponible.';
+            header('Location: ../../views/catalogo.php');
+            exit;
+        }
+        if (($publicacion['tipo'] ?? '') === 'Servicio') {
+            if ($esAjax) {
+                responder_carrito_json(['success' => false, 'message' => 'Los servicios se solicitan mediante una propuesta personalizada.'], 422);
+            }
+            $_SESSION['carrito_error'] = 'Los servicios se solicitan mediante una propuesta personalizada.';
+            header('Location: ../../views/servicio-detalle.php?id=' . $id_publicacion);
+            exit;
+        }
+        $autor_id = (int) $publicacion['id_usuario'];
         $currUser = usuario_actual();
         if ($currUser && (int)$currUser['id_usuario'] === $autor_id) {
+            if ($esAjax) {
+                responder_carrito_json(['success' => false, 'message' => 'No puedes comprar tus propias publicaciones.'], 403);
+            }
             $_SESSION['carrito_error'] = 'No puedes comprar tus propias publicaciones.';
             header("Location: ../../views/catalogo.php");
             exit;
         }
 
+        if (($publicacion['tipo'] ?? '') === 'Curso') {
+            $stmtAcceso = $pdo->prepare(
+                "SELECT 1
+                 FROM detalles_contratacion dc
+                 INNER JOIN contrataciones c ON c.id_contratacion = dc.id_contratacion
+                 INNER JOIN pagos pag ON pag.id_contratacion = c.id_contratacion
+                                      AND pag.estado_pago = 'Aprobado'
+                 WHERE c.id_usuario = :id_usuario
+                   AND dc.id_publicacion = :id_publicacion
+                   AND c.estado IN ('En Proceso', 'Completada')
+                 LIMIT 1"
+            );
+            $stmtAcceso->execute([
+                'id_usuario' => (int) $currUser['id_usuario'],
+                'id_publicacion' => $id_publicacion,
+            ]);
+
+            if ($stmtAcceso->fetchColumn() !== false) {
+                if ($esAjax) {
+                    responder_carrito_json([
+                        'success' => false,
+                        'message' => 'Ya tenés acceso a este curso.',
+                        'already_owned' => true,
+                    ], 409);
+                }
+                $_SESSION['carrito_error'] = 'Ya tenés acceso a este curso.';
+                header('Location: ../../views/curso.php?id=' . $id_publicacion);
+                exit;
+            }
+        }
+
         $_SESSION['carrito_publicaciones'] = $_SESSION['carrito_publicaciones'] ?? [];
-        if (!in_array($id_publicacion, $_SESSION['carrito_publicaciones'], true)) {
+        $yaExiste = in_array($id_publicacion, array_map('intval', $_SESSION['carrito_publicaciones']), true);
+        if (!$yaExiste) {
             $_SESSION['carrito_publicaciones'][] = $id_publicacion;
+            if ($esAjax) {
+                responder_carrito_json([
+                    'success' => true,
+                    'message' => 'La publicación se agregó al carrito.',
+                    'cart_count' => count(array_unique(array_map('intval', $_SESSION['carrito_publicaciones']))),
+                    'already_exists' => false,
+                ]);
+            }
             set_toast('success', 'Agregado al carrito', null, [
                 'action' => ['label' => 'Ver carrito', 'href' => '../../views/carrito.php'],
             ]);
         } else {
+            if ($esAjax) {
+                responder_carrito_json([
+                    'success' => true,
+                    'message' => 'Esta publicación ya estaba en tu carrito.',
+                    'cart_count' => count(array_unique(array_map('intval', $_SESSION['carrito_publicaciones']))),
+                    'already_exists' => true,
+                ]);
+            }
             set_toast('warning', 'Ya esta en el carrito', 'Este elemento ya habia sido agregado.');
         }
         $destinos_permitidos = [

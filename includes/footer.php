@@ -136,6 +136,11 @@ if ($publicBase !== null) {
   defer>
 </script>
 
+<script
+  src="<?= htmlspecialchars($assetPrefix) ?>/js/notificaciones.js?v=<?= filemtime(__DIR__ . '/../js/notificaciones.js') ?>"
+  defer>
+</script>
+
 <?php if (!empty($flashToasts)): ?>
   <script>
     window.addEventListener('DOMContentLoaded', function () {
