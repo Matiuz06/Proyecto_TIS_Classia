@@ -141,6 +141,8 @@ include '../includes/header.php';
 
   <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
+  <?php if ($curso): ?>
+
   <?php if ($curso && ($curso['estado'] ?? '') === 'Archivado'): ?>
     <div class="alert alert-warning" role="alert">
       <strong>Curso archivado.</strong>
@@ -156,30 +158,19 @@ include '../includes/header.php';
       <a class="btn" href="panel-proveedor.php">Volver al panel</a>
     </nav>
 
-    <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
     <section class="course-approval-settings" aria-labelledby="criterio-aprobacion">
-      <h2 id="criterio-aprobacion">Criterio de aprobación</h2>
+      <h2 id="criterio-aprobacion">Criterio de aprobacion</h2>
       <form method="POST" class="course-approval-form">
         <?php campo_base_curso($id_publicacion); ?>
         <input type="hidden" name="accion" value="actualizar_aprobacion">
         <label>
-          Porcentaje mínimo de aprobación
-          <input
-            type="number"
-            name="porcentaje_minimo_aprobacion"
-            min="0"
-            max="100"
-            value="<?= (int)($curso['porcentaje_minimo_aprobacion'] ?? 70) ?>"
-          >
+          Porcentaje minimo de aprobacion
+          <input type="number" name="porcentaje_minimo_aprobacion" min="0" max="100" value="<?= (int)($curso['porcentaje_minimo_aprobacion'] ?? 70) ?>">
         </label>
-        <span class="text-muted">
-          El alumno deberá alcanzar al menos este porcentaje de progreso para aprobar el curso.
-        </span>
+        <span class="text-muted">El alumno debera alcanzar al menos este porcentaje de progreso para aprobar el curso.</span>
         <button class="btn btn-sm btn-primary-action" type="submit">Guardar</button>
       </form>
     </section>
-    <?php endif; ?>
-
 
     <button class="btn btn-secondary course-structure-toggle" type="button" data-course-sidebar-toggle aria-expanded="false">Contenido del curso</button>
 
@@ -229,32 +220,31 @@ include '../includes/header.php';
                 <?php if (!empty($modulo['descripcion'])): ?><p><?= nl2br(htmlspecialchars($modulo['descripcion'])) ?></p><?php endif; ?>
               </div>
               <div class="course-actions" aria-label="Acciones del módulo">
-                <?php $es_archivado = ($curso['estado'] ?? '') === 'Archivado'; ?>
-                <?php if (!$es_archivado): ?>
+                <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
                 <?php foreach (['subir_modulo' => 'Subir', 'bajar_modulo' => 'Bajar'] as $accion => $texto): ?>
                   <form method="POST"><?php campo_base_curso($id_publicacion); ?><input type="hidden" name="accion" value="<?= $accion ?>"><input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>"><button class="btn btn-sm" type="submit"><?= $texto ?></button></form>
                 <?php endforeach; ?>
                 <button class="btn btn-sm" type="button" data-dialog-open="dialog-editar-modulo-<?= (int)$modulo['id_modulo'] ?>">Editar</button>
-                <form method="POST" onsubmit="return confirm('&iquest;Eliminar este m&oacute;dulo? Tambi&eacute;n se eliminar&aacute;n sus clases y recursos.');">
+                <form method="POST" onsubmit="return confirm('¿Eliminar este módulo? También se eliminarán sus clases y recursos.');">
                   <?php campo_base_curso($id_publicacion); ?>
                   <input type="hidden" name="accion" value="eliminar_modulo">
                   <input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>">
                   <button class="btn-status btn-status-delete" type="submit">Eliminar</button>
                 </form>
                 <?php endif; ?>
-                <!-- REQ-CON-04: Switch de visibilidad para alumnos -->
                 <?php $vis_mod = (int)($modulo['visible_alumnos'] ?? 1); ?>
+                <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
                 <form method="POST" class="inline-form">
                   <?php campo_base_curso($id_publicacion); ?>
                   <input type="hidden" name="accion" value="toggle_visible_modulo">
                   <input type="hidden" name="id_modulo" value="<?= (int)$modulo['id_modulo'] ?>">
-                  <button type="submit"
-                    class="btn btn-sm <?= $vis_mod ? 'btn-visible-on' : 'btn-visible-off' ?>"
+                  <button type="submit" class="btn btn-sm <?= $vis_mod ? 'btn-visible-on' : 'btn-visible-off' ?>"
                     title="<?= $vis_mod ? 'Módulo visible para alumnos — clic para ocultar' : 'Módulo oculto para alumnos — clic para mostrar' ?>"
                     aria-label="<?= $vis_mod ? 'Ocultar módulo a alumnos' : 'Mostrar módulo a alumnos' ?>">
                     <?= $vis_mod ? 'Visible' : 'Oculto' ?>
                   </button>
                 </form>
+                <?php endif; ?>
               </div>
             </header>
 
@@ -327,26 +317,26 @@ include '../includes/header.php';
                                 <form method="POST"><?php campo_base_curso($id_publicacion); ?><input type="hidden" name="accion" value="<?= $accion ?>"><input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>"><button class="btn btn-sm" type="submit"><?= $texto ?></button></form>
                               <?php endforeach; ?>
                               <button class="btn btn-sm" type="button" data-dialog-open="dialog-editar-recurso-<?= (int)$r['id_recurso'] ?>">Editar</button>
-                              <form method="POST" class="inline-form" onsubmit="return confirm('&iquest;Eliminar este recurso?');">
+                              <form method="POST" class="inline-form" onsubmit="return confirm('¿Eliminar este recurso?');">
                                 <?php campo_base_curso($id_publicacion); ?>
                                 <input type="hidden" name="accion" value="eliminar_recurso">
                                 <input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>">
                                 <button class="btn-status btn-status-delete" type="submit">Eliminar</button>
                               </form>
                               <?php endif; ?>
-                              <!-- REQ-CON-04: Switch de visibilidad por recurso -->
                               <?php $vis_rec = (int)($r['visible_alumnos'] ?? 1); ?>
+                              <?php if (($curso['estado'] ?? '') !== 'Archivado'): ?>
                               <form method="POST" class="inline-form">
                                 <?php campo_base_curso($id_publicacion); ?>
                                 <input type="hidden" name="accion" value="toggle_visible_recurso">
                                 <input type="hidden" name="id_recurso" value="<?= (int)$r['id_recurso'] ?>">
-                                <button type="submit"
-                                  class="btn btn-sm <?= $vis_rec ? 'btn-visible-on' : 'btn-visible-off' ?>"
+                                <button type="submit" class="btn btn-sm <?= $vis_rec ? 'btn-visible-on' : 'btn-visible-off' ?>"
                                   title="<?= $vis_rec ? 'Recurso visible para alumnos — clic para ocultar' : 'Recurso oculto para alumnos — clic para mostrar' ?>"
                                   aria-label="<?= $vis_rec ? 'Ocultar recurso a alumnos' : 'Mostrar recurso a alumnos' ?>">
                                   <?= $vis_rec ? 'Visible' : 'Oculto' ?>
                                 </button>
                               </form>
+                              <?php endif; ?>
                             </div>
                             <dialog class="course-dialog" id="dialog-editar-recurso-<?= (int)$r['id_recurso'] ?>" aria-labelledby="titulo-editar-recurso-<?= (int)$r['id_recurso'] ?>">
                               <div class="course-dialog-header">
@@ -536,7 +526,6 @@ include '../includes/header.php';
       </section>
     </div>
 
-
     <dialog class="course-dialog" id="dialog-agregar-modulo" aria-labelledby="titulo-agregar-modulo">
       <div class="course-dialog-header">
         <h2 id="titulo-agregar-modulo">Agregar módulo</h2>
@@ -554,6 +543,7 @@ include '../includes/header.php';
         </div>
       </form>
     </dialog>
+  <?php endif; ?>
   <?php endif; ?>
 </main>
 <?php include '../includes/footer.php'; ?>

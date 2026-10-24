@@ -49,11 +49,11 @@ include '../includes/header.php';
         <a href="#informacion-principal">Informacion principal</a>
         <a href="#configuracion">Configuracion</a>
         <a href="#categoria">Categoria</a>
-        <a href="#servicio">Servicio</a>
+        <?php if ($publicacion['tipo'] === 'Servicio'): ?><a href="#servicio">Servicio</a><?php endif; ?>
         <a href="#portada">Portada</a>
       </aside>
 
-      <form action="editar-publicacion.php?id=<?= (int)$publicacion['id_publicacion'] ?>" method="POST" enctype="multipart/form-data" class="publication-form">
+      <form action="editar-publicacion.php?id=<?= (int)$publicacion['id_publicacion'] ?>" method="POST" enctype="multipart/form-data" class="publication-form" data-publication-type="<?= htmlspecialchars($publicacion['tipo']) ?>">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
         <input type="hidden" name="id_publicacion" value="<?= (int)$publicacion['id_publicacion'] ?>">
         <input type="hidden" name="tipo" value="<?= htmlspecialchars($publicacion['tipo']) ?>">
@@ -78,15 +78,15 @@ include '../includes/header.php';
 
         <section class="publication-section" id="configuracion">
           <div class="publication-section__header">
-            <h2>Configuracion</h2>
-            <p>Ajusta precio, modalidad, disponibilidad y estado de publicacion.</p>
+            <h2><?= $publicacion['tipo'] === 'Curso' ? 'Información del curso' : 'Información del servicio' ?></h2>
+            <p><?= $publicacion['tipo'] === 'Curso' ? 'Ajustá precio, modalidad, disponibilidad y estado del curso.' : 'Ajustá precio, modalidad, disponibilidad y estado del servicio.' ?></p>
           </div>
           <div class="publication-field-grid">
-            <label class="publication-field">Precio ($ UYU)
+            <label class="publication-field" data-publication-field="precio"><span class="publication-field__label">Precio ($ UYU)</span>
               <input type="number" step="0.01" min="1" name="precio" required value="<?= htmlspecialchars($_POST['precio'] ?? $publicacion['precio']) ?>">
             </label>
             <?php $cm = $_POST['modalidad'] ?? ($publicacion['modalidad'] ?? ''); ?>
-            <label class="publication-field">Modalidad
+            <label class="publication-field" data-publication-field="modalidad"><span class="publication-field__label">Modalidad</span>
               <select name="modalidad">
                 <option value="">Sin especificar</option>
                 <?php foreach (['virtual' => 'Virtual', 'presencial' => 'Presencial', 'hibrida' => 'Hibrida', 'producto-entregable' => 'Producto entregable'] as $v => $e): ?>
@@ -95,7 +95,7 @@ include '../includes/header.php';
               </select>
             </label>
             <?php $cn = $_POST['nivel_experiencia'] ?? ($publicacion['nivel_experiencia'] ?? ''); ?>
-            <label class="publication-field">Nivel de experiencia
+            <label class="publication-field" data-publication-field="nivel_experiencia"><span class="publication-field__label">Nivel de experiencia</span>
               <select name="nivel_experiencia">
                 <option value="">Sin especificar</option>
                 <?php foreach (['inicial' => 'Inicial', 'intermedio' => 'Intermedio', 'avanzado' => 'Avanzado', 'depende-categoria' => 'Depende de la categoria'] as $v => $e): ?>
@@ -103,17 +103,17 @@ include '../includes/header.php';
                 <?php endforeach; ?>
               </select>
             </label>
-            <label class="publication-field">Duracion aproximada
+            <label class="publication-field" data-publication-field="duracion_horas"><span class="publication-field__label">Duración del curso</span>
               <input type="number" min="1" max="10000" name="duracion_horas" value="<?= htmlspecialchars($_POST['duracion_horas'] ?? ($publicacion['duracion_horas'] ?? '')) ?>">
-              <small>Cantidad estimada de horas del curso o servicio.</small>
+              <small data-publication-help="duracion_horas">Cantidad estimada de horas del curso.</small>
             </label>
-            <label class="publication-field">Cupos
+            <label class="publication-field" data-publication-field="cupos"><span class="publication-field__label">Cupos disponibles</span>
               <input type="number" min="1" name="cupos" value="<?= htmlspecialchars($_POST['cupos'] ?? ($publicacion['cupos'] ?? '')) ?>">
               <small>Deja vacio si no existe un limite.</small>
             </label>
-            <label class="publication-field">Disponibilidad
+            <label class="publication-field" data-publication-field="disponibilidad"><span class="publication-field__label">Disponibilidad del curso</span>
               <input name="disponibilidad" value="<?= htmlspecialchars($_POST['disponibilidad'] ?? ($publicacion['disponibilidad'] ?? '')) ?>">
-              <small>Indica horarios, frecuencia o coordinacion esperada.</small>
+              <small data-publication-help="disponibilidad">Indicá horarios, frecuencia o coordinación esperada.</small>
             </label>
             <label class="publication-field">Estado
               <select name="estado">
@@ -155,6 +155,7 @@ include '../includes/header.php';
           </div>
         </section>
 
+        <?php if ($publicacion['tipo'] === 'Servicio'): ?>
         <section class="publication-section" id="servicio">
           <div class="publication-section__header">
             <h2>Servicio</h2>
@@ -163,16 +164,17 @@ include '../includes/header.php';
           <div class="publication-field-grid">
             <?php $cts = $_POST['tipo_servicio'] ?? ($publicacion['tipo_servicio'] ?? ''); ?>
             <label class="publication-field publication-field--full">Plantilla de servicio
-              <select name="tipo_servicio" <?= $publicacion['tipo'] !== 'Servicio' ? 'disabled' : '' ?>>
-                <option value="">Sin plantilla / contratacion directa</option>
+              <select name="tipo_servicio"<?= $publicacion['estado'] === 'Activo' ? ' required' : '' ?>>
+                <option value="" <?= $cts === '' ? 'selected' : '' ?>><?= $publicacion['estado'] === 'Activo' ? 'Seleccioná una plantilla' : 'Sin plantilla (publicación no disponible)' ?></option>
                 <?php foreach ($plantillas_servicios as $clave => $plantilla): ?>
                   <option value="<?= htmlspecialchars($clave) ?>" <?= $cts === $clave ? 'selected' : '' ?>><?= htmlspecialchars($plantilla['nombre']) ?></option>
                 <?php endforeach; ?>
               </select>
-              <small><?= $publicacion['tipo'] === 'Servicio' ? 'Selecciona la plantilla que organiza la solicitud del estudiante.' : 'Este campo no aplica a publicaciones de tipo curso.' ?></small>
+              <small>Seleccioná la plantilla que organiza la solicitud del estudiante.</small>
             </label>
           </div>
         </section>
+        <?php endif; ?>
 
         <section class="publication-section" id="portada">
           <div class="publication-section__header">

@@ -15,6 +15,10 @@ $esAdmin = es_admin();
 $esDocente = es_docente();
 $puedeCrear = $esAdmin || $esDocente;
 $idUsuarioActual = $usuario ? (int)$usuario['id_usuario'] : 0;
+$autorVisible = trim((string)($usuario['nombre'] ?? ''));
+if ($autorVisible === '') {
+    $autorVisible = $usuario ? 'Usuario autenticado' : 'Equipo Classia';
+}
 
 $msg = '';
 $tipo_msg = 'info';
@@ -30,10 +34,8 @@ if ($puedeCrear && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $subtitulo = trim($_POST['subtitulo'] ?? '');
             $cuerpo = trim($_POST['cuerpo'] ?? '');
             $categoria = trim($_POST['categoria'] ?? 'Institucional');
-            $autor = trim($_POST['autor'] ?? '');
-            if ($autor === '') {
-                $autor = $usuario ? trim($usuario['nombre'] . ' ' . $usuario['apellido']) : 'Equipo AniTech';
-            }
+            // El autor se obtiene de la sesión; el valor del formulario solo es informativo.
+            $autor = $autorVisible;
             $orden = (int)($_POST['orden'] ?? 0);
             $imagen = '';
 
@@ -57,7 +59,7 @@ if ($puedeCrear && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     'titulo'    => $titulo,
                     'subtitulo' => $subtitulo,
                     'cuerpo'    => $cuerpo,
-                    'imagen'    => $imagen !== '' ? $imagen : 'assets/images/cybersecurity_lab.jpg',
+                    'imagen'    => $imagen !== '' ? $imagen : 'assets/images/noticias-default.png',
                     'categoria' => $categoria,
                     'autor'     => $autor,
                     'orden'     => $orden,
@@ -151,7 +153,11 @@ include '../includes/header.php';
           <?php 
             $fechaTimestamp = strtotime($item['fecha_publicacion']);
             $fechaLegible = date('d/m/Y', $fechaTimestamp);
-            $imgSrc = htmlspecialchars($item['imagen'] ?: 'assets/images/cybersecurity_lab.jpg');
+            $imagenGuardada = trim((string)($item['imagen'] ?? ''));
+            if ($imagenGuardada === '' || ltrim($imagenGuardada, './') === 'assets/images/cybersecurity_lab.jpg') {
+                $imagenGuardada = 'assets/images/noticias-default.png';
+            }
+            $imgSrc = htmlspecialchars($imagenGuardada);
             if (strpos($imgSrc, 'http') !== 0 && strpos($imgSrc, '..') !== 0) {
                 $imgSrc = '../' . ltrim($imgSrc, '/');
             }
@@ -229,9 +235,9 @@ include '../includes/header.php';
   <?php if ($puedeCrear): ?>
     <dialog id="modal-crear-noticia" class="modal">
       <div class="modal__card" style="max-width: 600px;">
-        <header class="modal__header">
+        <header class="course-dialog-header news-dialog-header">
           <h2 class="u-text-lg u-font-bold"><?= $esAdmin ? 'Publicar Nueva Noticia' : 'Proponer Nueva Noticia' ?></h2>
-          <button type="button" class="btn-close" onclick="document.getElementById('modal-crear-noticia').close();" aria-label="Cerrar modal">&times;</button>
+          <button type="button" class="course-dialog-close" onclick="document.getElementById('modal-crear-noticia').close();" aria-label="Cerrar modal">&times;</button>
         </header>
 
         <form action="noticias.php" method="post" enctype="multipart/form-data" class="service-req-stack u-mt-4">
@@ -263,7 +269,7 @@ include '../includes/header.php';
 
             <div>
               <label for="autor_noticia" class="service-req-label">Autor</label>
-              <input type="text" id="autor_noticia" name="autor" class="service-req-input" value="<?= htmlspecialchars($usuario ? $usuario['nombre'] . ' ' . $usuario['apellido'] : 'Equipo AniTech') ?>" />
+              <input type="text" id="autor_noticia" name="autor" class="service-req-input" value="<?= htmlspecialchars($autorVisible, ENT_QUOTES, 'UTF-8') ?>" readonly aria-readonly="true" />
             </div>
           </div>
 

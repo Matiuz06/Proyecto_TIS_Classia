@@ -6,6 +6,8 @@
 
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../utils/mailer.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
 
 function asegurar_tabla_solicitudes_docente(PDO $db): void
 {
@@ -16,6 +18,11 @@ function asegurar_tabla_solicitudes_docente(PDO $db): void
                 id_usuario INT NOT NULL,
                 estado ENUM('Pendiente', 'Aprobada', 'Rechazada') NOT NULL DEFAULT 'Pendiente',
                 motivo TEXT NULL,
+                documentacion_ruta VARCHAR(500) NULL,
+                documentacion_nombre VARCHAR(255) NULL,
+                documentacion_mime VARCHAR(100) NULL,
+                documentacion_tamano INT UNSIGNED NULL,
+                documentacion_fecha DATETIME NULL,
                 fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 fecha_respuesta DATETIME NULL,
                 CONSTRAINT fk_solicitudes_docente_usuarios
@@ -38,6 +45,8 @@ function obtener_solicitudes_docente_pendientes(?PDO $pdo_param = null): array
 
     try {
         $sql = "SELECT sd.id_solicitud_docente, sd.estado, sd.motivo, sd.fecha_solicitud,
+                       sd.documentacion_ruta, sd.documentacion_nombre, sd.documentacion_mime,
+                       sd.documentacion_tamano, sd.documentacion_fecha,
                        u.nombre, u.apellido, u.email
                 FROM solicitudes_docente sd
                 INNER JOIN usuarios u ON u.id_usuario = sd.id_usuario
@@ -50,6 +59,31 @@ function obtener_solicitudes_docente_pendientes(?PDO $pdo_param = null): array
         error_log("Error al obtener solicitudes pendientes: " . $e->getMessage());
         return [];
     }
+}
+
+function notificar_decision_solicitud_docente(array $solicitud, string $decision): bool
+{
+    $config = cargar_configuracion_correo();
+    $nombre = trim((string) ($solicitud['nombre'] ?? 'usuario'));
+    $enlace = $config['base_url'] . '/views/usuario.php';
+
+    if ($decision === 'aprobada') {
+        $asunto = 'Tu solicitud para ser docente fue aprobada - Classia';
+        $contenido = render_email_template('solicitud-docente-aprobada', [
+            'nombre' => $nombre,
+            'enlace' => $enlace,
+        ]);
+    } else {
+        $asunto = 'Actualización sobre tu solicitud docente - Classia';
+        $contenido = render_email_template('solicitud-docente-rechazada', [
+            'nombre' => $nombre,
+            'motivo' => trim((string) ($solicitud['motivo'] ?? '')),
+            'enlace' => $enlace,
+        ]);
+    }
+
+    return $contenido !== ''
+        && enviar_correo((string) ($solicitud['email'] ?? ''), $asunto, plantilla_correo($asunto, $contenido));
 }
 
 // Procesa la decisión (aprobar o rechazar) de una solicitud docente
@@ -76,9 +110,10 @@ function procesar_decision_solicitud_docente(int $id_solicitud, string $accion, 
             $db->beginTransaction();
 
             $stmt = $db->prepare(
-                "SELECT id_usuario
-                 FROM solicitudes_docente
-                 WHERE id_solicitud_docente = :id_solicitud AND estado = 'Pendiente'
+                "SELECT sd.id_usuario, sd.motivo, u.nombre, u.email
+                 FROM solicitudes_docente sd
+                 INNER JOIN usuarios u ON u.id_usuario = sd.id_usuario
+                 WHERE sd.id_solicitud_docente = :id_solicitud AND sd.estado = 'Pendiente'
                  FOR UPDATE"
             );
             $stmt->execute(['id_solicitud' => $id_solicitud]);
@@ -108,9 +143,29 @@ function procesar_decision_solicitud_docente(int $id_solicitud, string $accion, 
             ]);
 
             $db->commit();
+            try {
+                $notificaciones = new NotificacionService(new NotificacionRepository($db));
+                $notificaciones->crear([
+                    'id_usuario' => (int)$solicitud['id_usuario'],
+                    'categoria' => 'solicitudes',
+                    'titulo' => 'Solicitud docente aprobada',
+                    'mensaje' => 'Tu solicitud para convertirte en docente fue aprobada.',
+                    'url_destino' => 'views/solicitar-docente.php',
+                    'tipo_entidad' => 'solicitud_docente',
+                    'id_entidad' => $id_solicitud,
+                    'clave_idempotencia' => 'solicitud-docente:' . $id_solicitud . ':aprobada',
+                ]);
+            } catch (Throwable $e) {
+                error_log('Notificacion decision docente: ' . $e->getMessage());
+            }
+            $correoEnviado = notificar_decision_solicitud_docente($solicitud, 'aprobada');
             return [
                 'error'   => '',
                 'mensaje' => 'Solicitud aprobada.',
+                'toast_tipo' => $correoEnviado ? 'success' : 'warning',
+                'toast_descripcion' => $correoEnviado
+                    ? 'Se notificó al usuario por correo electrónico.'
+                    : 'La decisión se guardó, pero no se pudo enviar el correo.',
             ];
         } catch (PDOException $e) {
             if ($db->inTransaction()) {
@@ -124,19 +179,59 @@ function procesar_decision_solicitud_docente(int $id_solicitud, string $accion, 
         }
     } else {
         try {
+            $db->beginTransaction();
+            $stmt = $db->prepare(
+                "SELECT sd.id_usuario, sd.motivo, u.nombre, u.email
+                 FROM solicitudes_docente sd
+                 INNER JOIN usuarios u ON u.id_usuario = sd.id_usuario
+                 WHERE sd.id_solicitud_docente = :id_solicitud AND sd.estado = 'Pendiente'
+                 FOR UPDATE"
+            );
+            $stmt->execute(['id_solicitud' => $id_solicitud]);
+            $solicitud = $stmt->fetch();
+
+            if (!$solicitud) {
+                $db->rollBack();
+                return ['error' => 'La solicitud ya fue procesada.', 'mensaje' => ''];
+            }
+
             $stmt = $db->prepare(
                 "UPDATE solicitudes_docente
                  SET estado = 'Rechazada', fecha_respuesta = CURRENT_TIMESTAMP
                  WHERE id_solicitud_docente = :id_solicitud AND estado = 'Pendiente'"
             );
             $stmt->execute(['id_solicitud' => $id_solicitud]);
+            $db->commit();
 
-            $mensaje = ($stmt->rowCount() > 0) ? 'Solicitud rechazada.' : 'La solicitud ya fue procesada.';
+            try {
+                $notificaciones = new NotificacionService(new NotificacionRepository($db));
+                $notificaciones->crear([
+                    'id_usuario' => (int)$solicitud['id_usuario'],
+                    'categoria' => 'solicitudes',
+                    'titulo' => 'Solicitud docente rechazada',
+                    'mensaje' => 'Tu solicitud para convertirte en docente fue rechazada. Revisá el estado de tu solicitud para conocer más detalles.',
+                    'url_destino' => 'views/solicitar-docente.php',
+                    'tipo_entidad' => 'solicitud_docente',
+                    'id_entidad' => $id_solicitud,
+                    'clave_idempotencia' => 'solicitud-docente:' . $id_solicitud . ':rechazada',
+                ]);
+            } catch (Throwable $e) {
+                error_log('Notificacion decision docente: ' . $e->getMessage());
+            }
+
+            $correoEnviado = notificar_decision_solicitud_docente($solicitud, 'rechazada');
             return [
                 'error'   => '',
-                'mensaje' => $mensaje,
+                'mensaje' => 'Solicitud rechazada.',
+                'toast_tipo' => $correoEnviado ? 'success' : 'warning',
+                'toast_descripcion' => $correoEnviado
+                    ? 'Se notificó al usuario por correo electrónico.'
+                    : 'La decisión se guardó, pero no se pudo enviar el correo.',
             ];
         } catch (PDOException $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
             error_log('Error al rechazar solicitud docente: ' . $e->getMessage());
             return [
                 'error'   => 'No se pudo rechazar la solicitud.',

@@ -24,8 +24,13 @@ $indice_actual = null;
 foreach ($clases_planas as $i => $item) {
     if ((int)$item['unidad']['id_unidad'] === $id_unidad_actual) $indice_actual = $i;
 }
-if ($indice_actual === null && !empty($clases_planas) && $id_unidad_actual > 0) $indice_actual = 0;
+if ($indice_actual === null && !empty($clases_planas)) $indice_actual = 0;
 $item_actual = $indice_actual !== null ? $clases_planas[$indice_actual] : null;
+$porcentajeProgreso = (float)($progreso_curso['porcentaje'] ?? 0);
+$recurso_actual_id = (int)($_GET['recurso'] ?? 0);
+if ($recurso_actual_id <= 0 && $item_actual && !empty($item_actual['unidad']['recursos'])) {
+    $recurso_actual_id = (int)$item_actual['unidad']['recursos'][0]['id_recurso'];
+}
 $prev = $indice_actual !== null && isset($clases_planas[$indice_actual - 1]) ? $clases_planas[$indice_actual - 1]['unidad'] : null;
 $next = $indice_actual !== null && isset($clases_planas[$indice_actual + 1]) ? $clases_planas[$indice_actual + 1]['unidad'] : null;
 $puedeAgregar = esta_autenticado();
@@ -132,11 +137,29 @@ include '../includes/header.php';
       $mensaje_exito_curso = '';
     }
     if (isset($_GET['completado'])) {
-      set_toast('success', 'Curso completado', 'Felicitaciones, completaste el curso exitosamente.');
+      if (!empty($progreso_curso['pendiente_evaluacion'])) {
+        set_toast('info', 'Curso completado', 'Tus entregas están siendo revisadas por el docente.');
+      } else {
+        set_toast('success', 'Curso completado', 'Felicitaciones, completaste el curso exitosamente.');
+      }
     }
   ?>
   <?php if (!empty($mensaje_error_curso)): ?>
     <div class="alert alert-error u-mb-md"><?= htmlspecialchars($mensaje_error_curso) ?></div>
+  <?php endif; ?>
+
+  <?php if (!empty($mensaje_exito_curso)): ?>
+    <div class="alert alert-success u-mb-md"><?= htmlspecialchars($mensaje_exito_curso) ?></div>
+  <?php endif; ?>
+  <?php if (!empty($mensaje_error_curso)): ?>
+    <div class="alert alert-error u-mb-md"><?= htmlspecialchars($mensaje_error_curso) ?></div>
+  <?php endif; ?>
+  <?php if (isset($_GET['completado'])): ?>
+    <div class="alert <?= !empty($progreso_curso['pendiente_evaluacion']) ? 'alert-info' : 'alert-success' ?> u-mb-md">
+      <?= !empty($progreso_curso['pendiente_evaluacion'])
+        ? 'Curso completado, pendiente de evaluación. Tus entregas están siendo revisadas por el docente.'
+        : '¡Felicitaciones! Has completado el curso exitosamente.' ?>
+    </div>
   <?php endif; ?>
   <?php if (($curso['estado'] ?? '') === 'Archivado'): ?>
     <div class="alert alert-warning u-mb-md" role="status">
@@ -174,9 +197,12 @@ include '../includes/header.php';
         </figure>
       </section>
     <?php endif; ?>
+    <?php if ($item_actual): ?>
+      <h1 class="course-page-title"><?= htmlspecialchars($curso['titulo']) ?></h1>
+    <?php endif; ?>
     <button class="btn course-mobile-toggle" type="button" data-course-sidebar-toggle aria-controls="course-sidebar" aria-expanded="false">Contenido del curso</button>
-    <div class="course-shell<?= !$item_actual ? ' course-shell--overview' : '' ?>">
-      <aside class="course-sidebar" id="course-sidebar" data-course-sidebar aria-label="Contenido del curso">
+    <section class="course-layout course-shell">
+      <aside class="course-structure-card course-sidebar" id="course-sidebar" data-course-sidebar aria-label="Contenido del curso">
         <div class="course-sidebar-title">Contenido del curso</div>
         <?php if (!empty($puede_gestionar_entregas)): ?>
           <div class="course-sidebar-actions">
@@ -207,13 +233,14 @@ include '../includes/header.php';
                     <?php if (!empty($unidad['recursos'])): ?>
                       <ul class="course-subresource-list" aria-label="Recursos de <?= htmlspecialchars($unidad['titulo']) ?>">
                         <?php foreach ($unidad['recursos'] as $idxR => $rec): ?>
-                          <?php 
+                          <?php
                             $subCodigo = (int)$modulo['orden'] . '.' . (int)$unidad['orden'] . '.' . ($idxR + 1);
                             $emoji = icono_emoji_recurso($rec['tipo']);
-                            $hrefRec = $activa ? ('#recurso-' . (int)$rec['id_recurso']) : ('curso.php?id=' . (int)$curso['id_publicacion'] . '&unidad=' . (int)$unidad['id_unidad'] . '#recurso-' . (int)$rec['id_recurso']);
+                            $recursoEsActivo = $recurso_actual_id === (int)$rec['id_recurso'];
+                            $hrefRec = 'curso.php?id=' . (int)$curso['id_publicacion'] . '&unidad=' . (int)$unidad['id_unidad'] . '&recurso=' . (int)$rec['id_recurso'] . '#recurso-' . (int)$rec['id_recurso'];
                           ?>
-                          <li class="course-subresource-item">
-                            <a class="course-subresource-link" href="<?= $hrefRec ?>" title="<?= htmlspecialchars($rec['titulo']) ?> (<?= htmlspecialchars($rec['tipo']) ?>)">
+                          <li class="course-subresource-item<?= $recursoEsActivo ? ' is-active' : '' ?>">
+                            <a class="course-subresource-link<?= $recursoEsActivo ? ' is-active' : '' ?>" href="<?= $hrefRec ?>" data-recurso-id="<?= (int)$rec['id_recurso'] ?>" title="<?= htmlspecialchars($rec['titulo']) ?> (<?= htmlspecialchars($rec['tipo']) ?>)"<?= $recursoEsActivo ? ' aria-current="location"' : '' ?>>
                               <span class="course-subresource-code"><?= $subCodigo ?></span>
                               <span class="course-subresource-icon" aria-hidden="true"><?= $emoji ?></span>
                               <span class="course-subresource-text"><?= htmlspecialchars($rec['titulo']) ?></span>
@@ -279,25 +306,19 @@ include '../includes/header.php';
                   </tbody>
                 </table>
               </div>
-            <?php endif; ?>
-          </div>
-        </dialog>
-      <?php endif; ?>
-
-      <?php if (!empty($puede_gestionar_entregas)): ?>
-        <dialog class="course-dialog course-deliveries-dialog" id="dialog-entregas" aria-labelledby="titulo-dialog-entregas">
-          <div class="course-dialog-header">
-            <div>
-              <h2 id="titulo-dialog-entregas">Entregas</h2>
+              <span class="badge <?= !empty($progreso_curso['aprobado']) ? 'badge-success-soft' : (!empty($progreso_curso['completado']) ? 'badge-warning-soft' : 'badge-info-soft') ?>"><?= htmlspecialchars($progreso_curso['estado']) ?></span>
+            <div class="course-progress-card__foot">
+              <span>Progreso: <?= curso_formatear_porcentaje($porcentajeProgreso) ?>%</span>
+              <span>Rendimiento académico: <?= curso_formatear_porcentaje((float)($progreso_curso['porcentaje_academico'] ?? $porcentajeProgreso)) ?>%</span>
+              <span>Minimo para aprobar: <?= (int)$progreso_curso['porcentaje_minimo'] ?>%</span>
             </div>
-            <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
-          </div>
-          <div class="course-dialog-body">
-            <?php if (empty($resumen_entregas_docente)): ?>
-              <div class="course-empty-state course-empty-state-small">
-                <p>Este curso todavia no tiene tareas.</p>
-              </div>
+                <div class="course-progress-bar" role="progressbar" aria-label="Progreso del curso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= max(0, min(100, $porcentajeProgreso)) ?>">
+                  <span style="width: <?= max(0, min(100, $porcentajeProgreso)) ?>%;"></span>
+                </div>
+            <?php if (!empty($progreso_curso['aprobado'])): ?>
+              <p><a class="btn btn-sm btn-primary-action" href="../php/certificados/descargar.php?id_curso=<?= (int)$curso['id_publicacion'] ?>">Descargar certificado</a></p>
             <?php else: ?>
+              <p class="text-muted">El certificado estara disponible al aprobar el curso.</p>
               <div class="course-deliveries-list">
                 <?php foreach ($resumen_entregas_docente as $tareaEntrega): ?>
                   <?php
@@ -368,32 +389,9 @@ include '../includes/header.php';
           </div>
         </dialog>
       <?php endif; ?>
+      <?php endif; ?>
 
-      <article class="course-content" aria-live="polite">
-        <?php if ($comprado && $progreso_curso): ?>
-          <?php $porcentajeProgreso = (float)$progreso_curso['porcentaje']; ?>
-          <section class="course-progress-card" aria-label="Progreso del curso">
-            <div class="course-progress-card__head">
-              <div>
-                <strong>Progreso del curso</strong>
-                <span><?= (int)$progreso_curso['completados'] ?> de <?= (int)$progreso_curso['total'] ?> elementos completados</span>
-              </div>
-              <span class="badge <?= !empty($progreso_curso['aprobado']) ? 'badge-success-soft' : 'badge-info-soft' ?>"><?= htmlspecialchars($progreso_curso['estado']) ?></span>
-            </div>
-            <div class="course-progress-bar" aria-hidden="true">
-              <span style="width: <?= max(0, min(100, $porcentajeProgreso)) ?>%;"></span>
-            </div>
-            <div class="course-progress-card__foot">
-              <span><?= curso_formatear_porcentaje($porcentajeProgreso) ?>%</span>
-              <span>Minimo para aprobar: <?= (int)$progreso_curso['porcentaje_minimo'] ?>%</span>
-            </div>
-            <?php if (!empty($progreso_curso['aprobado'])): ?>
-              <p><a class="btn btn-sm btn-primary-action" href="../php/certificados/descargar.php?id_curso=<?= (int)$curso['id_publicacion'] ?>">Descargar certificado</a></p>
-            <?php else: ?>
-              <p class="text-muted">El certificado estara disponible al aprobar el curso.</p>
-            <?php endif; ?>
-          </section>
-        <?php endif; ?>
+      <main class="course-content-card course-content" aria-live="polite" id="course-detail-panel">
         <?php if (!$item_actual): ?>
           <section class="course-overview">
             <h2>Información del curso</h2>
@@ -410,7 +408,6 @@ include '../includes/header.php';
         <?php else: ?>
           <?php $modulo = $item_actual['modulo']; $unidad = $item_actual['unidad']; ?>
           <header class="course-content-header">
-            <span class="course-kicker"><?= htmlspecialchars($curso['titulo']) ?></span>
             <p><?= (int)$modulo['orden'] ?>. <?= htmlspecialchars($modulo['titulo']) ?></p>
             <h1><?= htmlspecialchars($unidad['titulo']) ?></h1>
 
@@ -430,15 +427,15 @@ include '../includes/header.php';
                   <div class="course-video-header-row">
                     <div>
                       <span class="course-resource-code"><?= $codVid ?></span>
-                      <strong><?= htmlspecialchars($vid['titulo']) ?></strong>
+                      <strong>🎥 <?= htmlspecialchars($vid['titulo']) ?></strong>
                     </div>
                     <?php if (!empty($vid['url'])): ?>
                       <a href="<?= htmlspecialchars($vid['url']) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
-                        Abrir en pestaña nueva ↗
+                        🔗 Abrir en pestaña nueva ↗
                       </a>
                     <?php elseif (!empty($vid['archivo'])): ?>
                       <a href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$vid['id_recurso'] ?>&modo=inline" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
-                        Abrir en pestaña nueva ↗
+                        🔗 Abrir en pestaña nueva ↗
                       </a>
                     <?php endif; ?>
                   </div>
@@ -545,7 +542,8 @@ include '../includes/header.php';
                             $tarea = $tareas_curso[$recurso['id_recurso']] ?? null;
                             $entrega = $mis_entregas[$recurso['id_recurso']] ?? null;
                             $entregaCorregida = $entrega ? curso_entrega_esta_corregida($entrega) : false;
-                            $puedeEntregarTarea = !$es_archivado && (!$tarea || $tarea->puedeEntregar(new DateTimeImmutable()));
+                            $puedeEntregarTarea = !$es_archivado
+                                && (!$tarea || $tarea->puedeEntregar(new DateTimeImmutable()));
                           ?>
                           <?php if (!$entrega): ?>
                             <span class="badge badge-warning-soft">Pendiente de entrega</span>
@@ -557,11 +555,11 @@ include '../includes/header.php';
                           <?php endif; ?>
                           <?php if ($entrega): ?>
                             <button class="btn btn-sm btn-outline" type="button" data-dialog-open="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
-                              Ver <?= $es_archivado ? 'entrega' : '/ Actualizar entrega' ?>
+                              ✓ Ver / Actualizar entrega
                             </button>
                           <?php elseif ($puedeEntregarTarea): ?>
                             <button class="btn btn-sm btn-primary-action" type="button" data-dialog-open="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
-                              Entregar tarea
+                              📤 Entregar tarea
                             </button>
                           <?php else: ?>
                             <span class="badge badge-warning-soft"><?= $es_archivado ? 'Curso archivado' : 'No acepta entregas ahora' ?></span>
@@ -579,7 +577,7 @@ include '../includes/header.php';
                               <?= $recursoCompletado ? 'Completado' : 'Marcar como completado' ?>
                             </button>
                           </form>
-                        <?php endif; ?>
+                          <?php endif; ?>
                       </div>
                     </div>
 
@@ -807,8 +805,232 @@ include '../includes/header.php';
                               <button class="btn btn-primary-action" type="submit" <?= $puedeEntregarTarea ? '' : 'disabled' ?>><?= $entrega ? 'Actualizar entrega' : 'Enviar entrega' ?></button>
                             </div>
                           </form>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+
+                    <?php if ($recurso['tipo'] === 'Foro'): ?>
+                      <?php $msgs = $mensajes_foro[$recurso['id_recurso']] ?? []; ?>
+                      <dialog class="course-dialog" id="dialog-foro-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-foro-<?= (int)$recurso['id_recurso'] ?>">
+                        <div class="course-dialog-header">
+                          <h2 id="titulo-dialog-foro-<?= (int)$recurso['id_recurso'] ?>">💬 Foro de debate: <?= htmlspecialchars($recurso['titulo']) ?></h2>
+                          <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
+                        </div>
+                        <div class="course-dialog-body">
+                          <?php if (!empty($recurso['descripcion'])): ?>
+                            <div class="course-delivery-consigna u-mb-md">
+                              <strong>Tema / Pautas del debate:</strong>
+                              <p><?= nl2br(htmlspecialchars($recurso['descripcion'])) ?></p>
+                            </div>
+                          <?php endif; ?>
+
+                          <div class="course-forum-thread u-mb-md">
+                            <h3>Comentarios y consultas (<?= count($msgs) ?>)</h3>
+                            <?php if (empty($msgs)): ?>
+                              <p class="text-muted u-mt-xs">Aún no hay mensajes en este debate. ¡Sé el primero en participar!</p>
+                            <?php else: ?>
+                              <div class="course-forum-messages-list">
+                                <?php foreach ($msgs as $msg): ?>
+                                  <article class="course-forum-message">
+                                    <div class="course-forum-author">
+                                      <strong><?= htmlspecialchars($msg['nombre'] . ' ' . $msg['apellido']) ?></strong>
+                                      <span class="badge badge-sm"><?= htmlspecialchars($msg['nombre_rol'] ?? 'Estudiante') ?></span>
+                                      <time class="course-forum-time"><?= date('d/m/Y H:i', strtotime($msg['fecha_mensaje'])) ?></time>
+                                    </div>
+                                    <div class="course-forum-body">
+                                      <?= nl2br(htmlspecialchars($msg['mensaje'])) ?>
+                                      <?php if (es_admin() || $es_propietario || ((int)($usuario_actual['id_usuario'] ?? 0) === (int)$msg['id_usuario'])): ?>
+                                        <div class="course-forum-actions-cell">
+                                          <form method="POST" class="inline-form" onsubmit="return confirm('¿Eliminar este mensaje del foro?');">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                                            <input type="hidden" name="accion" value="eliminar_mensaje_foro">
+                                            <input type="hidden" name="id_mensaje" value="<?= (int)$msg['id_mensaje'] ?>">
+                                            <input type="hidden" name="id_unidad" value="<?= (int)($unidad['id_unidad'] ?? 0) ?>">
+                                            <button type="submit" class="course-forum-delete-btn">
+                                              🗑️ Eliminar mensaje
+                                            </button>
+                                          </form>
+                                        </div>
+                                      <?php endif; ?>
+                                    </div>
+                                  </article>
+                                <?php endforeach; ?>
+                              </div>
+                            <?php endif; ?>
+                          </div>
+
+                          <form method="POST" class="form-grid course-forum-form">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                            <input type="hidden" name="accion" value="publicar_mensaje_foro">
+                            <input type="hidden" name="id_recurso" value="<?= (int)$recurso['id_recurso'] ?>">
+                            <input type="hidden" name="id_unidad" value="<?= (int)($unidad['id_unidad'] ?? 0) ?>">
+
+                            <label class="form-grid-full">
+                              Escribir en el debate
+                              <textarea name="mensaje_foro" rows="3" required placeholder="Escribí tu consulta, respuesta o comentario para el docente y tus compañeros..."></textarea>
+                            </label>
+
+                            <div class="course-dialog-actions form-grid-full">
+                              <button class="btn btn-secondary" type="button" data-dialog-close>Cerrar</button>
+                              <button class="btn btn-primary-action" type="submit">💬 Publicar en el foro</button>
+                            </div>
+                          </form>
                         </div>
                       </dialog>
+                    <?php endif; ?>
+
+                    <?php if (!empty($recurso['archivo']) && recurso_es_visualizable_nativamente($recurso['tipo'], $recurso['archivo'])): ?>
+                      <dialog class="course-dialog course-dialog--doc-viewer" id="dialog-doc-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-doc-<?= (int)$recurso['id_recurso'] ?>">
+                        <div class="course-dialog-header">
+                          <h2 id="titulo-dialog-doc-<?= (int)$recurso['id_recurso'] ?>">📄 <?= htmlspecialchars($recurso['titulo']) ?></h2>
+                          <div class="course-dialog-header-actions">
+                            <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=inline" target="_blank" rel="noopener" title="Abrir en pestaña completa">⛶ Pantalla completa</a>
+                            <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=descargar" title="Descargar archivo">📥 Descargar</a>
+                            <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
+                          </div>
+                        </div>
+                        <div class="course-dialog-body course-dialog-body--viewer">
+                          <?php if (!empty($recurso['descripcion'])): ?>
+                            <p class="course-doc-viewer__desc"><?= nl2br(htmlspecialchars($recurso['descripcion'])) ?></p>
+                          <?php endif; ?>
+                          <div class="course-doc-viewer__frame-wrap">
+                            <iframe 
+                              src="../php/descargas/descargar_archivo.php?tipo=recurso&id=<?= (int)$recurso['id_recurso'] ?>&modo=inline" 
+                              class="course-doc-viewer__frame" 
+                              title="<?= htmlspecialchars($recurso['titulo']) ?>"
+                              loading="lazy">
+                            </iframe>
+                          </div>
+                        </div>
+                      </dialog>
+                    <?php endif; ?>
+
+                    <?php if ($recurso['tipo'] === 'Entrega de Tareas'): ?>
+                      <?php
+                        $tarea = $tareas_curso[$recurso['id_recurso']] ?? null;
+                        $entrega = $mis_entregas[$recurso['id_recurso']] ?? null;
+                        $entregaCorregida = $entrega ? curso_entrega_esta_corregida($entrega) : false;
+                        $calificacionDocente = $entregaCorregida ? curso_formatear_calificacion_entrega($entrega, $tarea) : null;
+                        $archivosEntrega = $entrega ? ($archivos_entregas[(int)$entrega['id_entrega']] ?? []) : [];
+                        $puedeEntregarTarea = !$es_archivado && (!$tarea || $tarea->puedeEntregar(new DateTimeImmutable()));
+                      ?>
+                      <?php if (false): ?>
+                      <dialog class="course-dialog" id="dialog-entrega-<?= (int)$recurso['id_recurso'] ?>" aria-labelledby="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">
+                        <div class="course-dialog-header">
+                          <h2 id="titulo-dialog-entrega-<?= (int)$recurso['id_recurso'] ?>">Entrega de tarea: <?= htmlspecialchars($recurso['titulo']) ?></h2>
+                          <button type="button" class="course-dialog-close" data-dialog-close aria-label="Cerrar">X</button>
+                        </div>
+                        <div class="course-dialog-body">
+                          <?php if (!empty($recurso['descripcion'])): ?>
+                            <div class="course-delivery-consigna u-mb-md">
+                              <strong>Pautas / Consigna:</strong>
+                              <p><?= nl2br(htmlspecialchars($recurso['descripcion'])) ?></p>
+                            </div>
+                          <?php endif; ?>
+                          <?php if ($tarea): ?>
+                            <div class="course-delivery-consigna u-mb-md">
+                              <strong>Fechas de entrega:</strong>
+                              <p><?= $tarea->getFechaApertura() ? 'Disponible desde: ' . date('d/m/Y H:i', strtotime($tarea->getFechaApertura())) . ' hs' : 'Disponible desde ahora' ?><?= $tarea->getFechaCierre() ? ' - Cierre: ' . date('d/m/Y H:i', strtotime($tarea->getFechaCierre())) . ' hs' : '' ?></p>
+                            </div>
+                          <?php endif; ?>
+
+                          <?php if ($entrega): ?>
+                            <div class="alert alert-success u-mb-md">
+                              <p><strong>Estado:</strong> Entregada el <?= date('d/m/Y H:i', strtotime($entrega['fecha_entrega'])) ?> hs.</p>
+                              <?php if ($entregaCorregida): ?>
+                                <p class="u-mt-xs"><span class="badge badge-success-soft">Corregida</span></p>
+                              <?php else: ?>
+                                <p class="u-mt-xs"><span class="badge badge-warning-soft">Pendiente de corrección</span></p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['archivo_entrega']) && empty($archivosEntrega)): ?>
+                                <?php $entregaVisualizable = recurso_es_visualizable_nativamente('Archivo', $entrega['archivo_entrega']); ?>
+                                <div class="course-delivery-actions-row">
+                                  <?php if ($entregaVisualizable): ?>
+                                    <a class="btn btn-sm btn-outline" href="../php/descargas/descargar_archivo.php?tipo=entrega&id=<?= (int)$entrega['id_entrega'] ?>&modo=inline" target="_blank" rel="noopener">👁️ Ver mi archivo entregado</a>
+                                  <?php endif; ?>
+                                  <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=entrega&id=<?= (int)$entrega['id_entrega'] ?>&modo=descargar">📥 Descargar mi archivo entregado</a>
+                                </div>
+                              <?php endif; ?>
+                              <?php if ($archivosEntrega): ?>
+                                <div class="course-delivery-actions-row">
+                                  <?php foreach ($archivosEntrega as $archivoEntregado): ?>
+                                    <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=<?= !empty($archivoEntregado['legacy']) ? 'entrega' : 'entrega_archivo' ?>&id=<?= !empty($archivoEntregado['legacy']) ? (int)$entrega['id_entrega'] : (int)$archivoEntregado['id_archivo'] ?>&modo=descargar"><?= htmlspecialchars($archivoEntregado['nombre_original']) ?></a>
+                                  <?php endforeach; ?>
+                                </div>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['texto_entrega'])): ?>
+                                <p class="u-mt-xs"><strong>Texto:</strong> <?= nl2br(htmlspecialchars($entrega['texto_entrega'])) ?></p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['enlace_entrega'])): ?>
+                                <p class="u-mt-xs"><strong>Enlace:</strong> <a href="<?= htmlspecialchars($entrega['enlace_entrega']) ?>" target="_blank" rel="noopener">Abrir enlace entregado</a></p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['comentario_entrega'])): ?>
+                                <p class="u-mt-xs"><strong>Tus notas:</strong> <?= nl2br(htmlspecialchars($entrega['comentario_entrega'])) ?></p>
+                              <?php endif; ?>
+                            </div>
+                          <?php endif; ?>
+
+                          <?php if ($entrega && $entregaCorregida): ?>
+                            <div class="course-delivery-consigna u-mb-md">
+                              <strong>Devolución del docente</strong>
+                              <?php if ($calificacionDocente !== null): ?>
+                                <p class="u-mt-xs"><strong>Calificación</strong><br><?= htmlspecialchars($calificacionDocente) ?></p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['feedback_docente'])): ?>
+                                <p class="u-mt-xs"><strong>Retroalimentación</strong><br><?= nl2br(htmlspecialchars($entrega['feedback_docente'])) ?></p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['fecha_calificacion'])): ?>
+                                <p class="u-mt-xs"><strong>Corregida el</strong><br><?= date('d/m/Y H:i', strtotime($entrega['fecha_calificacion'])) ?> hs.</p>
+                              <?php endif; ?>
+                              <?php if (!empty($entrega['archivo_feedback'])): ?>
+                                <p class="u-mt-xs">
+                                  <a class="btn btn-sm" href="../php/descargas/descargar_archivo.php?tipo=feedback&id=<?= (int)$entrega['id_entrega'] ?>&modo=descargar">Descargar archivo de devolución</a>
+                                </p>
+                              <?php endif; ?>
+                            </div>
+                          <?php endif; ?>
+
+                          <form method="POST" enctype="multipart/form-data" class="form-grid">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                            <input type="hidden" name="accion" value="entregar_tarea">
+                            <input type="hidden" name="id_recurso" value="<?= (int)$recurso['id_recurso'] ?>">
+                            <input type="hidden" name="id_unidad" value="<?= (int)($unidad['id_unidad'] ?? 0) ?>">
+
+                            <label class="form-grid-full">
+                              <?= $entrega ? 'Reemplazar archivos de la entrega' : 'Adjuntar archivos de entrega' ?>
+                              <input type="file" name="archivo_entrega[]" multiple <?= ($tarea && !$tarea->permiteArchivos()) ? 'disabled' : '' ?>>
+                            </label>
+                            <?php if ($entrega && $archivosEntrega): ?>
+                              <p class="form-grid-full text-muted">Si no seleccionas archivos nuevos, se conservaran los enviados anteriormente. Los archivos seleccionados reemplazaran a los anteriores.</p>
+                            <?php endif; ?>
+
+                            <?php if ($tarea && $tarea->permiteTexto()): ?>
+                              <label class="form-grid-full">
+                                Texto en linea
+                                <textarea name="texto_entrega" rows="4"><?= htmlspecialchars($entrega['texto_entrega'] ?? '') ?></textarea>
+                              </label>
+                            <?php endif; ?>
+
+                            <?php if ($tarea && $tarea->permiteEnlace()): ?>
+                              <label class="form-grid-full">
+                                Enlace de entrega
+                                <input type="url" name="enlace_entrega" value="<?= htmlspecialchars($entrega['enlace_entrega'] ?? '') ?>" placeholder="https://...">
+                              </label>
+                            <?php endif; ?>
+
+                            <label class="form-grid-full">
+                              Comentarios o respuesta escrita (opcional)
+                              <textarea name="comentario_entrega" rows="3" placeholder="Escribí aquí tus observaciones, respuestas o enlaces si fuera necesario..."><?= htmlspecialchars($entrega['comentario_entrega'] ?? '') ?></textarea>
+                            </label>
+
+                            <div class="course-dialog-actions form-grid-full">
+                              <button class="btn btn-secondary" type="button" data-dialog-close>Cancelar</button>
+                              <button class="btn btn-primary-action" type="submit" <?= $puedeEntregarTarea ? '' : 'disabled' ?>><?= $entrega ? 'Actualizar entrega' : 'Enviar entrega' ?></button>
+                            </div>
+                          </form>
+                        </div>
+                      </dialog>
+                      <?php endif; ?>
                     <?php endif; ?>
                   </li>
                 <?php endforeach; ?>
@@ -820,19 +1042,21 @@ include '../includes/header.php';
             <?php if ($prev): ?><a class="btn" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$prev['id_unidad'] ?>">← Clase anterior</a><?php else: ?><span></span><?php endif; ?>
             <?php if ($next): ?>
               <a class="btn" href="curso.php?id=<?= (int)$curso['id_publicacion'] ?>&unidad=<?= (int)$next['id_unidad'] ?>">Siguiente clase →</a>
-            <?php elseif (!empty($contratacion_curso) && $contratacion_curso['estado'] === 'En Proceso'): ?>
+            <?php elseif (!empty($contratacion_curso) && $contratacion_curso['estado'] === 'En Proceso' && !empty($progreso_curso['completado'])): ?>
               <form method="POST" class="inline-form" onsubmit="return confirm('¿Deseas marcar este curso como completado?');">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
                 <input type="hidden" name="accion" value="completar_curso">
                 <button type="submit" class="btn btn-primary-action">Finalizar y completar curso</button>
               </form>
+            <?php elseif (!empty($contratacion_curso) && $contratacion_curso['estado'] === 'En Proceso'): ?>
+              <span class="badge badge-info-soft">Completá todos los recursos y entregá todas las tareas para finalizar el curso.</span>
             <?php elseif (!empty($contratacion_curso) && $contratacion_curso['estado'] === 'Completada'): ?>
-              <span class="badge badge-course">✓ Curso completado</span>
+              <span class="badge <?= !empty($progreso_curso['aprobado']) ? 'badge-success-soft' : 'badge-warning-soft' ?>">✓ <?= htmlspecialchars($progreso_curso['estado'] ?? 'Curso completado') ?></span>
             <?php endif; ?>
           </nav>
         <?php endif; ?>
-      </article>
-    </div>
+      </main>
+    </section>
   <?php else: ?>
     <div class="product-detail-layout">
       <article class="product-main-content">
@@ -950,11 +1174,14 @@ include '../includes/header.php';
               <p class="badge u-mb-sm">Modo Administrador</p>
               <a class="btn btn-secondary product-card-pricing__btn" href="editar-publicacion.php?id=<?= (int)$curso['id_publicacion'] ?>">Editar curso</a>
             </div>
+          <?php elseif ($comprado): ?>
+            <p class="badge badge-success-soft">Ya estás inscripto en este curso</p>
           <?php elseif ($puedeAgregar): ?>
-            <form action="carrito.php" method="POST">
+            <form action="../php/contrataciones/carrito.php" method="POST" data-add-to-cart-form>
               <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
               <input type="hidden" name="id_publicacion" value="<?= (int)$curso['id_publicacion'] ?>">
               <input type="hidden" name="accion" value="agregar">
+              <input type="hidden" name="ajax" value="1">
               <button type="submit" class="btn product-card-pricing__btn">Inscribirme al curso</button>
             </form>
           <?php else: ?>
