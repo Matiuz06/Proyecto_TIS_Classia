@@ -111,6 +111,7 @@ class "publicaciones" as publicaciones {
   cupos : INT
   estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Archivado', 'Eliminado') [NN]
   imagen : VARCHAR(255)
+  porcentaje_minimo_aprobacion : TINYINT UNSIGNED [NN, DEFAULT 70]
   # **id_usuario** : INT [FK, NN]
   # **id_categoria** : INT [FK, NN]
 }
@@ -138,10 +139,84 @@ class "curso_recursos" as recursos {
   --
   # **id_unidad** : INT [FK, NN]
   titulo : VARCHAR(180) [NN]
-  tipo : ENUM('Archivo', 'PDF', 'Imagen', 'Video', 'Enlace') [NN]
+  tipo : ENUM('Archivo','Foro','Entrega de Tareas','Video','PDF','Imagen','Enlace') [NN]
   url : VARCHAR(500)
   archivo : VARCHAR(255)
   orden : INT [NN]
+  visible_alumnos : TINYINT(1) [NN, DEFAULT 1]
+}
+
+class "curso_tareas" as tareas {
+  + **id_tarea** : INT [PK, AI]
+  --
+  # **id_recurso** : INT [FK, NN]
+  # **id_publicacion** : INT [FK, NN]
+  titulo : VARCHAR(180) [NN]
+  descripcion : TEXT
+  fecha_limite : DATETIME
+  permite_entrega_tardia : TINYINT(1) [NN, DEFAULT 0]
+  nota_maxima : DECIMAL(5,2) [NN, DEFAULT 100.00]
+}
+
+class "curso_entregas" as entregas {
+  + **id_entrega** : INT [PK, AI]
+  --
+  # **id_tarea** : INT [FK, NN]
+  # **id_usuario** : INT [FK, NN]
+  comentario : TEXT
+  nota : DECIMAL(5,2)
+  estado : ENUM('Pendiente','Revisada','Aprobada','Rechazada') [NN]
+  fecha_entrega : DATETIME [NN]
+}
+
+class "curso_entrega_archivos" as entrega_archivos {
+  + **id_archivo** : INT [PK, AI]
+  --
+  # **id_entrega** : INT [FK, NN]
+  nombre_archivo : VARCHAR(255) [NN]
+  ruta_archivo : VARCHAR(500) [NN]
+  tipo_mime : VARCHAR(100)
+  tamano_bytes : INT
+}
+
+class "curso_recursos_completados" as recursos_completados {
+  + **id_completado** : INT [PK, AI]
+  --
+  # **id_recurso** : INT [FK, NN]
+  # **id_usuario** : INT [FK, NN]
+  completado_en : DATETIME [NN]
+}
+
+class "certificados" as certificados {
+  + **id_certificado** : INT [PK, AI]
+  --
+  # **id_usuario** : INT [FK, NN]
+  # **id_publicacion** : INT [FK, NN]
+  codigo_verificacion : VARCHAR(64) [NN, UNIQUE]
+  fecha_emision : DATETIME [NN]
+  progreso_al_emitir : TINYINT UNSIGNED [NN]
+}
+
+class "curso_foro_mensajes" as foro {
+  + **id_mensaje** : INT [PK, AI]
+  --
+  # **id_recurso** : INT [FK, NN]
+  # **id_usuario** : INT [FK, NN]
+  id_mensaje_padre : INT [FK, NULL]
+  contenido : TEXT [NN]
+  fecha_mensaje : DATETIME [NN]
+}
+
+class "notificaciones" as notificaciones {
+  + **id_notificacion** : INT [PK, AI]
+  --
+  # **id_usuario** : INT [FK, NN]
+  tipo : VARCHAR(50) [NN]
+  titulo : VARCHAR(200) [NN]
+  mensaje : TEXT [NN]
+  leida : TINYINT(1) [NN, DEFAULT 0]
+  url_accion : VARCHAR(500)
+  creada_en : DATETIME [NN]
 }
 
 class "solicitudes" as solicitudes {
@@ -235,6 +310,19 @@ categorias "1" <-- "0..*" publicaciones : id_categoria
 publicaciones "1" <-- "0..*" modulos : id_publicacion
 modulos "1" <-- "0..*" unidades : id_modulo
 unidades "1" <-- "0..*" recursos : id_unidad
+recursos "1" <-- "0..*" tareas : id_recurso
+publicaciones "1" <-- "0..*" tareas : id_publicacion
+tareas "1" <-- "0..*" entregas : id_tarea
+usuarios "1" <-- "0..*" entregas : id_usuario
+entregas "1" <-- "0..*" entrega_archivos : id_entrega
+recursos "1" <-- "0..*" recursos_completados : id_recurso
+usuarios "1" <-- "0..*" recursos_completados : id_usuario
+usuarios "1" <-- "0..*" certificados : id_usuario
+publicaciones "1" <-- "0..*" certificados : id_publicacion
+recursos "1" <-- "0..*" foro : id_recurso
+usuarios "1" <-- "0..*" foro : id_usuario
+foro "0..1" <-- "0..*" foro : id_mensaje_padre
+usuarios "1" <-- "0..*" notificaciones : id_usuario
 
 usuarios "1" <-- "0..*" solicitudes : id_usuario
 publicaciones "0..1" <-- "0..*" solicitudes : id_publicacion
@@ -268,12 +356,21 @@ usuarios "1" <-- "0..*" eventos : id_usuario
 6. `curso_modulos` (**id_modulo** [PK], `id_publicacion` [FK -> publicaciones])
 7. `curso_unidades` (**id_unidad** [PK], `id_modulo` [FK -> curso_modulos])
 8. `curso_recursos` (**id_recurso** [PK], `id_unidad` [FK -> curso_unidades])
-9. `solicitudes` (**id_solicitud** [PK], `id_usuario` [FK -> usuarios], `id_publicacion` [FK -> publicaciones])
-10. `solicitud_mensajes` (**id_mensaje** [PK], `id_solicitud` [FK -> solicitudes], `id_usuario` [FK -> usuarios])
-11. `solicitudes_docente` (**id_solicitud_docente** [PK], `id_usuario` [FK -> usuarios])
-12. `contrataciones` (**id_contratacion** [PK], `id_usuario` [FK -> usuarios])
-13. `detalles_contratacion` (**id_detalle** [PK], `id_contratacion` [FK -> contrataciones], `id_publicacion` [FK -> publicaciones])
-14. `pagos` (**id_pago** [PK], `id_contratacion` [FK -> contrataciones])
-15. `valoraciones` (**id_valoracion** [PK], `id_usuario` [FK -> usuarios], `id_publicacion` [FK -> publicaciones], `id_contratacion` [FK -> contrataciones])
-16. `noticias` (**id_noticia** [PK], `id_usuario` [FK -> usuarios])
-17. `eventos` (**id_evento** [PK], `id_usuario` [FK -> usuarios])
+9. `curso_tareas` (**id_tarea** [PK], `id_recurso` [FK -> curso_recursos], `id_publicacion` [FK -> publicaciones]) *(Sprint 3-4)*
+10. `curso_entregas` (**id_entrega** [PK], `id_tarea` [FK -> curso_tareas], `id_usuario` [FK -> usuarios]) *(Sprint 3-4)*
+11. `curso_entrega_archivos` (**id_archivo** [PK], `id_entrega` [FK -> curso_entregas]) *(Sprint 3-4)*
+12. `curso_recursos_completados` (**id_completado** [PK], `id_recurso` [FK -> curso_recursos], `id_usuario` [FK -> usuarios]) *(Sprint 3-4)*
+13. `certificados` (**id_certificado** [PK], `id_usuario` [FK -> usuarios], `id_publicacion` [FK -> publicaciones]) *(Sprint 3-4)*
+14. `curso_foro_mensajes` (**id_mensaje** [PK], `id_recurso` [FK -> curso_recursos], `id_usuario` [FK -> usuarios], `id_mensaje_padre` [FK auto-ref NULL]) *(Sprint 3-4)*
+15. `notificaciones` (**id_notificacion** [PK], `id_usuario` [FK -> usuarios]) *(Sprint 3-4)*
+16. `solicitudes` (**id_solicitud** [PK], `id_usuario` [FK -> usuarios], `id_publicacion` [FK -> publicaciones])
+17. `solicitud_mensajes` (**id_mensaje** [PK], `id_solicitud` [FK -> solicitudes], `id_usuario` [FK -> usuarios])
+18. `solicitudes_docente` (**id_solicitud_docente** [PK], `id_usuario` [FK -> usuarios])
+19. `contrataciones` (**id_contratacion** [PK], `id_usuario` [FK -> usuarios])
+20. `detalles_contratacion` (**id_detalle** [PK], `id_contratacion` [FK -> contrataciones], `id_publicacion` [FK -> publicaciones])
+21. `pagos` (**id_pago** [PK], `id_contratacion` [FK -> contrataciones])
+22. `valoraciones` (**id_valoracion** [PK], `id_usuario` [FK -> usuarios], `id_publicacion` [FK -> publicaciones], `id_contratacion` [FK -> contrataciones])
+23. `publicacion_visitas` (**id_visita** [PK], `id_publicacion` [FK -> publicaciones])
+24. `noticias` (**id_noticia** [PK], `id_usuario` [FK -> usuarios])
+25. `eventos` (**id_evento** [PK], `id_usuario` [FK -> usuarios])
+26. `auditoria_seguridad` (**id_auditoria** [PK], `id_usuario` [FK NULL -> usuarios])
