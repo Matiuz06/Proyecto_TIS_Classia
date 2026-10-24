@@ -14,26 +14,6 @@ skinparam class {
     BorderColor #2B6CB0
     HeaderBackgroundColor #EBF8FF
 }
-skinparam entity {
-    BackgroundColor #FFFFFF
-    BorderColor #2B6CB0
-}
-skinparam sequence {
-    ActorBorderColor #2B6CB0
-    ActorBackgroundColor #EBF8FF
-    ParticipantBorderColor #2B6CB0
-    ParticipantBackgroundColor #EBF8FF
-    LifeLineBorderColor #4A5568
-    LifeLineBackgroundColor #EDF2F7
-    ArrowColor #2B6CB0
-}
-skinparam usecase {
-    BackgroundColor #FFFFFF
-    BorderColor #2B6CB0
-    ArrowColor #3182CE
-    ActorBorderColor #2B6CB0
-    ActorBackgroundColor #EBF8FF
-}
 
 title Modelo Relacional Físico — Classia (MariaDB / MySQL)
 
@@ -57,6 +37,7 @@ class "usuarios" as usuarios {
   foto_perfil : VARCHAR(255)
   dos_factores_activo : TINYINT(1) [NN]
   activo : TINYINT(1) [NN]
+  motivo_bloqueo : TEXT [NULL]
 }
 
 class "perfiles_profesionales" as perfiles {
@@ -91,10 +72,19 @@ class "publicaciones" as publicaciones {
   modalidad : VARCHAR(30)
   duracion_horas : SMALLINT
   cupos : INT
-  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado') [NN]
+  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado', 'Archivado') [NN]
+  porcentaje_minimo_aprobacion : TINYINT [NN, DEF 70]
   imagen : VARCHAR(255)
   # **id_usuario** : INT [FK, NN]
   # **id_categoria** : INT [FK, NN]
+}
+
+class "publicacion_visitas" as visitas {
+  + **id_visita** : INT [PK, AI]
+  --
+  # **id_publicacion** : INT [FK, NN]
+  fecha_visita : DATE [NN]
+  visitas : INT [NN, DEF 1]
 }
 
 class "curso_modulos" as modulos {
@@ -103,7 +93,8 @@ class "curso_modulos" as modulos {
   # **id_publicacion** : INT [FK, NN]
   titulo : VARCHAR(180) [NN]
   descripcion : TEXT
-  orden : INT [NN]
+  orden : INT [NN, DEF 1]
+  visible_alumnos : TINYINT(1) [NN, DEF 1]
 }
 
 class "curso_unidades" as unidades {
@@ -112,7 +103,7 @@ class "curso_unidades" as unidades {
   # **id_modulo** : INT [FK, NN]
   titulo : VARCHAR(180) [NN]
   descripcion : TEXT
-  orden : INT [NN]
+  orden : INT [NN, DEF 1]
 }
 
 class "curso_recursos" as recursos {
@@ -120,10 +111,84 @@ class "curso_recursos" as recursos {
   --
   # **id_unidad** : INT [FK, NN]
   titulo : VARCHAR(180) [NN]
-  tipo : ENUM('Archivo', 'PDF', 'Imagen', 'Video', 'Enlace') [NN]
+  tipo : ENUM('Archivo','Foro','Entrega de Tareas','Video','PDF','Imagen','Enlace') [NN]
   url : VARCHAR(500)
   archivo : VARCHAR(255)
-  orden : INT [NN]
+  descripcion : TEXT
+  orden : INT [NN, DEF 1]
+  visible_alumnos : TINYINT(1) [NN, DEF 1]
+}
+
+class "curso_tareas" as tareas {
+  + **id_tarea** : INT [PK, AI]
+  --
+  # **id_recurso** : INT [FK, UQ, NN]
+  fecha_apertura : DATETIME
+  fecha_cierre : DATETIME
+  permite_archivos : TINYINT(1) [NN, DEF 1]
+  permite_texto : TINYINT(1) [NN, DEF 0]
+  permite_enlace : TINYINT(1) [NN, DEF 0]
+  max_archivos : INT [NN, DEF 1]
+  max_tamano_mb : INT [NN, DEF 20]
+  formatos_permitidos : JSON
+  puntaje_maximo : DECIMAL(8,2)
+  tipo_calificacion : ENUM('numerica', 'aprobado_reprobado', 'sin_calificacion')
+}
+
+class "curso_entregas" as entregas {
+  + **id_entrega** : INT [PK, AI]
+  --
+  # **id_tarea** : INT [FK, NN]
+  # **id_recurso** : INT [FK, NN]
+  # **id_usuario** : INT [FK, NN]
+  archivo_entrega : VARCHAR(500)
+  texto_entrega : TEXT
+  enlace_entrega : VARCHAR(500)
+  comentario_entrega : TEXT
+  estado : ENUM('Entregada', 'Calificada') [NN]
+  estado_entrega : ENUM('borrador', 'entregada') [NN]
+  calificacion : VARCHAR(30)
+  feedback_docente : TEXT
+  fecha_calificacion : DATETIME
+  # **id_docente_calificador** : INT [FK, NULL]
+  fecha_entrega : DATETIME [NN]
+}
+
+class "curso_entrega_archivos" as entrega_archivos {
+  + **id_archivo** : INT [PK, AI]
+  --
+  # **id_entrega** : INT [FK, NN]
+  nombre_original : VARCHAR(255) [NN]
+  ruta : VARCHAR(500) [NN]
+  mime_type : VARCHAR(120)
+  tamano : BIGINT
+}
+
+class "curso_recursos_completados" as completados {
+  + **id_completado** : INT [PK, AI]
+  --
+  # **id_usuario** : INT [FK, NN]
+  # **id_recurso** : INT [FK, NN]
+  fecha_completado : DATETIME [NN]
+}
+
+class "certificados" as certificados {
+  + **id_certificado** : INT [PK, AI]
+  --
+  # **id_usuario** : INT [FK, NN]
+  # **id_curso** : INT [FK, NN]
+  codigo_verificacion : VARCHAR(32) [UQ, NN]
+  fecha_emision : DATETIME [NN]
+  porcentaje_aprobacion : DECIMAL(5,2) [NN]
+}
+
+class "curso_foro_mensajes" as foro_mensajes {
+  + **id_mensaje** : INT [PK, AI]
+  --
+  # **id_recurso** : INT [FK, NN]
+  # **id_usuario** : INT [FK, NN]
+  mensaje : TEXT [NN]
+  fecha_mensaje : DATETIME [NN]
 }
 
 class "solicitudes" as solicitudes {
@@ -135,15 +200,17 @@ class "solicitudes" as solicitudes {
   precio_propuesto : DECIMAL(10,2)
   # **id_usuario** : INT [FK, NN]
   # **id_publicacion** : INT [FK, NULL]
+  # **id_contratacion** : INT [FK, NULL]
 }
 
-class "solicitud_mensajes" as mensajes {
-  + **id_mensaje** : INT [PK, AI]
+class "solicitudes_docente" as sol_doc {
+  + **id_solicitud_docente** : INT [PK, AI]
   --
-  # **id_solicitud** : INT [FK, NN]
   # **id_usuario** : INT [FK, NN]
-  mensaje : TEXT [NN]
-  fecha_mensaje : DATETIME [NN]
+  estado : ENUM('Pendiente', 'Aprobada', 'Rechazada') [NN]
+  motivo : TEXT
+  documentacion_ruta : VARCHAR(500)
+  fecha_solicitud : DATETIME [NN]
 }
 
 class "contrataciones" as contrataciones {
@@ -185,20 +252,50 @@ class "valoraciones" as valoraciones {
   # **id_contratacion** : INT [FK, NULL]
 }
 
+class "notificaciones" as notificaciones {
+  + **id_notificacion** : INT [PK, AI]
+  --
+  # **id_usuario** : INT [FK, NN]
+  categoria : VARCHAR(60) [NN]
+  titulo : VARCHAR(180) [NN]
+  mensaje : TEXT [NN]
+  url_destino : VARCHAR(500)
+  leida : TINYINT(1) [NN, DEF 0]
+  fecha_creacion : DATETIME [NN]
+}
+
 roles "1" <-- "0..*" usuarios : id_rol
 usuarios "1" <-- "0..1" perfiles : id_usuario
+usuarios "1" <-- "0..*" sol_doc : id_usuario
 usuarios "1" <-- "0..*" categorias : creada_por
 usuarios "1" <-- "0..*" publicaciones : id_usuario
 categorias "1" <-- "0..*" publicaciones : id_categoria
+publicaciones "1" <-- "0..*" visitas : id_publicacion
 
 publicaciones "1" <-- "0..*" modulos : id_publicacion
 modulos "1" <-- "0..*" unidades : id_modulo
 unidades "1" <-- "0..*" recursos : id_unidad
 
+recursos "1" <-- "0..1" tareas : id_recurso
+tareas "1" <-- "0..*" entregas : id_tarea
+recursos "1" <-- "0..*" entregas : id_recurso
+usuarios "1" <-- "0..*" entregas : id_usuario
+entregas "1" <-- "0..*" entrega_archivos : id_entrega
+
+usuarios "1" <-- "0..*" completados : id_usuario
+recursos "1" <-- "0..*" completados : id_recurso
+
+usuarios "1" <-- "0..*" certificados : id_usuario
+publicaciones "1" <-- "0..*" certificados : id_curso
+
+recursos "1" <-- "0..*" foro_mensajes : id_recurso
+usuarios "1" <-- "0..*" foro_mensajes : id_usuario
+
+usuarios "1" <-- "0..*" notificaciones : id_usuario
+
 usuarios "1" <-- "0..*" solicitudes : id_usuario
 publicaciones "0..1" <-- "0..*" solicitudes : id_publicacion
-solicitudes "1" <-- "0..*" mensajes : id_solicitud
-usuarios "1" <-- "0..*" mensajes : id_usuario
+contrataciones "0..1" <-- "0..*" solicitudes : id_contratacion
 
 usuarios "1" <-- "0..*" contrataciones : id_usuario
 contrataciones "1" <-- "1..*" detalles : id_contratacion

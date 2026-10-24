@@ -18,24 +18,8 @@ skinparam entity {
     BackgroundColor #FFFFFF
     BorderColor #2B6CB0
 }
-skinparam sequence {
-    ActorBorderColor #2B6CB0
-    ActorBackgroundColor #EBF8FF
-    ParticipantBorderColor #2B6CB0
-    ParticipantBackgroundColor #EBF8FF
-    LifeLineBorderColor #4A5568
-    LifeLineBackgroundColor #EDF2F7
-    ArrowColor #2B6CB0
-}
-skinparam usecase {
-    BackgroundColor #FFFFFF
-    BorderColor #2B6CB0
-    ArrowColor #3182CE
-    ActorBorderColor #2B6CB0
-    ActorBackgroundColor #EBF8FF
-}
 
-title Modelo Entidad-Relación (MER) — Classia (Sprint 3)
+title Modelo Entidad-Relación (MER) — Classia (Entrega Final)
 
 entity "ROL" as roles {
   * id_rol : INT <<PK>>
@@ -57,6 +41,7 @@ entity "USUARIO" as usuarios {
   foto_perfil : VARCHAR(255)
   dos_factores_activo : TINYINT(1)
   activo : TINYINT(1)
+  motivo_bloqueo : TEXT
 }
 
 entity "PERFIL_PROFESIONAL" as perfiles {
@@ -91,10 +76,19 @@ entity "PUBLICACION" as publicaciones {
   modalidad : VARCHAR(30)
   duracion_horas : SMALLINT
   cupos : INT
-  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado')
+  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado', 'Archivado')
+  porcentaje_minimo_aprobacion : TINYINT
   imagen : VARCHAR(255)
   * id_usuario : INT <<FK>>
   * id_categoria : INT <<FK>>
+}
+
+entity "PUBLICACION_VISITA" as visitas {
+  * id_visita : INT <<PK>>
+  --
+  * id_publicacion : INT <<FK>>
+  fecha_visita : DATE
+  visitas : INT
 }
 
 entity "CURSO_MODULO" as modulos {
@@ -104,6 +98,7 @@ entity "CURSO_MODULO" as modulos {
   titulo : VARCHAR(180)
   descripcion : TEXT
   orden : INT
+  visible_alumnos : TINYINT(1)
 }
 
 entity "CURSO_UNIDAD" as unidades {
@@ -120,10 +115,74 @@ entity "CURSO_RECURSO" as recursos {
   --
   * id_unidad : INT <<FK>>
   titulo : VARCHAR(180)
-  tipo : ENUM('Archivo', 'PDF', 'Imagen', 'Video', 'Enlace')
+  tipo : ENUM('Archivo', 'Foro', 'Entrega de Tareas', 'Video', 'PDF', 'Imagen', 'Enlace')
   url : VARCHAR(500)
   archivo : VARCHAR(255)
+  descripcion : TEXT
   orden : INT
+  visible_alumnos : TINYINT(1)
+}
+
+entity "CURSO_TAREA" as tareas {
+  * id_tarea : INT <<PK>>
+  --
+  * id_recurso : INT <<FK, UNIQUE>>
+  puntaje_maximo : DECIMAL(8,2)
+  tipo_calificacion : ENUM('numerica', 'aprobado_reprobado', 'sin_calificacion')
+  fecha_apertura : DATETIME
+  fecha_cierre : DATETIME
+  max_archivos : INT
+}
+
+entity "CURSO_ENTREGA" as entregas {
+  * id_entrega : INT <<PK>>
+  --
+  * id_tarea : INT <<FK>>
+  * id_recurso : INT <<FK>>
+  * id_usuario : INT <<FK>>
+  archivo_entrega : VARCHAR(500)
+  texto_entrega : TEXT
+  enlace_entrega : VARCHAR(500)
+  estado : ENUM('Entregada', 'Calificada')
+  calificacion : VARCHAR(30)
+  feedback_docente : TEXT
+  fecha_entrega : DATETIME
+}
+
+entity "CURSO_ENTREGA_ARCHIVO" as entrega_archivos {
+  * id_archivo : INT <<PK>>
+  --
+  * id_entrega : INT <<FK>>
+  nombre_original : VARCHAR(255)
+  ruta : VARCHAR(500)
+  mime_type : VARCHAR(120)
+}
+
+entity "CURSO_RECURSO_COMPLETADO" as completados {
+  * id_completado : INT <<PK>>
+  --
+  * id_usuario : INT <<FK>>
+  * id_recurso : INT <<FK>>
+  fecha_completado : DATETIME
+}
+
+entity "CERTIFICADO" as certificados {
+  * id_certificado : INT <<PK>>
+  --
+  * id_usuario : INT <<FK>>
+  * id_curso : INT <<FK>>
+  codigo_verificacion : VARCHAR(32) <<UQ>>
+  porcentaje_aprobacion : DECIMAL(5,2)
+  fecha_emision : DATETIME
+}
+
+entity "CURSO_FORO_MENSAJE" as foro_mensajes {
+  * id_mensaje : INT <<PK>>
+  --
+  * id_recurso : INT <<FK>>
+  * id_usuario : INT <<FK>>
+  mensaje : TEXT
+  fecha_mensaje : DATETIME
 }
 
 entity "SOLICITUD" as solicitudes {
@@ -136,6 +195,7 @@ entity "SOLICITUD" as solicitudes {
   archivo_adjunto : VARCHAR(255)
   * id_usuario : INT <<FK>>
   id_publicacion : INT <<FK>>
+  id_contratacion : INT <<FK>>
 }
 
 entity "SOLICITUD_MENSAJE" as mensajes {
@@ -153,6 +213,7 @@ entity "SOLICITUD_DOCENTE" as sol_doc {
   * id_usuario : INT <<FK>>
   estado : ENUM('Pendiente', 'Aprobada', 'Rechazada')
   motivo : TEXT
+  documentacion_ruta : VARCHAR(500)
   fecha_solicitud : DATETIME
 }
 
@@ -195,16 +256,46 @@ entity "VALORACION" as valoraciones {
   id_contratacion : INT <<FK>>
 }
 
+entity "NOTIFICACION" as notificaciones {
+  * id_notificacion : INT <<PK>>
+  --
+  * id_usuario : INT <<FK>>
+  categoria : VARCHAR(60)
+  titulo : VARCHAR(180)
+  mensaje : TEXT
+  url_destino : VARCHAR(500)
+  leida : TINYINT(1)
+  fecha_creacion : DATETIME
+}
+
 roles ||--o{ usuarios : "asigna rol"
 usuarios ||--o| perfiles : "perfil profesional"
 usuarios ||--o{ sol_doc : "solicita rol docente"
 usuarios ||--o{ categorias : "crea categoría"
 usuarios ||--o{ publicaciones : "publica"
+publicaciones ||--o{ visitas : "registra visitas"
 categorias ||--o{ publicaciones : "clasifica"
 
 publicaciones ||--o{ modulos : "contiene"
 modulos ||--o{ unidades : "organiza"
 unidades ||--o{ recursos : "incluye"
+
+recursos ||--o| tareas : "define tarea"
+tareas ||--o{ entregas : "recibe entregas"
+recursos ||--o{ entregas : "asocia recurso"
+usuarios ||--o{ entregas : "entrega"
+entregas ||--o{ entrega_archivos : "contiene archivos"
+
+usuarios ||--o{ completados : "completa"
+recursos ||--o{ completados : "marcado completado"
+
+usuarios ||--o{ certificados : "obtiene"
+publicaciones ||--o{ certificados : "certifica curso"
+
+recursos ||--o{ foro_mensajes : "contiene debates"
+usuarios ||--o{ foro_mensajes : "participa en foro"
+
+usuarios ||--o{ notificaciones : "recibe"
 
 usuarios ||--o{ solicitudes : "envía solicitud"
 publicaciones ||--o{ solicitudes : "referencia oferta"

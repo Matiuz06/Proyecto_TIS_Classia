@@ -1,5 +1,19 @@
-ALTER TABLE publicaciones
-    ADD COLUMN porcentaje_minimo_aprobacion TINYINT UNSIGNED NOT NULL DEFAULT 70;
+SET @dbname = DATABASE();
+SET @tablename = "publicaciones";
+SET @columnname = "porcentaje_minimo_aprobacion";
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(1) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE table_schema = @dbname
+      AND table_name = @tablename
+      AND column_name = @columnname
+  ) > 0,
+  "SELECT 1",
+  CONCAT("ALTER TABLE ", @tablename, " ADD COLUMN ", @columnname, " TINYINT UNSIGNED NOT NULL DEFAULT 70")
+));
+PREPARE addColIfNotExists FROM @preparedStatement;
+EXECUTE addColIfNotExists;
+DEALLOCATE PREPARE addColIfNotExists;
 
 CREATE TABLE IF NOT EXISTS curso_recursos_completados (
     id_completado INT AUTO_INCREMENT PRIMARY KEY,
