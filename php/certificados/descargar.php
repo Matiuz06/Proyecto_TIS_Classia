@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../auth/roles.php';
 require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 require_once __DIR__ . '/CursoProgresoRepository.php';
 require_once __DIR__ . '/CertificadoPdf.php';
 

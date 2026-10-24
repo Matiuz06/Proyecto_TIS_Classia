@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!hash_equals($_SESSION['csrf_token'] ?? '', $token_recibido)) {
         $errores[] = 'La sesión del formulario expiró. Recargá la página e intentá nuevamente.';
     }
-    $errores = array_merge($errores, validar_datos_publicacion($_POST));
+    $errores = array_merge($errores, validar_datos_publicacion($_POST, true));
 
     $categoria = ['ok'=>false,'id'=>0,'error'=>''];
     if (empty($errores)) {
@@ -62,9 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'descripcion'=>trim($_POST['descripcion']),
                 'precio'=>(float)$_POST['precio'],
                 'modalidad'=>trim($_POST['modalidad'] ?? '') ?: null,
-                'nivel_experiencia'=>trim($_POST['nivel_experiencia'] ?? '') ?: null,
+                'nivel_experiencia'=>$_POST['tipo'] === 'Curso' ? (trim($_POST['nivel_experiencia'] ?? '') ?: null) : null,
                 'duracion_horas'=>trim($_POST['duracion_horas'] ?? '') !== '' ? (int)$_POST['duracion_horas'] : null,
-                'cupos'=>trim($_POST['cupos'] ?? '') !== '' ? (int)$_POST['cupos'] : null,
+                'cupos'=>$_POST['tipo'] === 'Curso' && trim($_POST['cupos'] ?? '') !== '' ? (int)$_POST['cupos'] : null,
                 'disponibilidad'=>trim($_POST['disponibilidad'] ?? '') ?: null,
                 'tipo_servicio'=>$_POST['tipo']==='Servicio' ? (trim($_POST['tipo_servicio'] ?? '') ?: null) : null,
                 'estado'=>'Activo',

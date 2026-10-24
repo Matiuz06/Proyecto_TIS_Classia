@@ -43,9 +43,9 @@ function registrar_auditoria(
 
     try {
         $stmt = $db->prepare("
-            INSERT INTO auditoria_seguridad 
+            INSERT INTO auditoria_seguridad
                 (id_usuario, tipo_evento, descripcion, direccion_ip, user_agent, nivel_severidad, datos_adicionales)
-            VALUES 
+            VALUES
                 (:id_usuario, :tipo_evento, :descripcion, :ip, :user_agent, :severidad, :datos_adicionales)
         ");
 

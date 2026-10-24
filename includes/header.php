@@ -49,6 +49,8 @@ if ($publicBase !== null) {
     $perfilProfesionalHref = $publicBase . '/views/perfil-profesional.php';
     $eventosHref  = $publicBase . '/views/eventos.php';
     $noticiasHref = $publicBase . '/views/noticias.php';
+    $notificacionesHref = $publicBase . '/views/notificaciones.php';
+    $notificacionesBase = $publicBase . '/php/notificaciones';
 } else {
     $indexHref    = ($cssPrefix === '.') ? 'index.php'           : '../index.php';
     $catalogoHref = ($cssPrefix === '.') ? 'views/catalogo.php'  : 'catalogo.php';
@@ -65,6 +67,8 @@ if ($publicBase !== null) {
     $perfilProfesionalHref = ($cssPrefix === '.') ? 'views/perfil-profesional.php' : 'perfil-profesional.php';
     $eventosHref  = ($cssPrefix === '.') ? 'views/eventos.php'   : 'eventos.php';
     $noticiasHref = ($cssPrefix === '.') ? 'views/noticias.php'  : 'noticias.php';
+    $notificacionesHref = ($cssPrefix === '.') ? 'views/notificaciones.php' : 'notificaciones.php';
+    $notificacionesBase = ($cssPrefix === '.') ? 'php/notificaciones' : '../php/notificaciones';
 }
 
 $isAuth = esta_autenticado();
@@ -92,6 +96,7 @@ $cartCount = count($cartItems);
   <link rel="stylesheet" href="<?= $assetPrefix ?>/css/animation.css?v=<?= filemtime(__DIR__ . '/../css/animation.css') ?>" />
   <link rel="stylesheet" href="<?= $assetPrefix ?>/css/style.css?v=<?= filemtime(__DIR__ . '/../css/style.css') ?>" />
   <link rel="stylesheet" href="<?= $assetPrefix ?>/css/header-footer.css?v=<?= filemtime(__DIR__ . '/../css/header-footer.css') ?>" />
+  <link rel="stylesheet" href="<?= $assetPrefix ?>/css/notificaciones.css?v=<?= filemtime(__DIR__ . '/../css/notificaciones.css') ?>" />
   <link rel="icon" type="image/png" href="<?= $assetPrefix ?>/assets/images/favicon.png" />
   <!-- Anti-FOUC: aplica el tema antes del primer paint -->
   <script>
@@ -129,13 +134,42 @@ $cartCount = count($cartItems);
             <circle cx="20" cy="21" r="1"></circle>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
           </svg>
-          <span class="nav-cart-text"><?= __t('nav_carrito') ?></span>
           <?php if ($cartCount > 0): ?>
             <span class="nav-cart-badge" id="cart-item-count"><?= $cartCount ?></span>
           <?php endif; ?>
         </a>
         <?php endif; ?>
 
+        <?php if ($isAuth): ?>
+          <div
+            class="notifications-nav"
+            data-notifications-root
+            data-notifications-base="<?= htmlspecialchars($notificacionesBase, ENT_QUOTES, 'UTF-8') ?>"
+            data-csrf-token="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+            <button
+              class="notifications-toggle"
+              type="button"
+              aria-label="Notificaciones"
+              aria-controls="notifications-panel"
+              aria-expanded="false">
+              <svg class="notifications-bell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                <path d="M10 21h4"></path>
+              </svg>
+              <span class="notifications-badge" data-notifications-count hidden>0</span>
+            </button>
+            <section class="notifications-panel" id="notifications-panel" aria-label="Notificaciones recientes" hidden>
+              <div class="notifications-panel__header">
+                <h2>Notificaciones</h2>
+                <button type="button" class="notifications-mark-all" data-notifications-mark-all>Marcar todas como leídas</button>
+              </div>
+              <div class="notifications-list" data-notifications-list aria-live="polite">
+                <p class="notifications-state">Cargando notificaciones...</p>
+              </div>
+              <a class="notifications-history-link" href="<?= htmlspecialchars($notificacionesHref, ENT_QUOTES, 'UTF-8') ?>">Ver todas las notificaciones</a>
+            </section>
+          </div>
+        <?php endif; ?>
 
         <?php if (!$isAuth): ?>
           <div class="user-nav-dropdown">
@@ -200,13 +234,6 @@ $cartCount = count($cartItems);
                   class="user-dropdown-item<?= $activePage === 'solicitudes-docente' ? ' active' : '' ?>">
                   <?= __t('nav_solicitudes_docentes', 'Solicitudes docentes') ?>
                 </a>
-                <a href="<?= $eventosHref ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_admin_eventos', 'Gestión de Eventos') ?>
-                </a>
-                <a href="<?= $noticiasHref ?>" role="menuitem" class="user-dropdown-item">
-                  <?= __t('nav_admin_noticias', 'Gestión de Noticias') ?>
-                </a>
-
                 <?php endif; ?>
 
               <div class="user-dropdown-divider" role="separator"></div>

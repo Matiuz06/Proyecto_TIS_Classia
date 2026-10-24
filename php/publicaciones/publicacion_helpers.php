@@ -37,7 +37,20 @@ function resolver_categoria_publicacion(PDO $pdo, int $id_usuario, int $id_categ
     return ['ok'=>true,'error'=>'','id'=>$id_categoria];
 }
 
-function validar_datos_publicacion(array $data): array
+function validar_tipo_servicio_publicacion(?string $tipoServicio, bool $obligatorio = true): array
+{
+    $tipoServicio = trim((string) $tipoServicio);
+    if ($tipoServicio === '') {
+        return $obligatorio ? ['Seleccioná una plantilla válida para el servicio.'] : [];
+    }
+
+    $plantillas = plantillas_servicio();
+    return isset($plantillas[$tipoServicio])
+        ? []
+        : ['La plantilla seleccionada para el servicio no es válida.'];
+}
+
+function validar_datos_publicacion(array $data, bool $exigirPlantillaServicio = true): array
 {
     $errores=[];
     $titulo=trim($data['titulo'] ?? '');
@@ -54,7 +67,7 @@ function validar_datos_publicacion(array $data): array
         $errores[]='La modalidad no es válida.';
     }
     $nivel=trim((string)($data['nivel_experiencia'] ?? ''));
-    if ($nivel!=='' && !in_array($nivel,['inicial','intermedio','avanzado','depende-categoria'],true)) {
+    if ($tipo === 'Curso' && $nivel!=='' && !in_array($nivel,['inicial','intermedio','avanzado','depende-categoria'],true)) {
         $errores[]='El nivel de experiencia no es válido.';
     }
     $duracion=trim((string)($data['duracion_horas'] ?? ''));
@@ -62,10 +75,17 @@ function validar_datos_publicacion(array $data): array
         $errores[]='La duración debe ser una cantidad de horas válida.';
     }
     $cupos=trim((string)($data['cupos'] ?? ''));
-    if ($cupos!=='' && (!ctype_digit($cupos) || (int)$cupos<1)) $errores[]='Los cupos deben ser un entero mayor a cero.';
+    if ($tipo === 'Curso' && $cupos!=='' && (!ctype_digit($cupos) || (int)$cupos<1)) $errores[]='Los cupos deben ser un entero mayor a cero.';
+
+    if ($tipo === 'Curso' && trim((string)($data['tipo_servicio'] ?? '')) !== '') {
+        $errores[]='Los cursos no pueden tener una plantilla de servicio.';
+    }
 
     if ($tipo==='Servicio') {
         $ts=trim((string)($data['tipo_servicio'] ?? ''));
+        if ($ts === '' && $exigirPlantillaServicio) {
+            $errores[]='Seleccioná una plantilla válida para el servicio.';
+        }
         if ($ts!=='') {
             $plantillas=plantillas_servicio();
             if (!isset($plantillas[$ts])) $errores[]='La plantilla seleccionada para el servicio no es válida.';
