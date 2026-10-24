@@ -24,40 +24,7 @@ USE `classia_db`;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Table structure for table `auditoria_seguridad`
---
 
-DROP TABLE IF EXISTS `auditoria_seguridad`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `auditoria_seguridad` (
-  `id_auditoria` bigint NOT NULL AUTO_INCREMENT,
-  `id_usuario` int DEFAULT NULL,
-  `tipo_evento` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `direccion_ip` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `nivel_severidad` enum('INFO','WARNING','CRITICAL') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'INFO',
-  `datos_adicionales` json DEFAULT NULL,
-  `fecha_evento` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_auditoria`),
-  KEY `idx_auditoria_evento` (`tipo_evento`),
-  KEY `idx_auditoria_fecha` (`fecha_evento`),
-  KEY `idx_auditoria_usuario` (`id_usuario`),
-  CONSTRAINT `fk_auditoria_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `auditoria_seguridad`
---
-
-LOCK TABLES `auditoria_seguridad` WRITE;
-/*!40000 ALTER TABLE `auditoria_seguridad` DISABLE KEYS */;
-INSERT INTO `auditoria_seguridad` VALUES (1,1,'LOGIN_EXITOSO','Inicio de sesión de administrador mediante credenciales válidas','192.168.1.10','Mozilla/5.0 (X11; Linux x86_64)','INFO',NULL,'2026-09-01 08:00:00'),(2,2,'LOGIN_EXITOSO','Inicio de sesión de docente en aula virtual','192.168.1.15','Mozilla/5.0 (Windows NT 10.0; Win64; x64)','INFO',NULL,'2026-09-01 08:30:00'),(3,6,'LOGIN_EXITOSO','Inicio de sesión de estudiante verificado','192.168.1.20','Mozilla/5.0 (X11; Linux x86_64)','INFO',NULL,'2026-09-01 09:00:00'),(4,1,'MODERACION_PUBLICACION','Administrador revisó y confirmó estado activo de publicación 1','192.168.1.10','Mozilla/5.0 (X11; Linux x86_64)','INFO',NULL,'2026-09-02 10:15:00'),(5,8,'INTENTO_FALLIDO_AUTH','Intento de login con contraseña errónea para cuenta diego.lopez@classia.com','192.168.1.45','Mozilla/5.0 (Windows NT 10.0; Win64; x64)','WARNING',NULL,'2026-09-03 14:00:00'),(6,1,'LOGIN_EXITOSO','Inicio de sesión exitoso','172.20.0.1','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36','INFO','{\"id_rol\": 3}','2026-10-24 16:40:19'),(7,1,'LOGIN_EXITOSO','Inicio de sesión exitoso','172.20.0.1','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36','INFO','{\"id_rol\": 3}','2026-10-24 16:44:01'),(8,2,'LOGIN_EXITOSO','Inicio de sesión exitoso','172.20.0.1','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36','INFO','{\"id_rol\": 2}','2026-10-24 16:44:41'),(9,2,'LOGIN_EXITOSO','Inicio de sesión exitoso','172.20.0.1','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36','INFO','{\"id_rol\": 2}','2026-10-24 16:46:08');
-/*!40000 ALTER TABLE `auditoria_seguridad` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `categorias`

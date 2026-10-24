@@ -373,4 +373,5 @@ usuarios "1" <-- "0..*" eventos : id_usuario
 23. `publicacion_visitas` (**id_visita** [PK], `id_publicacion` [FK -> publicaciones])
 24. `noticias` (**id_noticia** [PK], `id_usuario` [FK -> usuarios])
 25. `eventos` (**id_evento** [PK], `id_usuario` [FK -> usuarios])
-26. `auditoria_seguridad` (**id_auditoria** [PK], `id_usuario` [FK NULL -> usuarios])
+
+
