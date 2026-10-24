@@ -428,10 +428,9 @@ CREATE TABLE `roles` (
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id_rol`),
   UNIQUE KEY `nombre_rol` (`nombre_rol`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-INSERT INTO `roles` VALUES (1,'Cliente/Estudiante','Usuario consumidor de cursos y servicios'),(2,'Docente/Proveedor','Usuario creador y prestador de servicios educativos'),(3,'Administrador','Superusuario del sistema'),(4,'Institución / Empresa','Entidad educativa u organización que contrata servicios o publica convocatorias'),(5,'Moderador / Soporte','Personal de soporte técnico, verificación y moderación de contenidos');
+INSERT INTO `roles` VALUES (1,'Cliente/Estudiante','Usuario consumidor de cursos y servicios'),(2,'Docente/Proveedor','Usuario creador y prestador de servicios educativos'),(3,'Administrador','Superusuario del sistema');
 
 
 DROP TABLE IF EXISTS `solicitud_mensajes`;

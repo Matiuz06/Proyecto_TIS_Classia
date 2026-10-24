@@ -164,11 +164,11 @@ Se ejecutó `php -l` en **todos los archivos .php** del proyecto.
 
 ## 5. Base de datos — Estado actual
 
-### Tablas y registros de prueba (Mínimo 5 tuplas cumplido en el 100% de tablas)
+### Tablas y registros de prueba
 
 | Tabla | Registros | Descripción |
 |-------|-----------|-------------|
-| roles | 5 | Estudiante, Docente, Administrador, Institución, Moderador |
+| roles | 3 | Estudiante, Docente, Administrador |
 | usuarios | 14+ | 3 cuentas demo + usuarios de prueba |
 | categorias | 11 | Tecnología, Diseño, Electrónica, etc. |
 | publicaciones | 11 | Cursos y servicios activos |
