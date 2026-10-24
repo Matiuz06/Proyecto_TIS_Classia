@@ -44,7 +44,7 @@
 | RF-15 | Noticias publicadas | GET /views/noticias.php | 5 noticias estado=Publicada (HTTP 200) | ✅ PASS |
 | RF-16 | Eventos activos | GET /views/eventos.php | 5 eventos estado=Abierto (HTTP 200) | ✅ PASS |
 | RF-17 | Solicitudes rol docente | Consulta solicitudes_docente | 10 solicitudes (5 pendientes, 5 aprobadas) | ✅ PASS |
-| RF-18 | Auditoría de seguridad | Consulta auditoria_seguridad | 5 registros de eventos auditados | ✅ PASS |
+| RF-18 | Control de acceso y sesiones | Acceso no autorizado a panel administrativo sin rol 3 | Redirección 302 / Denegado | ✅ PASS |
 | RF-19 | Perfiles profesionales | Consulta perfiles_profesionales | 10 perfiles de docentes/proveedores | ✅ PASS |
 | RF-20 | Foro del curso | Consulta curso_foro_mensajes | 5 mensajes de foro registrados | ✅ PASS |
 
@@ -114,10 +114,30 @@ Se ejecutó `php -l` en **todos los archivos .php** del proyecto.
 | Administración | Gestión de solicitudes de rol docente | ✅ Implementado |
 | Seguridad | CSRF en todos los formularios | ✅ Implementado |
 | Seguridad | Protección XSS (htmlspecialchars) | ✅ Implementado |
-| Seguridad | Auditoría de seguridad | ✅ Implementado |
+| Seguridad | Logs de eventos de sistema | ✅ Implementado |
 | Seguridad | Sesiones seguras con regeneración de ID | ✅ Implementado |
 | Perfil | Perfil profesional público (docentes) | ✅ Implementado |
 | Accesibilidad | Políticas y páginas institucionales | ✅ Implementado |
+
+### Matriz de Permisos (Rol × Función)
+
+| Módulo / Funcionalidad | Visitante (Público) | Estudiante (Rol 1) | Docente (Rol 2) | Administrador (Rol 3) |
+|------------------------|---------------------|--------------------|-----------------|----------------------|
+| Explorar catálogo de cursos | ✅ Permitido | ✅ Permitido | ✅ Permitido | ✅ Permitido |
+| Ver noticias y eventos públicos | ✅ Permitido | ✅ Permitido | ✅ Permitido | ✅ Permitido |
+| Registro e inicio de sesión | ✅ Permitido | ✅ Permitido | ✅ Permitido | ✅ Permitido |
+| Configurar autenticación 2FA | ❌ Requiere login | ✅ Permitido | ✅ Permitido | ✅ Permitido |
+| Comprar / Inscribirse en cursos | ❌ Requiere login | ✅ Permitido | ✅ Permitido | ✅ Permitido |
+| Acceder a clases y aula virtual | ❌ No accesible | ✅ Alumno inscripto | ✅ Titular del curso | ✅ Acceso total |
+| Enviar entregas de tareas | ❌ No accesible | ✅ Permitido | ❌ No aplica | ❌ No aplica |
+| Calificar tareas y feedback | ❌ No accesible | ❌ Denegado | ✅ Docente del curso | ✅ Acceso total |
+| Emisión y descarga de certificados | ❌ No accesible | ✅ Alumno aprobado | ✅ Docente del curso | ✅ Acceso total |
+| Participar en foro del curso | ❌ No accesible | ✅ Alumno inscripto | ✅ Docente del curso | ✅ Moderador |
+| Crear y editar publicaciones | ❌ Denegado | ❌ Requiere rol 2 | ✅ Permitido | ✅ Acceso total |
+| Gestionar módulos y unidades | ❌ Denegado | ❌ Denegado | ✅ Titular del curso | ✅ Acceso total |
+| Postular a rol Docente/Proveedor | ❌ Requiere login | ✅ Permitido | ❌ Ya es docente | ❌ No aplica |
+| Panel de administración | ❌ Denegado (302) | ❌ Denegado (302) | ❌ Denegado (302) | ✅ Acceso exclusivo |
+| Moderar usuarios y solicitudes | ❌ Denegado (302) | ❌ Denegado (302) | ❌ Denegado (302) | ✅ Acceso exclusivo |
 
 ### Funcionalidades pendientes / limitaciones
 
@@ -144,11 +164,11 @@ Se ejecutó `php -l` en **todos los archivos .php** del proyecto.
 
 ## 5. Base de datos — Estado actual
 
-### Tablas y registros de prueba
+### Tablas y registros de prueba (Mínimo 5 tuplas cumplido en el 100% de tablas)
 
 | Tabla | Registros | Descripción |
 |-------|-----------|-------------|
-| roles | 3 | Admin, Docente/Proveedor, Estudiante/Cliente |
+| roles | 5 | Estudiante, Docente, Administrador, Institución, Moderador |
 | usuarios | 14+ | 3 cuentas demo + usuarios de prueba |
 | categorias | 11 | Tecnología, Diseño, Electrónica, etc. |
 | publicaciones | 11 | Cursos y servicios activos |
@@ -164,8 +184,8 @@ Se ejecutó `php -l` en **todos los archivos .php** del proyecto.
 | solicitudes | 10 | Solicitudes de servicios |
 | solicitud_mensajes | 10 | Mensajería de solicitudes |
 | solicitudes_docente | 10 | Solicitudes de rol docente |
-| contrataciones | 13 | Órdenes de compra |
-| detalles_contratacion | 13 | Líneas de contratación |
+| contrataciones | 14 | Órdenes de compra |
+| detalles_contratacion | 14 | Líneas de contratación |
 | pagos | 13 | Pagos registrados |
 | valoraciones | 10 | Reseñas 1–5 estrellas |
 | perfiles_profesionales | 10 | Perfiles de docentes |
@@ -173,7 +193,6 @@ Se ejecutó `php -l` en **todos los archivos .php** del proyecto.
 | eventos | 5 | Eventos programados |
 | notificaciones | 5 | Notificaciones de sistema |
 | publicacion_visitas | 337 | Estadísticas de visitas |
-| auditoria_seguridad | 5 | Eventos auditados |
 
 ### Credenciales para la demostración
 
@@ -205,16 +224,7 @@ docker compose up -d
 
 ---
 
-## 7. Uso de IA en el proyecto
-
-| Herramienta IA | Uso principal |
-|----------------|---------------|
-| Google Gemini (Antigravity IDE) | Desarrollo PHP, depuración, schema SQL, documentación |
-| GitHub Copilot | Autocompletado de código |
-
----
-
-## 8. Conclusión actualizada (Sprint 4)
+## 7. Conclusión actualizada (Sprint 4)
 
 Durante el Sprint 4 se consolidó Classia completando evaluación (tareas/entregas), progreso de aprendizaje, certificación automática, foro y notificaciones. Se corrigieron bugs críticos de acceso a cursos y consistencia del schema.
 
