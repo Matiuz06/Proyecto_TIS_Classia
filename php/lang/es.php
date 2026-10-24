@@ -287,6 +287,8 @@ return [
     'footer_help'           => 'Ayuda',
     'footer_faq'            => 'Preguntas frecuentes',
     'footer_usage_rules'    => 'Reglas de uso',
+    'footer_cancellations'  => 'Cancelaciones y Reembolsos',
+    'footer_cancellations_policy' => 'Política de cancelaciones',
     'footer_developed_by'   => 'Desarrollado por',
     'footer_rights'         => 'Todos los derechos reservados.',
 ];

@@ -30,6 +30,7 @@ if ($publicBase !== null) {
     $seguridadHref             = $publicBase . '/views/politica-seguridad.php';
     $cookiesHref               = $publicBase . '/views/politica-cookies.php';
     $accesibilidadHref         = $publicBase . '/views/politica-accesibilidad.php';
+    $cancelacionesHref         = $publicBase . '/views/politica-cancelaciones.php';
 } else {
     $contactoHref              = ($cssPrefix === '.') ? 'views/contacto.php' : 'contacto.php';
     $primerosPasosHref         = ($cssPrefix === '.') ? 'views/primeros-pasos.php' : 'primeros-pasos.php';
@@ -44,6 +45,7 @@ if ($publicBase !== null) {
     $seguridadHref             = ($cssPrefix === '.') ? 'views/politica-seguridad.php' : 'politica-seguridad.php';
     $cookiesHref               = ($cssPrefix === '.') ? 'views/politica-cookies.php' : 'politica-cookies.php';
     $accesibilidadHref         = ($cssPrefix === '.') ? 'views/politica-accesibilidad.php' : 'politica-accesibilidad.php';
+    $cancelacionesHref         = ($cssPrefix === '.') ? 'views/politica-cancelaciones.php' : 'politica-cancelaciones.php';
 }
 
 ?>
@@ -80,6 +82,7 @@ if ($publicBase !== null) {
       <ul class="site-footer__list">
         <li><a href="<?= htmlspecialchars($privacidadHref) ?>"><?= __t('footer_privacy') ?></a></li>
         <li><a href="<?= htmlspecialchars($terminosHref) ?>"><?= __t('footer_terms') ?></a></li>
+        <li><a href="<?= htmlspecialchars($cancelacionesHref) ?>"><?= __t('footer_cancellations_policy') ?></a></li>
         <li><a href="<?= htmlspecialchars($divulgHref) ?>"><?= __t('footer_disclosure') ?></a></li>
         <li><a href="<?= htmlspecialchars($seguridadHref) ?>"><?= __t('footer_security') ?></a></li>
         <li><a href="<?= htmlspecialchars($calidadHref) ?>"><?= __t('footer_quality') ?></a></li>

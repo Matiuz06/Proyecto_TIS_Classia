@@ -1,14 +1,25 @@
 # php/pagos/
 
-Backend de la pasarela de pago simulada del proyecto integrador.
+Módulo de procesamiento y pasarela de cobro de servicios del proyecto integrador Classia.
 
-## Archivos
+## Componentes y Servicios
 
-- `pasarela.php`: exige autenticación, carga una contratación propia por `id_contratacion`, obtiene sus detalles y calcula el importe que se muestra.
-- `procesar_pago.php`: valida CSRF, contratación y datos mínimos del formulario; actualiza el estado simulado sin almacenar números completos de tarjeta.
+- `pasarela.php`: Carga y valida la contratación asociada al usuario autenticado (`id_contratacion`), verifica el monto pendiente y prepara la orden de cobro.
+- `procesar_pago.php`: Valida tokens CSRF, contratación y datos de pago; actualiza el estado transaccional sin almacenar datos sensibles ni números de tarjeta en cumplimiento con PCI-DSS y RNF-11.
+- **Servicio de Cobro MercadoPago**: Integración mediante SDK / API de MercadoPago para la generación de preferencias de cobro de cursos y contrataciones de servicios, recepción de notificaciones IPN / webhooks y soporte de reintegros automáticos según la política de reembolsos institucional.
 
-## Alcance y seguridad
+## Política de Cancelaciones y Reembolsos (RN-14)
 
-El flujo es educativo y no representa una integración financiera real. No deben incorporarse datos de tarjeta reales ni credenciales de producción. El total se obtiene desde la base de datos, las consultas usan PDO preparado y el acceso se limita al usuario dueño de la contratación.
+Conforme a la regla de negocio institucional **RN-14** (*"Las cancelaciones o reembolsos deberán ajustarse a la política de cancelación definida por AniTech para cada tipo de servicio"*), los pagos y reintegros se rigen por las siguientes directrices:
 
-Para una integración real se debe delegar el pago a un proveedor certificado, verificar webhooks firmados, registrar estados idempotentes y mantener el alcance PCI DSS fuera de Classia.
+1. **Cursos y Talleres Virtuales**: Cancelaciones con más de 48 horas previas al inicio conllevan reintegro del 100%. Entre 24 y 48 horas previas conllevan 50% de reintegro. Menos de 24 horas previas o una vez iniciado el acceso al aula virtual, no aplican cancelaciones.
+2. **Servicios Profesionales Personalizados**: Cancelaciones previas a la aceptación del presupuesto o inicio del trabajo conllevan 100% de devolución. Si el proveedor ya inició el desarrollo o incurrió en costos operativos (ej. insumos de impresión 3D), se retendrá la proporción proporcional calculada.
+3. **Gestión de Reembolsos**: Los reintegros aprobados se procesan a través de la pasarela de MercadoPago acreditándose en el mismo medio de pago utilizado por el cliente.
+4. **Transparencia**: Todo usuario puede consultar las condiciones completas en la vista pública [`views/politica-cancelaciones.php`](../../views/politica-cancelaciones.php) enlazada de forma permanente en el pie de página institucional.
+
+## Seguridad y Cumplimiento
+
+- **Control de Acceso**: Solo el usuario titular de la contratación o un administrador pueden acceder al detalle transaccional.
+- **Consultas Preparadas**: Todas las consultas a base de datos utilizan PDO con sentencias preparadas para prevenir SQL Injection (`RNF-03`).
+- **Idempotencia y Webhooks**: Las notificaciones de confirmación de pago operan de forma idempotente para evitar duplicación de matrículas.
+- **Protección de Datos**: Cumplimiento estricto con la Ley N.º 18.331 de Protección de Datos Personales.
