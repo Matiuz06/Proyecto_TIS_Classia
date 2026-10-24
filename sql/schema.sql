@@ -24,8 +24,6 @@ USE `classia_db`;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
-
 --
 -- Table structure for table `categorias`
 --
@@ -697,7 +695,7 @@ CREATE TABLE `roles` (
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id_rol`),
   UNIQUE KEY `nombre_rol` (`nombre_rol`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -706,7 +704,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'Cliente/Estudiante','Usuario consumidor de cursos y servicios'),(2,'Docente/Proveedor','Usuario creador y prestador de servicios educativos'),(3,'Administrador','Superusuario del sistema');
+INSERT INTO `roles` VALUES (1,'Cliente/Estudiante','Usuario consumidor de cursos y servicios'),(2,'Docente/Proveedor','Usuario creador y prestador de servicios educativos'),(3,'Administrador','Superusuario del sistema'),(4,'Institución / Empresa','Entidad educativa u organización que contrata servicios o publica convocatorias'),(5,'Moderador / Soporte','Personal de soporte técnico, verificación y moderación de contenidos');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -928,4 +926,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-24 16:55:27
+-- Dump completed on 2026-10-24 17:10:55
