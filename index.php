@@ -244,7 +244,11 @@ include 'includes/header.php';
         <?php if (!empty($noticias_home)): ?>
           <?php foreach ($noticias_home as $noticia): ?>
             <?php 
-              $imgN = !empty($noticia['imagen']) ? htmlspecialchars($noticia['imagen']) : 'assets/images/cybersecurity_lab.jpg';
+              $imagenGuardada = trim((string)($noticia['imagen'] ?? ''));
+              if ($imagenGuardada === '' || ltrim($imagenGuardada, './') === 'assets/images/cybersecurity_lab.jpg') {
+                $imagenGuardada = 'assets/images/noticias-default.png';
+              }
+              $imgN = htmlspecialchars($imagenGuardada);
             ?>
             <article class="home-news-card">
               <div class="card-media-wrapper">

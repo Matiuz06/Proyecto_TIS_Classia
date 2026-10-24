@@ -5,6 +5,73 @@
  */
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../auth/roles.php';
+require_once __DIR__ . '/../notificaciones/NotificacionService.php';
+
+function notificar_nuevo_evento(PDO $pdo, int $idEvento, int $idUsuario, array $datos): void
+{
+    try {
+        $autor = trim((string)($datos['autor'] ?? 'Un docente'));
+        if ($idUsuario > 0) {
+            $autorStmt = $pdo->prepare('SELECT nombre, apellido FROM usuarios WHERE id_usuario = :id LIMIT 1');
+            $autorStmt->execute(['id' => $idUsuario]);
+            $autorDatos = $autorStmt->fetch(PDO::FETCH_ASSOC);
+            if ($autorDatos) {
+                $autor = trim(($autorDatos['nombre'] ?? '') . ' ' . ($autorDatos['apellido'] ?? '')) ?: $autor;
+            }
+        }
+
+        $administradores = $pdo->prepare(
+            'SELECT id_usuario FROM usuarios WHERE id_rol = :rol AND COALESCE(activo, 1) = 1'
+        );
+        $administradores->execute(['rol' => ROL_ADMIN]);
+        $idsAdministradores = array_map('intval', $administradores->fetchAll(PDO::FETCH_COLUMN));
+
+        if (!$idsAdministradores) {
+            return;
+        }
+
+        $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+        $notificaciones->crearParaUsuarios($idsAdministradores, [
+            'categoria' => 'eventos',
+            'titulo' => 'Nueva propuesta de evento',
+            'mensaje' => $autor . ' propuso el evento «' . trim((string)($datos['titulo'] ?? 'Sin título')) . '». Está pendiente de revisión.',
+            'url_destino' => 'views/eventos.php',
+            'tipo_entidad' => 'evento',
+            'id_entidad' => $idEvento,
+            'clave_idempotencia' => 'evento:nuevo:' . $idEvento,
+        ]);
+    } catch (Throwable $error) {
+        error_log('Notificacion nuevo evento #' . $idEvento . ': ' . $error->getMessage());
+    }
+}
+
+function notificar_decision_evento(PDO $pdo, array $evento, string $estado): void
+{
+    $idUsuario = (int)($evento['id_usuario'] ?? 0);
+    if ($idUsuario <= 0) {
+        return;
+    }
+
+    try {
+        $notificaciones = new NotificacionService(new NotificacionRepository($pdo));
+        $publicado = $estado === 'Abierto';
+        $notificaciones->crear([
+            'id_usuario' => $idUsuario,
+            'categoria' => 'eventos',
+            'titulo' => $publicado ? 'Evento aprobado' : 'Evento rechazado',
+            'mensaje' => $publicado
+                ? 'Tu evento «' . $evento['titulo'] . '» fue aprobado y publicado.'
+                : 'Tu evento «' . $evento['titulo'] . '» fue rechazado.',
+            'url_destino' => 'views/eventos.php',
+            'tipo_entidad' => 'evento',
+            'id_entidad' => (int)$evento['id_evento'],
+            'clave_idempotencia' => 'evento:' . (int)$evento['id_evento'] . ':estado:' . strtolower($estado),
+        ]);
+    } catch (Throwable $error) {
+        error_log('Notificacion decision evento #' . (int)$evento['id_evento'] . ': ' . $error->getMessage());
+    }
+}
 
 function obtener_eventos(PDO $pdo, int $limite = 0, string $estado = 'Abierto', ?int $id_usuario_docente = null, bool $es_admin = false): array
 {
@@ -85,7 +152,11 @@ function crear_evento(PDO $pdo, array $datos, ?int $id_usuario = null, bool $es_
             'id_usuario'       => $id_usuario,
             'estado'           => $estado,
         ]);
-        return (int)$pdo->lastInsertId();
+        $idEvento = (int)$pdo->lastInsertId();
+        if (!$es_admin && $idEvento > 0) {
+            notificar_nuevo_evento($pdo, $idEvento, (int)$id_usuario, $datos);
+        }
+        return $idEvento;
     } catch (PDOException $e) {
         $stmt = $pdo->prepare("
             INSERT INTO eventos (titulo, descripcion, tipo, modalidad, fecha_evento, ubicacion_enlace, cupos, imagen, estado)
@@ -102,20 +173,50 @@ function crear_evento(PDO $pdo, array $datos, ?int $id_usuario = null, bool $es_
             'imagen'           => trim($datos['imagen'] ?? ''),
             'estado'           => $estado,
         ]);
-        return (int)$pdo->lastInsertId();
+        $idEvento = (int)$pdo->lastInsertId();
+        if (!$es_admin && $idEvento > 0) {
+            notificar_nuevo_evento($pdo, $idEvento, (int)$id_usuario, $datos);
+        }
+        return $idEvento;
     }
 }
 
 function aprobar_evento(PDO $pdo, int $id_evento): bool
 {
-    $stmt = $pdo->prepare("UPDATE eventos SET estado = 'Abierto' WHERE id_evento = :id");
-    return $stmt->execute(['id' => $id_evento]);
+    $stmt = $pdo->prepare('SELECT id_evento, id_usuario, titulo, estado FROM eventos WHERE id_evento = :id LIMIT 1');
+    $stmt->execute(['id' => $id_evento]);
+    $evento = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$evento || $evento['estado'] !== 'Pendiente') {
+        return false;
+    }
+
+    $stmt = $pdo->prepare("UPDATE eventos SET estado = 'Abierto' WHERE id_evento = :id AND estado = 'Pendiente'");
+    $stmt->execute(['id' => $id_evento]);
+    if ($stmt->rowCount() !== 1) {
+        return false;
+    }
+
+    notificar_decision_evento($pdo, $evento, 'Abierto');
+    return true;
 }
 
 function rechazar_evento(PDO $pdo, int $id_evento): bool
 {
-    $stmt = $pdo->prepare("UPDATE eventos SET estado = 'Rechazado' WHERE id_evento = :id");
-    return $stmt->execute(['id' => $id_evento]);
+    $stmt = $pdo->prepare('SELECT id_evento, id_usuario, titulo, estado FROM eventos WHERE id_evento = :id LIMIT 1');
+    $stmt->execute(['id' => $id_evento]);
+    $evento = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$evento || $evento['estado'] !== 'Pendiente') {
+        return false;
+    }
+
+    $stmt = $pdo->prepare("UPDATE eventos SET estado = 'Rechazado' WHERE id_evento = :id AND estado = 'Pendiente'");
+    $stmt->execute(['id' => $id_evento]);
+    if ($stmt->rowCount() !== 1) {
+        return false;
+    }
+
+    notificar_decision_evento($pdo, $evento, 'Rechazado');
+    return true;
 }
 
 function eliminar_evento(PDO $pdo, int $id_evento, ?int $id_usuario = null, bool $es_admin = false): bool

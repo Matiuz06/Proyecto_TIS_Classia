@@ -56,10 +56,19 @@ try {
     $cursos_contratados     = $resumen_contrataciones['cursos'];
     $servicios_contratados  = $resumen_contrataciones['servicios'];
     $progresos_cursos = [];
+    $certificados_disponibles = [];
     $progresoRepo = new CursoProgresoRepository($pdo);
     foreach ($cursos_contratados as $cursoContratado) {
         if (in_array($cursoContratado['estado'], ['Completada', 'En Proceso'], true)) {
-            $progresos_cursos[(int)$cursoContratado['id_publicacion']] = $progresoRepo->obtenerProgresoAlumnoCurso($id_usuario, (int)$cursoContratado['id_publicacion']);
+            $idCurso = (int)$cursoContratado['id_publicacion'];
+            $progreso = $progresoRepo->obtenerProgresoAlumnoCurso($id_usuario, $idCurso);
+            $progresos_cursos[$idCurso] = $progreso;
+            if (!empty($progreso['aprobado'])) {
+                $certificados_disponibles[] = [
+                    'curso' => $cursoContratado,
+                    'progreso' => $progreso,
+                ];
+            }
         }
     }
 } catch (PDOException $e) {
@@ -68,4 +77,5 @@ try {
     $cursos_contratados = [];
     $servicios_contratados = [];
     $progresos_cursos = [];
+    $certificados_disponibles = [];
 }

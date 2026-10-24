@@ -61,8 +61,8 @@ try {
             header('Location: ../../views/carrito.php');
             exit;
         }
-        if ($publicacion['tipo'] === 'Servicio' && !empty($publicacion['tipo_servicio'])) {
-            $_SESSION['carrito_error'] = 'Este servicio requiere una solicitud personalizada antes de contratarse.';
+        if (($publicacion['tipo'] ?? '') === 'Servicio') {
+            $_SESSION['carrito_error'] = 'Los servicios se solicitan mediante una propuesta personalizada.';
             header('Location: ../../views/servicio-detalle.php?id=' . (int)$publicacion['id_publicacion']);
             exit;
         }

@@ -12,6 +12,9 @@ class CertificadoPdf
         $pdf->SetAuthor($this->txt('Classia'));
         $pdf->AddPage();
 
+        // Desplaza el bloque interno sin mover los marcos del certificado.
+        $contentOffset = 8;
+
         // Marco exterior
         $pdf->SetDrawColor(42, 79, 145);
         $pdf->SetLineWidth(1.2);
@@ -33,14 +36,15 @@ class CertificadoPdf
             $pdf->Image(
                 $logoPath,
                 $logoX,
-                18,
+                18 + $contentOffset,
                 $logoWidth
             );
 
             // Espacio después del logo
-            $pdf->SetY(42);
+            $pdf->SetY(42 + $contentOffset);
         } else {
             // Fallback si el logo no existe
+            $pdf->SetY(18 + $contentOffset);
             $pdf->SetFont('Arial', 'B', 22);
             $pdf->SetTextColor(42, 79, 145);
             $pdf->Cell(0, 14, $this->txt('CLASSIA'), 0, 1, 'C');
@@ -53,7 +57,7 @@ class CertificadoPdf
         $pdf->Cell(
             0,
             14,
-            $this->txt('CERTIFICADO DE FINALIZACION'),
+            $this->txt('CERTIFICADO DE FINALIZACIÓN'),
             0,
             1,
             'C'
