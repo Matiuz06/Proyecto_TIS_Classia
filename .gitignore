@@ -14,3 +14,6 @@ docker-compose.override.yml
 .env.local
 .env.supabase
 .env.active
+
+# Dependencias instaladas por Composer
+vendor/

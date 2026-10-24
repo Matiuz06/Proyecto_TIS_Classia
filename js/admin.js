@@ -34,6 +34,42 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  const adminLayout = document.querySelector(".admin-dashboard-layout");
+  if (!adminLayout) return;
+
+  const adminSections = Array.from(adminLayout.children).filter((element) =>
+    element.hasAttribute("data-admin-section")
+  );
+  const adminItems = Array.from(adminLayout.querySelectorAll(".admin-panel-item"));
+  const validSections = new Set(adminSections.map((section) => section.id));
+
+  const getActiveSection = () => {
+    const requested = window.location.hash.slice(1);
+    return validSections.has(requested) ? requested : "dashboard";
+  };
+
+  const renderAdminSection = (sectionId) => {
+    adminSections.forEach((section) => {
+      const active = section.id === sectionId;
+      section.hidden = !active;
+      section.setAttribute("aria-hidden", String(!active));
+    });
+
+    adminItems.forEach((item) => {
+      const active = item.getAttribute("href") === `#${sectionId}`;
+      item.classList.toggle("active", active);
+      if (active) item.setAttribute("aria-current", "page");
+      else item.removeAttribute("aria-current");
+    });
+
+    if (sectionId === "analiticas") {
+      window.requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+    }
+  };
+
+  renderAdminSection(getActiveSection());
+  window.addEventListener("hashchange", () => renderAdminSection(getActiveSection()));
 });
 
 /**

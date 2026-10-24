@@ -15,8 +15,6 @@ require_once '../config/database.php';
 require_once '../php/admin/acciones_admin.php';
 require_once '../php/admin/estadisticas_admin.php';
 require_once '../php/solicitudes/gestionar_solicitudes_docente.php';
-require_once '../php/noticias/gestionar_noticias.php';
-require_once '../php/eventos/gestionar_eventos.php';
 require_once '../php/utils/toast.php';
 
 if (empty($_SESSION['csrf_token'])) {
@@ -54,14 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje_admin = $resultado['mensaje'];
             break;
 
-        case 'inscribir_usuario_curso':
-            $id_u          = (int)($_POST['id_usuario_inscribir'] ?? 0);
-            $id_p          = (int)($_POST['id_curso_inscribir'] ?? 0);
-            $resultado     = inscribir_usuario_en_curso($pdo, $id_u, $id_p, $token_post, $csrf_session);
-            $error_admin   = $resultado['error'];
-            $mensaje_admin = $resultado['mensaje'];
-            break;
-
         case 'cambiar_estado_pub':
             $resultado     = cambiar_estado_publicacion_admin($pdo, (int)($_POST['id_publicacion'] ?? 0), $_POST['nuevo_estado'] ?? '', $token_post, $csrf_session);
             $error_admin   = $resultado['error'];
@@ -86,47 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje_admin = $resultado['mensaje'];
             break;
 
-        case 'aprobar_noticia':
-            if (!empty($csrf_session) && hash_equals($csrf_session, $token_post)) {
-                $id_n = (int)($_POST['id_noticia'] ?? 0);
-                if ($id_n > 0) { aprobar_noticia($pdo, $id_n); $mensaje_admin = 'Noticia aprobada correctamente.'; }
-            } else { $error_admin = 'Sesión de formulario inválida.'; }
-            break;
-
-        case 'rechazar_noticia':
-            if (!empty($csrf_session) && hash_equals($csrf_session, $token_post)) {
-                $id_n = (int)($_POST['id_noticia'] ?? 0);
-                if ($id_n > 0) { rechazar_noticia($pdo, $id_n); $mensaje_admin = 'Noticia rechazada correctamente.'; }
-            } else { $error_admin = 'Sesión de formulario inválida.'; }
-            break;
-
-        case 'eliminar_noticia':
-            if (!empty($csrf_session) && hash_equals($csrf_session, $token_post)) {
-                $id_n = (int)($_POST['id_noticia'] ?? 0);
-                if ($id_n > 0) { eliminar_noticia($pdo, $id_n, null, true); $mensaje_admin = 'Noticia eliminada correctamente.'; }
-            } else { $error_admin = 'Sesión de formulario inválida.'; }
-            break;
-
-        case 'aprobar_evento':
-            if (!empty($csrf_session) && hash_equals($csrf_session, $token_post)) {
-                $id_e = (int)($_POST['id_evento'] ?? 0);
-                if ($id_e > 0) { aprobar_evento($pdo, $id_e); $mensaje_admin = 'Evento aprobado correctamente.'; }
-            } else { $error_admin = 'Sesión de formulario inválida.'; }
-            break;
-
-        case 'rechazar_evento':
-            if (!empty($csrf_session) && hash_equals($csrf_session, $token_post)) {
-                $id_e = (int)($_POST['id_evento'] ?? 0);
-                if ($id_e > 0) { rechazar_evento($pdo, $id_e); $mensaje_admin = 'Evento rechazado correctamente.'; }
-            } else { $error_admin = 'Sesión de formulario inválida.'; }
-            break;
-
-        case 'eliminar_evento':
-            if (!empty($csrf_session) && hash_equals($csrf_session, $token_post)) {
-                $id_e = (int)($_POST['id_evento'] ?? 0);
-                if ($id_e > 0) { eliminar_evento($pdo, $id_e, null, true); $mensaje_admin = 'Evento eliminado correctamente.'; }
-            } else { $error_admin = 'Sesión de formulario inválida.'; }
-            break;
     }
 }
 
@@ -144,12 +93,8 @@ if ($mensaje_admin !== '') {
 
 $stats               = obtener_stats_plataforma($pdo);
 $todos_usuarios      = obtener_todos_usuarios($pdo, $uid);
-$todos_cursos        = obtener_todos_cursos($pdo);
 $todas_publicaciones = obtener_todas_publicaciones($pdo);
 $solicitudes_docente = obtener_solicitudes_docente_pendientes($pdo);
-$noticias_moderacion = obtener_noticias($pdo, 30, 'Pendiente', null, true);
-$eventos_pendientes  = obtener_eventos($pdo, 5, 'Pendiente', null, true);
-$total_eventos_pend  = $stats['eventos_pendientes'];
 
 // Carga de analíticas y estadísticas
 $filtro_periodo      = $_GET['periodo'] ?? '30d';
@@ -185,24 +130,15 @@ include '../includes/header.php';
 
   <!-- CABECERA -->
   <header class="admin-panel-header provider-dashboard__header">
-    <p class="admin-panel-kicker">Plataforma educativa</p>
-
     <h1>Panel de administración y control</h1>
 
-    <p>
-      Espacio centralizado para supervisar usuarios, gestionar solicitudes docentes,
-      revisar publicaciones, matricular estudiantes y moderar la actividad global de Classia.
-    </p>
-
-    <p>
-      <span>Sesión iniciada como:</span>
-      <strong><?= htmlspecialchars(trim(($usuario['nombre'] ?? '') . ' ' . ($usuario['apellido'] ?? ''))) ?></strong>
-    </p>
+    <p>Gestioná usuarios, solicitudes docentes, publicaciones y estadísticas de Classia.</p>
   </header>
 
 
   <!-- APARTADOS DEL PANEL -->
-  <section class="admin-panel-section" aria-labelledby="apartados-admin">
+  <div class="admin-dashboard-layout">
+  <section class="admin-panel-section admin-panel-navigation" aria-labelledby="apartados-admin">
 
     <p class="admin-panel-kicker">Gestión clara</p>
 
@@ -223,17 +159,11 @@ include '../includes/header.php';
 
         <a href="#analiticas" class="admin-panel-item" role="menuitem">
           Analíticas y Métricas
-          <span class="admin-badge-count">KPIs</span>
         </a>
 
         <a href="#usuarios" class="admin-panel-item" role="menuitem">
           Usuarios
           <span class="admin-badge-muted"><?= $stats['total_usuarios'] ?></span>
-        </a>
-
-        <a href="#matriculacion" class="admin-panel-item" role="menuitem">
-          Matriculación a cursos
-          <span class="admin-badge-muted"><?= count($todos_cursos) ?></span>
         </a>
 
         <a href="#solicitudes" class="admin-panel-item" role="menuitem">
@@ -248,39 +178,20 @@ include '../includes/header.php';
           <span class="admin-badge-muted"><?= $stats['publicaciones_total'] ?></span>
         </a>
 
-        <a href="#noticias" class="admin-panel-item" role="menuitem">
-          Noticias
-          <?php if ($stats['noticias_pendientes'] > 0): ?>
-            <span class="admin-badge-count"><?= $stats['noticias_pendientes'] ?></span>
-          <?php endif; ?>
-        </a>
-
-        <a href="#eventos" class="admin-panel-item" role="menuitem">
-          Eventos
-          <?php if ($stats['eventos_pendientes'] > 0): ?>
-            <span class="admin-badge-count"><?= $stats['eventos_pendientes'] ?></span>
-          <?php endif; ?>
-        </a>
-
-        <a href="#servicios" class="admin-panel-item" role="menuitem">
-          Servicios en proceso
-          <?php if ($stats['servicios_en_proceso'] > 0): ?>
-            <span class="admin-badge-muted"><?= $stats['servicios_en_proceso'] ?></span>
-          <?php endif; ?>
-        </a>
-
       </div>
 
     </div>
 
 
-    <!-- RESUMEN GENERAL / DASHBOARD -->
-    <div class="admin-panel-general" id="dashboard">
+  </section>
+
+  <!-- RESUMEN GENERAL / DASHBOARD -->
+  <section class="admin-panel-general admin-tab-panel" id="dashboard" data-admin-section="dashboard" aria-labelledby="titulo-dashboard">
 
       <div class="admin-panel-general-header">
         <p class="admin-panel-kicker">Resumen general</p>
 
-        <h3>Estado de la plataforma</h3>
+        <h3 id="titulo-dashboard">Estado de la plataforma</h3>
 
         <p>
           Consulta rápida de los principales elementos que requieren
@@ -364,13 +275,11 @@ include '../includes/header.php';
 
       </div>
 
-    </div>
-
   </section>
 
 
   <!--ANALÍTICAS Y RENDIMIENTO. Métricas de visitas, contrataciones, ingresos y valoraciones-->
-  <section id="analiticas" class="admin-analytics-section" aria-labelledby="titulo-analiticas">
+  <section id="analiticas" data-admin-section="analiticas" class="admin-tab-panel admin-analytics-section" aria-labelledby="titulo-analiticas">
     <header class="admin-analytics-header">
       <div class="admin-analytics-title-wrap">
         <p class="admin-panel-kicker">Métricas y Rendimiento</p>
@@ -379,7 +288,7 @@ include '../includes/header.php';
       </div>
 
       <!-- FILTRO POR PERÍODO Y SERVICIO (REQ-ADM-02) -->
-      <form method="GET" action="panel-administrador.php" class="admin-analytics-filter-form" role="search" aria-label="Filtro de analíticas">
+      <form method="GET" action="panel-administrador.php#analiticas" class="admin-analytics-filter-form" role="search" aria-label="Filtro de analíticas">
         <div class="admin-filter-group">
           <label for="analytics-periodo-select" class="admin-filter-label">Período:</label>
           <select id="analytics-periodo-select" name="periodo" class="admin-filter-select" aria-label="Seleccionar período de análisis">
@@ -601,7 +510,7 @@ include '../includes/header.php';
 
 
   <!-- USUARIOS -->
-  <section id="usuarios" class="admin-users-section" aria-labelledby="titulo-usuarios">
+  <section id="usuarios" data-admin-section="usuarios" class="admin-tab-panel admin-users-section" aria-labelledby="titulo-usuarios">
     <header>
       <h2 id="titulo-usuarios">Usuarios</h2>
       <p>Consultá, gestioná roles y moderá el acceso de los usuarios registrados en la plataforma.</p>
@@ -722,53 +631,8 @@ include '../includes/header.php';
   </section>
 
 
-  <!-- MATRICULACIÓN MANUAL A CURSOS -->
-  <section id="matriculacion" class="admin-panel-section admin-enroll-section" aria-labelledby="titulo-matriculacion">
-    <header>
-      <p class="admin-panel-kicker">Gestión académica</p>
-      <h2 id="titulo-matriculacion">Agregar y matricular usuarios a cursos</h2>
-      <p>Asigná acceso directo e inmediato a cualquier curso disponible para los estudiantes o usuarios registrados.</p>
-    </header>
-
-    <form method="POST" action="panel-administrador.php#matriculacion" class="form-grid u-mt-md admin-enroll-form">
-      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-      <input type="hidden" name="accion" value="inscribir_usuario_curso">
-
-      <label class="form-grid-full">
-        <strong>Seleccionar usuario a matricular:</strong>
-        <select name="id_usuario_inscribir" required class="admin-enroll-select">
-          <option value="">-- Seleccionar usuario --</option>
-          <?php foreach ($todos_usuarios as $u_item): ?>
-            <option value="<?= (int)$u_item['id_usuario'] ?>">
-              <?= htmlspecialchars(trim($u_item['nombre'] . ' ' . $u_item['apellido'])) ?> (<?= htmlspecialchars($u_item['email']) ?>)
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </label>
-
-      <label class="form-grid-full">
-        <strong>Seleccionar curso:</strong>
-        <select name="id_curso_inscribir" required class="admin-enroll-select">
-          <option value="">-- Seleccionar curso --</option>
-          <?php foreach ($todos_cursos as $c_item): ?>
-            <option value="<?= (int)$c_item['id_publicacion'] ?>">
-              <?= htmlspecialchars($c_item['titulo']) ?> (Docente: <?= htmlspecialchars(trim($c_item['docente_nombre'] . ' ' . $c_item['docente_apellido'])) ?>)
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </label>
-
-      <div class="form-grid-full u-mt-sm">
-        <button type="submit" class="btn btn-primary-action">
-          ✓ Matricular usuario en el curso
-        </button>
-      </div>
-    </form>
-  </section>
-
-
   <!-- SOLICITUDES DOCENTES -->
-  <section id="solicitudes" class="admin-requests-section" aria-labelledby="titulo-solicitudes">
+  <section id="solicitudes" data-admin-section="solicitudes" class="admin-tab-panel admin-requests-section" aria-labelledby="titulo-solicitudes">
     <header>
       <h2 id="titulo-solicitudes">
         Solicitudes docentes pendientes
@@ -785,6 +649,15 @@ include '../includes/header.php';
       <p class="muted">No hay solicitudes docentes pendientes.</p>
     <?php else: ?>
       <?php foreach ($solicitudes_docente as $sol): ?>
+        <details class="course-deliveries-task teacher-request-embedded-details">
+          <summary aria-controls="detalle-solicitud-panel-<?= (int) $sol['id_solicitud_docente'] ?>" aria-expanded="false">
+            <span class="teacher-request-embedded-summary">
+              <strong><?= htmlspecialchars($sol['nombre'] . ' ' . $sol['apellido']) ?></strong>
+              <span><?= htmlspecialchars($sol['email']) ?></span>
+            </span>
+            <span class="course-deliveries-chevron" aria-hidden="true"></span>
+          </summary>
+          <div id="detalle-solicitud-panel-<?= (int) $sol['id_solicitud_docente'] ?>" class="accordion-panel">
         <article>
           <header>
             <h3><?= htmlspecialchars($sol['nombre'] . ' ' . $sol['apellido']) ?></h3>
@@ -798,6 +671,20 @@ include '../includes/header.php';
             <p><?= htmlspecialchars(mb_strimwidth($sol['motivo'], 0, 260, '…')) ?></p>
           <?php endif; ?>
 
+          <?php if (!empty($sol['documentacion_ruta'])): ?>
+            <p>
+              <strong>Documentación adjunta:</strong>
+              <?= htmlspecialchars($sol['documentacion_nombre'] ?? 'Archivo') ?>
+              (<?= htmlspecialchars($sol['documentacion_mime'] ?? 'tipo desconocido') ?>,
+              <?= number_format(((int) ($sol['documentacion_tamano'] ?? 0)) / 1048576, 2, ',', '.') ?> MB,
+              <?= htmlspecialchars($sol['documentacion_fecha'] ?? '') ?>)
+            </p>
+            <div class="teacher-request-actions">
+              <a class="btn btn-secondary" href="../php/solicitudes/descargar_documentacion_docente.php?id=<?= (int) $sol['id_solicitud_docente'] ?>&modo=inline" target="_blank" rel="noopener">Ver documentación</a>
+              <a class="btn btn-secondary" href="../php/solicitudes/descargar_documentacion_docente.php?id=<?= (int) $sol['id_solicitud_docente'] ?>">Descargar documentación</a>
+            </div>
+          <?php endif; ?>
+
           <form method="POST" action="panel-administrador.php#solicitudes" class="admin-decision-form">
             <input type="hidden" name="csrf_token"           value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
             <input type="hidden" name="accion"               value="decision_solicitud">
@@ -809,13 +696,15 @@ include '../includes/header.php';
             </button>
           </form>
         </article>
+          </div>
+        </details>
       <?php endforeach; ?>
     <?php endif; ?>
   </section>
 
 
   <!-- PUBLICACIONES Y MODERACIÓN DE CURSOS -->
-  <section id="publicaciones" class="admin-publications-section" aria-labelledby="titulo-publicaciones">
+  <section id="publicaciones" data-admin-section="publicaciones" class="admin-tab-panel admin-publications-section" aria-labelledby="titulo-publicaciones">
     <header>
       <h2 id="titulo-publicaciones">Publicaciones y Cursos</h2>
       <p>Revisá, moderá contenidos, cambiá el estado o eliminá publicaciones de la plataforma. Los cursos archivados conservan su histórico pero no admiten nuevas actividades.</p>
@@ -935,174 +824,7 @@ include '../includes/header.php';
   </section>
 
 
-  <!-- NOTICIAS -->
-  <section id="noticias" class="admin-news-section" aria-labelledby="titulo-noticias">
-    <header>
-      <h2 id="titulo-noticias">
-        Moderación de noticias
-        <?php if ($stats['noticias_pendientes'] > 0): ?>
-          <span class="admin-badge-count"><?= $stats['noticias_pendientes'] ?></span>
-        <?php endif; ?>
-      </h2>
-      <p>Aprobá, rechazá o eliminá noticias propuestas por docentes y la institución.</p>
-      <a href="noticias.php" class="btn btn-secondary-action">Ver todas las noticias</a>
-    </header>
-
-    <?php if (empty($noticias_moderacion)): ?>
-      <br>
-      <p class="muted">No hay noticias pendientes de moderación.</p>
-    <?php else: ?>
-      <?php foreach ($noticias_moderacion as $noticia): ?>
-        <article>
-          <header>
-            <h3><?= htmlspecialchars($noticia['titulo']) ?></h3>
-            <p>
-              Estado: <strong><?= htmlspecialchars($noticia['estado']) ?></strong>
-              <?php if (!empty($noticia['categoria'])): ?> · <?= htmlspecialchars($noticia['categoria']) ?><?php endif; ?>
-            </p>
-          </header>
-          <?php if (!empty($noticia['subtitulo'])): ?>
-            <p><?= htmlspecialchars(mb_strimwidth($noticia['subtitulo'], 0, 200, '…')) ?></p>
-          <?php endif; ?>
-          <dl>
-            <div><dt>Autor</dt><dd><?= htmlspecialchars($noticia['autor'] ?? '—') ?></dd></div>
-            <div><dt>Publicación</dt><dd><?= !empty($noticia['fecha_publicacion']) ? date('d/m/Y', strtotime($noticia['fecha_publicacion'])) : '—' ?></dd></div>
-          </dl>
-
-          <nav aria-label="Acciones de la noticia <?= htmlspecialchars($noticia['titulo']) ?>">
-            <ul class="pub-actions">
-              <li><a href="noticia-detalle.php?id=<?= (int) $noticia['id_noticia'] ?>" class="pub-actions-link">Ver detalle</a></li>
-              <li>
-                <form method="POST" action="panel-administrador.php#noticias" class="admin-inline-form">
-                  <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                  <input type="hidden" name="accion"     value="aprobar_noticia">
-                  <input type="hidden" name="id_noticia" value="<?= (int) $noticia['id_noticia'] ?>">
-                  <button type="submit" class="btn-status btn-status-activate">Aprobar</button>
-                </form>
-              </li>
-              <li>
-                <form method="POST" action="panel-administrador.php#noticias" class="admin-inline-form">
-                  <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                  <input type="hidden" name="accion"     value="rechazar_noticia">
-                  <input type="hidden" name="id_noticia" value="<?= (int) $noticia['id_noticia'] ?>">
-                  <button type="submit" class="btn-status btn-status-pause">Rechazar</button>
-                </form>
-              </li>
-              <li>
-                <form method="POST" action="panel-administrador.php#noticias" class="admin-inline-form">
-                  <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                  <input type="hidden" name="accion"     value="eliminar_noticia">
-                  <input type="hidden" name="id_noticia" value="<?= (int) $noticia['id_noticia'] ?>">
-                  <button type="submit" class="btn-status btn-status-delete"
-                    onclick="return confirm('¿Eliminar definitivamente esta noticia?')">Eliminar</button>
-                </form>
-              </li>
-            </ul>
-          </nav>
-        </article>
-      <?php endforeach; ?>
-    <?php endif; ?>
-  </section>
-
-
-  <!-- EVENTOS -->
-  <section id="eventos" class="admin-events-section" aria-labelledby="titulo-eventos">
-    <header>
-      <h2 id="titulo-eventos">
-        Eventos
-        <?php if ($total_eventos_pend > 0): ?>
-          <span class="admin-badge-count"><?= $total_eventos_pend ?></span>
-        <?php endif; ?>
-      </h2>
-      <p>Administrá, aprobá o eliminá los eventos propuestos por docentes e institución.</p>
-    </header>
-
-    <div class="admin-events-actions">
-      <a href="eventos.php" class="btn">Ver todos los eventos</a>
-      <br><br>
-      <?php if ($total_eventos_pend > 0): ?>
-        <span class="admin-alert-pill">
-          <?= $total_eventos_pend ?> evento<?= $total_eventos_pend !== 1 ? 's' : '' ?> pendiente<?= $total_eventos_pend !== 1 ? 's' : '' ?> de aprobación
-        </span>
-      <?php else: ?>
-        <span class="muted">No hay eventos pendientes de moderación.</span>
-      <?php endif; ?>
     </div>
-
-    <?php if (!empty($eventos_pendientes)): ?>
-      <div class="admin-eventos-lista">
-        <?php foreach ($eventos_pendientes as $ev): ?>
-          <article>
-            <header>
-              <h3><?= htmlspecialchars($ev['titulo']) ?></h3>
-              <p>
-                <strong><?= htmlspecialchars($ev['tipo'] ?? '') ?></strong>
-                <?php if (!empty($ev['modalidad'])): ?> · <?= htmlspecialchars($ev['modalidad']) ?><?php endif; ?>
-                <?php if (!empty($ev['fecha_evento'])): ?> · <?= date('d/m/Y H:i', strtotime($ev['fecha_evento'])) ?><?php endif; ?>
-              </p>
-            </header>
-            <?php if (!empty($ev['descripcion'])): ?>
-              <p><?= htmlspecialchars(mb_strimwidth($ev['descripcion'], 0, 200, '…')) ?></p>
-            <?php endif; ?>
-
-            <nav aria-label="Acciones del evento <?= htmlspecialchars($ev['titulo']) ?>">
-              <ul class="pub-actions">
-                <li><a href="evento-detalle.php?id=<?= (int) $ev['id_evento'] ?>" class="pub-actions-link">Ver detalle</a></li>
-                <li>
-                  <form method="POST" action="panel-administrador.php#eventos" class="admin-inline-form">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                    <input type="hidden" name="accion"    value="aprobar_evento">
-                    <input type="hidden" name="id_evento" value="<?= (int) $ev['id_evento'] ?>">
-                    <button type="submit" class="btn-status btn-status-activate">Aprobar</button>
-                  </form>
-                </li>
-                <li>
-                  <form method="POST" action="panel-administrador.php#eventos" class="admin-inline-form">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                    <input type="hidden" name="accion"    value="rechazar_evento">
-                    <input type="hidden" name="id_evento" value="<?= (int) $ev['id_evento'] ?>">
-                    <button type="submit" class="btn-status btn-status-pause">Rechazar</button>
-                  </form>
-                </li>
-                <li>
-                  <form method="POST" action="panel-administrador.php#eventos" class="admin-inline-form">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                    <input type="hidden" name="accion"    value="eliminar_evento">
-                    <input type="hidden" name="id_evento" value="<?= (int) $ev['id_evento'] ?>">
-                    <button type="submit" class="btn-status btn-status-delete"
-                      onclick="return confirm('¿Eliminar definitivamente este evento?')">Eliminar</button>
-                  </form>
-                </li>
-              </ul>
-            </nav>
-          </article>
-        <?php endforeach; ?>
-
-        <?php if ($total_eventos_pend > count($eventos_pendientes)): ?>
-          <p class="admin-eventos-ver-mas">
-            <a href="eventos.php" class="btn btn-secondary-action">
-              Ver <?= $total_eventos_pend - count($eventos_pendientes) ?> evento<?= ($total_eventos_pend - count($eventos_pendientes)) !== 1 ? 's' : '' ?> más pendientes
-            </a>
-          </p>
-        <?php endif; ?>
-      </div>
-    <?php endif; ?>
-
-
-    <!-- Sección servicios enlazada desde el dropdown -->
-    <div id="servicios" class="admin-events-actions admin-servicios-section">
-      <h2 class="admin-servicios-title">Servicios en proceso</h2>
-      <a href="solicitudes-servicios.php" class="btn">Ver solicitudes de servicios</a>
-      <br><br>
-      <?php if ($stats['servicios_en_proceso'] > 0): ?>
-        <span class="admin-alert-pill">
-          <?= $stats['servicios_en_proceso'] ?> servicio<?= $stats['servicios_en_proceso'] !== 1 ? 's' : '' ?> en proceso
-        </span>
-      <?php else: ?>
-        <span class="muted">No hay servicios en proceso actualmente.</span>
-      <?php endif; ?>
-    </div>
-  </section>
 
 </main>
 
@@ -1138,7 +860,7 @@ include '../includes/header.php';
     topServicios: <?= json_encode($top_servicios) ?>
   };
 </script>
-<script src="<?= $jsPrefix ?>/js/admin.js" defer></script>
+<script src="<?= $jsPrefix ?>/js/admin.js?v=<?= filemtime(__DIR__ . '/../js/admin.js') ?>" defer></script>
 <script src="<?= $jsPrefix ?>/js/admin-charts.js" defer></script>
 
 <?php include '../includes/footer.php'; ?>
