@@ -5,7 +5,7 @@ skinparam backgroundColor #FFFFFF
 skinparam shadowing true
 skinparam roundcorner 8
 skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
-skinparam defaultFontSize 12
+skinparam defaultFontSize 10
 skinparam defaultFontColor #2D3748
 
 skinparam class {
@@ -13,296 +13,386 @@ skinparam class {
     ArrowColor #3182CE
     BorderColor #2B6CB0
     HeaderBackgroundColor #EBF8FF
+    FontStyle bold
 }
 
-title Modelo Relacional Físico — Classia (MariaDB / MySQL)
+hide methods
+hide stereotypes
 
-class "roles" as roles {
-  + **id_rol** : INT [PK, AI]
-  --
-  nombre_rol : VARCHAR(50) [UQ, NN]
-  descripcion : VARCHAR(255)
+title Modelo Relacional — Classia (Sprint 4 - Consolidación Final)
+
+' ─────────────────────────────────────────────
+' TABLAS
+' ─────────────────────────────────────────────
+
+class roles << (T,#EBF8FF) >> {
+  <u>id_rol INT PK</u>
+  nombre_rol VARCHAR(50) UNIQUE
+  descripcion VARCHAR(255)
 }
 
-class "usuarios" as usuarios {
-  + **id_usuario** : INT [PK, AI]
-  --
-  nombre : VARCHAR(100) [NN]
-  apellido : VARCHAR(100) [NN]
-  email : VARCHAR(150) [UQ, NN]
-  password_hash : VARCHAR(255) [NN]
-  telefono : VARCHAR(30)
-  fecha_registro : DATETIME [NN]
-  # **id_rol** : INT [FK, NN]
-  foto_perfil : VARCHAR(255)
-  dos_factores_activo : TINYINT(1) [NN]
-  activo : TINYINT(1) [NN]
-  motivo_bloqueo : TEXT [NULL]
+class usuarios << (T,#EBF8FF) >> {
+  <u>id_usuario INT PK</u>
+  nombre VARCHAR(100)
+  apellido VARCHAR(100)
+  cedula_identidad VARCHAR(255)
+  cedula_hash VARCHAR(64) UNIQUE
+  email VARCHAR(150) UNIQUE
+  password_hash VARCHAR(255)
+  telefono VARCHAR(30)
+  fecha_registro DATETIME
+  foto_perfil VARCHAR(255)
+  github_id VARCHAR(100) UNIQUE
+  nombre_usuario VARCHAR(30) UNIQUE
+  genero VARCHAR(30)
+  dos_factores_activo TINYINT(1)
+  dos_factores_secreto VARCHAR(255)
+  dos_factores_backup_codes TEXT
+  email_verificado TINYINT(1)
+  email_verificacion_token CHAR(64)
+  email_verificacion_expira DATETIME
+  onboarding_step TINYINT UNSIGNED
+  onboarding_data TEXT
+  fecha_nacimiento DATE
+  datos_cambiados_en DATETIME
+  nuevo_email_pendiente VARCHAR(150)
+  nuevo_email_token CHAR(64)
+  nuevo_email_expira DATETIME
+  password_reset_token CHAR(64)
+  password_reset_expira DATETIME
+  activo TINYINT(1)
+  fecha_baja DATETIME
+  motivo_bloqueo TEXT
+  <i>id_rol INT FK → roles.id_rol</i>
 }
 
-class "perfiles_profesionales" as perfiles {
-  + **id_perfil** : INT [PK, AI]
-  --
-  # **id_usuario** : INT [FK, UQ, NN]
-  titulo_profesional : VARCHAR(180)
-  presentacion : TEXT
-  experiencia : TEXT
-  formacion : TEXT
-  habilidades : TEXT
-  especialidades : TEXT
-  ubicacion : VARCHAR(150)
-  modalidad_trabajo : VARCHAR(150)
+class perfiles_profesionales << (T,#EBF8FF) >> {
+  <u>id_perfil INT PK</u>
+  titulo_profesional VARCHAR(180)
+  presentacion TEXT
+  experiencia TEXT
+  formacion TEXT
+  certificaciones TEXT
+  habilidades TEXT
+  especialidades TEXT
+  idiomas VARCHAR(255)
+  ubicacion VARCHAR(150)
+  modalidad_trabajo VARCHAR(150)
+  portfolio_url VARCHAR(255)
+  linkedin_url VARCHAR(255)
+  tiempo_respuesta VARCHAR(100)
+  visibilidad ENUM
+  actualizado_en DATETIME
+  <i>id_usuario INT FK → usuarios.id_usuario UNIQUE</i>
 }
 
-class "categorias" as categorias {
-  + **id_categoria** : INT [PK, AI]
-  --
-  nombre_categoria : VARCHAR(100) [UQ, NN]
-  descripcion : TEXT
-  # **creada_por** : INT [FK, NULL]
+class notificaciones << (T,#EBF8FF) >> {
+  <u>id_notificacion INT PK</u>
+  categoria VARCHAR(60)
+  titulo VARCHAR(180)
+  mensaje TEXT
+  url_destino VARCHAR(500)
+  tipo_entidad VARCHAR(80)
+  id_entidad INT
+  leida TINYINT(1)
+  fecha_creacion DATETIME
+  fecha_leida DATETIME
+  clave_idempotencia VARCHAR(64)
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
 }
 
-class "publicaciones" as publicaciones {
-  + **id_publicacion** : INT [PK, AI]
-  --
-  titulo : VARCHAR(200) [NN]
-  descripcion : TEXT [NN]
-  precio : DECIMAL(10,2) [NN]
-  tipo : ENUM('Curso', 'Servicio') [NN]
-  modalidad : VARCHAR(30)
-  duracion_horas : SMALLINT
-  cupos : INT
-  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado', 'Archivado') [NN]
-  porcentaje_minimo_aprobacion : TINYINT [NN, DEF 70]
-  imagen : VARCHAR(255)
-  # **id_usuario** : INT [FK, NN]
-  # **id_categoria** : INT [FK, NN]
+class categorias << (T,#EBF8FF) >> {
+  <u>id_categoria INT PK</u>
+  nombre_categoria VARCHAR(100) UNIQUE
+  descripcion TEXT
+  <i>creada_por INT FK → usuarios.id_usuario</i>
 }
 
-class "publicacion_visitas" as visitas {
-  + **id_visita** : INT [PK, AI]
-  --
-  # **id_publicacion** : INT [FK, NN]
-  fecha_visita : DATE [NN]
-  visitas : INT [NN, DEF 1]
+class publicaciones << (T,#EBF8FF) >> {
+  <u>id_publicacion INT PK</u>
+  titulo VARCHAR(200)
+  descripcion TEXT
+  precio DECIMAL(10,2)
+  tipo ENUM('Curso','Servicio')
+  modalidad VARCHAR(30)
+  nivel_experiencia VARCHAR(30)
+  duracion_horas SMALLINT UNSIGNED
+  cupos INT
+  disponibilidad TEXT
+  tipo_servicio VARCHAR(60)
+  estado ENUM
+  imagen VARCHAR(255)
+  eliminado_en DATETIME
+  fecha_creacion DATETIME
+  fecha_actualizacion DATETIME
+  porcentaje_minimo_aprobacion TINYINT UNSIGNED
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
+  <i>id_categoria INT FK → categorias.id_categoria</i>
 }
 
-class "curso_modulos" as modulos {
-  + **id_modulo** : INT [PK, AI]
-  --
-  # **id_publicacion** : INT [FK, NN]
-  titulo : VARCHAR(180) [NN]
-  descripcion : TEXT
-  orden : INT [NN, DEF 1]
-  visible_alumnos : TINYINT(1) [NN, DEF 1]
+class publicacion_visitas << (T,#EBF8FF) >> {
+  <u>id_visita INT PK</u>
+  fecha_visita DATE
+  visitas INT UNSIGNED
+  <i>id_publicacion INT FK → publicaciones.id_publicacion UNIQUE(id_pub,fecha)</i>
 }
 
-class "curso_unidades" as unidades {
-  + **id_unidad** : INT [PK, AI]
-  --
-  # **id_modulo** : INT [FK, NN]
-  titulo : VARCHAR(180) [NN]
-  descripcion : TEXT
-  orden : INT [NN, DEF 1]
+class curso_modulos << (T,#EBF8FF) >> {
+  <u>id_modulo INT PK</u>
+  titulo VARCHAR(180)
+  descripcion TEXT
+  orden INT
+  visible_alumnos TINYINT(1)
+  <i>id_publicacion INT FK → publicaciones.id_publicacion</i>
 }
 
-class "curso_recursos" as recursos {
-  + **id_recurso** : INT [PK, AI]
-  --
-  # **id_unidad** : INT [FK, NN]
-  titulo : VARCHAR(180) [NN]
-  tipo : ENUM('Archivo','Foro','Entrega de Tareas','Video','PDF','Imagen','Enlace') [NN]
-  url : VARCHAR(500)
-  archivo : VARCHAR(255)
-  descripcion : TEXT
-  orden : INT [NN, DEF 1]
-  visible_alumnos : TINYINT(1) [NN, DEF 1]
+class curso_unidades << (T,#EBF8FF) >> {
+  <u>id_unidad INT PK</u>
+  titulo VARCHAR(180)
+  descripcion TEXT
+  orden INT
+  <i>id_modulo INT FK → curso_modulos.id_modulo</i>
 }
 
-class "curso_tareas" as tareas {
-  + **id_tarea** : INT [PK, AI]
-  --
-  # **id_recurso** : INT [FK, UQ, NN]
-  fecha_apertura : DATETIME
-  fecha_cierre : DATETIME
-  permite_archivos : TINYINT(1) [NN, DEF 1]
-  permite_texto : TINYINT(1) [NN, DEF 0]
-  permite_enlace : TINYINT(1) [NN, DEF 0]
-  max_archivos : INT [NN, DEF 1]
-  max_tamano_mb : INT [NN, DEF 20]
-  formatos_permitidos : JSON
-  puntaje_maximo : DECIMAL(8,2)
-  tipo_calificacion : ENUM('numerica', 'aprobado_reprobado', 'sin_calificacion')
+class curso_recursos << (T,#EBF8FF) >> {
+  <u>id_recurso INT PK</u>
+  titulo VARCHAR(180)
+  tipo ENUM
+  url VARCHAR(500)
+  archivo VARCHAR(255)
+  descripcion TEXT
+  orden INT
+  fecha_creacion DATETIME
+  visible_alumnos TINYINT(1)
+  <i>id_unidad INT FK → curso_unidades.id_unidad</i>
 }
 
-class "curso_entregas" as entregas {
-  + **id_entrega** : INT [PK, AI]
-  --
-  # **id_tarea** : INT [FK, NN]
-  # **id_recurso** : INT [FK, NN]
-  # **id_usuario** : INT [FK, NN]
-  archivo_entrega : VARCHAR(500)
-  texto_entrega : TEXT
-  enlace_entrega : VARCHAR(500)
-  comentario_entrega : TEXT
-  estado : ENUM('Entregada', 'Calificada') [NN]
-  estado_entrega : ENUM('borrador', 'entregada') [NN]
-  calificacion : VARCHAR(30)
-  feedback_docente : TEXT
-  fecha_calificacion : DATETIME
-  # **id_docente_calificador** : INT [FK, NULL]
-  fecha_entrega : DATETIME [NN]
+class curso_recursos_completados << (T,#EBF8FF) >> {
+  <u>id_completado INT PK</u>
+  fecha_completado DATETIME
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
+  <i>id_recurso INT FK → curso_recursos.id_recurso</i>
+  UNIQUE(id_usuario, id_recurso)
 }
 
-class "curso_entrega_archivos" as entrega_archivos {
-  + **id_archivo** : INT [PK, AI]
-  --
-  # **id_entrega** : INT [FK, NN]
-  nombre_original : VARCHAR(255) [NN]
-  ruta : VARCHAR(500) [NN]
-  mime_type : VARCHAR(120)
-  tamano : BIGINT
+class curso_tareas << (T,#EBF8FF) >> {
+  <u>id_tarea INT PK</u>
+  fecha_apertura DATETIME
+  fecha_cierre DATETIME
+  permite_archivos TINYINT(1)
+  permite_texto TINYINT(1)
+  permite_enlace TINYINT(1)
+  max_archivos INT
+  max_tamano_mb INT
+  formatos_permitidos JSON
+  requisito_entrega ENUM
+  puntaje_maximo DECIMAL(8,2)
+  tipo_calificacion ENUM
+  permite_feedback_archivo TINYINT(1)
+  fecha_creacion DATETIME
+  fecha_actualizacion DATETIME
+  <i>id_recurso INT FK → curso_recursos.id_recurso UNIQUE</i>
 }
 
-class "curso_recursos_completados" as completados {
-  + **id_completado** : INT [PK, AI]
-  --
-  # **id_usuario** : INT [FK, NN]
-  # **id_recurso** : INT [FK, NN]
-  fecha_completado : DATETIME [NN]
+class curso_entregas << (T,#EBF8FF) >> {
+  <u>id_entrega INT PK</u>
+  archivo_entrega VARCHAR(500)
+  texto_entrega TEXT
+  enlace_entrega VARCHAR(500)
+  comentario_entrega TEXT
+  estado ENUM('Entregada','Calificada')
+  estado_entrega ENUM('borrador','entregada')
+  calificacion VARCHAR(30)
+  feedback_docente TEXT
+  archivo_feedback VARCHAR(500)
+  fecha_calificacion DATETIME
+  id_docente_calificador INT
+  fecha_entrega DATETIME
+  fecha_actualizacion DATETIME
+  <i>id_tarea INT FK → curso_tareas.id_tarea</i>
+  <i>id_recurso INT FK → curso_recursos.id_recurso</i>
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
+  UNIQUE(id_recurso, id_usuario)
 }
 
-class "certificados" as certificados {
-  + **id_certificado** : INT [PK, AI]
-  --
-  # **id_usuario** : INT [FK, NN]
-  # **id_curso** : INT [FK, NN]
-  codigo_verificacion : VARCHAR(32) [UQ, NN]
-  fecha_emision : DATETIME [NN]
-  porcentaje_aprobacion : DECIMAL(5,2) [NN]
+class curso_entrega_archivos << (T,#EBF8FF) >> {
+  <u>id_archivo INT PK</u>
+  nombre_original VARCHAR(255)
+  ruta VARCHAR(500)
+  mime_type VARCHAR(120)
+  extension VARCHAR(20)
+  tamano BIGINT
+  fecha_subida DATETIME
+  <i>id_entrega INT FK → curso_entregas.id_entrega</i>
 }
 
-class "curso_foro_mensajes" as foro_mensajes {
-  + **id_mensaje** : INT [PK, AI]
-  --
-  # **id_recurso** : INT [FK, NN]
-  # **id_usuario** : INT [FK, NN]
-  mensaje : TEXT [NN]
-  fecha_mensaje : DATETIME [NN]
+class curso_foro_mensajes << (T,#EBF8FF) >> {
+  <u>id_mensaje INT PK</u>
+  mensaje TEXT
+  fecha_mensaje DATETIME
+  <i>id_recurso INT FK → curso_recursos.id_recurso</i>
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
 }
 
-class "solicitudes" as solicitudes {
-  + **id_solicitud** : INT [PK, AI]
-  --
-  titulo : VARCHAR(200) [NN]
-  descripcion : TEXT [NN]
-  estado : ENUM('Pendiente', 'Aceptada', 'Rechazada', 'Contraoferta', 'En Proceso', 'Realizada', 'Cancelada') [NN]
-  precio_propuesto : DECIMAL(10,2)
-  # **id_usuario** : INT [FK, NN]
-  # **id_publicacion** : INT [FK, NULL]
-  # **id_contratacion** : INT [FK, NULL]
+class certificados << (T,#EBF8FF) >> {
+  <u>id_certificado INT PK</u>
+  codigo_verificacion VARCHAR(32) UNIQUE
+  fecha_emision DATETIME
+  porcentaje_aprobacion DECIMAL(5,2)
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
+  <i>id_curso INT FK → publicaciones.id_publicacion</i>
+  UNIQUE(id_usuario, id_curso)
 }
 
-class "solicitudes_docente" as sol_doc {
-  + **id_solicitud_docente** : INT [PK, AI]
-  --
-  # **id_usuario** : INT [FK, NN]
-  estado : ENUM('Pendiente', 'Aprobada', 'Rechazada') [NN]
-  motivo : TEXT
-  documentacion_ruta : VARCHAR(500)
-  fecha_solicitud : DATETIME [NN]
+class solicitudes << (T,#EBF8FF) >> {
+  <u>id_solicitud INT PK</u>
+  titulo VARCHAR(200)
+  descripcion TEXT
+  estado ENUM
+  detalles_json JSON
+  archivo_adjunto VARCHAR(255)
+  precio_propuesto DECIMAL(10,2)
+  fecha_hora_propuesta DATETIME
+  respuesta_proveedor TEXT
+  fecha_solicitud DATETIME
+  fecha_actualizacion DATETIME
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
+  <i>id_publicacion INT FK → publicaciones.id_publicacion</i>
+  <i>id_contratacion INT FK → contrataciones.id_contratacion</i>
 }
 
-class "contrataciones" as contrataciones {
-  + **id_contratacion** : INT [PK, AI]
-  --
-  fecha_contratacion : DATETIME [NN]
-  monto_total : DECIMAL(10,2) [NN]
-  estado : ENUM('Pendiente', 'En Proceso', 'Completada', 'Cancelada') [NN]
-  # **id_usuario** : INT [FK, NN]
+class solicitud_mensajes << (T,#EBF8FF) >> {
+  <u>id_mensaje INT PK</u>
+  mensaje TEXT
+  fecha_mensaje DATETIME
+  <i>id_solicitud INT FK → solicitudes.id_solicitud</i>
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
 }
 
-class "detalles_contratacion" as detalles {
-  + **id_detalle** : INT [PK, AI]
-  --
-  cantidad : INT [NN]
-  precio_unitario : DECIMAL(10,2) [NN]
-  subtotal : DECIMAL(10,2) [NN]
-  # **id_contratacion** : INT [FK, NN]
-  # **id_publicacion** : INT [FK, NN]
+class solicitudes_docente << (T,#EBF8FF) >> {
+  <u>id_solicitud_docente INT PK</u>
+  estado ENUM('Pendiente','Aprobada','Rechazada')
+  motivo TEXT
+  documentacion_ruta VARCHAR(500)
+  documentacion_nombre VARCHAR(255)
+  documentacion_mime VARCHAR(100)
+  documentacion_tamano INT UNSIGNED
+  documentacion_fecha DATETIME
+  fecha_solicitud DATETIME
+  fecha_respuesta DATETIME
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
 }
 
-class "pagos" as pagos {
-  + **id_pago** : INT [PK, AI]
-  --
-  monto : DECIMAL(10,2) [NN]
-  metodo_pago : ENUM('Tarjeta', 'Transferencia', 'MercadoPago', 'Efectivo') [NN]
-  estado_pago : ENUM('Pendiente', 'Aprobado', 'Rechazado') [NN]
-  transaccion_ref : VARCHAR(100)
-  # **id_contratacion** : INT [FK, NN]
+class contrataciones << (T,#EBF8FF) >> {
+  <u>id_contratacion INT PK</u>
+  fecha_contratacion DATETIME
+  monto_total DECIMAL(10,2)
+  estado ENUM('Pendiente','En Proceso','Completada','Cancelada')
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
 }
 
-class "valoraciones" as valoraciones {
-  + **id_valoracion** : INT [PK, AI]
-  --
-  puntuacion : INT [NN]
-  comentario : TEXT
-  # **id_usuario** : INT [FK, NN]
-  # **id_publicacion** : INT [FK, NN]
-  # **id_contratacion** : INT [FK, NULL]
+class detalles_contratacion << (T,#EBF8FF) >> {
+  <u>id_detalle INT PK</u>
+  cantidad INT
+  precio_unitario DECIMAL(10,2)
+  subtotal DECIMAL(10,2)
+  <i>id_contratacion INT FK → contrataciones.id_contratacion</i>
+  <i>id_publicacion INT FK → publicaciones.id_publicacion</i>
 }
 
-class "notificaciones" as notificaciones {
-  + **id_notificacion** : INT [PK, AI]
-  --
-  # **id_usuario** : INT [FK, NN]
-  categoria : VARCHAR(60) [NN]
-  titulo : VARCHAR(180) [NN]
-  mensaje : TEXT [NN]
-  url_destino : VARCHAR(500)
-  leida : TINYINT(1) [NN, DEF 0]
-  fecha_creacion : DATETIME [NN]
+class pagos << (T,#EBF8FF) >> {
+  <u>id_pago INT PK</u>
+  monto DECIMAL(10,2)
+  metodo_pago ENUM('Tarjeta','Transferencia','MercadoPago','Efectivo')
+  estado_pago ENUM('Pendiente','Aprobado','Rechazado')
+  fecha_pago DATETIME
+  transaccion_ref VARCHAR(100)
+  <i>id_contratacion INT FK → contrataciones.id_contratacion</i>
 }
 
-roles "1" <-- "0..*" usuarios : id_rol
-usuarios "1" <-- "0..1" perfiles : id_usuario
-usuarios "1" <-- "0..*" sol_doc : id_usuario
-usuarios "1" <-- "0..*" categorias : creada_por
-usuarios "1" <-- "0..*" publicaciones : id_usuario
-categorias "1" <-- "0..*" publicaciones : id_categoria
-publicaciones "1" <-- "0..*" visitas : id_publicacion
+class valoraciones << (T,#EBF8FF) >> {
+  <u>id_valoracion INT PK</u>
+  puntuacion INT CHECK(1..5)
+  comentario TEXT
+  fecha_valoracion DATETIME
+  <i>id_usuario INT FK → usuarios.id_usuario</i>
+  <i>id_publicacion INT FK → publicaciones.id_publicacion</i>
+  <i>id_contratacion INT FK → contrataciones.id_contratacion</i>
+}
 
-publicaciones "1" <-- "0..*" modulos : id_publicacion
-modulos "1" <-- "0..*" unidades : id_modulo
-unidades "1" <-- "0..*" recursos : id_unidad
+class eventos << (T,#EBF8FF) >> {
+  <u>id_evento INT PK</u>
+  titulo VARCHAR(255)
+  descripcion TEXT
+  tipo VARCHAR(100)
+  modalidad VARCHAR(50)
+  fecha_evento DATETIME
+  ubicacion_enlace VARCHAR(255)
+  cupos INT
+  imagen VARCHAR(255)
+  estado VARCHAR(50)
+  id_usuario INT
+}
 
-recursos "1" <-- "0..1" tareas : id_recurso
-tareas "1" <-- "0..*" entregas : id_tarea
-recursos "1" <-- "0..*" entregas : id_recurso
-usuarios "1" <-- "0..*" entregas : id_usuario
-entregas "1" <-- "0..*" entrega_archivos : id_entrega
+class noticias << (T,#EBF8FF) >> {
+  <u>id_noticia INT PK</u>
+  titulo VARCHAR(255)
+  subtitulo VARCHAR(255)
+  cuerpo TEXT
+  imagen VARCHAR(255)
+  categoria VARCHAR(100)
+  autor VARCHAR(100)
+  fecha_publicacion DATETIME
+  orden INT
+  estado VARCHAR(50)
+  id_usuario INT
+}
 
-usuarios "1" <-- "0..*" completados : id_usuario
-recursos "1" <-- "0..*" completados : id_recurso
+' ─────────────────────────────────────────────
+' RELACIONES (FK arrows)
+' ─────────────────────────────────────────────
 
-usuarios "1" <-- "0..*" certificados : id_usuario
-publicaciones "1" <-- "0..*" certificados : id_curso
+roles "1" --o{ "0..*" usuarios
 
-recursos "1" <-- "0..*" foro_mensajes : id_recurso
-usuarios "1" <-- "0..*" foro_mensajes : id_usuario
+usuarios "1" --o| "0..1" perfiles_profesionales
+usuarios "1" --o{ "0..*" notificaciones
+usuarios "1" --o{ "0..*" publicaciones
+usuarios "1" --o{ "0..*" contrataciones
+usuarios "1" --o{ "0..*" solicitudes
+usuarios "1" --o{ "0..*" solicitudes_docente
+usuarios "1" --o{ "0..*" valoraciones
+usuarios "1" --o{ "0..*" certificados
+usuarios "1" --o{ "0..*" curso_entregas
+usuarios "1" --o{ "0..*" curso_foro_mensajes
+usuarios "1" --o{ "0..*" solicitud_mensajes
+usuarios "1" --o{ "0..*" curso_recursos_completados
 
-usuarios "1" <-- "0..*" notificaciones : id_usuario
+categorias "1" --o{ "0..*" publicaciones
+categorias }o--o| "0..1" usuarios : "creada_por"
 
-usuarios "1" <-- "0..*" solicitudes : id_usuario
-publicaciones "0..1" <-- "0..*" solicitudes : id_publicacion
-contrataciones "0..1" <-- "0..*" solicitudes : id_contratacion
+publicaciones "1" --o{ "0..*" publicacion_visitas
+publicaciones "1" --o{ "0..*" curso_modulos
+publicaciones "1" --o{ "0..*" certificados
+publicaciones "1" --o{ "0..*" solicitudes
+publicaciones "1" --o{ "0..*" detalles_contratacion
+publicaciones "1" --o{ "0..*" valoraciones
 
-usuarios "1" <-- "0..*" contrataciones : id_usuario
-contrataciones "1" <-- "1..*" detalles : id_contratacion
-publicaciones "1" <-- "0..*" detalles : id_publicacion
-contrataciones "1" <-- "0..*" pagos : id_contratacion
+curso_modulos "1" --o{ "0..*" curso_unidades
+curso_unidades "1" --o{ "0..*" curso_recursos
 
-usuarios "1" <-- "0..*" valoraciones : id_usuario
-publicaciones "1" <-- "0..*" valoraciones : id_publicacion
-contrataciones "0..1" <-- "0..*" valoraciones : id_contratacion
+curso_recursos "1" --o| "0..1" curso_tareas
+curso_recursos "1" --o{ "0..*" curso_entregas
+curso_recursos "1" --o{ "0..*" curso_foro_mensajes
+curso_recursos "1" --o{ "0..*" curso_recursos_completados
+
+curso_tareas "1" --o{ "0..*" curso_entregas
+curso_entregas "1" --o{ "0..*" curso_entrega_archivos
+
+contrataciones "1" --o{ "0..*" pagos
+contrataciones "1" --o{ "0..*" detalles_contratacion
+contrataciones "1" --o{ "0..*" valoraciones
+contrataciones "1" --o{ "0..*" solicitudes
+
+solicitudes "1" --o{ "0..*" solicitud_mensajes
+
 @enduml

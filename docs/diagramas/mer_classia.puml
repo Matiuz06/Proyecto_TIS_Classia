@@ -5,309 +5,408 @@ skinparam backgroundColor #FFFFFF
 skinparam shadowing true
 skinparam roundcorner 8
 skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
-skinparam defaultFontSize 12
+skinparam defaultFontSize 11
 skinparam defaultFontColor #2D3748
 
-skinparam class {
-    BackgroundColor #FFFFFF
-    ArrowColor #3182CE
-    BorderColor #2B6CB0
-    HeaderBackgroundColor #EBF8FF
-}
 skinparam entity {
     BackgroundColor #FFFFFF
     BorderColor #2B6CB0
+    ArrowColor #3182CE
+    HeaderBackgroundColor #EBF8FF
 }
 
-title Modelo Entidad-Relación (MER) — Classia (Entrega Final)
+title Diagrama Entidad-Relación (MER) — Classia (Sprint 4 - Consolidación Final)
 
-entity "ROL" as roles {
+entity "ROLES" as roles {
   * id_rol : INT <<PK>>
   --
-  nombre_rol : VARCHAR(50)
+  nombre_rol : VARCHAR(50) <<UNIQUE>>
   descripcion : VARCHAR(255)
 }
 
-entity "USUARIO" as usuarios {
+entity "USUARIOS" as usuarios {
   * id_usuario : INT <<PK>>
   --
   nombre : VARCHAR(100)
   apellido : VARCHAR(100)
-  email : VARCHAR(150)
+  cedula_identidad : VARCHAR(255)
+  cedula_hash : VARCHAR(64) <<UNIQUE>>
+  email : VARCHAR(150) <<UNIQUE>>
   password_hash : VARCHAR(255)
   telefono : VARCHAR(30)
   fecha_registro : DATETIME
-  * id_rol : INT <<FK>>
   foto_perfil : VARCHAR(255)
+  github_id : VARCHAR(100) <<UNIQUE>>
+  nombre_usuario : VARCHAR(30) <<UNIQUE>>
+  genero : VARCHAR(30)
   dos_factores_activo : TINYINT(1)
+  dos_factores_secreto : VARCHAR(255)
+  dos_factores_backup_codes : TEXT
+  email_verificado : TINYINT(1)
+  email_verificacion_token : CHAR(64)
+  email_verificacion_expira : DATETIME
+  onboarding_step : TINYINT UNSIGNED
+  onboarding_data : TEXT
+  fecha_nacimiento : DATE
+  datos_cambiados_en : DATETIME
+  nuevo_email_pendiente : VARCHAR(150)
+  nuevo_email_token : CHAR(64)
+  nuevo_email_expira : DATETIME
+  password_reset_token : CHAR(64)
+  password_reset_expira : DATETIME
   activo : TINYINT(1)
+  fecha_baja : DATETIME
   motivo_bloqueo : TEXT
+  # id_rol : INT <<FK>>
 }
 
-entity "PERFIL_PROFESIONAL" as perfiles {
+entity "PERFILES_PROFESIONALES" as perfiles {
   * id_perfil : INT <<PK>>
   --
-  * id_usuario : INT <<FK, UNIQUE>>
   titulo_profesional : VARCHAR(180)
   presentacion : TEXT
   experiencia : TEXT
   formacion : TEXT
+  certificaciones : TEXT
   habilidades : TEXT
   especialidades : TEXT
+  idiomas : VARCHAR(255)
   ubicacion : VARCHAR(150)
   modalidad_trabajo : VARCHAR(150)
+  portfolio_url : VARCHAR(255)
+  linkedin_url : VARCHAR(255)
+  tiempo_respuesta : VARCHAR(100)
+  visibilidad : ENUM('Registrados','Relacionados')
+  actualizado_en : DATETIME
+  # id_usuario : INT <<FK>> <<UNIQUE>>
 }
 
-entity "CATEGORIA" as categorias {
+entity "NOTIFICACIONES" as notificaciones {
+  * id_notificacion : INT <<PK>>
+  --
+  categoria : VARCHAR(60)
+  titulo : VARCHAR(180)
+  mensaje : TEXT
+  url_destino : VARCHAR(500)
+  tipo_entidad : VARCHAR(80)
+  id_entidad : INT
+  leida : TINYINT(1)
+  fecha_creacion : DATETIME
+  fecha_leida : DATETIME
+  clave_idempotencia : VARCHAR(64)
+  # id_usuario : INT <<FK>>
+}
+
+entity "CATEGORIAS" as categorias {
   * id_categoria : INT <<PK>>
   --
-  nombre_categoria : VARCHAR(100)
+  nombre_categoria : VARCHAR(100) <<UNIQUE>>
   descripcion : TEXT
-  creada_por : INT <<FK>>
+  # creada_por : INT <<FK>>
 }
 
-entity "PUBLICACION" as publicaciones {
+entity "PUBLICACIONES" as publicaciones {
   * id_publicacion : INT <<PK>>
   --
   titulo : VARCHAR(200)
   descripcion : TEXT
   precio : DECIMAL(10,2)
-  tipo : ENUM('Curso', 'Servicio')
+  tipo : ENUM('Curso','Servicio')
   modalidad : VARCHAR(30)
-  duracion_horas : SMALLINT
+  nivel_experiencia : VARCHAR(30)
+  duracion_horas : SMALLINT UNSIGNED
   cupos : INT
-  estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Eliminado', 'Archivado')
-  porcentaje_minimo_aprobacion : TINYINT
+  disponibilidad : TEXT
+  tipo_servicio : VARCHAR(60)
+  estado : ENUM('Activo','Inactivo','Pausado','Eliminado','Archivado')
   imagen : VARCHAR(255)
-  * id_usuario : INT <<FK>>
-  * id_categoria : INT <<FK>>
+  eliminado_en : DATETIME
+  fecha_creacion : DATETIME
+  fecha_actualizacion : DATETIME
+  porcentaje_minimo_aprobacion : TINYINT UNSIGNED
+  # id_usuario : INT <<FK>>
+  # id_categoria : INT <<FK>>
 }
 
-entity "PUBLICACION_VISITA" as visitas {
+entity "PUBLICACION_VISITAS" as visitas {
   * id_visita : INT <<PK>>
   --
-  * id_publicacion : INT <<FK>>
   fecha_visita : DATE
-  visitas : INT
+  visitas : INT UNSIGNED
+  # id_publicacion : INT <<FK>>
 }
 
-entity "CURSO_MODULO" as modulos {
+entity "CURSO_MODULOS" as modulos {
   * id_modulo : INT <<PK>>
   --
-  * id_publicacion : INT <<FK>>
   titulo : VARCHAR(180)
   descripcion : TEXT
   orden : INT
   visible_alumnos : TINYINT(1)
+  # id_publicacion : INT <<FK>>
 }
 
-entity "CURSO_UNIDAD" as unidades {
+entity "CURSO_UNIDADES" as unidades {
   * id_unidad : INT <<PK>>
   --
-  * id_modulo : INT <<FK>>
   titulo : VARCHAR(180)
   descripcion : TEXT
   orden : INT
+  # id_modulo : INT <<FK>>
 }
 
-entity "CURSO_RECURSO" as recursos {
+entity "CURSO_RECURSOS" as recursos {
   * id_recurso : INT <<PK>>
   --
-  * id_unidad : INT <<FK>>
   titulo : VARCHAR(180)
-  tipo : ENUM('Archivo', 'Foro', 'Entrega de Tareas', 'Video', 'PDF', 'Imagen', 'Enlace')
+  tipo : ENUM('Archivo','Foro','Entrega de Tareas',\n\t'Video','PDF','Imagen','Enlace')
   url : VARCHAR(500)
   archivo : VARCHAR(255)
   descripcion : TEXT
   orden : INT
+  fecha_creacion : DATETIME
   visible_alumnos : TINYINT(1)
+  # id_unidad : INT <<FK>>
 }
 
-entity "CURSO_TAREA" as tareas {
+entity "CURSO_RECURSOS_COMPLETADOS" as completados {
+  * id_completado : INT <<PK>>
+  --
+  fecha_completado : DATETIME
+  # id_usuario : INT <<FK>>
+  # id_recurso : INT <<FK>>
+}
+
+entity "CURSO_TAREAS" as tareas {
   * id_tarea : INT <<PK>>
   --
-  * id_recurso : INT <<FK, UNIQUE>>
-  puntaje_maximo : DECIMAL(8,2)
-  tipo_calificacion : ENUM('numerica', 'aprobado_reprobado', 'sin_calificacion')
   fecha_apertura : DATETIME
   fecha_cierre : DATETIME
+  permite_archivos : TINYINT(1)
+  permite_texto : TINYINT(1)
+  permite_enlace : TINYINT(1)
   max_archivos : INT
+  max_tamano_mb : INT
+  formatos_permitidos : JSON
+  requisito_entrega : ENUM('cualquiera','todos')
+  puntaje_maximo : DECIMAL(8,2)
+  tipo_calificacion : ENUM('numerica','aprobado_reprobado',\n\t'sin_calificacion')
+  permite_feedback_archivo : TINYINT(1)
+  fecha_creacion : DATETIME
+  fecha_actualizacion : DATETIME
+  # id_recurso : INT <<FK>> <<UNIQUE>>
 }
 
-entity "CURSO_ENTREGA" as entregas {
+entity "CURSO_ENTREGAS" as entregas {
   * id_entrega : INT <<PK>>
   --
-  * id_tarea : INT <<FK>>
-  * id_recurso : INT <<FK>>
-  * id_usuario : INT <<FK>>
   archivo_entrega : VARCHAR(500)
   texto_entrega : TEXT
   enlace_entrega : VARCHAR(500)
-  estado : ENUM('Entregada', 'Calificada')
+  comentario_entrega : TEXT
+  estado : ENUM('Entregada','Calificada')
+  estado_entrega : ENUM('borrador','entregada')
   calificacion : VARCHAR(30)
   feedback_docente : TEXT
+  archivo_feedback : VARCHAR(500)
+  fecha_calificacion : DATETIME
+  id_docente_calificador : INT
   fecha_entrega : DATETIME
+  fecha_actualizacion : DATETIME
+  # id_tarea : INT <<FK>>
+  # id_recurso : INT <<FK>>
+  # id_usuario : INT <<FK>>
 }
 
-entity "CURSO_ENTREGA_ARCHIVO" as entrega_archivos {
+entity "CURSO_ENTREGA_ARCHIVOS" as archivos_entrega {
   * id_archivo : INT <<PK>>
   --
-  * id_entrega : INT <<FK>>
   nombre_original : VARCHAR(255)
   ruta : VARCHAR(500)
   mime_type : VARCHAR(120)
+  extension : VARCHAR(20)
+  tamano : BIGINT
+  fecha_subida : DATETIME
+  # id_entrega : INT <<FK>>
 }
 
-entity "CURSO_RECURSO_COMPLETADO" as completados {
-  * id_completado : INT <<PK>>
-  --
-  * id_usuario : INT <<FK>>
-  * id_recurso : INT <<FK>>
-  fecha_completado : DATETIME
-}
-
-entity "CERTIFICADO" as certificados {
-  * id_certificado : INT <<PK>>
-  --
-  * id_usuario : INT <<FK>>
-  * id_curso : INT <<FK>>
-  codigo_verificacion : VARCHAR(32) <<UQ>>
-  porcentaje_aprobacion : DECIMAL(5,2)
-  fecha_emision : DATETIME
-}
-
-entity "CURSO_FORO_MENSAJE" as foro_mensajes {
+entity "CURSO_FORO_MENSAJES" as foro {
   * id_mensaje : INT <<PK>>
   --
-  * id_recurso : INT <<FK>>
-  * id_usuario : INT <<FK>>
   mensaje : TEXT
   fecha_mensaje : DATETIME
+  # id_recurso : INT <<FK>>
+  # id_usuario : INT <<FK>>
 }
 
-entity "SOLICITUD" as solicitudes {
+entity "CERTIFICADOS" as certificados {
+  * id_certificado : INT <<PK>>
+  --
+  codigo_verificacion : VARCHAR(32) <<UNIQUE>>
+  fecha_emision : DATETIME
+  porcentaje_aprobacion : DECIMAL(5,2)
+  # id_usuario : INT <<FK>>
+  # id_curso : INT <<FK>>
+}
+
+entity "SOLICITUDES" as solicitudes {
   * id_solicitud : INT <<PK>>
   --
   titulo : VARCHAR(200)
   descripcion : TEXT
-  estado : ENUM('Pendiente', 'Aceptada', 'Rechazada', 'Contraoferta', 'En Proceso', 'Realizada', 'Cancelada')
-  precio_propuesto : DECIMAL(10,2)
+  estado : ENUM('Pendiente','Aceptada','Rechazada',\n\t'Contraoferta','En Proceso','Realizada','Cancelada')
+  detalles_json : JSON
   archivo_adjunto : VARCHAR(255)
-  * id_usuario : INT <<FK>>
-  id_publicacion : INT <<FK>>
-  id_contratacion : INT <<FK>>
+  precio_propuesto : DECIMAL(10,2)
+  fecha_hora_propuesta : DATETIME
+  respuesta_proveedor : TEXT
+  fecha_solicitud : DATETIME
+  fecha_actualizacion : DATETIME
+  # id_usuario : INT <<FK>>
+  # id_publicacion : INT <<FK>>
+  # id_contratacion : INT <<FK>>
 }
 
-entity "SOLICITUD_MENSAJE" as mensajes {
+entity "SOLICITUD_MENSAJES" as sol_mensajes {
   * id_mensaje : INT <<PK>>
   --
-  * id_solicitud : INT <<FK>>
-  * id_usuario : INT <<FK>>
   mensaje : TEXT
   fecha_mensaje : DATETIME
+  # id_solicitud : INT <<FK>>
+  # id_usuario : INT <<FK>>
 }
 
-entity "SOLICITUD_DOCENTE" as sol_doc {
+entity "SOLICITUDES_DOCENTE" as sol_docente {
   * id_solicitud_docente : INT <<PK>>
   --
-  * id_usuario : INT <<FK>>
-  estado : ENUM('Pendiente', 'Aprobada', 'Rechazada')
+  estado : ENUM('Pendiente','Aprobada','Rechazada')
   motivo : TEXT
   documentacion_ruta : VARCHAR(500)
+  documentacion_nombre : VARCHAR(255)
+  documentacion_mime : VARCHAR(100)
+  documentacion_tamano : INT UNSIGNED
+  documentacion_fecha : DATETIME
   fecha_solicitud : DATETIME
+  fecha_respuesta : DATETIME
+  # id_usuario : INT <<FK>>
 }
 
-entity "CONTRATACION" as contrataciones {
+entity "CONTRATACIONES" as contrataciones {
   * id_contratacion : INT <<PK>>
   --
   fecha_contratacion : DATETIME
   monto_total : DECIMAL(10,2)
-  estado : ENUM('Pendiente', 'En Proceso', 'Completada', 'Cancelada')
-  * id_usuario : INT <<FK>>
+  estado : ENUM('Pendiente','En Proceso','Completada','Cancelada')
+  # id_usuario : INT <<FK>>
 }
 
-entity "DETALLE_CONTRATACION" as detalles {
+entity "DETALLES_CONTRATACION" as detalles {
   * id_detalle : INT <<PK>>
   --
   cantidad : INT
   precio_unitario : DECIMAL(10,2)
   subtotal : DECIMAL(10,2)
-  * id_contratacion : INT <<FK>>
-  * id_publicacion : INT <<FK>>
+  # id_contratacion : INT <<FK>>
+  # id_publicacion : INT <<FK>>
 }
 
-entity "PAGO" as pagos {
+entity "PAGOS" as pagos {
   * id_pago : INT <<PK>>
   --
   monto : DECIMAL(10,2)
-  metodo_pago : ENUM('Tarjeta', 'Transferencia', 'MercadoPago', 'Efectivo')
-  estado_pago : ENUM('Pendiente', 'Aprobado', 'Rechazado')
+  metodo_pago : ENUM('Tarjeta','Transferencia','MercadoPago','Efectivo')
+  estado_pago : ENUM('Pendiente','Aprobado','Rechazado')
+  fecha_pago : DATETIME
   transaccion_ref : VARCHAR(100)
-  * id_contratacion : INT <<FK>>
+  # id_contratacion : INT <<FK>>
 }
 
-entity "VALORACION" as valoraciones {
+entity "VALORACIONES" as valoraciones {
   * id_valoracion : INT <<PK>>
   --
-  puntuacion : INT
+  puntuacion : INT [1..5]
   comentario : TEXT
-  * id_usuario : INT <<FK>>
-  * id_publicacion : INT <<FK>>
-  id_contratacion : INT <<FK>>
+  fecha_valoracion : DATETIME
+  # id_usuario : INT <<FK>>
+  # id_publicacion : INT <<FK>>
+  # id_contratacion : INT <<FK>>
 }
 
-entity "NOTIFICACION" as notificaciones {
-  * id_notificacion : INT <<PK>>
+entity "EVENTOS" as eventos {
+  * id_evento : INT <<PK>>
   --
-  * id_usuario : INT <<FK>>
-  categoria : VARCHAR(60)
-  titulo : VARCHAR(180)
-  mensaje : TEXT
-  url_destino : VARCHAR(500)
-  leida : TINYINT(1)
-  fecha_creacion : DATETIME
+  titulo : VARCHAR(255)
+  descripcion : TEXT
+  tipo : VARCHAR(100)
+  modalidad : VARCHAR(50)
+  fecha_evento : DATETIME
+  ubicacion_enlace : VARCHAR(255)
+  cupos : INT
+  imagen : VARCHAR(255)
+  estado : VARCHAR(50)
+  id_usuario : INT
 }
 
-roles ||--o{ usuarios : "asigna rol"
-usuarios ||--o| perfiles : "perfil profesional"
-usuarios ||--o{ sol_doc : "solicita rol docente"
-usuarios ||--o{ categorias : "crea categoría"
-usuarios ||--o{ publicaciones : "publica"
-publicaciones ||--o{ visitas : "registra visitas"
-categorias ||--o{ publicaciones : "clasifica"
+entity "NOTICIAS" as noticias {
+  * id_noticia : INT <<PK>>
+  --
+  titulo : VARCHAR(255)
+  subtitulo : VARCHAR(255)
+  cuerpo : TEXT
+  imagen : VARCHAR(255)
+  categoria : VARCHAR(100)
+  autor : VARCHAR(100)
+  fecha_publicacion : DATETIME
+  orden : INT
+  estado : VARCHAR(50)
+  id_usuario : INT
+}
 
-publicaciones ||--o{ modulos : "contiene"
-modulos ||--o{ unidades : "organiza"
-unidades ||--o{ recursos : "incluye"
+' ─────────────────────────────────────────────
+' RELACIONES
+' ─────────────────────────────────────────────
 
-recursos ||--o| tareas : "define tarea"
-tareas ||--o{ entregas : "recibe entregas"
-recursos ||--o{ entregas : "asocia recurso"
-usuarios ||--o{ entregas : "entrega"
-entregas ||--o{ entrega_archivos : "contiene archivos"
+roles ||--o{ usuarios : "asigna"
 
-usuarios ||--o{ completados : "completa"
-recursos ||--o{ completados : "marcado completado"
-
-usuarios ||--o{ certificados : "obtiene"
-publicaciones ||--o{ certificados : "certifica curso"
-
-recursos ||--o{ foro_mensajes : "contiene debates"
-usuarios ||--o{ foro_mensajes : "participa en foro"
-
+usuarios ||--o| perfiles : "tiene"
 usuarios ||--o{ notificaciones : "recibe"
+usuarios ||--o{ publicaciones : "publica"
+usuarios ||--o{ contrataciones : "realiza"
+usuarios ||--o{ solicitudes : "emite"
+usuarios ||--o{ sol_docente : "solicita rol"
+usuarios ||--o{ valoraciones : "registra"
+usuarios ||--o{ certificados : "obtiene"
+usuarios ||--o{ entregas : "envía"
+usuarios ||--o{ foro : "participa"
+usuarios ||--o{ sol_mensajes : "redacta"
+usuarios ||--o{ completados : "completa"
 
-usuarios ||--o{ solicitudes : "envía solicitud"
-publicaciones ||--o{ solicitudes : "referencia oferta"
-solicitudes ||--o{ mensajes : "intercambia"
-usuarios ||--o{ mensajes : "escribe"
+categorias ||--o{ publicaciones : "clasifica"
+categorias }o--o| usuarios : "creada por"
 
-usuarios ||--o{ contrataciones : "realiza orden"
-contrataciones ||--|{ detalles : "desglosa"
-publicaciones ||--o{ detalles : "ítem contratado"
-contrataciones ||--o{ pagos : "abona"
+publicaciones ||--o{ visitas : "registra"
+publicaciones ||--o{ modulos : "contiene"
+publicaciones ||--o{ certificados : "emite"
+publicaciones ||--o{ solicitudes : "referencia"
+publicaciones ||--o{ detalles : "incluida en"
+publicaciones ||--o{ valoraciones : "recibe"
 
-usuarios ||--o{ valoraciones : "emite opinión"
-publicaciones ||--o{ valoraciones : "recibe calificación"
-contrataciones ||--o{ valoraciones : "respalda"
+modulos ||--o{ unidades : "agrupa"
+unidades ||--o{ recursos : "contiene"
+
+recursos ||--o| tareas : "define"
+recursos ||--o{ entregas : "tiene"
+recursos ||--o{ foro : "hospeda"
+recursos ||--o{ completados : "rastreado en"
+
+tareas ||--o{ entregas : "recibe"
+entregas ||--o{ archivos_entrega : "adjunta"
+
+contrataciones ||--o{ pagos : "liquida"
+contrataciones ||--o{ detalles : "detalla"
+contrataciones ||--o{ valoraciones : "origina"
+contrataciones ||--o{ solicitudes : "vinculada a"
+
+solicitudes ||--o{ sol_mensajes : "tiene mensajes"
+
 @enduml
