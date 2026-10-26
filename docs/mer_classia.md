@@ -111,6 +111,7 @@ entity "PUBLICACION" as publicaciones {
   cupos : INT
   estado : ENUM('Activo', 'Inactivo', 'Pausado', 'Archivado', 'Eliminado')
   imagen : VARCHAR(255)
+  porcentaje_minimo_aprobacion : TINYINT UNSIGNED
   * id_usuario : INT <<FK>>
   * id_categoria : INT <<FK>>
 }
@@ -142,6 +143,80 @@ entity "CURSO_RECURSO" as recursos {
   url : VARCHAR(500)
   archivo : VARCHAR(255)
   orden : INT
+  visible_alumnos : TINYINT(1)
+}
+
+entity "CURSO_TAREA" as tareas {
+  * id_tarea : INT <<PK>>
+  --
+  * id_recurso : INT <<FK>>
+  * id_publicacion : INT <<FK>>
+  titulo : VARCHAR(180)
+  descripcion : TEXT
+  fecha_limite : DATETIME
+  permite_entrega_tardia : TINYINT(1)
+  nota_maxima : DECIMAL(5,2)
+}
+
+entity "CURSO_ENTREGA" as entregas {
+  * id_entrega : INT <<PK>>
+  --
+  * id_tarea : INT <<FK>>
+  * id_usuario : INT <<FK>>
+  comentario : TEXT
+  nota : DECIMAL(5,2)
+  estado : ENUM('Pendiente','Revisada','Aprobada','Rechazada')
+  fecha_entrega : DATETIME
+}
+
+entity "CURSO_ENTREGA_ARCHIVO" as entrega_archivos {
+  * id_archivo : INT <<PK>>
+  --
+  * id_entrega : INT <<FK>>
+  nombre_archivo : VARCHAR(255)
+  ruta_archivo : VARCHAR(500)
+  tipo_mime : VARCHAR(100)
+  tamano_bytes : INT
+}
+
+entity "CURSO_RECURSO_COMPLETADO" as recursos_completados {
+  * id_completado : INT <<PK>>
+  --
+  * id_recurso : INT <<FK>>
+  * id_usuario : INT <<FK>>
+  completado_en : DATETIME
+}
+
+entity "CERTIFICADO" as certificados {
+  * id_certificado : INT <<PK>>
+  --
+  * id_usuario : INT <<FK>>
+  * id_publicacion : INT <<FK>>
+  codigo_verificacion : VARCHAR(64)
+  fecha_emision : DATETIME
+  progreso_al_emitir : TINYINT UNSIGNED
+}
+
+entity "CURSO_FORO_MENSAJE" as foro {
+  * id_mensaje : INT <<PK>>
+  --
+  * id_recurso : INT <<FK>>
+  * id_usuario : INT <<FK>>
+  id_mensaje_padre : INT <<FK, NULL>>
+  contenido : TEXT
+  fecha_mensaje : DATETIME
+}
+
+entity "NOTIFICACION" as notificaciones {
+  * id_notificacion : INT <<PK>>
+  --
+  * id_usuario : INT <<FK>>
+  tipo : VARCHAR(50)
+  titulo : VARCHAR(200)
+  mensaje : TEXT
+  leida : TINYINT(1)
+  url_accion : VARCHAR(500)
+  creada_en : DATETIME
 }
 
 entity "SOLICITUD" as solicitudes {
@@ -246,6 +321,19 @@ categorias ||--o{ publicaciones : "clasifica"
 publicaciones ||--o{ modulos : "contiene"
 modulos ||--o{ unidades : "organiza"
 unidades ||--o{ recursos : "incluye"
+recursos ||--o{ tareas : "define tarea"
+publicaciones ||--o{ tareas : "agrupa tareas"
+tareas ||--o{ entregas : "recibe entrega"
+usuarios ||--o{ entregas : "envía entrega"
+entregas ||--o{ entrega_archivos : "adjunta archivos"
+recursos ||--o{ recursos_completados : "progreso"
+usuarios ||--o{ recursos_completados : "registra avance"
+usuarios ||--o{ certificados : "obtiene certificado"
+publicaciones ||--o{ certificados : "certifica completación"
+recursos ||--o{ foro : "debate en foro"
+usuarios ||--o{ foro : "participa en foro"
+foro ||--o{ foro : "responde mensaje"
+usuarios ||--o{ notificaciones : "recibe notificación"
 
 usuarios ||--o{ solicitudes : "envía solicitud"
 publicaciones ||--o{ solicitudes : "referencia oferta"
@@ -314,19 +402,40 @@ Oferta formativa o servicio a medida (`publicaciones`).
 - `modalidad` (VARCHAR(30))
 - `duracion_horas` (SMALLINT)
 - `cupos` (INT)
-- `estado` (ENUM('Activo','Inactivo','Pausado','Eliminado'), NOT NULL DEFAULT 'Activo')
+- `estado` (ENUM('Activo','Inactivo','Pausado','Archivado','Eliminado'), NOT NULL DEFAULT 'Activo')
 - `imagen` (VARCHAR(255))
+- `porcentaje_minimo_aprobacion` (TINYINT UNSIGNED, NOT NULL DEFAULT 70)
 - `id_usuario` (INT, FK -> usuarios)
 - `id_categoria` (INT, FK -> categorias)
 
 ### 6. Entidades de Estructura de Curso: CURSO_MODULO, CURSO_UNIDAD, CURSO_RECURSO
-Organización modular de lecciones y recursos con soporte Supabase Cloud (`curso_modulos`, `curso_unidades`, `curso_recursos`).
+Organización modular de lecciones y recursos (`curso_modulos`, `curso_unidades`, `curso_recursos`).
+- `curso_modulos`: `id_modulo`, `id_publicacion` (FK), `titulo`, `descripcion`, `orden`, `visible_alumnos`
+- `curso_unidades`: `id_unidad`, `id_modulo` (FK), `titulo`, `descripcion`, `orden`
+- `curso_recursos`: `id_recurso`, `id_unidad` (FK), `titulo`, `tipo`, `url`, `archivo`, `orden`, `visible_alumnos`
 
-### 7. Entidades de Servicios y Negociación: SOLICITUD, SOLICITUD_MENSAJE, SOLICITUD_DOCENTE
-Flujo interactivo de presupuestos y postulación docente (`solicitudes`, `solicitud_mensajes`, `solicitudes_docente`).
+### 7. Entidades de Evaluación: CURSO_TAREA, CURSO_ENTREGA, CURSO_ENTREGA_ARCHIVO *(Sprint 3–4)*
+Gestión de tareas asignadas y entregas de alumnos (`curso_tareas`, `curso_entregas`, `curso_entrega_archivos`).
+- `curso_tareas`: `id_tarea`, `id_recurso` (FK), `id_publicacion` (FK), `titulo`, `descripcion`, `fecha_limite`, `permite_entrega_tardia`, `nota_maxima`
+- `curso_entregas`: `id_entrega`, `id_tarea` (FK), `id_usuario` (FK), `comentario`, `nota`, `estado`, `fecha_entrega`
+- `curso_entrega_archivos`: `id_archivo`, `id_entrega` (FK), `nombre_archivo`, `ruta_archivo`, `tipo_mime`, `tamano_bytes`
 
-### 8. Entidades de Contenido Editorial: NOTICIA, EVENTO
+### 8. Entidades de Progreso y Certificación: CURSO_RECURSO_COMPLETADO, CERTIFICADO *(Sprint 3–4)*
+Seguimiento del avance del alumno y emisión automática de certificados (`curso_recursos_completados`, `certificados`).
+- `curso_recursos_completados`: `id_completado`, `id_recurso` (FK), `id_usuario` (FK), `completado_en`
+- `certificados`: `id_certificado`, `id_usuario` (FK), `id_publicacion` (FK), `codigo_verificacion`, `fecha_emision`, `progreso_al_emitir`
+
+### 9. Entidades de Comunicación: CURSO_FORO_MENSAJE, SOLICITUD_MENSAJE, NOTIFICACION *(Sprint 3–4)*
+Foro de discusión por recurso, mensajería de solicitudes y notificaciones push (`curso_foro_mensajes`, `solicitud_mensajes`, `notificaciones`).
+- `curso_foro_mensajes`: `id_mensaje`, `id_recurso` (FK), `id_usuario` (FK), `id_mensaje_padre` (FK auto-ref), `contenido`, `fecha_mensaje`
+- `solicitud_mensajes`: `id_mensaje`, `id_solicitud` (FK), `id_usuario` (FK), `mensaje`, `fecha_mensaje`
+- `notificaciones`: `id_notificacion`, `id_usuario` (FK), `tipo`, `titulo`, `mensaje`, `leida`, `url_accion`, `creada_en`
+
+### 10. Entidades de Servicios y Negociación: SOLICITUD, SOLICITUD_DOCENTE
+Flujo interactivo de presupuestos y postulación docente (`solicitudes`, `solicitudes_docente`).
+
+### 11. Entidades de Contenido Editorial: NOTICIA, EVENTO
 Flujo de propuesta (docente) y moderación (administrador) de noticias y eventos (`noticias`, `eventos`).
 
-### 9. Entidades Comerciales: CONTRATACION, DETALLE_CONTRATACION, PAGO, VALORACION
+### 12. Entidades Comerciales: CONTRATACION, DETALLE_CONTRATACION, PAGO, VALORACION
 Gestión de compras, pasarela de pago y opiniones con puntuación 1-5 (`contrataciones`, `detalles_contratacion`, `pagos`, `valoraciones`).

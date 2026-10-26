@@ -174,7 +174,7 @@ include '../includes/header.php';
                         </div>
                         <?php if (!empty($perfil['tiempo_respuesta'])): ?>
                             <div>
-                                <strong>⚡ <?= htmlspecialchars($perfil['tiempo_respuesta']) ?></strong>
+                                <strong> <?= htmlspecialchars($perfil['tiempo_respuesta']) ?></strong>
                                 <span class="text-muted">tiempo de respuesta</span>
                             </div>
                         <?php endif; ?>
@@ -219,7 +219,7 @@ include '../includes/header.php';
                 <?php if (!empty($perfil['experiencia'])): ?>
                     <article class="info-card" style="padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
                         <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                            💼 <span>Experiencia</span>
+                            <span>Experiencia</span>
                         </h3>
                         <p style="line-height: 1.6;"><?= nl2br(htmlspecialchars($perfil['experiencia'])) ?></p>
                     </article>
@@ -228,7 +228,7 @@ include '../includes/header.php';
                 <?php if (!empty($perfil['formacion'])): ?>
                     <article class="info-card" style="padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
                         <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                            🎓 <span>Formación académica</span>
+                            <span>Formación académica</span>
                         </h3>
                         <p style="line-height: 1.6;"><?= nl2br(htmlspecialchars($perfil['formacion'])) ?></p>
                     </article>
@@ -237,7 +237,7 @@ include '../includes/header.php';
                 <?php if (!empty($perfil['habilidades'])): ?>
                     <article class="info-card" style="padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
                         <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                            ⚡ <span>Habilidades técnicas</span>
+                            <span>Habilidades técnicas</span>
                         </h3>
                         <p style="line-height: 1.6;"><?= nl2br(htmlspecialchars($perfil['habilidades'])) ?></p>
                     </article>
@@ -246,7 +246,7 @@ include '../includes/header.php';
                 <?php if (!empty($perfil['especialidades'])): ?>
                     <article class="info-card" style="padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
                         <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                            🎯 <span>Especialidades</span>
+                            <span>Especialidades</span>
                         </h3>
                         <p style="line-height: 1.6;"><?= nl2br(htmlspecialchars($perfil['especialidades'])) ?></p>
                     </article>
@@ -255,7 +255,7 @@ include '../includes/header.php';
                 <?php if (!empty($perfil['certificaciones'])): ?>
                     <article class="info-card" style="padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
                         <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                            📜 <span>Certificaciones</span>
+                            <span>Certificaciones</span>
                         </h3>
                         <p style="line-height: 1.6;"><?= nl2br(htmlspecialchars($perfil['certificaciones'])) ?></p>
                     </article>
@@ -264,7 +264,7 @@ include '../includes/header.php';
                 <?php if (!empty($perfil['idiomas'])): ?>
                     <article class="info-card" style="padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm);">
                         <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                            🗣️ <span>Idiomas</span>
+                            <span>Idiomas</span>
                         </h3>
                         <p style="line-height: 1.6;"><?= htmlspecialchars($perfil['idiomas']) ?></p>
                     </article>
