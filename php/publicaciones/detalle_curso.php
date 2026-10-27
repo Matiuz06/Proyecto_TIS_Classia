@@ -97,20 +97,41 @@ function eliminar_ruta_entrega(?string $ruta): void
 
 if ($id_curso > 0) {
     try {
-        $stmt = $pdo->prepare("
-            SELECT p.id_publicacion, p.id_usuario, p.titulo, p.descripcion, p.precio, p.tipo,
-                   p.modalidad, p.imagen, p.id_categoria, p.nivel_experiencia, p.duracion_horas,
-                   p.fecha_creacion, p.estado, COALESCE(p.porcentaje_minimo_aprobacion, 70) AS porcentaje_minimo_aprobacion,
-                   c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido,
-                   u.id_usuario AS autor_id, u.foto_perfil AS autor_foto
-            FROM publicaciones p 
-            JOIN categorias c ON p.id_categoria = c.id_categoria 
-            JOIN usuarios u ON p.id_usuario = u.id_usuario 
-            WHERE p.id_publicacion = :id AND p.tipo = 'Curso'
-            LIMIT 1
-        ");
-        $stmt->execute(['id' => $id_curso]);
-        $curso = $stmt->fetch();
+        try {
+            $stmt = $pdo->prepare("
+                SELECT p.id_publicacion, p.id_usuario, p.titulo, p.descripcion, p.precio, p.tipo,
+                       p.modalidad, p.imagen, p.id_categoria, p.nivel_experiencia, p.duracion_horas,
+                       p.fecha_creacion, p.estado, COALESCE(p.porcentaje_minimo_aprobacion, 70) AS porcentaje_minimo_aprobacion,
+                       c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido,
+                       u.id_usuario AS autor_id, u.foto_perfil AS autor_foto
+                FROM publicaciones p 
+                JOIN categorias c ON p.id_categoria = c.id_categoria 
+                JOIN usuarios u ON p.id_usuario = u.id_usuario 
+                WHERE p.id_publicacion = :id AND p.tipo = 'Curso'
+                LIMIT 1
+            ");
+            $stmt->execute(['id' => $id_curso]);
+            $curso = $stmt->fetch();
+        } catch (PDOException $e) {
+            if (stripos($e->getMessage(), 'porcentaje_minimo_aprobacion') !== false) {
+                $stmt = $pdo->prepare("
+                    SELECT p.id_publicacion, p.id_usuario, p.titulo, p.descripcion, p.precio, p.tipo,
+                           p.modalidad, p.imagen, p.id_categoria, p.nivel_experiencia, p.duracion_horas,
+                           p.fecha_creacion, p.estado, 70 AS porcentaje_minimo_aprobacion,
+                           c.nombre_categoria, u.nombre AS autor_nombre, u.apellido AS autor_apellido,
+                           u.id_usuario AS autor_id, u.foto_perfil AS autor_foto
+                    FROM publicaciones p 
+                    JOIN categorias c ON p.id_categoria = c.id_categoria 
+                    JOIN usuarios u ON p.id_usuario = u.id_usuario 
+                    WHERE p.id_publicacion = :id AND p.tipo = 'Curso'
+                    LIMIT 1
+                ");
+                $stmt->execute(['id' => $id_curso]);
+                $curso = $stmt->fetch();
+            } else {
+                throw $e;
+            }
+        }
 
         if ($curso !== null && !empty($usuario_actual['id_usuario'])) {
             $id_autor = $curso['id_usuario'] ?? $curso['autor_id'] ?? 0;

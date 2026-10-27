@@ -1,0 +1,69 @@
+@startuml dfd_nivel_0_contexto
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 12
+skinparam defaultFontColor #2D3748
+
+skinparam rectangle {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    RoundCorner 8
+}
+
+skinparam usecase {
+    BackgroundColor #EBF8FF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+}
+
+skinparam arrow {
+    Color #2B6CB0
+    FontColor #2D3748
+    FontSize 11
+}
+
+title Diagrama de Flujo de Datos (DFD) — Nivel 0 (Diagrama de Contexto)\nPlataforma Classia (AniTech)
+
+left to right direction
+
+' --- Entidades Externas (Terminadores) ---
+rectangle "«Entidad Externa»\nEstudiante / Cliente" as Estudiante #EBF8FF
+rectangle "«Entidad Externa»\nDocente / Proveedor" as Docente #FEFCBF
+rectangle "«Entidad Externa»\nAdministrador" as Admin #FED7D7
+rectangle "«Entidad Externa»\nPasarela de Pagos\n(MercadoPago)" as PasarelaPago #E2E8F0
+rectangle "«Entidad Externa»\nServicio de Correo\n(SMTP / Notificaciones)" as ServicioCorreo #E2E8F0
+rectangle "«Entidad Externa»\nAlmacenamiento en la Nube\n(Supabase Storage)" as StorageCloud #E2E8F0
+
+' --- Proceso Central de Contexto ---
+usecase "<b>0.0</b>\n<b>Sistema Central Classia</b>\n(Gestión Educativa y Catálogo\nde Servicios Especializados)" as SistemaClassia #BEE3F8
+
+' --- Flujos: Estudiante <--> Sistema ---
+Estudiante --> SistemaClassia : 1. Credenciales / Registro / OTP 2FA\n2. Búsqueda y filtros de catálogo\n3. Solicitud de servicio personalizado\n4. Selección de cursos/servicios al carrito\n5. Valoración y feedback
+SistemaClassia --> Estudiante : 1. Confirmación de acceso / Token sesión\n2. Catálogo y fichas de publicación\n3. Estado de solicitudes y cotizaciones\n4. Aula virtual (recursos, temario, videos)\n5. Comprobante de pago y confirmación
+
+' --- Flujos: Docente <--> Sistema ---
+Docente --> SistemaClassia : 1q. Credenciales / Perfil profesional\n2. Publicaciones (cursos/servicios)\n3. Estructura de curso (módulos, unidades, recursos)\n4. Propuesta de cotización / mensajes servicio\n5. Propuestas de noticias y eventos
+SistemaClassia --> Docente : 1. Acceso a Panel de Proveedor\n2. Notificación de solicitudes de servicio\n3. Métricas de publicaciones y ventas\n4. Estado de aprobación de noticias/eventos
+
+' --- Flujos: Administrador <--> Sistema ---
+Admin --> SistemaClassia : 1. Credenciales de administrador\n2. Acciones de moderación (pausar, archivar, restaurar)\n3. Gestión de estados de usuarios (activar/suspender)\n4. Aprobación/rechazo de noticias y eventos
+SistemaClassia --> Admin : 1. Panel de administración y auditoría\n2. Métricas y estadísticas globales de la plataforma\n3. Alertas de publicaciones y contenido a moderar
+
+' --- Flujos: Pasarela de Pagos <--> Sistema ---
+SistemaClassia --> PasarelaPago : Solicitud de cobro / Datos de la orden
+PasarelaPago --> SistemaClassia : Respuesta de transacción (Aprobada / Rechazada)\ny token de referencia
+
+' --- Flujos: Servicio de Correo <--> Sistema ---
+SistemaClassia --> ServicioCorreo : Petición de envío de código TOTP / Alertas de contratación
+ServicioCorreo --> Estudiante : Correo con código de seguridad / Comprobante
+ServicioCorreo --> Docente : Notificación de nueva contratación o solicitud
+
+' --- Flujos: Almacenamiento en la Nube <--> Sistema ---
+SistemaClassia --> StorageCloud : Archivos, imágenes, documentos y multimedia
+StorageCloud --> SistemaClassia : URLs firmadas / Enlaces a recursos multimedia
+
+@enduml

@@ -41,25 +41,7 @@ function registrar_auditoria(
     $json_extra = !empty($datos_adicionales) ? json_encode($datos_adicionales, JSON_UNESCAPED_UNICODE) : null;
     $severidad_valida = in_array(strtoupper($severidad), ['INFO', 'WARNING', 'CRITICAL'], true) ? strtoupper($severidad) : 'INFO';
 
-    try {
-        $stmt = $db->prepare("
-            INSERT INTO auditoria_seguridad
-                (id_usuario, tipo_evento, descripcion, direccion_ip, user_agent, nivel_severidad, datos_adicionales)
-            VALUES
-                (:id_usuario, :tipo_evento, :descripcion, :ip, :user_agent, :severidad, :datos_adicionales)
-        ");
-
-        return $stmt->execute([
-            'id_usuario'        => $id_usuario,
-            'tipo_evento'       => substr($tipo_evento, 0, 60),
-            'descripcion'       => $descripcion,
-            'ip'                => $ip,
-            'user_agent'        => $user_agent,
-            'severidad'         => $severidad_valida,
-            'datos_adicionales' => $json_extra,
-        ]);
-    } catch (Throwable $e) {
-        error_log("Error al persistir auditoria de seguridad: " . $e->getMessage());
-        return false;
-    }
+    // Registro en log de sistema / syslog sin dependencia de tabla SQL
+    error_log(sprintf('[AUDITORIA][%s][User:%s][IP:%s] %s: %s', $severidad_valida, $id_usuario ?? 'anon', $ip, $tipo_evento, $descripcion));
+    return true;
 }
