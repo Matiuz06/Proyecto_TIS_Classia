@@ -1,3 +1,6 @@
+/**
+ * Responsabilidad: Script principal del cliente para interactividad global (modo oscuro, modales, carrito, validaciones y accesibilidad).
+ */
 document.addEventListener("DOMContentLoaded", () => {
   // =========================================================
   // MODO OSCURO — RNF-17 (Accesibilidad) y preferencia de tema

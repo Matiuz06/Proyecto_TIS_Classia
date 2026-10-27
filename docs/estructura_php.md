@@ -42,7 +42,8 @@ Proyecto_TIS_Classia/
 │   ├── noticia-detalle.php           # Detalle de noticia
 │   ├── valoracion.php                # Emisión de valoraciones y reseñas
 │   ├── primeros-pasos.php            # Onboarding para nuevos usuarios
-│   └── reglamento.php                # Términos y reglamento institucional
+│   ├── reglamento.php                # Términos y reglamento institucional
+│   └── politica-cancelaciones.php    # Política de cancelaciones y reembolsos (RN-14)
 ├── php/                              # Lógica de negocio y controladores
 │   ├── admin/
 │   │   └── acciones_admin.php        # Estadísticas, bloqueo de usuarios, matriculación y moderación

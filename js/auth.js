@@ -1,3 +1,6 @@
+/**
+ * Responsabilidad: Manejo de transiciones y alternancia visual entre inicio de sesión y registro.
+ */
 (() => {
     const initAuth = () => {
         const container = document.getElementById('auth-container');

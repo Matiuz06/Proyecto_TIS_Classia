@@ -1,3 +1,6 @@
+/**
+ * Responsabilidad: Sistema global de notificaciones emergentes (toasts) y mensajes flash.
+ */
 (function () {
   "use strict";
 

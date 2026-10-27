@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Vista de error 500 (Falla o excepción no controlada en el servidor).
+ */
+
 http_response_code(500);
 
 $title = 'Error interno';

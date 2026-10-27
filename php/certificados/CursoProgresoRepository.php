@@ -306,10 +306,14 @@ class CursoProgresoRepository
 
     private function obtenerPorcentajeMinimo(int $idCurso): int
     {
-        $stmt = $this->pdo->prepare('SELECT COALESCE(porcentaje_minimo_aprobacion, 70) FROM publicaciones WHERE id_publicacion = :curso AND tipo = \'Curso\' LIMIT 1');
-        $stmt->execute(['curso' => $idCurso]);
-        $valor = (int)($stmt->fetchColumn() ?: 70);
-        return max(0, min(100, $valor));
+        try {
+            $stmt = $this->pdo->prepare('SELECT COALESCE(porcentaje_minimo_aprobacion, 70) FROM publicaciones WHERE id_publicacion = :curso AND tipo = \'Curso\' LIMIT 1');
+            $stmt->execute(['curso' => $idCurso]);
+            $valor = (int)($stmt->fetchColumn() ?: 70);
+            return max(0, min(100, $valor));
+        } catch (PDOException) {
+            return 70;
+        }
     }
 
     private function generarCodigo(): string

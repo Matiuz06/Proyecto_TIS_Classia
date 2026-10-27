@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Vista de error 403 (Prohibido / Acceso denegado por restricciones de autorización).
+ */
+
 http_response_code(403);
 
 require_once '../php/auth/sesion.php';

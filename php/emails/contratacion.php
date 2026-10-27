@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Plantilla de correo de confirmación de pago y detalle de contratación.
+ */
+
 $nombreCliente = htmlspecialchars((string) ($nombre_cliente ?? 'Cliente'), ENT_QUOTES, 'UTF-8');
 $referencia = htmlspecialchars((string) ($referencia ?? ''), ENT_QUOTES, 'UTF-8');
 $fecha = htmlspecialchars((string) ($fecha ?? ''), ENT_QUOTES, 'UTF-8');

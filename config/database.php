@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Responsabilidad: Conexión centralizada PDO compatible con MySQL local y PostgreSQL / Supabase.
+ *
+ * Funcionalidades:
+ * - Carga variables de entorno desde el archivo .env si no fueron definidas a nivel servidor.
+ * - Detecta automáticamente el motor de base de datos (pgsql vs mysql) según credenciales.
+ * - Inicializa la instancia global $pdo con manejo de excepciones y modo fetch asociativo.
+ */
+
 if (!isset($pdo)) {
     $envPath = __DIR__ . '/../.env';
     if (file_exists($envPath)) {

@@ -1,0 +1,136 @@
+@startuml dfd_nivel_1_procesos
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 11
+skinparam defaultFontColor #2D3748
+
+skinparam rectangle {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    RoundCorner 8
+}
+
+skinparam usecase {
+    BackgroundColor #EBF8FF
+    BorderColor #2B6CB0
+    ArrowColor #3182CE
+}
+
+skinparam database {
+    BackgroundColor #FEFCBF
+    BorderColor #B7791F
+}
+
+skinparam arrow {
+    Color #2B6CB0
+    FontColor #2D3748
+    FontSize 10
+}
+
+title Diagrama de Flujo de Datos (DFD) — Nivel 1 (Descomposición de Procesos)\nPlataforma Classia (AniTech)
+
+top to bottom direction
+
+' ========================================================
+' ENTIDADES EXTERNAS
+' ========================================================
+rectangle "«Entidad»\nEstudiante / Cliente" as E_Estudiante #EBF8FF
+rectangle "«Entidad»\nDocente / Proveedor" as E_Docente #FEFCBF
+rectangle "«Entidad»\nAdministrador" as E_Admin #FED7D7
+rectangle "«Entidad Externa»\nPasarela MercadoPago" as E_MP #E2E8F0
+rectangle "«Entidad Externa»\nServicio de Correo (SMTP)" as E_SMTP #E2E8F0
+rectangle "«Entidad Externa»\nSupabase Storage" as E_Supabase #E2E8F0
+
+' ========================================================
+' ALMACENES DE DATOS (DATA STORES)
+' ========================================================
+database "<b>D1</b>\nusuarios\nroles\nperfiles_profesionales" as D1
+database "<b>D2</b>\npublicaciones\ncategorias" as D2
+database "<b>D3</b>\ncurso_modulos\ncurso_unidades\ncurso_recursos" as D3
+database "<b>D4</b>\nsolicitudes\nsolicitud_mensajes" as D4
+database "<b>D5</b>\ncontrataciones\ndetalles_contratacion\npagos" as D5
+database "<b>D6</b>\nnoticias\neventos\nvaloraciones" as D6
+
+' ========================================================
+' PROCESOS NIVEL 1
+' ========================================================
+usecase "<b>1.0</b>\nGestión de Usuarios,\nSesiones y 2FA/TOTP" as P1 #BEE3F8
+usecase "<b>2.0</b>\nGestión y Publicación de\nCursos y Servicios" as P2 #BEE3F8
+usecase "<b>3.0</b>\nExploración de Catálogo y\nSolicitudes a Medida" as P3 #BEE3F8
+usecase "<b>4.0</b>\nCarrito de Compras,\nContratación y Pagos" as P4 #BEE3F8
+usecase "<b>5.0</b>\nAula Virtual y Entrega\nde Recursos Didácticos" as P5 #BEE3F8
+usecase "<b>6.0</b>\nModeración, Noticias,\nEventos y Valoraciones" as P6 #BEE3F8
+
+' ========================================================
+' FLUJOS DE DATOS: PROCESO 1.0 (Usuarios y Autenticación)
+' ========================================================
+E_Estudiante --> P1 : Registro / Login / Código 2FA
+E_Docente --> P1 : Login / Edición Perfil Profesional
+E_Admin --> P1 : Gestión / Desactivación usuarios
+P1 --> E_SMTP : Solicitud código OTP / Verificación
+P1 --> D1 : Guardar/Actualizar credenciales y perfil
+D1 --> P1 : Validar hash password y rol (RBAC)
+P1 --> E_Estudiante : Sesión iniciada / Token CSRF
+P1 --> E_Docente : Sesión de proveedor habilitada
+
+' ========================================================
+' FLUJOS DE DATOS: PROCESO 2.0 (Publicación y Temarios)
+' ========================================================
+E_Docente --> P2 : Datos del curso o servicio (precio, cupos, etc.)
+E_Docente --> P2 : Estructura temario (módulos, unidades, archivos)
+P2 --> E_Supabase : Cargar archivos / PDFs / imágenes / videos
+E_Supabase --> P2 : URL remota de recurso
+P2 --> D2 : Registrar o actualizar publicación
+P2 --> D3 : Registrar módulos, unidades y visibilidad (RD-09)
+D2 --> P2 : Obtener publicaciones del docente
+
+' ========================================================
+' FLUJOS DE DATOS: PROCESO 3.0 (Catálogo y Solicitudes)
+' ========================================================
+E_Estudiante --> P3 : Filtros de búsqueda (categoría, precio, tipo)
+D2 --> P3 : Lista de publicaciones activas
+P3 --> E_Estudiante : Catálogo y fichas de detalle
+E_Estudiante --> P3 : Envío solicitud a medida / mensaje
+P3 --> D4 : Guardar solicitud y mensajes
+D4 --> P3 : Estado de negociación / cotización
+P3 --> E_Docente : Notificación de nueva solicitud personalizada
+E_Docente --> P3 : Respuesta / Contraoferta de servicio
+
+' ========================================================
+' FLUJOS DE DATOS: PROCESO 4.0 (Carrito, Contratación y Pagos)
+' ========================================================
+E_Estudiante --> P4 : Agregar items al carrito / Confirmar compra
+D2 --> P4 : Validar precio vigente y cupos disponibles
+P4 --> E_MP : Iniciar transacción de pago (Monto, ID Orden)
+E_MP --> P4 : Callback de pago (Aprobado / Pendiente / Rechazado)
+P4 --> D5 : Guardar orden de contratación, detalles y pago
+P4 --> E_SMTP : Enviar comprobante y confirmación de compra
+P4 --> E_Estudiante : Comprobante descargable / Acceso habilitado
+D5 --> P4 : Historial de compras y verificación de acceso
+
+' ========================================================
+' FLUJOS DE DATOS: PROCESO 5.0 (Aula Virtual)
+' ========================================================
+E_Estudiante --> P5 : Solicitar acceso a curso matriculado
+D5 --> P5 : Verificar pago aprobado para el curso
+D3 --> P5 : Cargar módulos y recursos activos
+P5 --> E_Estudiante : Despliegue de temario, videos y material
+
+' ========================================================
+' FLUJOS DE DATOS: PROCESO 6.0 (Moderación, Noticias, Reseñas)
+' ========================================================
+E_Estudiante --> P6 : Enviar valoración y reseña de curso
+P6 --> D6 : Guardar puntuación y comentario
+E_Docente --> P6 : Proponer noticia o evento académico
+P6 --> D6 : Registrar evento/noticia en estado 'Pendiente'
+E_Admin --> P6 : Moderar publicaciones, aprobar noticias/eventos
+P6 --> D2 : Modificar estado de publicación (Pausar/Archivar/Activar)
+P6 --> D6 : Actualizar estado de noticia o evento ('Publicada'/'Rechazada')
+D6 --> P6 : Consultar noticias, eventos y valoraciones públicas
+P6 --> E_Estudiante : Muro de noticias, eventos y calificaciones
+
+@enduml
