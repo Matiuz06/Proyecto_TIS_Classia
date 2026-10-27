@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * Responsabilidad: Página de inicio principal de Classia (Landing page, propuesta de valor y destacados).
+ *
+ * Funcionalidades:
+ * - Carga datos destacados para la página de inicio (cursos, novedades, estadísticas).
+ * - Adapta las llamadas a la acción (CTA) según el estado de autenticación del usuario.
+ * - Soporte de internacionalización con traducciones __t().
+ */
+
 $title       = 'Classia — Plataforma Educativa y Servicios';
 $description = 'Classia conecta aprendizaje, cursos prácticos, servicios y administración en una plataforma educativa moderna.';
 $cssPrefix   = '.';
@@ -6,6 +16,7 @@ $jsPrefix    = '.';
 $bodyClass   = 'home-page';
 $activePage  = 'inicio';
 
+// Carga de publicaciones destacadas, testimonios y métricas de la portada
 require_once 'php/inicio/obtener_datos_home.php';
 include 'includes/header.php';
 ?>
@@ -244,7 +255,11 @@ include 'includes/header.php';
         <?php if (!empty($noticias_home)): ?>
           <?php foreach ($noticias_home as $noticia): ?>
             <?php 
-              $imgN = !empty($noticia['imagen']) ? htmlspecialchars($noticia['imagen']) : 'assets/images/cybersecurity_lab.jpg';
+              $imagenGuardada = trim((string)($noticia['imagen'] ?? ''));
+              if ($imagenGuardada === '' || ltrim($imagenGuardada, './') === 'assets/images/cybersecurity_lab.jpg') {
+                $imagenGuardada = 'assets/images/noticias-default.png';
+              }
+              $imgN = htmlspecialchars($imagenGuardada);
             ?>
             <article class="home-news-card">
               <div class="card-media-wrapper">

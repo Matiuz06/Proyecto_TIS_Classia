@@ -5,7 +5,7 @@ skinparam backgroundColor #FFFFFF
 skinparam shadowing true
 skinparam roundcorner 8
 skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
-skinparam defaultFontSize 12
+skinparam defaultFontSize 11
 skinparam defaultFontColor #2D3748
 
 skinparam class {
@@ -14,30 +14,16 @@ skinparam class {
     BorderColor #2B6CB0
     HeaderBackgroundColor #EBF8FF
 }
-skinparam entity {
-    BackgroundColor #FFFFFF
-    BorderColor #2B6CB0
-}
-skinparam sequence {
-    ActorBorderColor #2B6CB0
-    ActorBackgroundColor #EBF8FF
-    ParticipantBorderColor #2B6CB0
-    ParticipantBackgroundColor #EBF8FF
-    LifeLineBorderColor #4A5568
-    LifeLineBackgroundColor #EDF2F7
-    ArrowColor #2B6CB0
-}
-skinparam usecase {
-    BackgroundColor #FFFFFF
-    BorderColor #2B6CB0
-    ArrowColor #3182CE
-    ActorBorderColor #2B6CB0
-    ActorBackgroundColor #EBF8FF
-}
 
-title Diagrama de Clases del Sistema — Classia (Arquitectura PHP)
+title Diagrama de Clases del Sistema — Classia (Sprint 4 - Consolidación Final)
 
-package "Modelos / Entidades" {
+package "Autenticación y Usuarios" {
+  class Rol {
+    - id_rol: int
+    - nombre_rol: string
+    - descripcion: string
+  }
+
   class Usuario {
     - id_usuario: int
     - nombre: string
@@ -61,6 +47,26 @@ package "Modelos / Entidades" {
     + obtenerPorUsuario(id_usuario: int): PerfilProfesional
   }
 
+  class Notificacion {
+    - id_notificacion: int
+    - id_usuario: int
+    - titulo: string
+    - mensaje: string
+    - tipo: string
+    - leida: bool
+    - fecha_creacion: DateTime
+    + marcarComoLeida(): bool
+  }
+}
+
+package "Catálogo y Contenidos" {
+  class Categoria {
+    - id_categoria: int
+    - nombre_categoria: string
+    - descripcion: string
+    + resolver(id: int, nombre: string): int
+  }
+
   class Publicacion {
     - id_publicacion: int
     - titulo: string
@@ -69,16 +75,10 @@ package "Modelos / Entidades" {
     - tipo: string
     - estado: string
     - imagen: string
+    - porcentaje_minimo_aprobacion: int
     + guardar(): bool
     + cambiarEstado(nuevo_estado: string): bool
     + obtenerModulos(): List<CursoModulo>
-  }
-
-  class Categoria {
-    - id_categoria: int
-    - nombre_categoria: string
-    - descripcion: string
-    + resolver(id: int, nombre: string): int
   }
 
   class CursoModulo {
@@ -86,6 +86,7 @@ package "Modelos / Entidades" {
     - id_publicacion: int
     - titulo: string
     - orden: int
+    - visible_alumnos: bool
     + agregarUnidad(u: CursoUnidad): bool
   }
 
@@ -104,9 +105,68 @@ package "Modelos / Entidades" {
     - tipo: string
     - url: string
     - archivo: string
+    - visible_alumnos: bool
     + descargar(): Stream
   }
+}
 
+package "Evaluación y Certificación (Sprint 4)" {
+  class CursoTarea {
+    - id_tarea: int
+    - id_recurso: int
+    - fecha_apertura: DateTime
+    - fecha_cierre: DateTime
+    - formatos_permitidos: string
+    - puntaje_maximo: float
+    - tipo_calificacion: string
+    + estaAbierta(): bool
+  }
+
+  class CursoEntrega {
+    - id_entrega: int
+    - id_tarea: int
+    - id_usuario: int
+    - texto_entrega: string
+    - enlace_entrega: string
+    - estado_entrega: string
+    - calificacion: string
+    - feedback_docente: string
+    - fecha_calificacion: DateTime
+    + calificar(nota: string, feedback: string, idDocente: int): bool
+  }
+
+  class CursoEntregaArchivo {
+    - id_archivo: int
+    - id_entrega: int
+    - nombre_original: string
+    - ruta: string
+    - mime_type: string
+    - tamano: int
+  }
+
+  class Certificado {
+    - id_certificado: int
+    - id_usuario: int
+    - id_curso: int
+    - codigo_verificacion: string
+    - fecha_emision: DateTime
+    - porcentaje_aprobacion: float
+    + generarCodigo(): string
+    + verificar(codigo: string): Certificado
+  }
+
+  class CursoForoMensaje {
+    - id_mensaje: int
+    - id_recurso: int
+    - id_usuario: int
+    - id_mensaje_padre: int
+    - mensaje: string
+    - fecha_mensaje: DateTime
+    + responder(texto: string, idUsuario: int): bool
+  }
+}
+
+package "Servicios y Contrataciones" {
   class Solicitud {
     - id_solicitud: int
     - titulo: string
@@ -114,7 +174,6 @@ package "Modelos / Entidades" {
     - estado: string
     - precio_propuesto: float
     + responder(nuevo_estado: string, respuesta: string): bool
-    + enviarMensaje(id_usuario: int, texto: string): bool
   }
 
   class Contratacion {
@@ -131,7 +190,7 @@ package "Modelos / Entidades" {
     - metodo_pago: string
     - estado_pago: string
     - transaccion_ref: string
-    + procesar(): bool
+    + procesarSandbox(): bool
   }
 
   class Valoracion {
@@ -142,41 +201,52 @@ package "Modelos / Entidades" {
   }
 }
 
-package "Servicios y Helpers" {
+package "Servicios de Soporte" {
+  class CursoProgresoRepository {
+    + calcularProgreso(idUsuario: int, idCurso: int): float
+    + verificarAprobacion(idUsuario: int, idCurso: int): bool
+  }
+
   class AuthHelper {
     + iniciarSesion(usuario: Usuario): void
     + cerrarSesion(): void
     + verificar2FA(codigo: string): bool
   }
 
-  class UploadHelper {
-    + guardarImagen(archivo: array, subcarpeta: string): array
-    + eliminarImagen(ruta: string): bool
-  }
-
   class SupabaseStorageService {
     + subirArchivo(rutaLocal: string, destino: string): array
     + obtenerUrlFirmada(destino: string): string
-    + eliminarArchivo(destino: string): bool
   }
 }
 
+' Relaciones
+Rol "1" <-- "0..*" Usuario : asignado
 Usuario "1" *-- "0..1" PerfilProfesional
+Usuario "1" o-- "0..*" Notificacion : recibe
 Usuario "1" o-- "0..*" Publicacion : publica
 Categoria "1" o-- "0..*" Publicacion : clasifica
+
 Publicacion "1" *-- "0..*" CursoModulo
 CursoModulo "1" *-- "0..*" CursoUnidad
 CursoUnidad "1" *-- "0..*" CursoRecurso
 
-Usuario "1" o-- "0..*" Solicitud : emite
-Publicacion "0..1" o-- "0..*" Solicitud : referencia
-Usuario "1" o-- "0..*" Contratacion : compra
-Contratacion "1" *-- "1..*" Publicacion : contiene
-Contratacion "1" *-- "0..*" Pago : liquida
-Usuario "1" o-- "0..*" Valoracion : emite
-Publicacion "1" o-- "0..*" Valoracion : calificada
+CursoRecurso "1" *-- "0..1" CursoTarea
+CursoTarea "1" *-- "0..*" CursoEntrega
+CursoEntrega "1" *-- "0..*" CursoEntregaArchivo
+Usuario "1" o-- "0..*" CursoEntrega : envía
 
-Publicacion ..> UploadHelper : usa
-CursoRecurso ..> SupabaseStorageService : almacena
-Usuario ..> AuthHelper : gestiona
+Usuario "1" o-- "0..*" Certificado : obtiene
+Publicacion "1" o-- "0..*" Certificado : emite
+CursoRecurso "1" *-- "0..*" CursoForoMensaje
+Usuario "1" o-- "0..*" CursoForoMensaje : publica
+
+Usuario "1" o-- "0..*" Solicitud : emite
+Usuario "1" o-- "0..*" Contratacion : contrata
+Contratacion "1" *-- "0..*" Pago : liquida
+Usuario "1" o-- "0..*" Valoracion : valora
+Publicacion "1" o-- "0..*" Valoracion : recibe
+
+CursoProgresoRepository ..> Certificado : evalúa
+Publicacion ..> SupabaseStorageService : almacena
+Usuario ..> AuthHelper : autentica
 @enduml

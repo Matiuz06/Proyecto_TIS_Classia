@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" role="img" aria-label="Icono de notificación pagos">
+  <circle cx="24" cy="24" r="24" fill="#CFF7F6"/>
+  <g transform="translate(5 5) scale(1.5833333)" stroke="#082E65" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M6 2.7h12v13l-2 1.2-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2Z"/><path d="M9 7h6M9 10h4"/><circle cx="17" cy="17" r="4.4"/><path d="m14.9 17 1.4 1.4 2.8-3"/>
+  </g>
+</svg>

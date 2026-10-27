@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Verificación pública y autenticidad de certificados emitidos por la plataforma.
+ */
+
 require_once '../config/database.php';
 require_once '../php/certificados/CursoProgresoRepository.php';
 

@@ -7,6 +7,7 @@
 
 
 require_once __DIR__ . '/../auth/sesion.php';
+require_once __DIR__ . '/../auth/roles.php';
 iniciar_sesion();
 
 
@@ -17,6 +18,7 @@ if (empty($_SESSION['csrf_token'])) {
 
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/PublicacionRepository.php';
+require_once __DIR__ . '/../certificados/CursoProgresoRepository.php';
 
 
 $repository = new PublicacionRepository($pdo);
@@ -72,6 +74,45 @@ try {
 
 $cursos = array_filter($publicaciones, fn($p) => $p->getTipo() === 'Curso');
 $servicios = array_filter($publicaciones, fn($p) => $p->getTipo() === 'Servicio');
+$cursos_con_acceso = [];
+$progreso_cursos = [];
+
+if (esta_autenticado() && !es_admin()) {
+    try {
+        $stmt_acceso = $pdo->prepare(
+            "SELECT DISTINCT dc.id_publicacion
+             FROM detalles_contratacion dc
+             INNER JOIN contrataciones c ON c.id_contratacion = dc.id_contratacion
+             INNER JOIN pagos pag ON pag.id_contratacion = c.id_contratacion
+                                  AND pag.estado_pago = 'Aprobado'
+             WHERE c.id_usuario = :id_usuario
+               AND c.estado IN ('En Proceso', 'Completada')"
+        );
+        $stmt_acceso->execute(['id_usuario' => (int) usuario_actual()['id_usuario']]);
+        $cursos_con_acceso = array_fill_keys(
+            array_map('intval', $stmt_acceso->fetchAll(PDO::FETCH_COLUMN)),
+            true
+        );
+        $ids_cursos_con_acceso = array_intersect(
+            array_keys($cursos_con_acceso),
+            array_map(static fn(Publicacion $curso): int => $curso->getId(), $cursos)
+        );
+        if ($ids_cursos_con_acceso) {
+            $progreso_cursos = (new CursoProgresoRepository($pdo))->obtenerProgresoAlumnoCursos(
+                (int) usuario_actual()['id_usuario'],
+                $ids_cursos_con_acceso
+            );
+            foreach ($ids_cursos_con_acceso as $idCurso) {
+                $progreso_cursos[(int) $idCurso] ??= [
+                    'porcentaje' => 0.0,
+                    'completado' => false,
+                ];
+            }
+        }
+    } catch (PDOException $e) {
+        error_log('Error al consultar acceso a cursos del catalogo: ' . $e->getMessage());
+    }
+}
 
 if (!function_exists('puntaje_recomendacion')) {
     function puntaje_recomendacion(Publicacion $publicacion, array $preferencias): int {

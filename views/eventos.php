@@ -2,6 +2,12 @@
 
 /**
  * Responsabilidad: Cartelera de eventos institucionales y propuesta de nuevas actividades.
+ *
+ * Funcionalidades:
+ * - Listado de eventos académicos con filtros de visibilidad según rol.
+ * - Formulario modal para propuesta de nuevos eventos por docentes y administradores.
+ * - Soporte para carga de imágenes locales o enlaces remotos.
+ * - Procesamiento de acciones de moderación (aprobación, rechazo y eliminación).
  */
 
 require_once __DIR__ . '/../php/auth/sesion.php';
@@ -9,6 +15,7 @@ require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../php/eventos/gestionar_eventos.php';
 
+// Inicialización de sesión y resolución de perfil del usuario
 iniciar_sesion();
 $usuario = usuario_actual();
 $esAdmin = es_admin();
@@ -16,9 +23,11 @@ $esDocente = es_docente();
 $puedeCrear = $esAdmin || $esDocente;
 $idUsuarioActual = $usuario ? (int)$usuario['id_usuario'] : 0;
 
+// Mensajes informativos y de éxito
 $msg = '';
 $tipo_msg = 'info';
 
+// Detección de mensajes redirigidos por parámetro GET
 if (isset($_GET['msg']) && $_GET['msg'] === 'eliminado') {
     $msg = 'El evento fue eliminado correctamente.';
     $tipo_msg = 'success';
@@ -230,9 +239,9 @@ include '../includes/header.php';
   <?php if ($puedeCrear): ?>
     <dialog id="modal-crear-evento" class="modal">
       <div class="modal__card" style="max-width: 600px;">
-        <header class="modal__header">
+        <header class="course-dialog-header event-dialog-header">
           <h2 class="u-text-lg u-font-bold"><?= $esAdmin ? 'Publicar Nuevo Evento' : 'Proponer Nuevo Evento' ?></h2>
-          <button type="button" class="btn-close" onclick="document.getElementById('modal-crear-evento').close();" aria-label="Cerrar modal">&times;</button>
+          <button type="button" class="course-dialog-close" onclick="document.getElementById('modal-crear-evento').close();" aria-label="Cerrar modal">&times;</button>
         </header>
 
         <form action="eventos.php" method="post" enctype="multipart/form-data" class="service-req-stack u-mt-4">

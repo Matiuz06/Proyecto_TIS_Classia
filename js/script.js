@@ -1,3 +1,6 @@
+/**
+ * Responsabilidad: Script principal del cliente para interactividad global (modo oscuro, modales, carrito, validaciones y accesibilidad).
+ */
 document.addEventListener("DOMContentLoaded", () => {
   // =========================================================
   // MODO OSCURO — RNF-17 (Accesibilidad) y preferencia de tema
@@ -201,6 +204,98 @@ document.addEventListener("DOMContentLoaded", () => {
       lastDialogTrigger = null;
     }
   }, true);
+
+  const teacherRequestDialog = document.getElementById("dialog-solicitud-docente");
+  const teacherRequestData = document.getElementById("teacher-request-dialog-data");
+
+  if (teacherRequestDialog && teacherRequestData) {
+    let requests = {};
+    let lastTeacherRequestTrigger = null;
+
+    try {
+      requests = JSON.parse(teacherRequestData.textContent || "{}");
+    } catch (error) {
+      console.error("No se pudieron cargar los datos de la solicitud docente.", error);
+    }
+
+    const setDialogText = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value || "-";
+    };
+
+    const renderTeacherRequest = (request) => {
+      setDialogText("dialog-solicitud-nombre", request.nombre);
+      setDialogText("dialog-solicitud-email", request.email);
+      setDialogText("dialog-solicitud-fecha", request.fecha_solicitud);
+      setDialogText("dialog-solicitud-motivo", request.motivo || "Sin motivo indicado.");
+      setDialogText("dialog-solicitud-estado", request.estado || "Pendiente");
+      setDialogText("dialog-documentacion-nombre", request.documentacion_nombre);
+      setDialogText("dialog-documentacion-mime", request.documentacion_mime);
+      setDialogText("dialog-documentacion-tamano", request.documentacion_tamano ? `${request.documentacion_tamano} MB` : "-");
+      setDialogText("dialog-documentacion-fecha", request.documentacion_fecha);
+
+      const id = Number(request.id);
+      const idInput = document.getElementById("dialog-solicitud-id");
+      if (idInput) idInput.value = String(id);
+
+      const status = document.getElementById("dialog-solicitud-estado");
+      if (status) {
+        status.classList.remove("teacher-request-status-badge--pending", "teacher-request-status-badge--approved", "teacher-request-status-badge--rejected");
+        const stateClass = String(request.estado || "Pendiente").toLowerCase() === "aprobada"
+          ? "teacher-request-status-badge--approved"
+          : String(request.estado || "Pendiente").toLowerCase() === "rechazada"
+            ? "teacher-request-status-badge--rejected"
+            : "teacher-request-status-badge--pending";
+        status.classList.add(stateClass);
+      }
+
+      const documentacion = document.getElementById("dialog-solicitud-documentacion");
+      const emptyDocumentation = document.getElementById("dialog-solicitud-documentacion-vacia");
+      const documentationActions = document.getElementById("dialog-documentacion-actions");
+      const hasDocumentation = Boolean(request.tiene_documentacion);
+      if (documentacion) documentacion.hidden = !hasDocumentation;
+      if (emptyDocumentation) emptyDocumentation.hidden = hasDocumentation;
+      if (documentationActions) documentationActions.hidden = !hasDocumentation;
+
+      if (hasDocumentation) {
+        const inlineLink = document.getElementById("dialog-documentacion-ver");
+        const downloadLink = document.getElementById("dialog-documentacion-descargar");
+        const baseUrl = `../php/solicitudes/descargar_documentacion_docente.php?id=${encodeURIComponent(id)}`;
+        if (inlineLink) inlineLink.href = `${baseUrl}&modo=inline`;
+        if (downloadLink) downloadLink.href = baseUrl;
+      }
+    };
+
+    document.querySelectorAll(".teacher-request-details-trigger").forEach((trigger) => {
+      if (trigger.dataset.dialogReady === "true") return;
+      trigger.dataset.dialogReady = "true";
+      trigger.addEventListener("click", () => {
+        const request = requests[String(trigger.dataset.solicitudId)];
+        if (!request || typeof teacherRequestDialog.showModal !== "function") {
+          console.error("No se pudo abrir el detalle de la solicitud docente.");
+          return;
+        }
+
+        lastTeacherRequestTrigger = trigger;
+        trigger.setAttribute("aria-expanded", "true");
+        renderTeacherRequest(request);
+        document.body.classList.add("course-dialog-open");
+        if (!teacherRequestDialog.open) teacherRequestDialog.showModal();
+        teacherRequestDialog.querySelector("[data-dialog-close]")?.focus();
+      });
+    });
+
+    teacherRequestDialog.addEventListener("close", () => {
+      if (lastTeacherRequestTrigger?.isConnected) {
+        lastTeacherRequestTrigger.setAttribute("aria-expanded", "false");
+        lastTeacherRequestTrigger.focus();
+      }
+      lastTeacherRequestTrigger = null;
+      setDialogText("dialog-solicitud-nombre", "");
+      setDialogText("dialog-solicitud-email", "");
+      setDialogText("dialog-solicitud-motivo", "");
+    });
+  }
 
   const HINTS_RECURSOS = {
     "Archivo": "Sube un documento, plantilla o archivo complementario para la clase.",
@@ -425,9 +520,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  const publicationForm = document.querySelector("form.publication-form");
+  if (publicationForm) {
+    const publicationType = publicationForm.dataset.publicationType || publicationForm.querySelector('[name="tipo"]')?.value || "";
+    const serviceType = publicationForm.querySelector('[name="tipo_servicio"]');
+    const serviceContexts = {
+      mentoria: { duration: "Duración de la sesión", durationHelp: "Tiempo estimado de cada sesión o del acompañamiento.", availability: "Disponibilidad para agendar", availabilityHelp: "Indicá días y horarios disponibles para coordinar." },
+      formacion_institucional: { duration: "Duración estimada de la formación", durationHelp: "Cantidad estimada de horas o jornadas de formación.", availability: "Disponibilidad para nuevas formaciones", availabilityHelp: "Indicá períodos o condiciones para recibir solicitudes." },
+      impresion_3d: { duration: "Tiempo estimado de producción", durationHelp: "Cantidad estimada de horas para producir el pedido.", availability: "Disponibilidad del servicio", availabilityHelp: "Indicá cuándo podés recibir nuevos pedidos." },
+      proyecto_educativo: { duration: "Duración estimada del trabajo", durationHelp: "Tiempo estimado para desarrollar el proyecto educativo.", availability: "Disponibilidad para nuevos proyectos", availabilityHelp: "Indicá cuándo podés comenzar nuevos proyectos." },
+      robotica_automatizacion: { duration: "Duración estimada del proyecto", durationHelp: "Tiempo estimado para desarrollar y entregar el proyecto.", availability: "Disponibilidad para nuevos proyectos", availabilityHelp: "Indicá cuándo podés comenzar nuevos proyectos." }
+    };
+
+    const setPublicationField = (name, visible) => {
+      const field = publicationForm.querySelector(`[data-publication-field="${name}"]`);
+      if (!field) return;
+      field.hidden = !visible;
+      field.querySelectorAll("input, select, textarea").forEach((control) => {
+        control.disabled = !visible;
+      });
+    };
+
+    const refreshPublicationContext = () => {
+      const isCourse = publicationType === "Curso";
+      const context = serviceContexts[serviceType?.value] || {};
+      setPublicationField("nivel_experiencia", isCourse);
+      setPublicationField("cupos", isCourse);
+      const priceLabel = publicationForm.querySelector('[data-publication-field="precio"] .publication-field__label');
+      const modalityLabel = publicationForm.querySelector('[data-publication-field="modalidad"] .publication-field__label');
+      const durationLabel = publicationForm.querySelector('[data-publication-field="duracion_horas"] .publication-field__label');
+      const durationHelp = publicationForm.querySelector('[data-publication-help="duracion_horas"]');
+      const availabilityLabel = publicationForm.querySelector('[data-publication-field="disponibilidad"] .publication-field__label');
+      const availabilityHelp = publicationForm.querySelector('[data-publication-help="disponibilidad"]');
+      if (priceLabel) priceLabel.textContent = isCourse ? "Precio del curso ($ UYU)" : "Precio del servicio ($ UYU)";
+      if (modalityLabel) modalityLabel.textContent = isCourse ? "Modalidad del curso" : "Modalidad del servicio";
+      if (durationLabel) durationLabel.textContent = isCourse ? "Duración del curso" : (context.duration || "Duración estimada");
+      if (durationHelp) durationHelp.textContent = isCourse ? "Cantidad estimada de horas del curso." : (context.durationHelp || "Cantidad estimada de horas del servicio.");
+      if (availabilityLabel) availabilityLabel.textContent = isCourse ? "Disponibilidad del curso" : (context.availability || "Disponibilidad del servicio");
+      if (availabilityHelp) availabilityHelp.textContent = isCourse ? "Indicá horarios, frecuencia o coordinación esperada." : (context.availabilityHelp || "Indicá cuándo podés recibir nuevas solicitudes.");
+    };
+
+    if (serviceType) serviceType.addEventListener("change", refreshPublicationContext);
+    refreshPublicationContext();
+  }
+
   const selectCat = document.querySelector('select[name="id_categoria"]');
   const inputNueva = document.querySelector('input[name="nueva_categoria"]');
   const txtDesc = document.querySelector('textarea[name="descripcion_categoria"]');
+
+  if (publicationForm) {
+    let hasUnsavedPublicationData = false;
+    publicationForm.addEventListener("input", () => {
+      hasUnsavedPublicationData = true;
+    });
+    publicationForm.addEventListener("change", () => {
+      hasUnsavedPublicationData = true;
+    });
+    document.querySelectorAll("[data-publication-type-change]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (hasUnsavedPublicationData && !window.confirm("Se perderán los datos no guardados. ¿Querés cambiar el tipo de publicación?")) {
+          event.preventDefault();
+        }
+      });
+    });
+  }
 
   if (selectCat && inputNueva) {
     const nuevaChoiceBox = inputNueva.closest(".publication-choice");
@@ -484,6 +640,202 @@ document.addEventListener("DOMContentLoaded", () => {
       selector.disabled = true;
     }
   }
+
+  // Tabs de perfil: un único comportamiento reutilizable, con fallback de contenido visible sin JS.
+  document.querySelectorAll(".profile-tabs").forEach((tablist) => {
+    if (tablist.dataset.tabsReady === "true") return;
+
+    const tabs = Array.from(tablist.querySelectorAll("a[href^='#']"));
+    const panels = Array.from(tablist.parentElement.querySelectorAll(":scope > .profile-tab-panel"));
+    const validSections = new Set(panels.map((panel) => panel.id));
+    if (!tabs.length || tabs.length !== panels.length) return;
+
+    tablist.dataset.tabsReady = "true";
+    tablist.setAttribute("role", "tablist");
+
+    const getActiveSection = () => {
+      const requested = window.location.hash.slice(1);
+      return validSections.has(requested) ? requested : "perfil";
+    };
+
+    const renderProfileSection = (sectionId, moveFocus = false) => {
+      panels.forEach((panel) => {
+        const active = panel.id === sectionId;
+        panel.hidden = !active;
+        panel.setAttribute("role", "tabpanel");
+        panel.setAttribute("aria-hidden", String(!active));
+      });
+
+      tabs.forEach((tab) => {
+        const active = tab.getAttribute("href") === `#${sectionId}`;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("role", "tab");
+        tab.setAttribute("aria-selected", String(active));
+        tab.setAttribute("aria-controls", tab.getAttribute("href").slice(1));
+        tab.tabIndex = active ? 0 : -1;
+        if (active) tab.setAttribute("aria-current", "page");
+        else tab.removeAttribute("aria-current");
+        if (active && moveFocus) tab.focus();
+      });
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", (event) => {
+        event.preventDefault();
+        const target = tab.getAttribute("href").slice(1);
+        if (window.location.hash !== `#${target}`) {
+          window.history.pushState({}, "", `#${target}`);
+        }
+        renderProfileSection(validSections.has(target) ? target : "perfil");
+      });
+      tab.addEventListener("keydown", (event) => {
+        if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        let nextIndex = index;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % tabs.length;
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index - 1 + tabs.length) % tabs.length;
+        if (event.key === "Home") nextIndex = 0;
+        if (event.key === "End") nextIndex = tabs.length - 1;
+        tabs[nextIndex].click();
+        tabs[nextIndex].focus();
+      });
+    });
+
+    renderProfileSection(getActiveSection());
+    window.addEventListener("hashchange", () => renderProfileSection(getActiveSection()));
+    window.addEventListener("popstate", () => renderProfileSection(getActiveSection()));
+  });
+
+  document.querySelectorAll(".provider-workspace").forEach((workspace) => {
+    const tablist = workspace.querySelector(".provider-subnav");
+    const panels = Array.from(workspace.querySelectorAll("[data-provider-section]"));
+    const tabs = Array.from(tablist?.querySelectorAll("a[href^='#']") || []);
+    const validSections = new Set(panels.map((panel) => panel.id));
+
+    if (!tablist || !panels.length || tabs.length !== panels.length) return;
+
+    const getActiveSection = () => {
+      const requested = window.location.hash.slice(1);
+      return validSections.has(requested) ? requested : "publicaciones";
+    };
+
+    const renderProviderSection = (sectionId) => {
+      panels.forEach((panel) => {
+        const active = panel.id === sectionId;
+        panel.hidden = !active;
+        panel.setAttribute("aria-hidden", String(!active));
+      });
+
+      tabs.forEach((tab) => {
+        const active = tab.getAttribute("href") === `#${sectionId}`;
+        tab.classList.toggle("active", active);
+        if (active) tab.setAttribute("aria-current", "page");
+        else tab.removeAttribute("aria-current");
+      });
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", (event) => {
+        event.preventDefault();
+        const target = tab.getAttribute("href").slice(1);
+        if (window.location.hash !== `#${target}`) {
+          window.history.pushState({}, "", `#${target}`);
+        }
+        renderProviderSection(validSections.has(target) ? target : "publicaciones");
+      });
+    });
+
+    renderProviderSection(getActiveSection());
+    window.addEventListener("hashchange", () => renderProviderSection(getActiveSection()));
+    window.addEventListener("popstate", () => renderProviderSection(getActiveSection()));
+  });
+
+  // Acordeones nativos: conservan apertura sin JS y sincronizan su estado accesible.
+  document.querySelectorAll("details[data-accordion], details.course-nav-module, details.course-deliveries-task").forEach((accordion, index) => {
+    if (accordion.dataset.accordionReady === "true") return;
+
+    const summary = accordion.querySelector(":scope > summary");
+    if (!summary) return;
+
+    let panel = accordion.querySelector(":scope > .accordion-panel");
+    if (!panel && accordion.dataset.accordion === "true") {
+      panel = document.createElement("div");
+      panel.className = "accordion-panel";
+      Array.from(accordion.children).forEach((child) => {
+        if (child !== summary) panel.appendChild(child);
+      });
+      accordion.appendChild(panel);
+    }
+
+    if (!panel) return;
+    const panelId = panel.id || `accordion-panel-${index + 1}`;
+    panel.id = panelId;
+    summary.setAttribute("aria-controls", panelId);
+    summary.setAttribute("aria-expanded", String(accordion.open));
+    accordion.dataset.accordionReady = "true";
+    accordion.addEventListener("toggle", () => {
+      summary.setAttribute("aria-expanded", String(accordion.open));
+    });
+  });
+
+  document.querySelectorAll("form[data-add-to-cart-form]").forEach((form) => {
+    if (form.dataset.cartReady === "true") return;
+    form.dataset.cartReady = "true";
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = form.querySelector('button[type="submit"]');
+      if (!button || button.disabled) return;
+
+      button.disabled = true;
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+          credentials: "same-origin",
+        });
+        const rawResponse = await response.text();
+        let data;
+
+        try {
+          data = JSON.parse(rawResponse);
+        } catch (parseError) {
+          throw new Error(`El servidor devolvió una respuesta no válida (${response.status}).`);
+        }
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "No se pudo agregar el curso al carrito.");
+        }
+
+        const badge = document.getElementById("cart-item-count");
+        if (badge) {
+          badge.textContent = String(data.cart_count ?? 0);
+        } else if ((data.cart_count ?? 0) > 0) {
+          const cartLink = document.querySelector(".nav-cart-btn");
+          if (cartLink) {
+            const newBadge = document.createElement("span");
+            newBadge.id = "cart-item-count";
+            newBadge.className = "nav-cart-badge";
+            newBadge.textContent = String(data.cart_count);
+            cartLink.appendChild(newBadge);
+          }
+        }
+
+        if (window.ClassiaToast) {
+          window.ClassiaToast[data.already_exists ? "info" : "success"]({ title: data.message });
+        }
+        button.textContent = data.already_exists ? "Ya está en el carrito" : "Agregado al carrito";
+      } catch (error) {
+        console.error("Error al agregar el curso al carrito:", error);
+        if (window.ClassiaToast) {
+          window.ClassiaToast.error({ title: error.message || "No se pudo agregar el curso al carrito." });
+        }
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
 });
 
 /**

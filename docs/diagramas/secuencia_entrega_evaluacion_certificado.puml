@@ -1,0 +1,81 @@
+@startuml secuencia_entrega_evaluacion_certificado
+!theme plain
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing true
+skinparam roundcorner 8
+skinparam defaultFontName 'Segoe UI', 'Helvetica', 'Arial', sans-serif
+skinparam defaultFontSize 11
+skinparam defaultFontColor #2D3748
+
+skinparam sequence {
+    ActorBorderColor #2B6CB0
+    ActorBackgroundColor #EBF8FF
+    ParticipantBorderColor #2B6CB0
+    ParticipantBackgroundColor #EBF8FF
+    LifeLineBorderColor #4A5568
+    LifeLineBackgroundColor #EDF2F7
+    ArrowColor #2B6CB0
+}
+
+title Diagrama de Secuencia: Entrega de Tareas, Calificación y Emisión de Certificado (Sprint 4)
+
+autonumber
+
+actor "Estudiante" as Estudiante
+boundary "Vista: curso.php" as ViewCurso
+control "php/cursos/procesar_entrega.php" as C_Entrega
+actor "Docente" as Docente
+boundary "Vista: panel-proveedor.php" as ViewDocente
+control "php/cursos/calificar_entrega.php" as C_Calif
+control "php/certificados/CursoProgresoRepository.php" as C_Prog
+entity "Base de Datos (MySQL)" as DB
+boundary "Vista: verificar-certificado.php" as ViewCert
+
+== 1. Envío de Entrega por el Alumno ==
+Estudiante -> ViewCurso: Selecciona recurso tipo "Tarea" y adjunta archivo / texto
+ViewCurso -> C_Entrega: POST (id_tarea, archivo, texto_entrega, CSRF)
+activate C_Entrega
+
+C_Entrega -> C_Entrega: Valida tamaño, formato y token CSRF
+C_Entrega -> DB: INSERT INTO curso_entregas (id_tarea, id_usuario, estado='Entregada')
+C_Entrega -> DB: INSERT INTO curso_entrega_archivos (...)
+C_Entrega -> DB: INSERT INTO notificaciones (id_usuario=docente, 'Nueva entrega recibida')
+DB --> C_Entrega: OK
+C_Entrega --> ViewCurso: Confirmación visual de entrega registrada
+deactivate C_Entrega
+
+== 2. Calificación y Feedback por el Docente ==
+Docente -> ViewDocente: Accede a entregas pendientes de su curso
+ViewDocente -> DB: SELECT * FROM curso_entregas WHERE id_docente=...
+DB --> ViewDocente: Lista de entregas
+
+Docente -> ViewDocente: Asigna nota (95) y escribe feedback pedagógico
+ViewDocente -> C_Calif: POST (id_entrega, calificacion, feedback)
+activate C_Calif
+
+C_Calif -> DB: UPDATE curso_entregas SET calificacion='95', feedback_docente=..., estado='Calificada'
+C_Calif -> DB: INSERT INTO notificaciones (id_usuario=alumno, 'Tarea calificada')
+
+== 3. Cálculo de Progreso y Certificación Automática ==
+C_Calif -> C_Prog: verificarAprobacion(id_usuario, id_curso)
+activate C_Prog
+C_Prog -> DB: Consulta entregas aprobadas vs total tareas y recursos completados
+DB --> C_Prog: porcentaje_progreso = 100% (min_aprobacion = 70%)
+
+alt Cumple porcentaje mínimo de aprobación
+    C_Prog -> C_Prog: Genera código único hash (ej: CERT-PHP-2026-JP6)
+    C_Prog -> DB: INSERT INTO certificados (id_usuario, id_curso, codigo_verificacion, porcentaje_aprobacion=95.0)
+    C_Prog -> DB: INSERT INTO notificaciones (id_usuario=alumno, '¡Felicitaciones! Certificado emitido')
+end
+deactivate C_Prog
+
+C_Calif --> ViewDocente: Notificación de calificación registrada
+deactivate C_Calif
+
+== 4. Descarga y Verificación Pública ==
+Estudiante -> ViewCert: Accede con código de verificación
+ViewCert -> DB: SELECT * FROM certificados WHERE codigo_verificacion='CERT-PHP-2026-JP6'
+DB --> ViewCert: Datos del alumno, curso, nota y fecha de emisión
+ViewCert --> Estudiante: Muestra certificado oficial validado
+@enduml

@@ -24,7 +24,7 @@ if (isset($_GET['2fa_desactivado'])) {
 include '../includes/header.php';
 ?>
 
-  <main id="main-content" class="motion-entry">
+  <main id="main-content" class="motion-entry profile-page">
     <?php if (!empty($mensaje_acceso)): ?>
       <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($mensaje_acceso); ?>
@@ -69,7 +69,6 @@ include '../includes/header.php';
         </div>
 
         <div class="profile-hero-text">
-          <p class="profile-greeting">Bienvenido/a,</p>
           <h1 id="perfil-usuario"><?php echo htmlspecialchars($userData['nombre'] . ' ' . ($userData['apellido'] ?? '')); ?></h1>
           <p>Perfil de Usuario (<?php echo htmlspecialchars($rol_actual); ?>) · <strong><?php echo htmlspecialchars($userData['email']); ?></strong></p>
           <p>
@@ -81,14 +80,13 @@ include '../includes/header.php';
     </section>
 
     <nav class="profile-tabs" aria-label="Secciones de la cuenta">
-      <button type="button" class="active">Perfil</button>
-      <button type="button">Mis Cursos Comprados</button>
-      <button type="button">Mis Servicios Contratados</button>
-      <button type="button">Certificados</button>
-      <button type="button">Estadísticas</button>
+      <a href="#perfil">Perfil</a>
+      <a href="#cursos-inscriptos">Mis Cursos Comprados</a>
+      <a href="#servicios-contratados">Mis Servicios Contratados</a>
+      <a href="#certificados">Certificados</a>
     </nav>
 
-    <section class="account-section" aria-labelledby="informacion-cuenta">
+    <section id="perfil" class="account-section profile-tab-panel" aria-labelledby="informacion-cuenta">
       <h2 id="informacion-cuenta">Información básica de la cuenta</h2>
       <p>
         <label for="nombre-cuenta">Nombre:</label><br />
@@ -148,10 +146,8 @@ include '../includes/header.php';
       </div>
     </section>
 
-    <hr />
-
-    <section class="account-section" aria-labelledby="cursos-inscriptos">
-      <h2 id="cursos-inscriptos">Mis cursos contratados</h2>
+    <section id="cursos-inscriptos" class="account-section profile-tab-panel" aria-labelledby="titulo-cursos-inscriptos" hidden>
+      <h2 id="titulo-cursos-inscriptos">Mis cursos contratados</h2>
       <?php if (empty($cursos_contratados)): ?>
         <p>Aún no estás inscripto en ningún curso.</p>
         <p><a class="btn" href="catalogo.php?tipo=curso">Ver catálogo de cursos</a></p>
@@ -195,10 +191,8 @@ include '../includes/header.php';
       <?php endif; ?>
     </section>
 
-    <hr />
-
-    <section class="account-section" aria-labelledby="servicios-contratados">
-      <h2 id="servicios-contratados">Mis servicios contratados</h2>
+    <section id="servicios-contratados" class="account-section profile-tab-panel" aria-labelledby="titulo-servicios-contratados" hidden>
+      <h2 id="titulo-servicios-contratados">Mis servicios contratados</h2>
       <?php if (empty($servicios_contratados)): ?>
         <p>No tenés servicios solicitados a proveedores en este momento.</p>
         <p><a class="btn" href="catalogo.php?tipo=servicio">Contratar nuevo servicio</a></p>
@@ -228,18 +222,31 @@ include '../includes/header.php';
       <?php endif; ?>
     </section>
 
-    <hr />
-
-    <section class="account-section" aria-labelledby="certificados">
-      <h2 id="certificados">Mis certificados</h2>
-      <p>Certificados disponibles según tus cursos finalizados.</p>
-    </section>
-
-    <hr />
-
-    <section class="account-section" aria-labelledby="estadisticas">
-      <h2 id="estadisticas">Estadísticas</h2>
-      <p>Resumen de aprendizaje e historial de participación en la plataforma.</p>
+    <section id="certificados" class="account-section profile-tab-panel" aria-labelledby="titulo-certificados" hidden>
+      <h2 id="titulo-certificados">Mis certificados</h2>
+      <p>Certificados disponibles de cursos completados y aprobados.</p>
+      <?php if (empty($certificados_disponibles)): ?>
+        <p class="text-muted">Todavía no tenés certificados disponibles. Cuando completes y apruebes un curso, podrás descargarlo desde aquí.</p>
+      <?php else: ?>
+        <div class="profile-certificates-grid">
+          <?php foreach ($certificados_disponibles as $certificadoDisponible): ?>
+            <?php
+              $cursoCertificado = $certificadoDisponible['curso'];
+              $progresoCertificado = $certificadoDisponible['progreso'];
+              $porcentajeAcademico = rtrim(rtrim(number_format((float)($progresoCertificado['porcentaje_academico'] ?? 0), 2, '.', ''), '0'), '.');
+            ?>
+            <article class="profile-certificate-card">
+              <div class="profile-certificate-icon" aria-hidden="true">✓</div>
+              <div class="profile-certificate-content">
+                <h3><?php echo htmlspecialchars($cursoCertificado['titulo'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                <p><span class="badge badge-success-soft">Certificado disponible</span></p>
+                <p class="text-muted">Aprobación académica: <?php echo htmlspecialchars($porcentajeAcademico); ?>%</p>
+                <a class="btn btn-sm btn-primary-action" href="../php/certificados/descargar.php?id_curso=<?php echo (int)$cursoCertificado['id_publicacion']; ?>">Descargar certificado</a>
+              </div>
+            </article>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </section>
   </main>
 

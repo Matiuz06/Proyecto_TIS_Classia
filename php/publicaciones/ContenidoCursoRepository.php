@@ -267,10 +267,21 @@ class ContenidoCursoRepository
         return $q->fetch() ?: null;
     }
 
-    public function crearMensajeForo(int $id_recurso, int $id_usuario, string $mensaje): void
+    public function crearMensajeForo(int $id_recurso, int $id_usuario, string $mensaje): int
     {
-        $q = $this->pdo->prepare('INSERT INTO curso_foro_mensajes (id_recurso, id_usuario, mensaje) VALUES (:r, :u, :m)');
+        $returning = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+        $sql = 'INSERT INTO curso_foro_mensajes (id_recurso, id_usuario, mensaje) VALUES (:r, :u, :m)';
+        if ($returning) $sql .= ' RETURNING id_mensaje';
+        $q = $this->pdo->prepare($sql);
         $q->execute(['r' => $id_recurso, 'u' => $id_usuario, 'm' => $mensaje]);
+        return $returning ? (int)$q->fetchColumn() : (int)$this->pdo->lastInsertId();
+    }
+
+    public function obtenerEstudiantesInscritos(int $id_publicacion): array
+    {
+        $q = $this->pdo->prepare("\n            SELECT DISTINCT c.id_usuario\n            FROM contrataciones c\n            JOIN pagos pag ON pag.id_contratacion = c.id_contratacion\n                AND pag.estado_pago = 'Aprobado'\n            JOIN detalles_contratacion dc ON dc.id_contratacion = c.id_contratacion\n            WHERE c.id_usuario IS NOT NULL\n              AND c.estado IN ('Completada', 'En Proceso')\n              AND dc.id_publicacion = :p\n        ");
+        $q->execute(['p' => $id_publicacion]);
+        return array_map('intval', $q->fetchAll(PDO::FETCH_COLUMN));
     }
 
     public function listarMensajesForoPorCurso(int $id_publicacion): array
