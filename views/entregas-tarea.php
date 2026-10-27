@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Bandeja docente para visualización, filtrado y resumen de entregas de una tarea.
+ */
+
 require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');
 require_once '../php/publicaciones/contenido_curso.php';

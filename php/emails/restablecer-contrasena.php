@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Plantilla de correo con enlace temporal para restablecer la contraseña.
+ */
+
 $enlace = htmlspecialchars((string) ($enlace ?? ''), ENT_QUOTES, 'UTF-8');
 $contenido = '<p>Recibimos una solicitud para restablecer tu contraseña.</p>'
     . '<p><a href="' . $enlace . '" style="display:inline-block;padding:12px 18px;background:#146c94;color:#ffffff;text-decoration:none;border-radius:8px">Restablecer contraseña</a></p>'

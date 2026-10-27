@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Plantilla de correo informativo tras la desestimación o rechazo de la solicitud docente.
+ */
+
 $nombre = htmlspecialchars((string) ($nombre ?? 'usuario'), ENT_QUOTES, 'UTF-8');
 $motivo = trim((string) ($motivo ?? ''));
 $enlace = htmlspecialchars((string) ($enlace ?? ''), ENT_QUOTES, 'UTF-8');

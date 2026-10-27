@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Responsabilidad: Vista de error 404 (Página o recurso no encontrado en el servidor).
+ */
+
 http_response_code(404);
 
 $title = 'Pagina no encontrada';

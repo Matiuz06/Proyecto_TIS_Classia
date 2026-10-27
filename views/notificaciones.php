@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Historial y centro de notificaciones de la cuenta del usuario.
+ */
+
 require_once __DIR__ . '/../php/auth/sesion.php';
 iniciar_sesion();
 

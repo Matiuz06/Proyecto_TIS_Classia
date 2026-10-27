@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Confirmación de orden de compra y visualización del estado de pago (Mercado Pago).
+ */
+
 require_once '../php/contrataciones/confirmacion.php';
 
 $title = 'Confirmación de compra - Classia';

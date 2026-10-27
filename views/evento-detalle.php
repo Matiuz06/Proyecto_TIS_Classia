@@ -2,42 +2,54 @@
 
 /**
  * Responsabilidad: Detalle informativo, fecha, modalidad y agenda de un evento.
+ *
+ * Funcionalidades:
+ * - Valida la existencia del evento y controla permisos de visualización.
+ * - Procesa acciones de moderación (aprobar, rechazar, eliminar) con protección CSRF.
+ * - Calcula y formatea fechas, cupos, enlaces a Google Calendar y opciones para compartir.
+ * - Renderiza la vista con diseño accesible, alertas dinámicas y panel de administración contextual.
  */
 
+// Dependencias de autenticación, control de roles, conexión a base de datos y lógica de eventos
 require_once __DIR__ . '/../php/auth/sesion.php';
 require_once __DIR__ . '/../php/auth/roles.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../php/eventos/gestionar_eventos.php';
 
+// Inicialización de la sesión del usuario
 iniciar_sesion();
 
+// Validación del identificador numérico de evento recibido por parámetro GET
 $id_evento = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id_evento || $id_evento <= 0) {
     header('Location: eventos.php');
     exit;
 }
 
+// Obtención de la información del evento desde la base de datos
 $evento = obtener_evento_por_id($pdo, $id_evento);
 if (!$evento) {
     header('Location: eventos.php');
     exit;
 }
 
+// Identificación del usuario en sesión y verificación de privilegios
 $usuario = usuario_actual();
 $esAdmin = es_admin();
 $esDocente = es_docente();
 $idUsuarioActual = $usuario ? (int)$usuario['id_usuario'] : 0;
 
-// Si el evento está pendiente y el usuario no es admin ni el docente creador, redirigir
+// Regla de acceso: si el evento está en revisión (Pendiente), solo administradores o su docente autor pueden verlo
 if ($evento['estado'] === 'Pendiente' && !$esAdmin && ($evento['id_usuario'] === null || (int)$evento['id_usuario'] !== $idUsuarioActual)) {
     header('Location: eventos.php');
     exit;
 }
 
+// Variables para mensajes de retroalimentación al usuario
 $msg = '';
 $tipo_msg = 'info';
 
-// Procesamiento de acciones de moderación (Aprobar, Rechazar, Eliminar)
+// Procesamiento de acciones de moderación (Aprobar, Rechazar, Eliminar) mediante método POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
     if (hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
@@ -60,25 +72,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Construcción de la URL canónica actual para compartir
 $urlActual = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+// Normalización de la ruta de la imagen con fallback a imagen por defecto
 $imgSrc = htmlspecialchars($evento['imagen'] ?: 'assets/images/event_webinar.jpg');
 if (strpos($imgSrc, 'http') !== 0 && strpos($imgSrc, '..') !== 0) {
     $imgSrc = '../' . ltrim($imgSrc, '/');
 }
 
+// Formateo legible de la fecha y hora del evento
 $fechaObj = new DateTime($evento['fecha_evento']);
 $fechaFormateada = $fechaObj->format('d/m/Y \a \l\a\s H:i') . ' hs';
 
-// Fechas para Google Calendar (formato YYYYMMDDTHHMMSSZ)
+// Cálculo de fechas de inicio y finalización (+2 horas estimadas) en formato ISO para Google Calendar
 $fechaCalInicio = $fechaObj->format('Ymd\THis');
 $fechaFinObj = clone $fechaObj;
 $fechaFinObj->modify('+2 hours');
 $fechaCalFin = $fechaFinObj->format('Ymd\THis');
 
+// Enlaces codificados para compartir en redes sociales y agregar a calendario
 $shareText = urlencode('¡Te invito al evento "' . $evento['titulo'] . '" en Classia! ' . $fechaFormateada);
 $shareUrl = urlencode($urlActual);
 $gCalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" . urlencode($evento['titulo']) . "&dates={$fechaCalInicio}/{$fechaCalFin}&details=" . urlencode($evento['descripcion']) . "&location=" . urlencode($evento['ubicacion_enlace'] ?? '');
 
+// Configuración de metadatos de cabecera e inclusión del encabezado común
 $title       = htmlspecialchars($evento['titulo']) . ' — Eventos Classia';
 $description = htmlspecialchars(substr(strip_tags($evento['descripcion']), 0, 150));
 $cssPrefix   = '..';
@@ -88,6 +106,7 @@ include '../includes/header.php';
 ?>
 
   <main id="main-content" class="events-page-container motion-entry">
+    <!-- Migas de pan para navegación contextual -->
     <nav aria-label="Ruta de navegación" class="breadcrumb u-mb-4">
       <ol class="breadcrumb__list">
         <li><a href="../index.php">Inicio</a> /</li>
@@ -96,12 +115,14 @@ include '../includes/header.php';
       </ol>
     </nav>
 
+    <!-- Alertas de estado y resultado de acciones del usuario -->
     <?php if ($msg !== ''): ?>
       <div class="alert alert-<?= $tipo_msg ?> u-mb-4">
         <?= htmlspecialchars($msg) ?>
       </div>
     <?php endif; ?>
 
+    <!-- Aviso visible si el evento se encuentra en estado de revisión -->
     <?php if ($evento['estado'] === 'Pendiente'): ?>
       <div class="alert alert-warning u-mb-4">
         <strong>Evento en revisión:</strong> Este evento está pendiente de aprobación por el equipo de administración antes de mostrarse en la agenda pública.
