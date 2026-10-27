@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Plantilla de correo para verificación de dirección de correo electrónico con enlace temporal.
+ */
+
 $nombre = htmlspecialchars((string) ($nombre ?? 'usuario'), ENT_QUOTES, 'UTF-8');
 $enlace = htmlspecialchars((string) ($enlace ?? ''), ENT_QUOTES, 'UTF-8');
 $email = htmlspecialchars((string) ($email ?? ''), ENT_QUOTES, 'UTF-8');

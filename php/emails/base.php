@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Plantilla HTML base y contenedor corporativo para correos electrónicos transaccionales.
+ */
+
 $titulo = htmlspecialchars((string) ($titulo ?? 'Classia'), ENT_QUOTES, 'UTF-8');
 $contenido = (string) ($contenido ?? '');
 ?>

@@ -4,6 +4,12 @@
  * Responsabilidad: Define reglas reutilizables para validar fortaleza de contraseñas.
  */
 
+/**
+ * Valida la robustez de una contraseña según los estándares de seguridad de la plataforma.
+ *
+ * @param string $contrasena Contraseña en texto plano a validar.
+ * @return array Lista de errores encontrados (vacío si cumple con todas las reglas).
+ */
 function validar_contrasena(string $contrasena): array
 {
     $errores = [];

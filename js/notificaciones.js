@@ -1,3 +1,6 @@
+/**
+ * Responsabilidad: Cliente de API y componente de interfaz para notificaciones en tiempo real en la barra de navegación.
+ */
 (function () {
   'use strict';
 
