@@ -1,4 +1,8 @@
-<?php   
+<?php
+
+/**
+ * Responsabilidad: Calificación y retroalimentación docente sobre la entrega de una tarea estudiantil.
+ */
 
 require_once '../php/auth/roles.php';
 requerir_cualquier_rol([ROL_DOCENTE, ROL_ADMIN], 'usuario.php');

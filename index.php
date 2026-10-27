@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * Responsabilidad: Página de inicio principal de Classia (Landing page, propuesta de valor y destacados).
+ *
+ * Funcionalidades:
+ * - Carga datos destacados para la página de inicio (cursos, novedades, estadísticas).
+ * - Adapta las llamadas a la acción (CTA) según el estado de autenticación del usuario.
+ * - Soporte de internacionalización con traducciones __t().
+ */
+
 $title       = 'Classia — Plataforma Educativa y Servicios';
 $description = 'Classia conecta aprendizaje, cursos prácticos, servicios y administración en una plataforma educativa moderna.';
 $cssPrefix   = '.';
@@ -6,6 +16,7 @@ $jsPrefix    = '.';
 $bodyClass   = 'home-page';
 $activePage  = 'inicio';
 
+// Carga de publicaciones destacadas, testimonios y métricas de la portada
 require_once 'php/inicio/obtener_datos_home.php';
 include 'includes/header.php';
 ?>

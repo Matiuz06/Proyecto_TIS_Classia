@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Responsabilidad: Plantilla de correo informativo tras la aprobación de la solicitud de rol docente.
+ */
+
 $nombre = htmlspecialchars((string) ($nombre ?? 'usuario'), ENT_QUOTES, 'UTF-8');
 $enlace = htmlspecialchars((string) ($enlace ?? ''), ENT_QUOTES, 'UTF-8');
 $contenido = '<p>Hola ' . $nombre . ',</p>'

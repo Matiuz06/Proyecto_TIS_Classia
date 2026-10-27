@@ -1,3 +1,6 @@
+/**
+ * Responsabilidad: Paginación, filtrado y renderizado del historial completo de notificaciones en views/notificaciones.php.
+ */
 (function () {
   'use strict';
 
