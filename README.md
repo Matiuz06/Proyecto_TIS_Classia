@@ -6,6 +6,10 @@ La propuesta centraliza en un único entorno digital a diferentes actores, recur
 
 ---
 
+## Pantalla principal
+<img width="800" height="421" alt="1794402912515" src="https://github.com/user-attachments/assets/d794e308-d850-44d2-98ae-18a3d9668a4e" />
+
+---
 ## Objetivo del proyecto
 
 El objetivo principal de Classia es construir un Entorno Virtual de Aprendizaje (EVA) y catálogo de servicios educativos capaz de gestionar de forma integral el ciclo formativo y comercial:
